@@ -1,10 +1,8 @@
-package requestlimit
+package api
 
 import (
 	"k8s.io/kubernetes/pkg/api/unversioned"
 	"k8s.io/kubernetes/pkg/runtime"
-
-	_ "github.com/openshift/origin/pkg/project/admission/requestlimit/latest"
 )
 
 const GroupName = ""
