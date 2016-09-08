@@ -30,18 +30,10 @@ type REST struct {
 // a statusREST containing the REST storage for changing the status of a DeploymentConfig,
 // and a scaleREST containing the REST storage for the Scale subresources of DeploymentConfigs.
 func NewREST(optsGetter restoptions.Getter, rcNamespacer kclient.ReplicationControllersNamespacer) (*REST, *StatusREST, *ScaleREST, error) {
-	prefix := "/deploymentconfigs"
-
 	store := &registry.Store{
 		NewFunc:           func() runtime.Object { return &api.DeploymentConfig{} },
 		NewListFunc:       func() runtime.Object { return &api.DeploymentConfigList{} },
 		QualifiedResource: api.Resource("deploymentconfigs"),
-		KeyRootFunc: func(ctx kapi.Context) string {
-			return registry.NamespaceKeyRootFunc(ctx, prefix)
-		},
-		KeyFunc: func(ctx kapi.Context, id string) (string, error) {
-			return registry.NamespaceKeyFunc(ctx, prefix, id)
-		},
 		ObjectNameFunc: func(obj runtime.Object) (string, error) {
 			return obj.(*api.DeploymentConfig).Name, nil
 		},
@@ -54,7 +46,7 @@ func NewREST(optsGetter restoptions.Getter, rcNamespacer kclient.ReplicationCont
 		ReturnDeletedObject: false,
 	}
 
-	if err := restoptions.ApplyOptions(optsGetter, store, prefix, storage.NoTriggerPublisher); err != nil {
+	if err := restoptions.ApplyOptions(optsGetter, store, true, storage.NoTriggerPublisher); err != nil {
 		return nil, nil, nil, err
 	}
 
