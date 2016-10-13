@@ -182,6 +182,34 @@ func TestValidateRoute(t *testing.T) {
 			expectedErrors: 1,
 		},
 		{
+			name: "Wildcard host",
+			route: &api.Route{
+				ObjectMeta: kapi.ObjectMeta{
+					Name:      "name",
+					Namespace: "aceswild",
+				},
+				Spec: api.RouteSpec{
+					Host: "*.aceswild.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Invalid Wildcard host",
+			route: &api.Route{
+				ObjectMeta: kapi.ObjectMeta{
+					Name:      "name",
+					Namespace: "wildly",
+				},
+				Spec: api.RouteSpec{
+					Host: "*.not.*.wild.ly",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 1,
+		},
+		{
 			name: "No service name",
 			route: &api.Route{
 				ObjectMeta: kapi.ObjectMeta{
@@ -998,80 +1026,145 @@ func TestExtendedValidateRoute(t *testing.T) {
 	}
 }
 
-// TestValidateHostName checks that a route's host name matches DNS requirements.
-func TestValidateHostName(t *testing.T) {
+func TestValidateRouteWildcard(t *testing.T) {
 	tests := []struct {
-		name           string
-		route          *api.Route
-		expectedErrors bool
+		name             string
+		route            *api.Route
+		errorExpectation bool
 	}{
 		{
-			name: "valid-host-name",
+			name: "No Name",
 			route: &api.Route{
+				ObjectMeta: kapi.ObjectMeta{
+					Namespace: "foo",
+				},
 				Spec: api.RouteSpec{
-					Host: "www.example.test",
+					Host: "host",
+					To:   createRouteSpecTo("serviceName", "Service"),
 				},
 			},
-			expectedErrors: false,
+			errorExpectation: false,
 		},
 		{
-			name: "invalid-host-name",
+			name: "Named host",
 			route: &api.Route{
+				ObjectMeta: kapi.ObjectMeta{
+					Name: "named",
+				},
 				Spec: api.RouteSpec{
-					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-1234567890-1234567890-1234567890.example.test",
+					Host: "www.name.test",
+					To:   createRouteSpecTo("serviceName", "Service"),
 				},
 			},
-			expectedErrors: true,
+			errorExpectation: false,
 		},
 		{
-			name: "valid-host-63-chars-label",
+			name: "aceswild",
 			route: &api.Route{
+				ObjectMeta: kapi.ObjectMeta{
+					Name: "aceswild",
+				},
 				Spec: api.RouteSpec{
-					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-1234.example.test",
+					Host: "*.aceswild.test",
+					To:   createRouteSpecTo("serviceName", "Service"),
 				},
 			},
-			expectedErrors: false,
+			errorExpectation: false,
 		},
 		{
-			name: "invalid-host-64-chars-label",
+			name: "another wild",
 			route: &api.Route{
+				ObjectMeta: kapi.ObjectMeta{
+					Name: "anotherwild",
+				},
 				Spec: api.RouteSpec{
-					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-12345.example.test",
+					Host: "*.where.the.wild.things.ar",
+					To:   createRouteSpecTo("serviceName", "Service"),
 				},
 			},
-			expectedErrors: true,
+			errorExpectation: false,
 		},
 		{
-			name: "valid-name-253-chars",
+			name: "Invalid host",
 			route: &api.Route{
+				ObjectMeta: kapi.ObjectMeta{
+					Name:      "invalid",
+					Namespace: "foo",
+				},
 				Spec: api.RouteSpec{
-					Host: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s12345678.example.test",
+					Host: "aces.*.test",
+					To:   createRouteSpecTo("serviceName", "Service"),
 				},
 			},
-			expectedErrors: false,
+			errorExpectation: true,
 		},
 		{
-			name: "invalid-name-279-chars",
+			name: "Bad wildcard host",
 			route: &api.Route{
+				ObjectMeta: kapi.ObjectMeta{
+					Name:      "badwildcard",
+					Namespace: "foo",
+				},
 				Spec: api.RouteSpec{
-					Host: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s1234567890.t1234567890.u1234567890.example.test",
+					Host: "*.aces.*.test",
+					To:   createRouteSpecTo("serviceName", "Service"),
 				},
 			},
-			expectedErrors: true,
+			errorExpectation: true,
+		},
+		{
+			name: "Another bad wildcard host",
+			route: &api.Route{
+				ObjectMeta: kapi.ObjectMeta{
+					Name:      "badwildcard2",
+					Namespace: "foo",
+				},
+				Spec: api.RouteSpec{
+					Host: "*aces.wild.test",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			errorExpectation: true,
+		},
+		{
+			name: "Yet another bad wildcard host",
+			route: &api.Route{
+				ObjectMeta: kapi.ObjectMeta{
+					Name:      "badwildcard3",
+					Namespace: "foo",
+				},
+				Spec: api.RouteSpec{
+					Host: "aces*.wild.test",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			errorExpectation: true,
+		},
+		{
+			name: "And one more bad wildcard host",
+			route: &api.Route{
+				ObjectMeta: kapi.ObjectMeta{
+					Name:      "badwildcard4",
+					Namespace: "foo",
+				},
+				Spec: api.RouteSpec{
+					Host: "a*es.wild.test",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			errorExpectation: true,
 		},
 	}
 
 	for _, tc := range tests {
-		errs := ValidateHostName(tc.route)
+		errs := ValidateRoute(tc.route)
 
-		if tc.expectedErrors {
-			if len(errs) < 1 {
-				t.Errorf("Test case %s expected errors, got none.", tc.name)
+		if tc.errorExpectation {
+			if len(errs) == 0 {
+				t.Errorf("Test case %s expected error(s), got none.", tc.name)
 			}
-		} else {
-			if len(errs) > 0 {
-				t.Errorf("Test case %s expected no errors, got %d. %v", tc.name, len(errs), errs)
-			}
+		} else if len(errs) > 1 {
+			t.Errorf("Test case %s expected no error(s), got %d: %v", tc.name, len(errs), errs)
 		}
 	}
 }
