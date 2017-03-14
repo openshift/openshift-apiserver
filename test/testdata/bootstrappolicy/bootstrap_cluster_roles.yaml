@@ -2771,6 +2771,7 @@ items:
     verbs:
     - update
   - apiGroups:
+    - build.openshift.io
     - ""
     attributeRestrictions: null
     resources:
