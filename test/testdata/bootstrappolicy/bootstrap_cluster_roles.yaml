@@ -3597,15 +3597,6 @@ items:
     - ""
     attributeRestrictions: null
     resources:
-    - pods
-    verbs:
-    - get
-    - list
-    - watch
-  - apiGroups:
-    - ""
-    attributeRestrictions: null
-    resources:
     - replicationcontrollers
     verbs:
     - create
