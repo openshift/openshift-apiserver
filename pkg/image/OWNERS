@@ -1,16 +1,15 @@
 reviewers:
   - smarterclayton
-  - deads2k
-  - liggitt
-  - bparees
-  - mfojtik
-  - stevekuznetsov
   - ncdc
-  - kargakis
+  - deads2k
   - soltysh
+  - miminar
+  - mfojtik
+  - liggitt
+  - legionus
 approvers:
   - smarterclayton
   - deads2k
-  - liggitt
-  - bparees
+  - soltysh
   - mfojtik
+  - liggitt
