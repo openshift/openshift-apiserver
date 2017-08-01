@@ -871,7 +871,6 @@ items:
     resources:
     - deploymentconfigs
     - deploymentconfigs/scale
-    - generatedeploymentconfigs
     verbs:
     - create
     - delete
@@ -1271,7 +1270,6 @@ items:
     resources:
     - deploymentconfigs
     - deploymentconfigs/scale
-    - generatedeploymentconfigs
     verbs:
     - create
     - delete
