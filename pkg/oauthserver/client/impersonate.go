@@ -11,8 +11,8 @@ import (
 	"k8s.io/client-go/util/flowcontrol"
 	kclientset "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
 
-	authenticationapi "github.com/openshift/origin/pkg/auth/api"
 	authorizationapi "github.com/openshift/origin/pkg/authorization/apis/authorization"
+	authenticationapi "github.com/openshift/origin/pkg/oauthserver/api"
 )
 
 type impersonatingRoundTripper struct {
