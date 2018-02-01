@@ -5,24 +5,24 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
-	"github.com/openshift/origin/pkg/project/admission/requestlimit/api"
+	"github.com/openshift/origin/pkg/project/admission/apis/requestlimit"
 )
 
 func TestValidateProjectRequestLimitConfig(t *testing.T) {
 	tests := []struct {
-		config      api.ProjectRequestLimitConfig
+		config      requestlimit.ProjectRequestLimitConfig
 		errExpected bool
 		errType     field.ErrorType
 		errField    string
 	}{
 		// 0: empty config
 		{
-			config: api.ProjectRequestLimitConfig{},
+			config: requestlimit.ProjectRequestLimitConfig{},
 		},
 		// 1: single default
 		{
-			config: api.ProjectRequestLimitConfig{
-				Limits: []api.ProjectLimitBySelector{
+			config: requestlimit.ProjectRequestLimitConfig{
+				Limits: []requestlimit.ProjectLimitBySelector{
 					{
 						Selector:    nil,
 						MaxProjects: intp(1),
@@ -32,8 +32,8 @@ func TestValidateProjectRequestLimitConfig(t *testing.T) {
 		},
 		// 2: multiple limits
 		{
-			config: api.ProjectRequestLimitConfig{
-				Limits: []api.ProjectLimitBySelector{
+			config: requestlimit.ProjectRequestLimitConfig{
+				Limits: []requestlimit.ProjectLimitBySelector{
 					{
 						Selector:    map[string]string{"foo": "bar", "foo2": "baz"},
 						MaxProjects: intp(10),
@@ -47,8 +47,8 @@ func TestValidateProjectRequestLimitConfig(t *testing.T) {
 		},
 		// 3: negative limit (error)
 		{
-			config: api.ProjectRequestLimitConfig{
-				Limits: []api.ProjectLimitBySelector{
+			config: requestlimit.ProjectRequestLimitConfig{
+				Limits: []requestlimit.ProjectLimitBySelector{
 					{
 						Selector:    map[string]string{"foo": "bar", "foo2": "baz"},
 						MaxProjects: intp(10),
@@ -65,8 +65,8 @@ func TestValidateProjectRequestLimitConfig(t *testing.T) {
 		},
 		// 4: invalid selector label (error)
 		{
-			config: api.ProjectRequestLimitConfig{
-				Limits: []api.ProjectLimitBySelector{
+			config: requestlimit.ProjectRequestLimitConfig{
+				Limits: []requestlimit.ProjectLimitBySelector{
 					{
 						Selector:    map[string]string{"foo": "bar", "foo2": "baz"},
 						MaxProjects: intp(10),

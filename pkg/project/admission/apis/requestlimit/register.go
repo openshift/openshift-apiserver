@@ -1,4 +1,4 @@
-package api
+package requestlimit
 
 import (
 	"k8s.io/apimachinery/pkg/runtime"
