@@ -21,7 +21,6 @@ import (
 	configapilatest "github.com/openshift/origin/pkg/cmd/server/apis/config/latest"
 	imageadmission "github.com/openshift/origin/pkg/image/admission"
 	imagepolicy "github.com/openshift/origin/pkg/image/admission/apis/imagepolicy"
-	imagequalify "github.com/openshift/origin/pkg/image/admission/apis/imagequalify"
 	ingressadmission "github.com/openshift/origin/pkg/ingress/admission"
 	overrideapi "github.com/openshift/origin/pkg/quota/admission/apis/clusterresourceoverride"
 	sccadmission "github.com/openshift/origin/pkg/security/admission"
@@ -77,7 +76,6 @@ var (
 		serviceadmit.ExternalIPPluginName,
 		serviceadmit.RestrictedEndpointsPluginName,
 		imagepolicy.PluginName,
-		imagequalify.PluginName,
 		"ImagePolicyWebhook",
 		"PodPreset",
 		"InitialResources",
@@ -136,7 +134,6 @@ var (
 		serviceadmit.ExternalIPPluginName,
 		serviceadmit.RestrictedEndpointsPluginName,
 		imagepolicy.PluginName,
-		imagequalify.PluginName,
 		"ImagePolicyWebhook",
 		"PodPreset",
 		"InitialResources",
