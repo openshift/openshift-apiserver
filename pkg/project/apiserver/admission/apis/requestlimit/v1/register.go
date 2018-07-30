@@ -1,10 +1,11 @@
 package v1
 
 import (
-	"github.com/openshift/origin/pkg/project/admission/apis/requestlimit"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	"github.com/openshift/origin/pkg/project/apiserver/admission/apis/requestlimit"
 )
 
 const (

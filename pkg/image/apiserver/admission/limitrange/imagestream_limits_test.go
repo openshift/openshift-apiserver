@@ -1,4 +1,4 @@
-package admission
+package limitrange
 
 import (
 	"strings"
@@ -8,8 +8,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 
-	imagetest "github.com/openshift/origin/pkg/image/admission/testutil"
 	imageapi "github.com/openshift/origin/pkg/image/apis/image"
+	imagetest "github.com/openshift/origin/pkg/image/util/testutil"
 	quotautil "github.com/openshift/origin/pkg/quota/util"
 )
 

@@ -3,9 +3,9 @@ package validation
 import (
 	"testing"
 
-	"k8s.io/apimachinery/pkg/util/validation/field"
+	"github.com/openshift/origin/pkg/project/apiserver/admission/apis/requestlimit"
 
-	"github.com/openshift/origin/pkg/project/admission/apis/requestlimit"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 func TestValidateProjectRequestLimitConfig(t *testing.T) {

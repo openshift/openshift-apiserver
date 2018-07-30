@@ -1,4 +1,4 @@
-package admission
+package limitrange
 
 import (
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"

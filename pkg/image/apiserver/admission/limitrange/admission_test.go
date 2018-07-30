@@ -1,4 +1,4 @@
-package admission
+package limitrange
 
 import (
 	"fmt"
@@ -17,8 +17,8 @@ import (
 
 	"github.com/openshift/api/image"
 	"github.com/openshift/origin/pkg/api/legacy"
-	"github.com/openshift/origin/pkg/image/admission/testutil"
 	imageapi "github.com/openshift/origin/pkg/image/apis/image"
+	"github.com/openshift/origin/pkg/image/util/testutil"
 )
 
 func TestAdmitImageStreamMapping(t *testing.T) {

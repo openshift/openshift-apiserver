@@ -18,9 +18,9 @@ import (
 	"github.com/openshift/origin/pkg/api/legacy"
 	oadmission "github.com/openshift/origin/pkg/cmd/server/admission"
 	configlatest "github.com/openshift/origin/pkg/cmd/server/apis/config/latest"
-	requestlimitapi "github.com/openshift/origin/pkg/project/admission/apis/requestlimit"
-	requestlimitapivalidation "github.com/openshift/origin/pkg/project/admission/apis/requestlimit/validation"
 	projectapi "github.com/openshift/origin/pkg/project/apis/project"
+	requestlimitapi "github.com/openshift/origin/pkg/project/apiserver/admission/apis/requestlimit"
+	requestlimitapivalidation "github.com/openshift/origin/pkg/project/apiserver/admission/apis/requestlimit/validation"
 	projectcache "github.com/openshift/origin/pkg/project/cache"
 	uservalidation "github.com/openshift/origin/pkg/user/apis/user/validation"
 )
