@@ -15,7 +15,7 @@ import (
 	buildv1 "github.com/openshift/api/build/v1"
 	"github.com/openshift/library-go/pkg/build/buildutil"
 	buildapi "github.com/openshift/origin/pkg/build/apis/build"
-	"github.com/openshift/origin/pkg/build/webhook"
+	"github.com/openshift/origin/pkg/build/apiserver/webhook"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 )
 

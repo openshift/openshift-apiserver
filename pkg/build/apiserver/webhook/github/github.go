@@ -13,7 +13,7 @@ import (
 
 	buildv1 "github.com/openshift/api/build/v1"
 	"github.com/openshift/library-go/pkg/build/buildutil"
-	"github.com/openshift/origin/pkg/build/webhook"
+	"github.com/openshift/origin/pkg/build/apiserver/webhook"
 )
 
 // WebHookPlugin used for processing github webhook requests.
