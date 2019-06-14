@@ -5,8 +5,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/authentication/serviceaccount"
 
-	securityv1 "github.com/openshift/api/security/v1"
+	securityapiv1 "github.com/openshift/api/security/v1"
 	"github.com/openshift/origin/pkg/cmd/openshift-kube-apiserver/admission/customresourcevalidation/securitycontextconstraints"
+	securityapi "github.com/openshift/origin/pkg/security/apis/security"
+	securityapiinstall "github.com/openshift/origin/pkg/security/apis/security/install"
 )
 
 const (
@@ -278,13 +280,18 @@ func GetBootstrapSecurityContextConstraints(sccNameToAdditionalGroups map[string
 		},
 	}
 
-	for i := range constraints {
-		securitycontextconstraints.SetDefaults_SCC(constraints[i])
+	constraints := []*securityapiv1.SecurityContextConstraints{}
+	// add default access
+	for i := range internalConstraints {
+		// round trip to external, apply defaults, to ensure we match what we compare against the server
+		v1constraint := &securityapiv1.SecurityContextConstraints{}
+		securitycontextconstraints.SetDefaults_SCC(v1constraint)
+		constraints = append(constraints, v1constraint)
 
-		if usersToAdd, ok := sccNameToAdditionalUsers[constraints[i].Name]; ok {
+		if usersToAdd, ok := sccNameToAdditionalUsers[v1constraint.Name]; ok {
 			constraints[i].Users = append(constraints[i].Users, usersToAdd...)
 		}
-		if groupsToAdd, ok := sccNameToAdditionalGroups[constraints[i].Name]; ok {
+		if groupsToAdd, ok := sccNameToAdditionalGroups[v1constraint.Name]; ok {
 			constraints[i].Groups = append(constraints[i].Groups, groupsToAdd...)
 		}
 	}
