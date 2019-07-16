@@ -39,7 +39,7 @@ var MissingValidationExceptions = []reflect.Type{
 
 func TestCoverage(t *testing.T) {
 	for kind, apiType := range legacyscheme.Scheme.KnownTypes(legacy.InternalGroupVersion) {
-		if strings.HasPrefix(apiType.PkgPath(), "github.com/openshift/origin/vendor/") {
+		if strings.HasPrefix(apiType.PkgPath(), "github.com/openshift/openshift-apiserver/vendor/") {
 			continue
 		}
 		if strings.HasSuffix(kind, "List") {
