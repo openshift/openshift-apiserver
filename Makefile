@@ -14,7 +14,7 @@ include $(addprefix ./vendor/github.com/openshift/library-go/alpha-build-machine
 # $2 - Dockerfile path
 # $3 - context directory for image build
 # It will generate target "image-$(1)" for builing the image an binding it as a prerequisite to target "images".
-$(call build-image,origin-$(GO_PACKAGE),./Dockerfile,.)
+$(call build-image,origin-$(GO_PACKAGE),./images/Dockerfile,.)
 
 clean:
 	$(RM) ./openshift-apiserver
