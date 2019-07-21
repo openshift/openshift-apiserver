@@ -90,13 +90,4 @@ var specialDefaultResourcePrefixes = map[schema.GroupResource]string{
 
 	{Resource: "identities"}:                             "useridentities",
 	{Resource: "identities", Group: "user.openshift.io"}: "useridentities",
-
-	{Resource: "clusternetworks"}:                                      "registry/sdnnetworks",
-	{Resource: "clusternetworks", Group: "network.openshift.io"}:       "registry/sdnnetworks",
-	{Resource: "egressnetworkpolicies"}:                                "registry/egressnetworkpolicy",
-	{Resource: "egressnetworkpolicies", Group: "network.openshift.io"}: "registry/egressnetworkpolicy",
-	{Resource: "hostsubnets"}:                                          "registry/sdnsubnets",
-	{Resource: "hostsubnets", Group: "network.openshift.io"}:           "registry/sdnsubnets",
-	{Resource: "netnamespaces"}:                                        "registry/sdnnetnamespaces",
-	{Resource: "netnamespaces", Group: "network.openshift.io"}:         "registry/sdnnetnamespaces",
 }
