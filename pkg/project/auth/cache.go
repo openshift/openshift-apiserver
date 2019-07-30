@@ -22,8 +22,8 @@ import (
 	rbacv1listers "k8s.io/client-go/listers/rbac/v1"
 	"k8s.io/client-go/tools/cache"
 
+	"github.com/openshift/apiserver-library-go/pkg/authorization/scope"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
-	"k8s.io/kubernetes/openshift-kube-apiserver/authorization/scope"
 )
 
 // Lister enforces ability to enumerate a resource based on role

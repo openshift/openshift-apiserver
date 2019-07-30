@@ -16,6 +16,7 @@ import (
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
 	"github.com/openshift/api/project"
+	"github.com/openshift/apiserver-library-go/pkg/authorization/scope"
 	"github.com/openshift/openshift-apiserver/pkg/api/apihelpers"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
@@ -24,7 +25,6 @@ import (
 	projectauth "github.com/openshift/openshift-apiserver/pkg/project/auth"
 	projectcache "github.com/openshift/openshift-apiserver/pkg/project/cache"
 	projectutil "github.com/openshift/openshift-apiserver/pkg/project/util"
-	"k8s.io/kubernetes/openshift-kube-apiserver/authorization/scope"
 )
 
 type REST struct {

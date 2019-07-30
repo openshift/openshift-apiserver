@@ -9,9 +9,9 @@ import (
 
 	appsapiv1 "github.com/openshift/api/apps/v1"
 	securityapiv1 "github.com/openshift/api/security/v1"
+	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy/imagereferencemutators"
 	appsapi "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
-	"k8s.io/kubernetes/openshift-kube-apiserver/admission/imagepolicy/imagereferencemutators"
 )
 
 // getPodSpec returns a mutable pod spec out of the provided object, including a field path

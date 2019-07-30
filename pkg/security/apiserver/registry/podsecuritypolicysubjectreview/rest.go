@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"k8s.io/kubernetes/openshift-kube-apiserver/admission/security/securitycontextconstraints/sccmatching"
-
 	"k8s.io/klog"
 
 	corev1 "k8s.io/api/core/v1"
@@ -23,6 +21,7 @@ import (
 	"k8s.io/kubernetes/pkg/serviceaccount"
 
 	securityv1 "github.com/openshift/api/security/v1"
+	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sccmatching"
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 	securityvalidation "github.com/openshift/openshift-apiserver/pkg/security/apis/security/validation"
 )
