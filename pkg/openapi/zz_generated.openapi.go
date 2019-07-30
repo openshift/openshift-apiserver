@@ -259,6 +259,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/console/v1.ConsoleCLIDownload":                                                      schema_openshift_api_console_v1_ConsoleCLIDownload(ref),
 		"github.com/openshift/api/console/v1.ConsoleCLIDownloadList":                                                  schema_openshift_api_console_v1_ConsoleCLIDownloadList(ref),
 		"github.com/openshift/api/console/v1.ConsoleCLIDownloadSpec":                                                  schema_openshift_api_console_v1_ConsoleCLIDownloadSpec(ref),
+		"github.com/openshift/api/console/v1.ConsoleExternalLogLink":                                                  schema_openshift_api_console_v1_ConsoleExternalLogLink(ref),
+		"github.com/openshift/api/console/v1.ConsoleExternalLogLinkSpec":                                              schema_openshift_api_console_v1_ConsoleExternalLogLinkSpec(ref),
 		"github.com/openshift/api/console/v1.ConsoleLink":                                                             schema_openshift_api_console_v1_ConsoleLink(ref),
 		"github.com/openshift/api/console/v1.ConsoleLinkList":                                                         schema_openshift_api_console_v1_ConsoleLinkList(ref),
 		"github.com/openshift/api/console/v1.ConsoleLinkSpec":                                                         schema_openshift_api_console_v1_ConsoleLinkSpec(ref),
@@ -7005,7 +7007,7 @@ func schema_openshift_api_config_v1_APIServer(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "APIServer holds cluster-wide information about api-servers.  The canonical name is `cluster`",
+				Description: "APIServer holds configuration (like serving certificates, client CA and CORS domains) shared by all API servers in the system, among them especially kube-apiserver and openshift-apiserver. The canonical name of an instance is 'cluster'.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -7399,7 +7401,7 @@ func schema_openshift_api_config_v1_Authentication(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Authentication holds cluster-wide information about Authentication.  The canonical name is `cluster`",
+				Description: "Authentication specifies cluster-wide settings for authentication (like OAuth and webhook token authenticators). The canonical name of an instance is `cluster`.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -7523,7 +7525,6 @@ func schema_openshift_api_config_v1_AuthenticationSpec(ref common.ReferenceCallb
 						},
 					},
 				},
-				Required: []string{"type"},
 			},
 		},
 		Dependencies: []string{
@@ -8525,7 +8526,7 @@ func schema_openshift_api_config_v1_Console(ref common.ReferenceCallback) common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Console holds cluster-wide information about Console.  The canonical name is `cluster`.",
+				Description: "Console holds cluster-wide configuration for the web console, including the logout URL, and reports the public URL of the console. The canonical name is `cluster`.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -8721,7 +8722,7 @@ func schema_openshift_api_config_v1_DNS(ref common.ReferenceCallback) common.Ope
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "DNS holds cluster-wide information about DNS.  The canonical name is `cluster`",
+				Description: "DNS holds cluster-wide information about DNS. The canonical name is `cluster`",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -8820,20 +8821,20 @@ func schema_openshift_api_config_v1_DNSSpec(ref common.ReferenceCallback) common
 				Properties: map[string]spec.Schema{
 					"baseDomain": {
 						SchemaProps: spec.SchemaProps{
-							Description: "baseDomain is the base domain of the cluster. All managed DNS records will be sub-domains of this base.\n\nFor example, given the base domain `openshift.example.com`, an API server DNS record may be created for `cluster-api.openshift.example.com`.",
+							Description: "baseDomain is the base domain of the cluster. All managed DNS records will be sub-domains of this base.\n\nFor example, given the base domain `openshift.example.com`, an API server DNS record may be created for `cluster-api.openshift.example.com`.\n\nOnce set, this field cannot be changed.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"publicZone": {
 						SchemaProps: spec.SchemaProps{
-							Description: "publicZone is the location where all the DNS records that are publicly accessible to the internet exist. If this field is nil, no public records should be created.",
+							Description: "publicZone is the location where all the DNS records that are publicly accessible to the internet exist.\n\nIf this field is nil, no public records should be created.\n\nOnce set, this field cannot be changed.",
 							Ref:         ref("github.com/openshift/api/config/v1.DNSZone"),
 						},
 					},
 					"privateZone": {
 						SchemaProps: spec.SchemaProps{
-							Description: "privateZone is the location where all the DNS records that are only available internally to the cluster exist. If this field is nil, no private records should be created.",
+							Description: "privateZone is the location where all the DNS records that are only available internally to the cluster exist.\n\nIf this field is nil, no private records should be created.\n\nOnce set, this field cannot be changed.",
 							Ref:         ref("github.com/openshift/api/config/v1.DNSZone"),
 						},
 					},
@@ -11666,9 +11667,17 @@ func schema_openshift_api_config_v1_ProxySpec(ref common.ReferenceCallback) comm
 							},
 						},
 					},
+					"trustedCA": {
+						SchemaProps: spec.SchemaProps{
+							Description: "trustedCA is a reference to a ConfigMap containing a CA certificate bundle used for client egress HTTPS connections. The certificate bundle must be from the CA that signed the proxy's certificate and be signed for everything. trustedCA should only be consumed by a proxy validator. The validator is responsible for reading ConfigMapNameReference, validating the certificate and copying \"ca-bundle.crt\" from data to a ConfigMap in the namespace of an operator configured for proxy. The namespace for this ConfigMap is \"openshift-config-managed\". Here is an example ConfigMap (in yaml):\n\napiVersion: v1 kind: ConfigMap metadata:\n name: proxy-ca\n namespace: openshift-config-managed\n data:\n   ca-bundle.crt: |\n     -----BEGIN CERTIFICATE-----\n     Custom CA certificate bundle.\n     -----END CERTIFICATE-----",
+							Ref:         ref("github.com/openshift/api/config/v1.ConfigMapNameReference"),
+						},
+					},
 				},
 			},
 		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.ConfigMapNameReference"},
 	}
 }
 
@@ -12449,7 +12458,7 @@ func schema_openshift_api_console_v1_ApplicationMenuSpec(ref common.ReferenceCal
 						},
 					},
 				},
-				Required: []string{"section", "imageURL"},
+				Required: []string{"section"},
 			},
 		},
 	}
@@ -12583,6 +12592,82 @@ func schema_openshift_api_console_v1_ConsoleCLIDownloadSpec(ref common.Reference
 		},
 		Dependencies: []string{
 			"github.com/openshift/api/console/v1.Link"},
+	}
+}
+
+func schema_openshift_api_console_v1_ConsoleExternalLogLink(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ConsoleExternalLogLink is an extension for customizing OpenShift web console log links.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/openshift/api/console/v1.ConsoleExternalLogLinkSpec"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/console/v1.ConsoleExternalLogLinkSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_openshift_api_console_v1_ConsoleExternalLogLinkSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ConsoleExternalLogLinkSpec is the desired log link configuration. The log link will appear on the logs tab of the pod details page.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"text": {
+						SchemaProps: spec.SchemaProps{
+							Description: "text is the display text for the link",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"hrefTemplate": {
+						SchemaProps: spec.SchemaProps{
+							Description: "hrefTemplate is an absolute secure URL (must use https) for the log link including variables to be replaced. Variables are specified in the URL with the format ${variableName}, for instance, ${containerName} and will be replaced with the corresponding values from the resource. Resource is a pod. Supported variables are: - ${resourceName} - name of the resource which containes the logs - ${resourceUID} - UID of the resource which contains the logs\n              - e.g. `11111111-2222-3333-4444-555555555555`\n- ${containerName} - name of the resource's container that contains the logs - ${resourceNamespace} - namespace of the resource that contains the logs - ${podLabels} - JSON representation of labels matching the pod with the logs\n            - e.g. `{\"key1\":\"value1\",\"key2\":\"value2\"}`\n\ne.g., https://example.com/logs?resourceName=${resourceName}&containerName=${containerName}&resourceNamespace=${resourceNamespace}&podLabels=${podLabels}",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"namespaceFilter": {
+						SchemaProps: spec.SchemaProps{
+							Description: "namespaceFilter is a regular expression used to restrict a log link to a matching set of namespaces (e.g., `^openshift-`). The string is converted into a regular expression using the JavaScript RegExp constructor. If not specified, links will be displayed for all the namespaces.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"text", "hrefTemplate"},
+			},
+		},
 	}
 }
 
@@ -25080,6 +25165,13 @@ func schema_openshift_api_operator_v1_OpenShiftSDNConfig(ref common.ReferenceCal
 							Format:      "",
 						},
 					},
+					"enableUnidling": {
+						SchemaProps: spec.SchemaProps{
+							Description: "enableUnidling controls whether or not the service proxy will support idling and unidling of services. By default, unidling is enabled.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
 				},
 				Required: []string{"mode"},
 			},
@@ -26436,7 +26528,7 @@ func schema_openshift_api_operator_v1alpha1_ImageContentSourcePolicy(ref common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageContentSourcePolicy holds cluster-wide information about how to handle registry mirror rules. When multple policies are defined, the outcome of the behavior is defined on each field.",
+				Description: "ImageContentSourcePolicy holds cluster-wide information about how to handle registry mirror rules. When multiple policies are defined, the outcome of the behavior is defined on each field.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -26531,7 +26623,7 @@ func schema_openshift_api_operator_v1alpha1_ImageContentSourcePolicySpec(ref com
 				Properties: map[string]spec.Schema{
 					"repositoryDigestMirrors": {
 						SchemaProps: spec.SchemaProps{
-							Description: "repositoryDigestMirrors allows images referenced by image digests in pods to be pulled from alternative mirrored repository locations. The image pull specification provided to the pod will be compared to the source locations described in RepositoryDigestMirrors and the image may be pulled down from any of the repositories in the list instead of the specified repository allowing administrators to choose a potentially faster mirror. Only image pull specifications that have an image disgest will have this behavior applied to them - tags will continue to be pulled from the specified repository in the pull spec. When multiple policies are defined, any overlaps found will be merged together when the mirror rules are written to `/etc/containers/registries.conf`. For example, if policy A has sources `a, b, c` and policy B has sources `c, d, e`. Then the mirror rule written to `registries.conf` will be `a, b, c, d, e` where the duplicate `c` is removed.",
+							Description: "repositoryDigestMirrors allows images referenced by image digests in pods to be pulled from alternative mirrored repository locations. The image pull specification provided to the pod will be compared to the source locations described in RepositoryDigestMirrors and the image may be pulled down from any of the mirrors in the list instead of the specified repository allowing administrators to choose a potentially faster mirror. Only image pull specifications that have an image disgest will have this behavior applied to them - tags will continue to be pulled from the specified repository in the pull spec.\n\nEach “source” repository is treated independently; configurations for different “source” repositories don’t interact.\n\nWhen multiple policies are defined for the same “source” repository, the sets of defined mirrors will be merged together, preserving the relative order of the mirrors, if possible. For example, if policy A has mirrors `a, b, c` and policy B has mirrors `c, d, e`, the mirrors will be used in the order `a, b, c, d, e`.  If the orders of mirror entries conflict (e.g. `a, b` vs. `b, a`) the configuration is not rejected but the resulting order is unspecified.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -26794,12 +26886,19 @@ func schema_openshift_api_operator_v1alpha1_RepositoryDigestMirrors(ref common.R
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RepositoryDigestMirrors holds cluster-wide information about how to handle mirros in the registries config. Note: the mirrors only work when pulling the images that are reference by their digests.",
+				Description: "RepositoryDigestMirrors holds cluster-wide information about how to handle mirros in the registries config. Note: the mirrors only work when pulling the images that are referenced by their digests.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"sources": {
+					"source": {
 						SchemaProps: spec.SchemaProps{
-							Description: "sources are repositories that are mirrors of each other.",
+							Description: "source is the repository that users refer to, e.g. in image pull specifications.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"mirrors": {
+						SchemaProps: spec.SchemaProps{
+							Description: "mirrors is one or more repositories that may also contain the same images. The order of mirrors in this list is treated as the user's desired priority, while source is by default considered lower priority than all mirrors. Other cluster configuration, including (but not limited to) other repositoryDigestMirrors objects, may impact the exact order mirrors are contacted in, or some mirrors may be contacted in parallel, so this should be considered a preference rather than a guarantee of ordering.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -26812,6 +26911,7 @@ func schema_openshift_api_operator_v1alpha1_RepositoryDigestMirrors(ref common.R
 						},
 					},
 				},
+				Required: []string{"source"},
 			},
 		},
 	}
@@ -46246,7 +46346,7 @@ func schema_k8sio_api_core_v1_NodeStatus(ref common.ReferenceCallback) common.Op
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/concepts/nodes/node/#addresses Note: This field is declared as mergeable, but the merge key is not sufficiently unique, which can cause data corruption when it is merged. Callers should instead use a full-replacement patch. See http://pr.k8s.io/79391 for an example.",
+							Description: "List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/concepts/nodes/node/#addresses",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
