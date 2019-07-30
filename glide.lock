@@ -1,5 +1,5 @@
-hash: dbbc60b82413cc440647e52cbec77f052849fd196d659f2240970d09b3bbddfb
-updated: 2019-07-17T09:04:22.209105+02:00
+hash: e18e74da1b68e9b371d48dae285e0a738171ae0c126f550d69688587fcbcd1e2
+updated: 2019-07-30T14:49:37.318405589-04:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 2ae31c8b6b30d2f4c8100c20d527b571e9c433bb
@@ -338,7 +338,7 @@ imports:
   version: 53ca7dc85f609e8aa3af7902f189ed5dca96dbb5
   repo: https://github.com/openshift/onsi-ginkgo.git
 - name: github.com/opencontainers/go-digest
-  version: ac19fd6e7483ff933754af248d80be865e543d22
+  version: a6d0ee40d4207ea02364bd3b9e8e77b9159ba1eb
 - name: github.com/opencontainers/image-spec
   version: 372ad780f63454fbbbbcc7cf80e5b90245c13e13
   subpackages:
@@ -364,7 +364,7 @@ imports:
   - libcontainer/user
   - libcontainer/utils
 - name: github.com/openshift/api
-  version: 25a4eebe16c8bcb53e28605f8d5b91df392daeba
+  version: 0922aa5a655be314e20a3e0e94f4f2b105100154
   subpackages:
   - annotations
   - apps
@@ -410,8 +410,28 @@ imports:
   - user/v1
   - webconsole
   - webconsole/v1
+- name: github.com/openshift/apiserver-library-go
+  version: 9ba756241be5498149388d39031e6161e8ebf90c
+  subpackages:
+  - pkg/admission/imagepolicy
+  - pkg/admission/imagepolicy/apis/imagepolicy/v1
+  - pkg/admission/imagepolicy/apis/imagepolicy/validation
+  - pkg/admission/imagepolicy/imagereferencemutators
+  - pkg/admission/imagepolicy/rules
+  - pkg/admission/quota/clusterresourcequota
+  - pkg/authorization/scope
+  - pkg/configflags
+  - pkg/securitycontextconstraints/capabilities
+  - pkg/securitycontextconstraints/group
+  - pkg/securitycontextconstraints/sccdefaults
+  - pkg/securitycontextconstraints/sccmatching
+  - pkg/securitycontextconstraints/seccomp
+  - pkg/securitycontextconstraints/selinux
+  - pkg/securitycontextconstraints/user
+  - pkg/securitycontextconstraints/util
+  - pkg/securitycontextconstraints/util/sort
 - name: github.com/openshift/client-go
-  version: c44a8b61b9f46cd9e802384dfeda0bc9942db68a
+  version: a85ea6a6b3a5d2dbe41582ee35695dd4683e1f02
   subpackages:
   - apps/clientset/versioned
   - apps/clientset/versioned/fake
@@ -490,7 +510,7 @@ imports:
   - user/informers/externalversions/user/v1
   - user/listers/user/v1
 - name: github.com/openshift/library-go
-  version: e48a704752ab49d1a820b658d0f3d66d41245398
+  version: 06fca5b7f9cc44922a00a9850755a79e3060213e
   subpackages:
   - pkg/apiserver/admission/admissionregistrationtesting
   - pkg/apiserver/admission/admissionrestconfig
@@ -717,8 +737,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: 5420a8b6744d3b0345ab293f6fcba19c978f1183
 - name: k8s.io/api
-  version: 5b6d4ec96213966713b65f5d4aa1ee1b765f2c7c
-  repo: https://github.com/openshift/kubernetes-api.git
+  version: 40a48860b5abbba9aa891b02b32da429b08d96a0
   subpackages:
   - admission/v1beta1
   - admissionregistration/v1beta1
@@ -759,8 +778,7 @@ imports:
   - storage/v1alpha1
   - storage/v1beta1
 - name: k8s.io/apiextensions-apiserver
-  version: ee330a2a5c6d54e58af0defc868f1258a5c47422
-  repo: https://github.com/openshift/kubernetes-apiextensions-apiserver.git
+  version: 53c4693659ed354d76121458fb819202dd1635fa
   subpackages:
   - pkg/apis/apiextensions
   - pkg/apis/apiextensions/install
@@ -796,8 +814,7 @@ imports:
   - pkg/registry/customresource/tableconvertor
   - pkg/registry/customresourcedefinition
 - name: k8s.io/apimachinery
-  version: eab709b58ad6d98573ce6daddb9f6d17487efe6c
-  repo: https://github.com/openshift/kubernetes-apimachinery.git
+  version: d7deff9243b165ee192f5551710ea4285dcfd615
   subpackages:
   - pkg/api/apitesting
   - pkg/api/apitesting/fuzzer
@@ -861,7 +878,7 @@ imports:
   - third_party/forked/golang/netutil
   - third_party/forked/golang/reflect
 - name: k8s.io/apiserver
-  version: 609697ced6c17aa748be8e7af619bfd99aa2e952
+  version: f670f6431b378389388565b8deb05d52e74b3392
   repo: https://github.com/openshift/kubernetes-apiserver.git
   subpackages:
   - pkg/admission
@@ -930,7 +947,6 @@ imports:
   - pkg/registry/rest
   - pkg/registry/rest/resttest
   - pkg/server
-  - pkg/server/certs
   - pkg/server/filters
   - pkg/server/healthz
   - pkg/server/httplog
@@ -969,11 +985,9 @@ imports:
   - plugin/pkg/authenticator/token/webhook
   - plugin/pkg/authorizer/webhook
 - name: k8s.io/cli-runtime
-  version: a9444fab08246283f19c8ab752bf8cc10bf0fd18
-  repo: https://github.com/openshift/kubernetes-cli-runtime.git
+  version: 2899ed30580fdbc8286718edb4382b529463099d
   subpackages:
   - pkg/genericclioptions
-  - pkg/genericclioptions/openshiftpatch
   - pkg/kustomize
   - pkg/kustomize/k8sdeps
   - pkg/kustomize/k8sdeps/configmapandsecret
@@ -986,8 +1000,7 @@ imports:
   - pkg/printers
   - pkg/resource
 - name: k8s.io/client-go
-  version: 70952d66b5d131aa0142ceaebfe6d6da51178878
-  repo: https://github.com/openshift/kubernetes-client-go.git
+  version: 6ee68ca5fd8355d024d02f9db0b3b667e8357a0f
   subpackages:
   - discovery
   - discovery/cached
@@ -1197,18 +1210,14 @@ imports:
   - util/workqueue
 - name: k8s.io/cloud-provider
   version: c892ea32361a3655e7bd8c06f2d02dd8ce73dd78
-  repo: https://github.com/openshift/kubernetes-cloud-provider.git
   subpackages:
   - features
 - name: k8s.io/cluster-bootstrap
   version: 50662da99b70008aa395937d09b9da52a9edd041
-  repo: https://github.com/openshift/kubernetes-cluster-bootstrap.git
 - name: k8s.io/code-generator
-  version: f40157d9638d05ebf65421a9bbad5a7f68878b65
-  repo: https://github.com/openshift/kubernetes-code-generator.git
+  version: 50b561225d70b3eb79a1faafd3dfe7b1a62cbe73
 - name: k8s.io/component-base
   version: 4a91899592f42b2f5859587cc5a676a5b94d2ee3
-  repo: https://github.com/openshift/kubernetes-component-base.git
   subpackages:
   - cli/flag
   - config
@@ -1216,17 +1225,14 @@ imports:
   - logs
 - name: k8s.io/csi-api
   version: 693d387aa133c41adc69c717981d40df2b5c797a
-  repo: https://github.com/openshift/kubernetes-csi-api.git
 - name: k8s.io/csi-translation-lib
   version: ce92c5cfdd61987ea4ce3b8c279cec25d109f366
-  repo: https://github.com/openshift/kubernetes-csi-translation-lib.git
 - name: k8s.io/gengo
   version: 51747d6e00da1fc578d5a333a93bb2abcbce7a95
 - name: k8s.io/klog
   version: 8139d8cb77af419532b33dfa7dd09fbc5f1d344f
 - name: k8s.io/kube-aggregator
-  version: 0050b795891b7085b9c9e0df9677789e61fd812d
-  repo: https://github.com/openshift/kubernetes-kube-aggregator.git
+  version: da8327669ac57b6e6a06676eeb7de19c9780f76d
   subpackages:
   - pkg/apis/apiregistration
   - pkg/apis/apiregistration/install
@@ -1252,7 +1258,6 @@ imports:
   - pkg/registry/apiservice/rest
 - name: k8s.io/kube-controller-manager
   version: 97ed623e38350ab8a3cce36d6003ff9ab27f6669
-  repo: https://github.com/openshift/kubernetes-kube-controller-manager.git
   subpackages:
   - config/v1alpha1
 - name: k8s.io/kube-openapi
@@ -1268,39 +1273,17 @@ imports:
   - pkg/util/proto/validation
 - name: k8s.io/kube-proxy
   version: 4d735c31b05439ef4136b5ee8454e62e854fac1f
-  repo: https://github.com/openshift/kubernetes-kube-proxy.git
 - name: k8s.io/kube-scheduler
   version: b74e9e79538d3a93ad1d1f391b9461c04a20c84e
-  repo: https://github.com/openshift/kubernetes-kube-scheduler.git
 - name: k8s.io/kubelet
   version: f6da02f583256d1a15cc44a101c80bfa2080a46f
-  repo: https://github.com/openshift/kubernetes-kubelet.git
 - name: k8s.io/kubernetes
-  version: 0a254611a05f93947e024a3916bba8e670a129dd
+  version: a76fdb0577a008c3105c14f4613f014a21b3fb20
   repo: https://github.com/openshift/kubernetes.git
   subpackages:
   - cmd/cloud-controller-manager/app/apis/config
   - cmd/cloud-controller-manager/app/apis/config/scheme
   - cmd/cloud-controller-manager/app/apis/config/v1alpha1
-  - openshift-kube-apiserver/admission/customresourcevalidation
-  - openshift-kube-apiserver/admission/customresourcevalidation/securitycontextconstraints
-  - openshift-kube-apiserver/admission/customresourcevalidation/securitycontextconstraints/validation
-  - openshift-kube-apiserver/admission/imagepolicy
-  - openshift-kube-apiserver/admission/imagepolicy/apis/imagepolicy/v1
-  - openshift-kube-apiserver/admission/imagepolicy/apis/imagepolicy/validation
-  - openshift-kube-apiserver/admission/imagepolicy/imagereferencemutators
-  - openshift-kube-apiserver/admission/imagepolicy/rules
-  - openshift-kube-apiserver/admission/quota/clusterresourcequota
-  - openshift-kube-apiserver/admission/security/securitycontextconstraints/capabilities
-  - openshift-kube-apiserver/admission/security/securitycontextconstraints/group
-  - openshift-kube-apiserver/admission/security/securitycontextconstraints/sccmatching
-  - openshift-kube-apiserver/admission/security/securitycontextconstraints/seccomp
-  - openshift-kube-apiserver/admission/security/securitycontextconstraints/selinux
-  - openshift-kube-apiserver/admission/security/securitycontextconstraints/user
-  - openshift-kube-apiserver/admission/security/securitycontextconstraints/util
-  - openshift-kube-apiserver/admission/security/securitycontextconstraints/util/sort
-  - openshift-kube-apiserver/authorization/scope
-  - openshift-kube-apiserver/configflags
   - pkg/api/legacyscheme
   - pkg/api/ref
   - pkg/api/service
@@ -1494,19 +1477,14 @@ imports:
   - plugin/pkg/auth/authorizer/rbac/bootstrappolicy
 - name: k8s.io/metrics
   version: 1bd6a4002213382a0afb4f0b96717926e5413646
-  repo: https://github.com/openshift/kubernetes-metrics.git
 - name: k8s.io/node-api
   version: eb17cba16a8f41e02b078e0584ebb3cfe5783514
-  repo: https://github.com/openshift/kubernetes-node-api.git
 - name: k8s.io/sample-apiserver
   version: 236f85ce49e5a88a9b0a4eff066c5c61f51a1d95
-  repo: https://github.com/openshift/kubernetes-sample-apiserver.git
 - name: k8s.io/sample-cli-plugin
   version: 59043b4d4f841e1240827a0a30aab14cdc8e4e08
-  repo: https://github.com/openshift/kubernetes-sample-cli-plugin.git
 - name: k8s.io/sample-controller
   version: 324336050c979273816000d5d2c6df1ff1be9ea6
-  repo: https://github.com/openshift/kubernetes-sample-controller.git
 - name: k8s.io/utils
   version: c2654d5206da6b7b6ace12841e8f359bb89b443c
   subpackages:
