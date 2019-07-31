@@ -17,9 +17,9 @@ import (
 	rbacv1helpers "k8s.io/kubernetes/pkg/apis/rbac/v1"
 	rbacregistryvalidation "k8s.io/kubernetes/pkg/registry/rbac/validation"
 
+	"github.com/openshift/apiserver-library-go/pkg/authorization/scope"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 	"github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization/rbacconversion"
-	"k8s.io/kubernetes/openshift-kube-apiserver/authorization/scope"
 )
 
 type REST struct {

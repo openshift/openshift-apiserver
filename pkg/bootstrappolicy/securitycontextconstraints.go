@@ -1,12 +1,12 @@
 package bootstrappolicy
 
 import (
+	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sccdefaults"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/authentication/serviceaccount"
 
 	securityv1 "github.com/openshift/api/security/v1"
-	"k8s.io/kubernetes/openshift-kube-apiserver/admission/customresourcevalidation/securitycontextconstraints"
 )
 
 const (
@@ -279,7 +279,7 @@ func GetBootstrapSecurityContextConstraints(sccNameToAdditionalGroups map[string
 	}
 
 	for i := range constraints {
-		securitycontextconstraints.SetDefaults_SCC(constraints[i])
+		sccdefaults.SetDefaults_SCC(constraints[i])
 
 		if usersToAdd, ok := sccNameToAdditionalUsers[constraints[i].Name]; ok {
 			constraints[i].Users = append(constraints[i].Users, usersToAdd...)

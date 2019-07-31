@@ -14,10 +14,10 @@ import (
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
 
 	securityv1 "github.com/openshift/api/security/v1"
+	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sccmatching"
 	securityv1listers "github.com/openshift/client-go/security/listers/security/v1"
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 	admissionttesting "github.com/openshift/openshift-apiserver/pkg/security/apiserver/admission/testing"
-	"k8s.io/kubernetes/openshift-kube-apiserver/admission/security/securitycontextconstraints/sccmatching"
 )
 
 func TestPodSecurityPolicySelfSubjectReview(t *testing.T) {

@@ -19,6 +19,8 @@ import (
 	"k8s.io/kubernetes/pkg/quota/v1/generic"
 	"k8s.io/kubernetes/pkg/quota/v1/install"
 
+	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy"
+	"github.com/openshift/apiserver-library-go/pkg/admission/quota/clusterresourcequota"
 	imagev1client "github.com/openshift/client-go/image/clientset/versioned"
 	imagev1informer "github.com/openshift/client-go/image/informers/externalversions"
 	quotainformer "github.com/openshift/client-go/quota/informers/externalversions"
@@ -28,8 +30,6 @@ import (
 	"github.com/openshift/library-go/pkg/quota/clusterquotamapping"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/admission/imagepolicy/originimagereferencemutators"
 	"github.com/openshift/openshift-apiserver/pkg/quota/image"
-	"k8s.io/kubernetes/openshift-kube-apiserver/admission/imagepolicy"
-	"k8s.io/kubernetes/openshift-kube-apiserver/admission/quota/clusterresourcequota"
 )
 
 type InformerAccess interface {

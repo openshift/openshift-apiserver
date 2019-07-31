@@ -6,8 +6,9 @@ import (
 
 	kapiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"k8s.io/kubernetes/openshift-kube-apiserver/admission/imagepolicy/imagereferencemutators"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
+
+	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy/imagereferencemutators"
 
 	_ "github.com/openshift/openshift-apiserver/pkg/api/install"
 )

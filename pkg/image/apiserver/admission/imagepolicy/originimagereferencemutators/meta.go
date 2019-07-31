@@ -8,8 +8,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 
+	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy/imagereferencemutators"
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
-	"k8s.io/kubernetes/openshift-kube-apiserver/admission/imagepolicy/imagereferencemutators"
 )
 
 type OriginImageMutators struct {

@@ -6,12 +6,12 @@ import (
 	"k8s.io/kubernetes/plugin/pkg/admission/gc"
 	"k8s.io/kubernetes/plugin/pkg/admission/resourcequota"
 
+	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy"
+	quotaclusterresourcequota "github.com/openshift/apiserver-library-go/pkg/admission/quota/clusterresourcequota"
 	buildsecretinjector "github.com/openshift/openshift-apiserver/pkg/build/apiserver/admission/secretinjector"
 	buildstrategyrestrictions "github.com/openshift/openshift-apiserver/pkg/build/apiserver/admission/strategyrestrictions"
 	imageadmission "github.com/openshift/openshift-apiserver/pkg/image/apiserver/admission/limitrange"
 	projectrequestlimit "github.com/openshift/openshift-apiserver/pkg/project/apiserver/admission/requestlimit"
-	"k8s.io/kubernetes/openshift-kube-apiserver/admission/imagepolicy"
-	quotaclusterresourcequota "k8s.io/kubernetes/openshift-kube-apiserver/admission/quota/clusterresourcequota"
 )
 
 // TODO register this per apiserver or at least per process

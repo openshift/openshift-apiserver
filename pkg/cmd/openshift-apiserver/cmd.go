@@ -15,7 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
@@ -46,8 +45,6 @@ func NewOpenShiftAPIServerCommand(name string, out, errout io.Writer, stopCh <-c
 		Short: "Launch OpenShift apiserver",
 		Long:  longDescription,
 		Run: func(c *cobra.Command, args []string) {
-			rest.CommandNameOverride = name
-
 			legacy.InstallInternalLegacyAll(legacyscheme.Scheme)
 
 			kcmdutil.CheckErr(options.Validate())

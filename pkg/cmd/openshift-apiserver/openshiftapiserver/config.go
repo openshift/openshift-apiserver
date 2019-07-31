@@ -24,6 +24,7 @@ import (
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
+	"github.com/openshift/apiserver-library-go/pkg/configflags"
 	"github.com/openshift/library-go/pkg/apiserver/admission/admissiontimeout"
 	"github.com/openshift/library-go/pkg/apiserver/apiserverconfig"
 	"github.com/openshift/library-go/pkg/config/helpers"
@@ -32,7 +33,6 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver/configprocessing"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
 	"github.com/openshift/openshift-apiserver/pkg/version"
-	"k8s.io/kubernetes/openshift-kube-apiserver/configflags"
 )
 
 func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerConfig) (*OpenshiftAPIConfig, error) {

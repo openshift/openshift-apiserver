@@ -8,8 +8,8 @@ import (
 	"k8s.io/apiserver/pkg/authentication/serviceaccount"
 
 	securityv1 "github.com/openshift/api/security/v1"
-	sccutil "k8s.io/kubernetes/openshift-kube-apiserver/admission/security/securitycontextconstraints/util"
-	sccsort "k8s.io/kubernetes/openshift-kube-apiserver/admission/security/securitycontextconstraints/util/sort"
+	sccutil "github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/util"
+	sccsort "github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/util/sort"
 )
 
 func TestBootstrappedConstraints(t *testing.T) {
