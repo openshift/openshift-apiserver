@@ -1349,18 +1349,13 @@ items:
     - /api/*
     - /apis
     - /apis/*
-    - /oapi
-    - /oapi/*
     - /openapi/v2
     - /swaggerapi
     - /swaggerapi/*
     - /swagger.json
     - /swagger-2.0.0.pb-v1
-    - /osapi
-    - /osapi/
     - /.well-known
     - /.well-known/*
-    - /
     verbs:
     - get
 - apiVersion: rbac.authorization.k8s.io/v1
@@ -1951,18 +1946,13 @@ items:
     - /api/*
     - /apis
     - /apis/*
-    - /oapi
-    - /oapi/*
     - /openapi/v2
     - /swaggerapi
     - /swaggerapi/*
     - /swagger.json
     - /swagger-2.0.0.pb-v1
-    - /osapi
-    - /osapi/
     - /.well-known
     - /.well-known/*
-    - /
     verbs:
     - get
 - apiVersion: rbac.authorization.k8s.io/v1
