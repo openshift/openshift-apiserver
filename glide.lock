@@ -1,5 +1,5 @@
 hash: e18e74da1b68e9b371d48dae285e0a738171ae0c126f550d69688587fcbcd1e2
-updated: 2019-07-30T14:49:37.318405589-04:00
+updated: 2019-08-01T22:53:39.36977852-04:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 2ae31c8b6b30d2f4c8100c20d527b571e9c433bb
@@ -261,7 +261,7 @@ imports:
 - name: github.com/google/gofuzz
   version: 24818f796faf91cd76ec7bddd72458fbced7a6c1
 - name: github.com/google/uuid
-  version: 8c31c18f31ede9fc8eae72290a7e7a8064e9b3e3
+  version: c2e93f3ae59f2904160ceaab466009f965df46d6
 - name: github.com/googleapis/gnostic
   version: 0c5108395e2debce0d731cf0287ddf7242066aba
   subpackages:
@@ -338,7 +338,7 @@ imports:
   version: 53ca7dc85f609e8aa3af7902f189ed5dca96dbb5
   repo: https://github.com/openshift/onsi-ginkgo.git
 - name: github.com/opencontainers/go-digest
-  version: a6d0ee40d4207ea02364bd3b9e8e77b9159ba1eb
+  version: ac19fd6e7483ff933754af248d80be865e543d22
 - name: github.com/opencontainers/image-spec
   version: 372ad780f63454fbbbbcc7cf80e5b90245c13e13
   subpackages:
@@ -411,7 +411,7 @@ imports:
   - webconsole
   - webconsole/v1
 - name: github.com/openshift/apiserver-library-go
-  version: 9ba756241be5498149388d39031e6161e8ebf90c
+  version: 4d81e8c49306fab396f2ad574beb87e10203d578
   subpackages:
   - pkg/admission/imagepolicy
   - pkg/admission/imagepolicy/apis/imagepolicy/v1
@@ -510,7 +510,7 @@ imports:
   - user/informers/externalversions/user/v1
   - user/listers/user/v1
 - name: github.com/openshift/library-go
-  version: 06fca5b7f9cc44922a00a9850755a79e3060213e
+  version: 1810ce5f54ff4a1a4fea05e06024896a4885eb05
   subpackages:
   - pkg/apiserver/admission/admissionregistrationtesting
   - pkg/apiserver/admission/admissionrestconfig
@@ -682,7 +682,7 @@ imports:
   subpackages:
   - imports
 - name: google.golang.org/appengine
-  version: 12d5545dc1cfa6047a286d5e853841b6471f4c19
+  version: fb139bde60fa77cede04f226b4d5a3cf68dcce27
   subpackages:
   - internal
   - internal/base
@@ -1529,5 +1529,5 @@ imports:
   - typed
   - value
 - name: sigs.k8s.io/yaml
-  version: fd68e9863619f6ec2fdd8625fe1f02e7c877e480
+  version: 4cd0c284b15f1735b8cc247df097d262b8903f9f
 testImports: []
