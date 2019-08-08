@@ -1,5 +1,5 @@
 hash: e18e74da1b68e9b371d48dae285e0a738171ae0c126f550d69688587fcbcd1e2
-updated: 2019-08-01T22:53:39.36977852-04:00
+updated: 2019-08-08T14:50:46.822488+02:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 2ae31c8b6b30d2f4c8100c20d527b571e9c433bb
@@ -364,7 +364,7 @@ imports:
   - libcontainer/user
   - libcontainer/utils
 - name: github.com/openshift/api
-  version: 0922aa5a655be314e20a3e0e94f4f2b105100154
+  version: d2972510af76418506bf0374bc2e73b0b9e538ce
   subpackages:
   - annotations
   - apps
@@ -431,7 +431,7 @@ imports:
   - pkg/securitycontextconstraints/util
   - pkg/securitycontextconstraints/util/sort
 - name: github.com/openshift/client-go
-  version: a85ea6a6b3a5d2dbe41582ee35695dd4683e1f02
+  version: e9678e3b850da36470c5554609c6cd110aace47e
   subpackages:
   - apps/clientset/versioned
   - apps/clientset/versioned/fake
@@ -510,7 +510,7 @@ imports:
   - user/informers/externalversions/user/v1
   - user/listers/user/v1
 - name: github.com/openshift/library-go
-  version: 1810ce5f54ff4a1a4fea05e06024896a4885eb05
+  version: 4d03f355b0f22570586e3bf4b4a4a7c1332813c3
   subpackages:
   - pkg/apiserver/admission/admissionregistrationtesting
   - pkg/apiserver/admission/admissionrestconfig
@@ -674,7 +674,7 @@ imports:
   - unicode/norm
   - width
 - name: golang.org/x/time
-  version: f51c12702a4d776e4c1fa9b0fabab841babae631
+  version: 9d24e82272b4f38b78bc8cff74fa936d31ccd8ef
   subpackages:
   - rate
 - name: golang.org/x/tools
@@ -878,7 +878,7 @@ imports:
   - third_party/forked/golang/netutil
   - third_party/forked/golang/reflect
 - name: k8s.io/apiserver
-  version: f670f6431b378389388565b8deb05d52e74b3392
+  version: 23e48df1780624a5c29951629b1e256c51d21928
   repo: https://github.com/openshift/kubernetes-apiserver.git
   subpackages:
   - pkg/admission
@@ -947,6 +947,7 @@ imports:
   - pkg/registry/rest
   - pkg/registry/rest/resttest
   - pkg/server
+  - pkg/server/certs
   - pkg/server/filters
   - pkg/server/healthz
   - pkg/server/httplog
