@@ -193,6 +193,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.GoogleIdentityProvider":                                                   schema_openshift_api_config_v1_GoogleIdentityProvider(ref),
 		"github.com/openshift/api/config/v1.HTPasswdIdentityProvider":                                                 schema_openshift_api_config_v1_HTPasswdIdentityProvider(ref),
 		"github.com/openshift/api/config/v1.HTTPServingInfo":                                                          schema_openshift_api_config_v1_HTTPServingInfo(ref),
+		"github.com/openshift/api/config/v1.HubSource":                                                                schema_openshift_api_config_v1_HubSource(ref),
+		"github.com/openshift/api/config/v1.HubSourceStatus":                                                          schema_openshift_api_config_v1_HubSourceStatus(ref),
 		"github.com/openshift/api/config/v1.IdentityProvider":                                                         schema_openshift_api_config_v1_IdentityProvider(ref),
 		"github.com/openshift/api/config/v1.IdentityProviderConfig":                                                   schema_openshift_api_config_v1_IdentityProviderConfig(ref),
 		"github.com/openshift/api/config/v1.Image":                                                                    schema_openshift_api_config_v1_Image(ref),
@@ -229,6 +231,10 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.OpenIDIdentityProvider":                                                   schema_openshift_api_config_v1_OpenIDIdentityProvider(ref),
 		"github.com/openshift/api/config/v1.OpenStackPlatformStatus":                                                  schema_openshift_api_config_v1_OpenStackPlatformStatus(ref),
 		"github.com/openshift/api/config/v1.OperandVersion":                                                           schema_openshift_api_config_v1_OperandVersion(ref),
+		"github.com/openshift/api/config/v1.OperatorHub":                                                              schema_openshift_api_config_v1_OperatorHub(ref),
+		"github.com/openshift/api/config/v1.OperatorHubList":                                                          schema_openshift_api_config_v1_OperatorHubList(ref),
+		"github.com/openshift/api/config/v1.OperatorHubSpec":                                                          schema_openshift_api_config_v1_OperatorHubSpec(ref),
+		"github.com/openshift/api/config/v1.OperatorHubStatus":                                                        schema_openshift_api_config_v1_OperatorHubStatus(ref),
 		"github.com/openshift/api/config/v1.PlatformStatus":                                                           schema_openshift_api_config_v1_PlatformStatus(ref),
 		"github.com/openshift/api/config/v1.Project":                                                                  schema_openshift_api_config_v1_Project(ref),
 		"github.com/openshift/api/config/v1.ProjectList":                                                              schema_openshift_api_config_v1_ProjectList(ref),
@@ -9706,6 +9712,83 @@ func schema_openshift_api_config_v1_HTTPServingInfo(ref common.ReferenceCallback
 	}
 }
 
+func schema_openshift_api_config_v1_HubSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HubSource is used to specify the OperatorSource and its configuration",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "name is the name of one of the default OperatorSources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"disabled": {
+						SchemaProps: spec.SchemaProps{
+							Description: "disabled is used to disable a default OperatorSource on cluster",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name", "disabled"},
+			},
+		},
+	}
+}
+
+func schema_openshift_api_config_v1_HubSourceStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HubSourceStatus is used to reflect the current state of applying the configuration to a default source",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "name is the name of one of the default OperatorSources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"configuration": {
+						SchemaProps: spec.SchemaProps{
+							Description: "configuration is the state of the default OperatorSources configuration",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "status indicates success or failure in applying the configuration",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "message provides more information regarding failures",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_config_v1_IdentityProvider(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -11345,6 +11428,154 @@ func schema_openshift_api_config_v1_OperandVersion(ref common.ReferenceCallback)
 	}
 }
 
+func schema_openshift_api_config_v1_OperatorHub(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "OperatorHub is the Schema for the operatorhubs API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/openshift/api/config/v1.OperatorHubSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/openshift/api/config/v1.OperatorHubStatus"),
+						},
+					},
+				},
+				Required: []string{"metadata", "spec", "status"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.OperatorHubSpec", "github.com/openshift/api/config/v1.OperatorHubStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_openshift_api_config_v1_OperatorHubList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "OperatorHubList contains a list of OperatorHub",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/openshift/api/config/v1.OperatorHub"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"metadata", "items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.OperatorHub", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_openshift_api_config_v1_OperatorHubSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "OperatorHubSpec defines the desired state of OperatorHub",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"hubSources": {
+						SchemaProps: spec.SchemaProps{
+							Description: "hubSources is the list of default OperatorSources and their configuration",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/openshift/api/config/v1.HubSource"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.HubSource"},
+	}
+}
+
+func schema_openshift_api_config_v1_OperatorHubStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "OperatorHubStatus defines the observed state of OperatorHub",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"hubSourcesStatus": {
+						SchemaProps: spec.SchemaProps{
+							Description: "hubSourcesStatus encapsulates the result applying the configuration",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/openshift/api/config/v1.HubSourceStatus"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.HubSourceStatus"},
+	}
+}
+
 func schema_openshift_api_config_v1_PlatformStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -11669,7 +11900,7 @@ func schema_openshift_api_config_v1_ProxySpec(ref common.ReferenceCallback) comm
 					},
 					"trustedCA": {
 						SchemaProps: spec.SchemaProps{
-							Description: "trustedCA is a reference to a ConfigMap containing a CA certificate bundle used for client egress HTTPS connections. The certificate bundle must be from the CA that signed the proxy's certificate and be signed for everything. trustedCA should only be consumed by a proxy validator. The validator is responsible for reading ConfigMapNameReference, validating the certificate and copying \"ca-bundle.crt\" from data to a ConfigMap in the namespace of an operator configured for proxy. The namespace for this ConfigMap is \"openshift-config-managed\". Here is an example ConfigMap (in yaml):\n\napiVersion: v1 kind: ConfigMap metadata:\n name: proxy-ca\n namespace: openshift-config-managed\n data:\n   ca-bundle.crt: |\n     -----BEGIN CERTIFICATE-----\n     Custom CA certificate bundle.\n     -----END CERTIFICATE-----",
+							Description: "trustedCA is a reference to a ConfigMap containing a CA certificate bundle used for client egress HTTPS connections. The certificate bundle must be from the CA that signed the proxy's certificate and be signed for everything. trustedCA should only be consumed by a proxy validator. The validator is responsible for reading ConfigMapNameReference, validating the certificate and copying \"ca-bundle.crt\" from data to a ConfigMap in the namespace of an operator configured for proxy. The namespace for this ConfigMap is \"openshift-config\". Here is an example ConfigMap (in yaml):\n\napiVersion: v1 kind: ConfigMap metadata:\n name: trusted-ca-bundle\n namespace: openshift-config\n data:\n   ca-bundle.crt: |\n     -----BEGIN CERTIFICATE-----\n     Custom CA certificate bundle.\n     -----END CERTIFICATE-----",
 							Ref:         ref("github.com/openshift/api/config/v1.ConfigMapNameReference"),
 						},
 					},
