@@ -72,7 +72,7 @@ func (s *SecureServingInfo) Serve(handler http.Handler, shutdownTimeout time.Dur
 		secureServer.TLSConfig.Certificates = nil
 		// need to load the certs at least once
 		if err := s.DynamicCertificates.CheckCerts(); err != nil {
-			return err
+			return nil, err
 		}
 		go s.DynamicCertificates.Run(stopCh)
 		secureServer.TLSConfig.GetCertificate = s.DynamicCertificates.GetCertificate
