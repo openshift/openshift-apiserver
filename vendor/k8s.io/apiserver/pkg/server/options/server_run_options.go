@@ -42,6 +42,7 @@ type ServerRunOptions struct {
 	MaxMutatingRequestsInFlight int
 	RequestTimeout              time.Duration
 	MinRequestTimeout           int
+	MinimalShutdownDuration     time.Duration
 	// We intentionally did not add a flag for this option. Users of the
 	// apiserver library can wire it to a flag.
 	JSONPatchMaxCopyBytes int64
@@ -60,6 +61,7 @@ func NewServerRunOptions() *ServerRunOptions {
 		MaxMutatingRequestsInFlight: defaults.MaxMutatingRequestsInFlight,
 		RequestTimeout:              defaults.RequestTimeout,
 		MinRequestTimeout:           defaults.MinRequestTimeout,
+		MinimalShutdownDuration:     defaults.MinimalShutdownDuration,
 		JSONPatchMaxCopyBytes:       defaults.JSONPatchMaxCopyBytes,
 		MaxRequestBodyBytes:         defaults.MaxRequestBodyBytes,
 	}
@@ -73,6 +75,7 @@ func (s *ServerRunOptions) ApplyTo(c *server.Config) error {
 	c.MaxMutatingRequestsInFlight = s.MaxMutatingRequestsInFlight
 	c.RequestTimeout = s.RequestTimeout
 	c.MinRequestTimeout = s.MinRequestTimeout
+	c.MinimalShutdownDuration = s.MinimalShutdownDuration
 	c.JSONPatchMaxCopyBytes = s.JSONPatchMaxCopyBytes
 	c.MaxRequestBodyBytes = s.MaxRequestBodyBytes
 	c.PublicAddress = s.AdvertiseAddress
@@ -173,6 +176,10 @@ func (s *ServerRunOptions) AddUniversalFlags(fs *pflag.FlagSet) {
 		"a request open before timing it out. Currently only honored by the watch request "+
 		"handler, which picks a randomized value above this number as the connection timeout, "+
 		"to spread out load.")
+
+	fs.DurationVar(&s.MinimalShutdownDuration, "minimal-shutdown-duration", s.MinimalShutdownDuration, ""+
+		"Minimal duration of a graceful shutdown, e.g. to guarantee that all endpoints pointing to this API server "+
+		"have converged")
 
 	utilfeature.DefaultMutableFeatureGate.AddFlag(fs)
 }

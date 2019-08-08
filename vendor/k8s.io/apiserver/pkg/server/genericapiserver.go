@@ -167,6 +167,10 @@ type GenericAPIServer struct {
 	// HandlerChainWaitGroup allows you to wait for all chain handlers finish after the server shutdown.
 	HandlerChainWaitGroup *utilwaitgroup.SafeWaitGroup
 
+	// MinimalShutdownDuration allows to block shutdown for some time, e.g. until endpoints pointing to this API server
+	// have converged on all node. During this time, the API server keeps serving.
+	MinimalShutdownDuration time.Duration
+
 	// The limit on the request body size that would be accepted and decoded in a write request.
 	// 0 means no limit.
 	maxRequestBodyBytes int64
@@ -320,6 +324,10 @@ func (s preparedGenericAPIServer) NonBlockingRun(stopCh <-chan struct{}) error {
 	// ensure cleanup.
 	go func() {
 		<-stopCh
+
+		// keep serving for some time
+		time.Sleep(s.GenericAPIServer.MinimalShutdownDuration)
+
 		close(internalStopCh)
 		if stoppedCh != nil {
 			<-stoppedCh

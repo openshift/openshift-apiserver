@@ -154,6 +154,9 @@ type Config struct {
 	// If specified, long running requests such as watch will be allocated a random timeout between this value, and
 	// twice this value.  Note that it is up to the request handlers to ignore or honor this timeout. In seconds.
 	MinRequestTimeout int
+	// MinimalShutdownDuration allows to block shutdown for some time, e.g. until endpoints pointing to this API server
+	// have converged on all node. During this time, the API server keeps serving.
+	MinimalShutdownDuration time.Duration
 	// The limit on the total size increase all "copy" operations in a json
 	// patch may cause.
 	// This affects all places that applies json patch in the binary.
@@ -262,6 +265,7 @@ func NewConfig(codecs serializer.CodecFactory) *Config {
 		MaxMutatingRequestsInFlight: 200,
 		RequestTimeout:              time.Duration(60) * time.Second,
 		MinRequestTimeout:           1800,
+		MinimalShutdownDuration:     0,
 		// 10MB is the recommended maximum client request size in bytes
 		// the etcd server should accept. See
 		// https://github.com/etcd-io/etcd/blob/release-3.3/etcdserver/server.go#L90.
@@ -449,8 +453,9 @@ func (c completedConfig) New(name string, delegationTarget DelegationTarget) (*G
 		delegationTarget:       delegationTarget,
 		HandlerChainWaitGroup:  c.HandlerChainWaitGroup,
 
-		minRequestTimeout: time.Duration(c.MinRequestTimeout) * time.Second,
-		ShutdownTimeout:   c.RequestTimeout,
+		minRequestTimeout:       time.Duration(c.MinRequestTimeout) * time.Second,
+		MinimalShutdownDuration: c.MinimalShutdownDuration,
+		ShutdownTimeout:         c.RequestTimeout,
 
 		SecureServingInfo: c.SecureServing,
 		ExternalAddress:   c.ExternalAddress,
