@@ -61,31 +61,19 @@ var (
 	kAuthzGroup                = kauthorizationapi.GroupName
 	kAuthnGroup                = kauthenticationapi.GroupName
 
-	deployGroup         = oapps.GroupName
-	authzGroup          = authorization.GroupName
-	buildGroup          = build.GroupName
-	configGroup         = config.GroupName
-	imageGroup          = image.GroupName
-	networkGroup        = network.GroupName
-	oauthGroup          = oauth.GroupName
-	projectGroup        = project.GroupName
-	quotaGroup          = quota.GroupName
-	routeGroup          = route.GroupName
-	securityGroup       = security.GroupName
-	templateGroup       = template.GroupName
-	userGroup           = user.GroupName
-	legacyAuthzGroup    = ""
-	legacyBuildGroup    = ""
-	legacyDeployGroup   = ""
-	legacyImageGroup    = ""
-	legacyProjectGroup  = ""
-	legacyQuotaGroup    = ""
-	legacyRouteGroup    = ""
-	legacyTemplateGroup = ""
-	legacyUserGroup     = ""
-	legacyOauthGroup    = ""
-	legacyNetworkGroup  = ""
-	legacySecurityGroup = ""
+	deployGroup   = oapps.GroupName
+	authzGroup    = authorization.GroupName
+	buildGroup    = build.GroupName
+	configGroup   = config.GroupName
+	imageGroup    = image.GroupName
+	networkGroup  = network.GroupName
+	oauthGroup    = oauth.GroupName
+	projectGroup  = project.GroupName
+	quotaGroup    = quota.GroupName
+	routeGroup    = route.GroupName
+	securityGroup = security.GroupName
+	templateGroup = template.GroupName
+	userGroup     = user.GroupName
 
 	userResource        = "users"
 	groupResource       = "groups"
@@ -124,8 +112,8 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: SudoerRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("impersonate").Groups(userGroup, legacyUserGroup).Resources(systemUserResource, userResource).Names(SystemAdminUsername).RuleOrDie(),
-				rbacv1helpers.NewRule("impersonate").Groups(userGroup, legacyUserGroup).Resources(systemGroupResource, groupResource).Names(MastersGroup).RuleOrDie(),
+				rbacv1helpers.NewRule("impersonate").Groups(userGroup).Resources(systemUserResource, userResource).Names(SystemAdminUsername).RuleOrDie(),
+				rbacv1helpers.NewRule("impersonate").Groups(userGroup).Resources(systemGroupResource, groupResource).Names(MastersGroup).RuleOrDie(),
 			},
 		},
 		{
@@ -198,42 +186,42 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				rbacv1helpers.NewRule(read...).Groups(certificatesGroup).Resources("certificatesigningrequests", "certificatesigningrequests/approval",
 					"certificatesigningrequests/status").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(authzGroup, legacyAuthzGroup).Resources("clusterroles", "clusterrolebindings", "roles", "rolebindings",
+				rbacv1helpers.NewRule(read...).Groups(authzGroup).Resources("clusterroles", "clusterrolebindings", "roles", "rolebindings",
 					"rolebindingrestrictions").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(buildGroup, legacyBuildGroup).Resources("builds/details").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(buildGroup).Resources("builds/details").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(imageGroup, legacyImageGroup).Resources("images", "imagesignatures").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(imageGroup).Resources("images", "imagesignatures").RuleOrDie(),
 				// pull images
-				rbacv1helpers.NewRule("get").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/layers").RuleOrDie(),
+				rbacv1helpers.NewRule("get").Groups(imageGroup).Resources("imagestreams/layers").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(oauthGroup, legacyOauthGroup).Resources("oauthclientauthorizations").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(oauthGroup).Resources("oauthclientauthorizations").RuleOrDie(),
 
 				// "get" comes in from aggregate-to-view role
-				rbacv1helpers.NewRule("list", "watch").Groups(projectGroup, legacyProjectGroup).Resources("projects").RuleOrDie(),
+				rbacv1helpers.NewRule("list", "watch").Groups(projectGroup).Resources("projects").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(projectGroup, legacyProjectGroup).Resources("projectrequests").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(projectGroup).Resources("projectrequests").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(quotaGroup, legacyQuotaGroup).Resources("clusterresourcequotas", "clusterresourcequotas/status").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(quotaGroup).Resources("clusterresourcequotas", "clusterresourcequotas/status").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(networkGroup, legacyNetworkGroup).Resources("clusternetworks", "egressnetworkpolicies", "hostsubnets",
+				rbacv1helpers.NewRule(read...).Groups(networkGroup).Resources("clusternetworks", "egressnetworkpolicies", "hostsubnets",
 					"netnamespaces").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(securityGroup, legacySecurityGroup).Resources("securitycontextconstraints").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(securityGroup).Resources("securitycontextconstraints").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(securityGroup).Resources("rangeallocations").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(templateGroup, legacyTemplateGroup).Resources("brokertemplateinstances", "templateinstances/status").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(templateGroup).Resources("brokertemplateinstances", "templateinstances/status").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(userGroup, legacyUserGroup).Resources("groups", "identities", "useridentitymappings", "users").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(userGroup).Resources("groups", "identities", "useridentitymappings", "users").RuleOrDie(),
 
 				// permissions to check access.  These creates are non-mutating
-				rbacv1helpers.NewRule("create").Groups(authzGroup, legacyAuthzGroup).Resources("localresourceaccessreviews", "localsubjectaccessreviews",
+				rbacv1helpers.NewRule("create").Groups(authzGroup).Resources("localresourceaccessreviews", "localsubjectaccessreviews",
 					"resourceaccessreviews", "selfsubjectrulesreviews", "subjectrulesreviews", "subjectaccessreviews").RuleOrDie(),
 				rbacv1helpers.NewRule("create").Groups(kAuthzGroup).Resources("selfsubjectaccessreviews", "subjectaccessreviews", "selfsubjectrulesreviews",
 					"localsubjectaccessreviews").RuleOrDie(),
 				rbacv1helpers.NewRule("create").Groups(kAuthnGroup).Resources("tokenreviews").RuleOrDie(),
 				// permissions to check PSP, these creates are non-mutating
-				rbacv1helpers.NewRule("create").Groups(securityGroup, legacySecurityGroup).Resources("podsecuritypolicysubjectreviews",
+				rbacv1helpers.NewRule("create").Groups(securityGroup).Resources("podsecuritypolicysubjectreviews",
 					"podsecuritypolicyselfsubjectreviews", "podsecuritypolicyreviews").RuleOrDie(),
 				// Allow read access to node metrics
 				rbacv1helpers.NewRule("get").Groups(kapiGroup).Resources("nodes/"+NodeMetricsSubresource, "nodes/"+NodeSpecSubresource).RuleOrDie(),
@@ -257,7 +245,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: BuildStrategyDockerRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources(DockerBuildResource, OptimizedDockerBuildResource).RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(buildGroup).Resources(DockerBuildResource, OptimizedDockerBuildResource).RuleOrDie(),
 			},
 		},
 		{
@@ -265,7 +253,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: BuildStrategyCustomRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources(CustomBuildResource).RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(buildGroup).Resources(CustomBuildResource).RuleOrDie(),
 			},
 		},
 		{
@@ -273,7 +261,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: BuildStrategySourceRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources(SourceBuildResource).RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(buildGroup).Resources(SourceBuildResource).RuleOrDie(),
 			},
 		},
 		{
@@ -281,7 +269,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: BuildStrategyJenkinsPipelineRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources(JenkinsPipelineBuildResource).RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(buildGroup).Resources(JenkinsPipelineBuildResource).RuleOrDie(),
 			},
 		},
 		{
@@ -299,48 +287,48 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			// a role for a namespace level admin.  It is `edit` plus the power to grant permissions to other users.
 			ObjectMeta: metav1.ObjectMeta{Name: AggregatedAdminRoleName, Labels: map[string]string{"rbac.authorization.k8s.io/aggregate-to-admin": "true"}},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule(readWrite...).Groups(authzGroup, legacyAuthzGroup).Resources("roles", "rolebindings").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(authzGroup, legacyAuthzGroup).Resources("localresourceaccessreviews", "localsubjectaccessreviews", "subjectrulesreviews").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(securityGroup, legacySecurityGroup).Resources("podsecuritypolicysubjectreviews", "podsecuritypolicyselfsubjectreviews", "podsecuritypolicyreviews").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(authzGroup).Resources("roles", "rolebindings").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(authzGroup).Resources("localresourceaccessreviews", "localsubjectaccessreviews", "subjectrulesreviews").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(securityGroup).Resources("podsecuritypolicysubjectreviews", "podsecuritypolicyselfsubjectreviews", "podsecuritypolicyreviews").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(authzGroup, legacyAuthzGroup).Resources("rolebindingrestrictions").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(authzGroup).Resources("rolebindingrestrictions").RuleOrDie(),
 
-				rbacv1helpers.NewRule(readWrite...).Groups(buildGroup, legacyBuildGroup).Resources("builds", "buildconfigs", "buildconfigs/webhooks").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(buildGroup, legacyBuildGroup).Resources("builds/log").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources("buildconfigs/instantiate", "buildconfigs/instantiatebinary", "builds/clone").RuleOrDie(),
-				rbacv1helpers.NewRule("update").Groups(buildGroup, legacyBuildGroup).Resources("builds/details").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(buildGroup).Resources("builds", "buildconfigs", "buildconfigs/webhooks").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(buildGroup).Resources("builds/log").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(buildGroup).Resources("buildconfigs/instantiate", "buildconfigs/instantiatebinary", "builds/clone").RuleOrDie(),
+				rbacv1helpers.NewRule("update").Groups(buildGroup).Resources("builds/details").RuleOrDie(),
 				// access to jenkins.  multiple values to ensure that covers relationships
 				rbacv1helpers.NewRule("admin", "edit", "view").Groups(build.GroupName).Resources("jenkins").RuleOrDie(),
 
-				rbacv1helpers.NewRule(readWrite...).Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs", "deploymentconfigs/scale").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigrollbacks", "deploymentconfigs/rollback", "deploymentconfigs/instantiate").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs/log", "deploymentconfigs/status").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(deployGroup).Resources("deploymentconfigs", "deploymentconfigs/scale").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(deployGroup).Resources("deploymentconfigrollbacks", "deploymentconfigs/rollback", "deploymentconfigs/instantiate").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(deployGroup).Resources("deploymentconfigs/log", "deploymentconfigs/status").RuleOrDie(),
 
-				rbacv1helpers.NewRule(readWrite...).Groups(imageGroup, legacyImageGroup).Resources("imagestreams", "imagestreammappings", "imagestreamtags", "imagestreamimages", "imagestreams/secrets").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(imageGroup, legacyImageGroup).Resources("imagestreams/status").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(imageGroup).Resources("imagestreams", "imagestreammappings", "imagestreamtags", "imagestreamimages", "imagestreams/secrets").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(imageGroup).Resources("imagestreams/status").RuleOrDie(),
 				// push and pull images
-				rbacv1helpers.NewRule("get", "update").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/layers").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(imageGroup, legacyImageGroup).Resources("imagestreamimports").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "update").Groups(imageGroup).Resources("imagestreams/layers").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(imageGroup).Resources("imagestreamimports").RuleOrDie(),
 
-				rbacv1helpers.NewRule("get", "patch", "update", "delete").Groups(projectGroup, legacyProjectGroup).Resources("projects").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "patch", "update", "delete").Groups(projectGroup).Resources("projects").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(quotaGroup, legacyQuotaGroup).Resources("appliedclusterresourcequotas").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(quotaGroup).Resources("appliedclusterresourcequotas").RuleOrDie(),
 
-				rbacv1helpers.NewRule(readWrite...).Groups(routeGroup, legacyRouteGroup).Resources("routes").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(routeGroup).Resources("routes").RuleOrDie(),
 				// admins can create routes with custom hosts
-				rbacv1helpers.NewRule("create").Groups(routeGroup, legacyRouteGroup).Resources("routes/custom-host").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(routeGroup, legacyRouteGroup).Resources("routes/status").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(routeGroup).Resources("routes/custom-host").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(routeGroup).Resources("routes/status").RuleOrDie(),
 				// an admin can run routers that write back conditions to the route
-				rbacv1helpers.NewRule("update").Groups(routeGroup, legacyRouteGroup).Resources("routes/status").RuleOrDie(),
+				rbacv1helpers.NewRule("update").Groups(routeGroup).Resources("routes/status").RuleOrDie(),
 
-				rbacv1helpers.NewRule(readWrite...).Groups(templateGroup, legacyTemplateGroup).Resources("templates", "templateconfigs", "processedtemplates", "templateinstances").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(templateGroup).Resources("templates", "templateconfigs", "processedtemplates", "templateinstances").RuleOrDie(),
 
 				rbacv1helpers.NewRule(readWrite...).Groups(extensionsGroup, networkingGroup).Resources("networkpolicies").RuleOrDie(),
 
 				// backwards compatibility
-				rbacv1helpers.NewRule(readWrite...).Groups(buildGroup, legacyBuildGroup).Resources("buildlogs").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(buildGroup).Resources("buildlogs").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(kapiGroup).Resources("resourcequotausages").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(authzGroup, legacyAuthzGroup).Resources("resourceaccessreviews", "subjectaccessreviews").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(authzGroup).Resources("resourceaccessreviews", "subjectaccessreviews").RuleOrDie(),
 			},
 		},
 		{
@@ -349,38 +337,38 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			// subresources or `quota`/`limits` which are used to control namespaces
 			ObjectMeta: metav1.ObjectMeta{Name: AggregatedEditRoleName, Labels: map[string]string{"rbac.authorization.k8s.io/aggregate-to-edit": "true"}},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule(readWrite...).Groups(buildGroup, legacyBuildGroup).Resources("builds", "buildconfigs", "buildconfigs/webhooks").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(buildGroup, legacyBuildGroup).Resources("builds/log").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources("buildconfigs/instantiate", "buildconfigs/instantiatebinary", "builds/clone").RuleOrDie(),
-				rbacv1helpers.NewRule("update").Groups(buildGroup, legacyBuildGroup).Resources("builds/details").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(buildGroup).Resources("builds", "buildconfigs", "buildconfigs/webhooks").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(buildGroup).Resources("builds/log").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(buildGroup).Resources("buildconfigs/instantiate", "buildconfigs/instantiatebinary", "builds/clone").RuleOrDie(),
+				rbacv1helpers.NewRule("update").Groups(buildGroup).Resources("builds/details").RuleOrDie(),
 				// access to jenkins.  multiple values to ensure that covers relationships
 				rbacv1helpers.NewRule("edit", "view").Groups(buildGroup).Resources("jenkins").RuleOrDie(),
 
-				rbacv1helpers.NewRule(readWrite...).Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs", "deploymentconfigs/scale").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigrollbacks", "deploymentconfigs/rollback", "deploymentconfigs/instantiate").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs/log", "deploymentconfigs/status").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(deployGroup).Resources("deploymentconfigs", "deploymentconfigs/scale").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(deployGroup).Resources("deploymentconfigrollbacks", "deploymentconfigs/rollback", "deploymentconfigs/instantiate").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(deployGroup).Resources("deploymentconfigs/log", "deploymentconfigs/status").RuleOrDie(),
 
-				rbacv1helpers.NewRule(readWrite...).Groups(imageGroup, legacyImageGroup).Resources("imagestreams", "imagestreammappings", "imagestreamtags", "imagestreamimages", "imagestreams/secrets").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(imageGroup, legacyImageGroup).Resources("imagestreams/status").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(imageGroup).Resources("imagestreams", "imagestreammappings", "imagestreamtags", "imagestreamimages", "imagestreams/secrets").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(imageGroup).Resources("imagestreams/status").RuleOrDie(),
 				// push and pull images
-				rbacv1helpers.NewRule("get", "update").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/layers").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(imageGroup, legacyImageGroup).Resources("imagestreamimports").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "update").Groups(imageGroup).Resources("imagestreams/layers").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(imageGroup).Resources("imagestreamimports").RuleOrDie(),
 
-				rbacv1helpers.NewRule("get").Groups(projectGroup, legacyProjectGroup).Resources("projects").RuleOrDie(),
+				rbacv1helpers.NewRule("get").Groups(projectGroup).Resources("projects").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(quotaGroup, legacyQuotaGroup).Resources("appliedclusterresourcequotas").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(quotaGroup).Resources("appliedclusterresourcequotas").RuleOrDie(),
 
-				rbacv1helpers.NewRule(readWrite...).Groups(routeGroup, legacyRouteGroup).Resources("routes").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(routeGroup).Resources("routes").RuleOrDie(),
 				// editors can create routes with custom hosts
-				rbacv1helpers.NewRule("create").Groups(routeGroup, legacyRouteGroup).Resources("routes/custom-host").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(routeGroup, legacyRouteGroup).Resources("routes/status").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(routeGroup).Resources("routes/custom-host").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(routeGroup).Resources("routes/status").RuleOrDie(),
 
-				rbacv1helpers.NewRule(readWrite...).Groups(templateGroup, legacyTemplateGroup).Resources("templates", "templateconfigs", "processedtemplates", "templateinstances").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(templateGroup).Resources("templates", "templateconfigs", "processedtemplates", "templateinstances").RuleOrDie(),
 
 				rbacv1helpers.NewRule(readWrite...).Groups(extensionsGroup, networkingGroup).Resources("networkpolicies").RuleOrDie(),
 
 				// backwards compatibility
-				rbacv1helpers.NewRule(readWrite...).Groups(buildGroup, legacyBuildGroup).Resources("buildlogs").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(buildGroup).Resources("buildlogs").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(kapiGroup).Resources("resourcequotausages").RuleOrDie(),
 			},
 		},
@@ -389,31 +377,31 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			// a namespace.
 			ObjectMeta: metav1.ObjectMeta{Name: AggregatedViewRoleName, Labels: map[string]string{"rbac.authorization.k8s.io/aggregate-to-view": "true"}},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule(read...).Groups(buildGroup, legacyBuildGroup).Resources("builds", "buildconfigs", "buildconfigs/webhooks").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(buildGroup, legacyBuildGroup).Resources("builds/log").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(buildGroup).Resources("builds", "buildconfigs", "buildconfigs/webhooks").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(buildGroup).Resources("builds/log").RuleOrDie(),
 				// access to jenkins
 				rbacv1helpers.NewRule("view").Groups(buildGroup).Resources("jenkins").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs", "deploymentconfigs/scale").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs/log", "deploymentconfigs/status").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(deployGroup).Resources("deploymentconfigs", "deploymentconfigs/scale").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(deployGroup).Resources("deploymentconfigs/log", "deploymentconfigs/status").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(imageGroup, legacyImageGroup).Resources("imagestreams", "imagestreammappings", "imagestreamtags", "imagestreamimages").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(imageGroup, legacyImageGroup).Resources("imagestreams/status").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(imageGroup).Resources("imagestreams", "imagestreammappings", "imagestreamtags", "imagestreamimages").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(imageGroup).Resources("imagestreams/status").RuleOrDie(),
 				// TODO let them pull images?
 				// pull images
-				// rbacv1helpers.NewRule("get").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/layers").RuleOrDie(),
+				// rbacv1helpers.NewRule("get").Groups(imageGroup, ).Resources("imagestreams/layers").RuleOrDie(),
 
-				rbacv1helpers.NewRule("get").Groups(projectGroup, legacyProjectGroup).Resources("projects").RuleOrDie(),
+				rbacv1helpers.NewRule("get").Groups(projectGroup).Resources("projects").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(quotaGroup, legacyQuotaGroup).Resources("appliedclusterresourcequotas").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(quotaGroup).Resources("appliedclusterresourcequotas").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(routeGroup, legacyRouteGroup).Resources("routes").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(routeGroup, legacyRouteGroup).Resources("routes/status").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(routeGroup).Resources("routes").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(routeGroup).Resources("routes/status").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(templateGroup, legacyTemplateGroup).Resources("templates", "templateconfigs", "processedtemplates", "templateinstances").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(templateGroup).Resources("templates", "templateconfigs", "processedtemplates", "templateinstances").RuleOrDie(),
 
 				// backwards compatibility
-				rbacv1helpers.NewRule(read...).Groups(buildGroup, legacyBuildGroup).Resources("buildlogs").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(buildGroup).Resources("buildlogs").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(kapiGroup).Resources("resourcequotausages").RuleOrDie(),
 			},
 		},
@@ -425,13 +413,13 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				},
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("get").Groups(userGroup, legacyUserGroup).Resources("users").Names("~").RuleOrDie(),
-				rbacv1helpers.NewRule("list").Groups(projectGroup, legacyProjectGroup).Resources("projectrequests").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "list").Groups(authzGroup, legacyAuthzGroup).Resources("clusterroles").RuleOrDie(),
+				rbacv1helpers.NewRule("get").Groups(userGroup).Resources("users").Names("~").RuleOrDie(),
+				rbacv1helpers.NewRule("list").Groups(projectGroup).Resources("projectrequests").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list").Groups(authzGroup).Resources("clusterroles").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(rbacGroup).Resources("clusterroles").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list").Groups(storageGroup).Resources("storageclasses").RuleOrDie(),
-				rbacv1helpers.NewRule("list", "watch").Groups(projectGroup, legacyProjectGroup).Resources("projects").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(authzGroup, legacyAuthzGroup).Resources("selfsubjectrulesreviews").RuleOrDie(),
+				rbacv1helpers.NewRule("list", "watch").Groups(projectGroup).Resources("projects").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(authzGroup).Resources("selfsubjectrulesreviews").RuleOrDie(),
 				rbacv1helpers.NewRule("create").Groups(kAuthzGroup).Resources("selfsubjectaccessreviews").RuleOrDie(),
 			},
 		},
@@ -440,7 +428,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: SelfAccessReviewerRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("create").Groups(authzGroup, legacyAuthzGroup).Resources("selfsubjectrulesreviews").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(authzGroup).Resources("selfsubjectrulesreviews").RuleOrDie(),
 				rbacv1helpers.NewRule("create").Groups(kAuthzGroup).Resources("selfsubjectaccessreviews").RuleOrDie(),
 			},
 		},
@@ -452,7 +440,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				},
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("create").Groups(projectGroup, legacyProjectGroup).Resources("projectrequests").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(projectGroup).Resources("projectrequests").RuleOrDie(),
 			},
 		},
 		{
@@ -473,7 +461,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: ImageAuditorRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("get", "list", "watch", "patch", "update").Groups(imageGroup, legacyImageGroup).Resources("images").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list", "watch", "patch", "update").Groups(imageGroup).Resources("images").RuleOrDie(),
 			},
 		},
 		{
@@ -485,7 +473,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			},
 			Rules: []rbacv1.PolicyRule{
 				// pull images
-				rbacv1helpers.NewRule("get").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/layers").RuleOrDie(),
+				rbacv1helpers.NewRule("get").Groups(imageGroup).Resources("imagestreams/layers").RuleOrDie(),
 			},
 		},
 		{
@@ -501,7 +489,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			},
 			Rules: []rbacv1.PolicyRule{
 				// push and pull images
-				rbacv1helpers.NewRule("get", "update").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/layers").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "update").Groups(imageGroup).Resources("imagestreams/layers").RuleOrDie(),
 			},
 		},
 		{
@@ -515,11 +503,11 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			},
 			Rules: []rbacv1.PolicyRule{
 				// push and pull images
-				rbacv1helpers.NewRule("get", "update").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/layers").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "update").Groups(imageGroup).Resources("imagestreams/layers").RuleOrDie(),
 				// allow auto-provisioning when pushing an image that doesn't have an imagestream yet
-				rbacv1helpers.NewRule("create").Groups(imageGroup, legacyImageGroup).Resources("imagestreams").RuleOrDie(),
-				rbacv1helpers.NewRule("update").Groups(buildGroup, legacyBuildGroup).Resources("builds/details").RuleOrDie(),
-				rbacv1helpers.NewRule("get").Groups(buildGroup, legacyBuildGroup).Resources("builds").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(imageGroup).Resources("imagestreams").RuleOrDie(),
+				rbacv1helpers.NewRule("update").Groups(buildGroup).Resources("builds/details").RuleOrDie(),
+				rbacv1helpers.NewRule("get").Groups(buildGroup).Resources("builds").RuleOrDie(),
 			},
 		},
 		{
@@ -529,15 +517,15 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			Rules: []rbacv1.PolicyRule{
 				rbacv1helpers.NewRule("get", "list").Groups(kapiGroup).Resources("pods", "replicationcontrollers").RuleOrDie(),
 				rbacv1helpers.NewRule("list").Groups(kapiGroup).Resources("limitranges").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "list").Groups(buildGroup, legacyBuildGroup).Resources("buildconfigs", "builds").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "list").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list").Groups(buildGroup).Resources("buildconfigs", "builds").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list").Groups(deployGroup).Resources("deploymentconfigs").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list").Groups(appsGroup, extensionsGroup).Resources("daemonsets").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list").Groups(appsGroup, extensionsGroup).Resources("deployments").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list").Groups(appsGroup, extensionsGroup).Resources("replicasets").RuleOrDie(),
 
-				rbacv1helpers.NewRule("delete").Groups(imageGroup, legacyImageGroup).Resources("images").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "list", "watch").Groups(imageGroup, legacyImageGroup).Resources("images", "imagestreams").RuleOrDie(),
-				rbacv1helpers.NewRule("update").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/status").RuleOrDie(),
+				rbacv1helpers.NewRule("delete").Groups(imageGroup).Resources("images").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list", "watch").Groups(imageGroup).Resources("images", "imagestreams").RuleOrDie(),
+				rbacv1helpers.NewRule("update").Groups(imageGroup).Resources("imagestreams/status").RuleOrDie(),
 			},
 		},
 		{
@@ -545,8 +533,8 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: ImageSignerRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("get").Groups(imageGroup, legacyImageGroup).Resources("images", "imagestreams/layers").RuleOrDie(),
-				rbacv1helpers.NewRule("create", "delete").Groups(imageGroup, legacyImageGroup).Resources("imagesignatures").RuleOrDie(),
+				rbacv1helpers.NewRule("get").Groups(imageGroup).Resources("images", "imagestreams/layers").RuleOrDie(),
+				rbacv1helpers.NewRule("create", "delete").Groups(imageGroup).Resources("imagesignatures").RuleOrDie(),
 			},
 		},
 		{
@@ -567,7 +555,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				rbacv1helpers.NewRule("get").Groups(kapiGroup).Resources("pods/log").RuleOrDie(),
 				rbacv1helpers.NewRule("create", "list").Groups(kapiGroup).Resources("events").RuleOrDie(),
 
-				rbacv1helpers.NewRule("create", "update").Groups(imageGroup, legacyImageGroup).Resources("imagestreamtags").RuleOrDie(),
+				rbacv1helpers.NewRule("create", "update").Groups(imageGroup).Resources("imagestreamtags").RuleOrDie(),
 			},
 		},
 		{
@@ -584,7 +572,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: OAuthTokenDeleterRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("delete").Groups(oauthGroup, legacyOauthGroup).Resources("oauthaccesstokens", "oauthauthorizetokens").RuleOrDie(),
+				rbacv1helpers.NewRule("delete").Groups(oauthGroup).Resources("oauthaccesstokens", "oauthauthorizetokens").RuleOrDie(),
 			},
 		},
 		{
@@ -598,8 +586,8 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				rbacv1helpers.NewRule("create").Groups(kAuthnGroup).Resources("tokenreviews").RuleOrDie(),
 				rbacv1helpers.NewRule("create").Groups(kAuthzGroup).Resources("subjectaccessreviews").RuleOrDie(),
 
-				rbacv1helpers.NewRule("list", "watch").Groups(routeGroup, legacyRouteGroup).Resources("routes").RuleOrDie(),
-				rbacv1helpers.NewRule("update").Groups(routeGroup, legacyRouteGroup).Resources("routes/status").RuleOrDie(),
+				rbacv1helpers.NewRule("list", "watch").Groups(routeGroup).Resources("routes").RuleOrDie(),
+				rbacv1helpers.NewRule("update").Groups(routeGroup).Resources("routes/status").RuleOrDie(),
 			},
 		},
 		{
@@ -609,10 +597,10 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			Rules: []rbacv1.PolicyRule{
 				rbacv1helpers.NewRule("list").Groups(kapiGroup).Resources("limitranges", "resourcequotas", "imagestreams").RuleOrDie(),
 
-				rbacv1helpers.NewRule("get", "delete").Groups(imageGroup, legacyImageGroup).Resources("images", "imagestreamtags").RuleOrDie(),
-				rbacv1helpers.NewRule("get").Groups(imageGroup, legacyImageGroup).Resources("imagestreamimages", "imagestreams/secrets").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "update").Groups(imageGroup, legacyImageGroup).Resources("images", "imagestreams").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(imageGroup, legacyImageGroup).Resources("imagestreammappings").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "delete").Groups(imageGroup).Resources("images", "imagestreamtags").RuleOrDie(),
+				rbacv1helpers.NewRule("get").Groups(imageGroup).Resources("imagestreamimages", "imagestreams/secrets").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "update").Groups(imageGroup).Resources("images", "imagestreams").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(imageGroup).Resources("imagestreammappings").RuleOrDie(),
 			},
 		},
 		{
@@ -648,11 +636,11 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: SDNReaderRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule(read...).Groups(networkGroup, legacyNetworkGroup).Resources("egressnetworkpolicies", "hostsubnets", "netnamespaces").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(networkGroup).Resources("egressnetworkpolicies", "hostsubnets", "netnamespaces").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(kapiGroup).Resources("nodes", "namespaces").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(extensionsGroup).Resources("networkpolicies").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(networkingGroup).Resources("networkpolicies").RuleOrDie(),
-				rbacv1helpers.NewRule("get").Groups(networkGroup, legacyNetworkGroup).Resources("clusternetworks").RuleOrDie(),
+				rbacv1helpers.NewRule("get").Groups(networkGroup).Resources("clusternetworks").RuleOrDie(),
 				rbacv1helpers.NewRule("create", "update", "patch").Groups(kapiGroup).Resources("events").RuleOrDie(),
 			},
 		},
@@ -662,8 +650,8 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: SDNManagerRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("get", "list", "watch", "create", "delete").Groups(networkGroup, legacyNetworkGroup).Resources("hostsubnets", "netnamespaces").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "create").Groups(networkGroup, legacyNetworkGroup).Resources("clusternetworks").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list", "watch", "create", "delete").Groups(networkGroup).Resources("hostsubnets", "netnamespaces").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "create").Groups(networkGroup).Resources("clusternetworks").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(kapiGroup).Resources("nodes").RuleOrDie(),
 			},
 		},
@@ -673,7 +661,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: WebHooksRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("get", "create").Groups(buildGroup, legacyBuildGroup).Resources("buildconfigs/webhooks").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "create").Groups(buildGroup).Resources("buildconfigs/webhooks").RuleOrDie(),
 			},
 		},
 
@@ -693,19 +681,19 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			},
 			Rules: []rbacv1.PolicyRule{
 				rbacv1helpers.NewRule(readWrite...).Groups(kapiGroup).Resources("serviceaccounts", "secrets").RuleOrDie(),
-				rbacv1helpers.NewRule(readWrite...).Groups(imageGroup, legacyImageGroup).Resources("imagestreamimages", "imagestreammappings", "imagestreams", "imagestreams/secrets", "imagestreamtags").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(imageGroup, legacyImageGroup).Resources("imagestreamimports").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "update").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/layers").RuleOrDie(),
-				rbacv1helpers.NewRule(readWrite...).Groups(authzGroup, legacyAuthzGroup).Resources("rolebindings", "roles").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(imageGroup).Resources("imagestreamimages", "imagestreammappings", "imagestreams", "imagestreams/secrets", "imagestreamtags").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(imageGroup).Resources("imagestreamimports").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "update").Groups(imageGroup).Resources("imagestreams/layers").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(authzGroup).Resources("rolebindings", "roles").RuleOrDie(),
 				rbacv1helpers.NewRule(readWrite...).Groups(rbacGroup).Resources("roles", "rolebindings").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(authzGroup, legacyAuthzGroup).Resources("localresourceaccessreviews", "localsubjectaccessreviews", "subjectrulesreviews").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(authzGroup).Resources("localresourceaccessreviews", "localsubjectaccessreviews", "subjectrulesreviews").RuleOrDie(),
 				rbacv1helpers.NewRule("create").Groups(kAuthzGroup).Resources("localsubjectaccessreviews").RuleOrDie(),
 
 				rbacv1helpers.NewRule("get").Groups(kapiGroup).Resources("namespaces").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "delete").Groups(projectGroup, legacyProjectGroup).Resources("projects").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "delete").Groups(projectGroup).Resources("projects").RuleOrDie(),
 
 				// backwards compatibility
-				rbacv1helpers.NewRule("create").Groups(authzGroup, legacyAuthzGroup).Resources("resourceaccessreviews", "subjectaccessreviews").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(authzGroup).Resources("resourceaccessreviews", "subjectaccessreviews").RuleOrDie(),
 			},
 		},
 		{
@@ -715,12 +703,12 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			},
 			Rules: []rbacv1.PolicyRule{
 				rbacv1helpers.NewRule(readWrite...).Groups(kapiGroup).Resources("serviceaccounts", "secrets").RuleOrDie(),
-				rbacv1helpers.NewRule(readWrite...).Groups(imageGroup, legacyImageGroup).Resources("imagestreamimages", "imagestreammappings", "imagestreams", "imagestreams/secrets", "imagestreamtags").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(imageGroup, legacyImageGroup).Resources("imagestreamimports").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "update").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/layers").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(imageGroup).Resources("imagestreamimages", "imagestreammappings", "imagestreams", "imagestreams/secrets", "imagestreamtags").RuleOrDie(),
+				rbacv1helpers.NewRule("create").Groups(imageGroup).Resources("imagestreamimports").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "update").Groups(imageGroup).Resources("imagestreams/layers").RuleOrDie(),
 
 				rbacv1helpers.NewRule("get").Groups(kapiGroup).Resources("namespaces").RuleOrDie(),
-				rbacv1helpers.NewRule("get").Groups(projectGroup, legacyProjectGroup).Resources("projects").RuleOrDie(),
+				rbacv1helpers.NewRule("get").Groups(projectGroup).Resources("projects").RuleOrDie(),
 			},
 		},
 		{
@@ -729,11 +717,11 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Labels: map[string]string{"rbac.authorization.k8s.io/aggregate-to-view": "true"},
 			},
 			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule(read...).Groups(imageGroup, legacyImageGroup).Resources("imagestreamimages", "imagestreammappings", "imagestreams", "imagestreamtags").RuleOrDie(),
-				rbacv1helpers.NewRule("get").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/layers").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(imageGroup).Resources("imagestreamimages", "imagestreammappings", "imagestreams", "imagestreamtags").RuleOrDie(),
+				rbacv1helpers.NewRule("get").Groups(imageGroup).Resources("imagestreams/layers").RuleOrDie(),
 
 				rbacv1helpers.NewRule("get").Groups(kapiGroup).Resources("namespaces").RuleOrDie(),
-				rbacv1helpers.NewRule("get").Groups(projectGroup, legacyProjectGroup).Resources("projects").RuleOrDie(),
+				rbacv1helpers.NewRule("get").Groups(projectGroup).Resources("projects").RuleOrDie(),
 			},
 		},
 		{

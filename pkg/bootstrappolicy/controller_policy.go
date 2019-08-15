@@ -95,17 +95,17 @@ func init() {
 	addControllerRole(rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraBuildControllerServiceAccountName},
 		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("get", "list", "watch", "patch", "update", "delete").Groups(buildGroup, legacyBuildGroup).Resources("builds").RuleOrDie(),
-			rbacv1helpers.NewRule("update").Groups(buildGroup, legacyBuildGroup).Resources("builds/finalizers").RuleOrDie(),
-			rbacv1helpers.NewRule("get").Groups(buildGroup, legacyBuildGroup).Resources("buildconfigs").RuleOrDie(),
-			rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources("builds/optimizeddocker", "builds/docker", "builds/source", "builds/custom", "builds/jenkinspipeline").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "list").Groups(imageGroup, legacyImageGroup).Resources("imagestreams").RuleOrDie(),
+			rbacv1helpers.NewRule("get", "list", "watch", "patch", "update", "delete").Groups(buildGroup).Resources("builds").RuleOrDie(),
+			rbacv1helpers.NewRule("update").Groups(buildGroup).Resources("builds/finalizers").RuleOrDie(),
+			rbacv1helpers.NewRule("get").Groups(buildGroup).Resources("buildconfigs").RuleOrDie(),
+			rbacv1helpers.NewRule("create").Groups(buildGroup).Resources("builds/optimizeddocker", "builds/docker", "builds/source", "builds/custom", "builds/jenkinspipeline").RuleOrDie(),
+			rbacv1helpers.NewRule("get", "list").Groups(imageGroup).Resources("imagestreams").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "list").Groups(kapiGroup).Resources("secrets").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "list", "create").Groups(kapiGroup).Resources("configmaps").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "list", "create", "delete").Groups(kapiGroup).Resources("pods").RuleOrDie(),
 			rbacv1helpers.NewRule("get").Groups(kapiGroup).Resources("namespaces").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "list").Groups(kapiGroup).Resources("serviceaccounts").RuleOrDie(),
-			rbacv1helpers.NewRule("create").Groups(securityGroup, legacySecurityGroup).Resources("podsecuritypolicysubjectreviews").RuleOrDie(),
+			rbacv1helpers.NewRule("create").Groups(securityGroup).Resources("podsecuritypolicysubjectreviews").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "list").Groups(configGroup).Resources("builds").RuleOrDie(),
 			eventsRule(),
 		},
@@ -115,9 +115,9 @@ func init() {
 	addControllerRole(rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraBuildConfigChangeControllerServiceAccountName},
 		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("get", "list", "watch").Groups(buildGroup, legacyBuildGroup).Resources("buildconfigs").RuleOrDie(),
-			rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources("buildconfigs/instantiate").RuleOrDie(),
-			rbacv1helpers.NewRule("delete").Groups(buildGroup, legacyBuildGroup).Resources("builds").RuleOrDie(),
+			rbacv1helpers.NewRule("get", "list", "watch").Groups(buildGroup).Resources("buildconfigs").RuleOrDie(),
+			rbacv1helpers.NewRule("create").Groups(buildGroup).Resources("buildconfigs/instantiate").RuleOrDie(),
+			rbacv1helpers.NewRule("delete").Groups(buildGroup).Resources("builds").RuleOrDie(),
 			eventsRule(),
 		},
 	})
@@ -144,9 +144,9 @@ func init() {
 		Rules: []rbacv1.PolicyRule{
 			rbacv1helpers.NewRule("create", "get", "list", "watch", "update", "patch", "delete").Groups(kapiGroup).Resources("replicationcontrollers").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "update").Groups(kapiGroup).Resources("replicationcontrollers/scale").RuleOrDie(),
-			rbacv1helpers.NewRule("update").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs/status").RuleOrDie(),
-			rbacv1helpers.NewRule("update").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs/finalizers").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "list", "watch").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs").RuleOrDie(),
+			rbacv1helpers.NewRule("update").Groups(deployGroup).Resources("deploymentconfigs/status").RuleOrDie(),
+			rbacv1helpers.NewRule("update").Groups(deployGroup).Resources("deploymentconfigs/finalizers").RuleOrDie(),
+			rbacv1helpers.NewRule("get", "list", "watch").Groups(deployGroup).Resources("deploymentconfigs").RuleOrDie(),
 			eventsRule(),
 		},
 	})
@@ -214,16 +214,16 @@ func init() {
 	addControllerRole(rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraImageTriggerControllerServiceAccountName},
 		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("list", "watch").Groups(imageGroup, legacyImageGroup).Resources("imagestreams").RuleOrDie(),
+			rbacv1helpers.NewRule("list", "watch").Groups(imageGroup).Resources("imagestreams").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "update").Groups(extensionsGroup).Resources("daemonsets").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "update").Groups(extensionsGroup, appsGroup).Resources("deployments").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "update").Groups(appsGroup).Resources("statefulsets").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "update").Groups(batchGroup).Resources("cronjobs").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs").RuleOrDie(),
-			rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources("buildconfigs/instantiate").RuleOrDie(),
+			rbacv1helpers.NewRule("get", "update").Groups(deployGroup).Resources("deploymentconfigs").RuleOrDie(),
+			rbacv1helpers.NewRule("create").Groups(buildGroup).Resources("buildconfigs/instantiate").RuleOrDie(),
 			// trigger controller must be able to modify these build types
 			// TODO: move to a new custom binding that can be removed separately from end user access?
-			rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources(
+			rbacv1helpers.NewRule("create").Groups(buildGroup).Resources(
 				SourceBuildResource,
 				DockerBuildResource,
 				CustomBuildResource,
@@ -249,9 +249,9 @@ func init() {
 	addControllerRole(rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraImageImportControllerServiceAccountName},
 		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("get", "list", "watch", "create", "update").Groups(imageGroup, legacyImageGroup).Resources("imagestreams").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "list", "watch", "create", "update", "patch", "delete").Groups(imageGroup, legacyImageGroup).Resources("images").RuleOrDie(),
-			rbacv1helpers.NewRule("create").Groups(imageGroup, legacyImageGroup).Resources("imagestreamimports").RuleOrDie(),
+			rbacv1helpers.NewRule("get", "list", "watch", "create", "update").Groups(imageGroup).Resources("imagestreams").RuleOrDie(),
+			rbacv1helpers.NewRule("get", "list", "watch", "create", "update", "patch", "delete").Groups(imageGroup).Resources("images").RuleOrDie(),
+			rbacv1helpers.NewRule("create").Groups(imageGroup).Resources("imagestreamimports").RuleOrDie(),
 			eventsRule(),
 		},
 	})
@@ -262,7 +262,7 @@ func init() {
 		Rules: []rbacv1.PolicyRule{
 			rbacv1helpers.NewRule("get", "list").Groups(kapiGroup).Resources("configmaps").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "list").Groups(kapiGroup).Resources("secrets").RuleOrDie(),
-			rbacv1helpers.NewRule("update").Groups(quotaGroup, legacyQuotaGroup).Resources("clusterresourcequotas/status").RuleOrDie(),
+			rbacv1helpers.NewRule("update").Groups(quotaGroup).Resources("clusterresourcequotas/status").RuleOrDie(),
 			eventsRule(),
 		},
 	})
@@ -273,9 +273,9 @@ func init() {
 		Rules: []rbacv1.PolicyRule{
 			rbacv1helpers.NewRule("get", "update").Groups(kapiGroup).Resources("replicationcontrollers/scale", "endpoints").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "update", "patch").Groups(kapiGroup).Resources("replicationcontrollers").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update", "patch").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs").RuleOrDie(),
+			rbacv1helpers.NewRule("get", "update", "patch").Groups(deployGroup).Resources("deploymentconfigs").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "update").Groups(extensionsGroup, appsGroup).Resources("replicasets/scale", "deployments/scale").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs/scale").RuleOrDie(),
+			rbacv1helpers.NewRule("get", "update").Groups(deployGroup).Resources("deploymentconfigs/scale").RuleOrDie(),
 			rbacv1helpers.NewRule("watch", "list").Groups(kapiGroup).Resources("events").RuleOrDie(),
 			eventsRule(),
 		},
@@ -334,7 +334,7 @@ func init() {
 	addControllerRole(rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraHorizontalPodAutoscalerControllerServiceAccountName},
 		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("get", "update").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs/scale").RuleOrDie(),
+			rbacv1helpers.NewRule("get", "update").Groups(deployGroup).Resources("deploymentconfigs/scale").RuleOrDie(),
 		},
 	})
 
@@ -351,7 +351,6 @@ func init() {
 			rbacv1helpers.NewRule("get", "list", "watch").Groups(templateGroup).Resources("templates").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "create", "delete").Groups(kapiGroup).Resources("secrets").RuleOrDie(),
 			rbacv1helpers.NewRule("get").Groups(kapiGroup).Resources("services", "configmaps").RuleOrDie(),
-			rbacv1helpers.NewRule("get").Groups(legacyRouteGroup).Resources("routes").RuleOrDie(),
 			rbacv1helpers.NewRule("get").Groups(routeGroup).Resources("routes").RuleOrDie(),
 			eventsRule(),
 		},
