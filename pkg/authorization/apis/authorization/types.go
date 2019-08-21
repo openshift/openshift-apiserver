@@ -1,7 +1,6 @@
 package authorization
 
 import (
-	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -32,27 +31,6 @@ const (
 	SystemUserKind     = "SystemUser"
 	SystemGroupKind    = "SystemGroup"
 )
-
-// DiscoveryRule is a rule that allows a client to discover the API resources available on this server
-var DiscoveryRule = rbacv1.PolicyRule{
-	Verbs: []string{"get"},
-	NonResourceURLs: []string{
-		// Server version checking
-		"/version", "/version/*",
-
-		// API discovery/negotiation
-		"/api", "/api/*",
-		"/apis", "/apis/*",
-		"/oapi", "/oapi/*",
-		"/openapi/v2",
-		"/swaggerapi", "/swaggerapi/*", "/swagger.json", "/swagger-2.0.0.pb-v1",
-		"/osapi", "/osapi/", // these cannot be removed until we can drop support for pre 3.1 clients
-		"/.well-known", "/.well-known/*",
-
-		// we intentionally allow all to here
-		"/",
-	},
-}
 
 // PolicyRule holds information that describes a policy rule, but does not contain information
 // about who the rule applies to or which namespace the rule applies to.
