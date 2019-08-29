@@ -12,8 +12,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/generic"
-	"k8s.io/apiserver/pkg/storage/etcd/etcdtest"
-	etcdtesting "k8s.io/apiserver/pkg/storage/etcd/testing"
+
+	//"k8s.io/apiserver/pkg/storage/etcd/etcdtest"
+
+	// etcdtesting "k8s.io/apiserver/pkg/storage/etcd/testing"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	imagev1 "github.com/openshift/api/image/v1"
@@ -209,7 +211,7 @@ func TestGet(t *testing.T) {
 				ctx = apirequest.WithNamespace(apirequest.NewContext(), test.repo.Namespace)
 				_, err := client.Put(
 					context.TODO(),
-					etcdtest.AddPrefix("/imagestreams/"+test.repo.Namespace+"/"+test.repo.Name),
+					//etcdtest.AddPrefix("/imagestreams/"+test.repo.Namespace+"/"+test.repo.Name),
 					runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), test.repo),
 				)
 				if err != nil {
@@ -220,7 +222,7 @@ func TestGet(t *testing.T) {
 			if test.image != nil {
 				_, err := client.Put(
 					context.TODO(),
-					etcdtest.AddPrefix("/images/"+test.image.Name),
+					//etcdtest.AddPrefix("/images/"+test.image.Name),
 					runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), test.image),
 				)
 				if err != nil {
