@@ -12,7 +12,8 @@ import (
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistrytest "k8s.io/apiserver/pkg/registry/generic/testing"
 	"k8s.io/apiserver/pkg/registry/rest"
-	etcdtesting "k8s.io/apiserver/pkg/storage/etcd/testing"
+
+	// etcdtesting "k8s.io/apiserver/pkg/storage/etcd/testing"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	kapihelper "k8s.io/kubernetes/pkg/apis/core/helper"
 
@@ -20,6 +21,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/fake"
 	admfake "github.com/openshift/openshift-apiserver/pkg/image/apiserver/admission/fake"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
+
 	// install all APIs
 	_ "github.com/openshift/openshift-apiserver/pkg/api/install"
 )
