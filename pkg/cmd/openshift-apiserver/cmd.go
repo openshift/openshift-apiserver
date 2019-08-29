@@ -17,8 +17,10 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
-	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
-	"k8s.io/kubernetes/pkg/kubectl/util/templates"
+
+	// kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
+
+	// "k8s.io/kubernetes/pkg/kubectl/util/templates"
 
 	configv1 "github.com/openshift/api/config/v1"
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
@@ -34,8 +36,8 @@ type OpenShiftAPIServer struct {
 	Output     io.Writer
 }
 
-var longDescription = templates.LongDesc(`
-	Start an apiserver that contains the OpenShift resources`)
+//var longDescription = templates.LongDesc(`
+var longDescription = `Start an apiserver that contains the OpenShift resources`
 
 func NewOpenShiftAPIServerCommand(name string, out, errout io.Writer, stopCh <-chan struct{}) *cobra.Command {
 	options := &OpenShiftAPIServer{Output: out}
