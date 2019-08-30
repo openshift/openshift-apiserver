@@ -10,7 +10,6 @@ import (
 
 	etcd "github.com/coreos/etcd/clientv3"
 	"k8s.io/apiserver/pkg/registry/rest"
-
 	authorizationapi "k8s.io/api/authorization/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metainternal "k8s.io/apimachinery/pkg/apis/meta/internalversion"
@@ -21,10 +20,7 @@ import (
 	"k8s.io/apiserver/pkg/authentication/user"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/generic"
-
-	// "k8s.io/apiserver/pkg/storage/etcd/etcdtest"
-
-	//etcdtesting "k8s.io/apiserver/pkg/storage/etcd/testing"
+	etcdtesting "k8s.io/apiserver/pkg/storage/etcd3/testing"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 
@@ -172,7 +168,7 @@ func TestCreateSuccessWithName(t *testing.T) {
 
 	_, err := client.Put(
 		context.TODO(),
-		// etcdtest.AddPrefix("/imagestreams/default/somerepo"),
+		etcdtesting.AddPrefix("/imagestreams/default/somerepo"),
 		runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), initialRepo),
 	)
 	if err != nil {
@@ -246,7 +242,7 @@ func TestAddExistingImageWithNewTag(t *testing.T) {
 
 	_, err := client.Put(
 		context.TODO(),
-		// etcdtest.AddPrefix("/imagestreams/default/somerepo"),
+		etcdtesting.AddPrefix("/imagestreams/default/somerepo"),
 		runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), existingRepo),
 	)
 	if err != nil {
@@ -255,7 +251,7 @@ func TestAddExistingImageWithNewTag(t *testing.T) {
 
 	_, err = client.Put(
 		context.TODO(),
-		// etcdtest.AddPrefix("/images/"+imageID), runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), existingImage),
+		etcdtesting.AddPrefix("/images/"+imageID), runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), existingImage),
 	)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
@@ -343,7 +339,7 @@ func TestAddExistingImageOverridingDockerImageReference(t *testing.T) {
 
 	_, err := client.Put(
 		context.TODO(),
-		// etcdtest.AddPrefix("/imagestreams/default/newrepo"),
+		etcdtesting.AddPrefix("/imagestreams/default/newrepo"),
 		runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), newRepo),
 	)
 	if err != nil {
@@ -351,7 +347,7 @@ func TestAddExistingImageOverridingDockerImageReference(t *testing.T) {
 	}
 	_, err = client.Put(
 		context.TODO(),
-		// etcdtest.AddPrefix("/images/"+imageID), runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), existingImage),
+		etcdtesting.AddPrefix("/images/"+imageID), runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), existingImage),
 	)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
@@ -449,7 +445,7 @@ func TestAddExistingImageAndTag(t *testing.T) {
 
 	_, err := client.Put(
 		context.TODO(),
-		// etcdtest.AddPrefix("/imagestreams/default/somerepo"),
+		etcdtesting.AddPrefix("/imagestreams/default/somerepo"),
 		runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), existingRepo),
 	)
 	if err != nil {
@@ -458,7 +454,7 @@ func TestAddExistingImageAndTag(t *testing.T) {
 
 	_, err = client.Put(
 		context.TODO(),
-		// etcdtest.AddPrefix("/images/default/existingImage"),
+		etcdtesting.AddPrefix("/images/default/existingImage"),
 		runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), existingImage),
 	)
 	if err != nil {
@@ -532,7 +528,7 @@ func TestTrackingTags(t *testing.T) {
 
 	_, err := client.Put(
 		context.TODO(),
-		// etcdtest.AddPrefix("/imagestreams/default/stream"),
+		etcdtesting.AddPrefix("/imagestreams/default/stream"),
 		runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), stream),
 	)
 	if err != nil {
