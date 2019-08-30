@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -58,6 +57,10 @@ const (
 	// that decides if pod volumes are unmounted when pod is terminated
 	KeepTerminatedPodVolumesAnnotation string = "volumes.kubernetes.io/keep-terminated-pod-volumes"
 
+	// MountsInGlobalPDPath is name of the directory appended to a volume plugin
+	// name to create the place for volume mounts in the global PD path.
+	MountsInGlobalPDPath = "mounts"
+
 	// VolumeGidAnnotationKey is the of the annotation on the PersistentVolume
 	// object that specifies a supplemental GID.
 	VolumeGidAnnotationKey = "pv.beta.kubernetes.io/gid"
@@ -71,7 +74,7 @@ const (
 // called 'ready' in the given directory and returns
 // true if that file exists.
 func IsReady(dir string) bool {
-	readyFile := path.Join(dir, readyFileName)
+	readyFile := filepath.Join(dir, readyFileName)
 	s, err := os.Stat(readyFile)
 	if err != nil {
 		return false
@@ -94,7 +97,7 @@ func SetReady(dir string) {
 		return
 	}
 
-	readyFile := path.Join(dir, readyFileName)
+	readyFile := filepath.Join(dir, readyFileName)
 	file, err := os.Create(readyFile)
 	if err != nil {
 		klog.Errorf("Can't touch %s: %v", readyFile, err)
@@ -529,4 +532,47 @@ func MapBlockVolume(
 	}
 
 	return nil
+}
+
+// GetPluginMountDir returns the global mount directory name appended
+// to the given plugin name's plugin directory
+func GetPluginMountDir(host volume.VolumeHost, name string) string {
+	mntDir := filepath.Join(host.GetPluginDir(name), MountsInGlobalPDPath)
+	return mntDir
+}
+
+// IsLocalEphemeralVolume determines whether the argument is a local ephemeral
+// volume vs. some other type
+func IsLocalEphemeralVolume(volume v1.Volume) bool {
+	return volume.GitRepo != nil ||
+		(volume.EmptyDir != nil && volume.EmptyDir.Medium != v1.StorageMediumMemory) ||
+		volume.ConfigMap != nil || volume.DownwardAPI != nil
+}
+
+// GetPodVolumeNames returns names of volumes that are used in a pod,
+// either as filesystem mount or raw block device.
+func GetPodVolumeNames(pod *v1.Pod) (mounts sets.String, devices sets.String) {
+	mounts = sets.NewString()
+	devices = sets.NewString()
+
+	addContainerVolumes(pod.Spec.Containers, mounts, devices)
+	addContainerVolumes(pod.Spec.InitContainers, mounts, devices)
+	return
+}
+
+func addContainerVolumes(containers []v1.Container, mounts, devices sets.String) {
+	for _, container := range containers {
+		if container.VolumeMounts != nil {
+			for _, mount := range container.VolumeMounts {
+				mounts.Insert(mount.Name)
+			}
+		}
+		// TODO: remove feature gate check after no longer needed
+		if utilfeature.DefaultFeatureGate.Enabled(features.BlockVolume) &&
+			container.VolumeDevices != nil {
+			for _, device := range container.VolumeDevices {
+				devices.Insert(device.Name)
+			}
+		}
+	}
 }

@@ -26,7 +26,7 @@ import (
 	"strings"
 	"time"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/types"
 	cloudprovider "k8s.io/cloud-provider"
@@ -177,6 +177,9 @@ func (volumes *VolumesV1) getVolume(volumeID string) (Volume, error) {
 	timeTaken := time.Since(startTime).Seconds()
 	recordOpenstackOperationMetric("get_v1_volume", timeTaken, err)
 	if err != nil {
+		if isNotFound(err) {
+			return Volume{}, ErrNotFound
+		}
 		return Volume{}, fmt.Errorf("error occurred getting volume by ID: %s, err: %v", volumeID, err)
 	}
 
@@ -202,6 +205,9 @@ func (volumes *VolumesV2) getVolume(volumeID string) (Volume, error) {
 	timeTaken := time.Since(startTime).Seconds()
 	recordOpenstackOperationMetric("get_v2_volume", timeTaken, err)
 	if err != nil {
+		if isNotFound(err) {
+			return Volume{}, ErrNotFound
+		}
 		return Volume{}, fmt.Errorf("error occurred getting volume by ID: %s, err: %v", volumeID, err)
 	}
 
@@ -227,6 +233,9 @@ func (volumes *VolumesV3) getVolume(volumeID string) (Volume, error) {
 	timeTaken := time.Since(startTime).Seconds()
 	recordOpenstackOperationMetric("get_v3_volume", timeTaken, err)
 	if err != nil {
+		if isNotFound(err) {
+			return Volume{}, ErrNotFound
+		}
 		return Volume{}, fmt.Errorf("error occurred getting volume by ID: %s, err: %v", volumeID, err)
 	}
 
@@ -409,7 +418,7 @@ func (os *OpenStack) ExpandVolume(volumeID string, oldSize resource.Quantity, ne
 	}
 	if volume.Status != volumeAvailableStatus {
 		// cinder volume can not be expanded if its status is not available
-		return oldSize, fmt.Errorf("volume status is not available")
+		return oldSize, fmt.Errorf("volume in %s status can not be expanded, it must be available and not attached to a node", volume.Status)
 	}
 
 	// Cinder works with gigabytes, convert to GiB with rounding up
@@ -614,6 +623,10 @@ func (os *OpenStack) DiskIsAttached(instanceID, volumeID string) (bool, error) {
 	}
 	volume, err := os.getVolume(volumeID)
 	if err != nil {
+		if err == ErrNotFound {
+			// Volume does not exists, it can't be attached.
+			return false, nil
+		}
 		return false, err
 	}
 

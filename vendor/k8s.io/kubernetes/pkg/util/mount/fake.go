@@ -29,7 +29,6 @@ import (
 type FakeMounter struct {
 	MountPoints []MountPoint
 	Log         []FakeAction
-	Filesystem  map[string]FileType
 	// Error to return for a path when calling IsLikelyNotMountPoint
 	MountCheckErrors map[string]error
 	// Some tests run things in parallel, make sure the mounter does not produce
@@ -39,9 +38,12 @@ type FakeMounter struct {
 
 var _ Interface = &FakeMounter{}
 
-// Values for FakeAction.Action
-const FakeActionMount = "mount"
-const FakeActionUnmount = "unmount"
+const (
+	// FakeActionMount is the string for specifying mount as FakeAction.Action
+	FakeActionMount = "mount"
+	// FakeActionUnmount is the string for specifying unmount as FakeAction.Action
+	FakeActionUnmount = "unmount"
+)
 
 // FakeAction objects are logged every time a fake mount or unmount is called.
 type FakeAction struct {
@@ -51,6 +53,7 @@ type FakeAction struct {
 	FSType string // applies only to "mount" actions
 }
 
+// ResetLog clears all the log entries in FakeMounter
 func (f *FakeMounter) ResetLog() {
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
@@ -58,6 +61,7 @@ func (f *FakeMounter) ResetLog() {
 	f.Log = []FakeAction{}
 }
 
+// Mount records the mount event and updates the in-memory mount points for FakeMounter
 func (f *FakeMounter) Mount(source string, target string, fstype string, options []string) error {
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
@@ -100,6 +104,7 @@ func (f *FakeMounter) Mount(source string, target string, fstype string, options
 	return nil
 }
 
+// Unmount records the unmount event and updates the in-memory mount points for FakeMounter
 func (f *FakeMounter) Unmount(target string) error {
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
@@ -125,6 +130,7 @@ func (f *FakeMounter) Unmount(target string) error {
 	return nil
 }
 
+// List returns all the in-memory mountpoints for FakeMounter
 func (f *FakeMounter) List() ([]MountPoint, error) {
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
@@ -132,14 +138,13 @@ func (f *FakeMounter) List() ([]MountPoint, error) {
 	return f.MountPoints, nil
 }
 
+// IsMountPointMatch tests if dir and mp are the same path
 func (f *FakeMounter) IsMountPointMatch(mp MountPoint, dir string) bool {
 	return mp.Path == dir
 }
 
-func (f *FakeMounter) IsNotMountPoint(dir string) (bool, error) {
-	return isNotMountPoint(f, dir)
-}
-
+// IsLikelyNotMountPoint determines whether a path is a mountpoint by checking
+// if the absolute path to file is in the in-memory mountpoints
 func (f *FakeMounter) IsLikelyNotMountPoint(file string) (bool, error) {
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
@@ -170,56 +175,8 @@ func (f *FakeMounter) IsLikelyNotMountPoint(file string) (bool, error) {
 	return true, nil
 }
 
-func (f *FakeMounter) DeviceOpened(pathname string) (bool, error) {
-	f.mutex.Lock()
-	defer f.mutex.Unlock()
-
-	for _, mp := range f.MountPoints {
-		if mp.Device == pathname {
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
-func (f *FakeMounter) PathIsDevice(pathname string) (bool, error) {
-	return true, nil
-}
-
-func (f *FakeMounter) GetDeviceNameFromMount(mountPath, pluginDir string) (string, error) {
-	return getDeviceNameFromMount(f, mountPath, pluginDir)
-}
-
-func (f *FakeMounter) MakeRShared(path string) error {
-	return nil
-}
-
-func (f *FakeMounter) GetFileType(pathname string) (FileType, error) {
-	if t, ok := f.Filesystem[pathname]; ok {
-		return t, nil
-	}
-	return FileType("Directory"), nil
-}
-
-func (f *FakeMounter) MakeDir(pathname string) error {
-	return nil
-}
-
-func (f *FakeMounter) MakeFile(pathname string) error {
-	return nil
-}
-
-func (f *FakeMounter) ExistsPath(pathname string) (bool, error) {
-	if _, ok := f.Filesystem[pathname]; ok {
-		return true, nil
-	}
-	return false, nil
-}
-
-func (f *FakeMounter) EvalHostSymlinks(pathname string) (string, error) {
-	return pathname, nil
-}
-
+// GetMountRefs finds all mount references to the path, returns a
+// list of paths.
 func (f *FakeMounter) GetMountRefs(pathname string) ([]string, error) {
 	realpath, err := filepath.EvalSymlinks(pathname)
 	if err != nil {
@@ -229,14 +186,95 @@ func (f *FakeMounter) GetMountRefs(pathname string) ([]string, error) {
 	return getMountRefsByDev(f, realpath)
 }
 
-func (f *FakeMounter) GetFSGroup(pathname string) (int64, error) {
-	return -1, errors.New("GetFSGroup not implemented")
+// FakeHostUtil is a fake mount.HostUtils implementation for testing
+type FakeHostUtil struct {
+	MountPoints []MountPoint
+	Filesystem  map[string]FileType
+
+	mutex sync.Mutex
 }
 
-func (f *FakeMounter) GetSELinuxSupport(pathname string) (bool, error) {
+var _ HostUtils = &FakeHostUtil{}
+
+// DeviceOpened checks if block device referenced by pathname is in use by
+// checking if is listed as a device in the in-memory mountpoint table.
+func (hu *FakeHostUtil) DeviceOpened(pathname string) (bool, error) {
+	hu.mutex.Lock()
+	defer hu.mutex.Unlock()
+
+	for _, mp := range hu.MountPoints {
+		if mp.Device == pathname {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// PathIsDevice always returns true
+func (hu *FakeHostUtil) PathIsDevice(pathname string) (bool, error) {
+	return true, nil
+}
+
+// GetDeviceNameFromMount given a mount point, find the volume id
+func (hu *FakeHostUtil) GetDeviceNameFromMount(mounter Interface, mountPath, pluginMountDir string) (string, error) {
+	return getDeviceNameFromMount(mounter, mountPath, pluginMountDir)
+}
+
+// MakeRShared checks if path is shared and bind-mounts it as rshared if needed.
+// No-op for testing
+func (hu *FakeHostUtil) MakeRShared(path string) error {
+	return nil
+}
+
+// GetFileType checks for file/directory/socket/block/character devices.
+// Defaults to Directory if otherwise unspecified.
+func (hu *FakeHostUtil) GetFileType(pathname string) (FileType, error) {
+	if t, ok := hu.Filesystem[pathname]; ok {
+		return t, nil
+	}
+	return FileType("Directory"), nil
+}
+
+// MakeDir creates a new directory.
+// No-op for testing
+func (hu *FakeHostUtil) MakeDir(pathname string) error {
+	return nil
+}
+
+// MakeFile creates a new file.
+// No-op for testing
+func (hu *FakeHostUtil) MakeFile(pathname string) error {
+	return nil
+}
+
+// PathExists checks if pathname exists.
+func (hu *FakeHostUtil) PathExists(pathname string) (bool, error) {
+	if _, ok := hu.Filesystem[pathname]; ok {
+		return true, nil
+	}
+	return false, nil
+}
+
+// EvalHostSymlinks returns the path name after evaluating symlinks.
+// No-op for testing
+func (hu *FakeHostUtil) EvalHostSymlinks(pathname string) (string, error) {
+	return pathname, nil
+}
+
+// GetOwner returns the integer ID for the user and group of the given path
+// Not implemented for testing
+func (hu *FakeHostUtil) GetOwner(pathname string) (int64, int64, error) {
+	return -1, -1, errors.New("GetOwner not implemented")
+}
+
+// GetSELinuxSupport tests if pathname is on a mount that supports SELinux.
+// Not implemented for testing
+func (hu *FakeHostUtil) GetSELinuxSupport(pathname string) (bool, error) {
 	return false, errors.New("GetSELinuxSupport not implemented")
 }
 
-func (f *FakeMounter) GetMode(pathname string) (os.FileMode, error) {
+// GetMode returns permissions of pathname.
+// Not implemented for testing
+func (hu *FakeHostUtil) GetMode(pathname string) (os.FileMode, error) {
 	return 0, errors.New("not implemented")
 }

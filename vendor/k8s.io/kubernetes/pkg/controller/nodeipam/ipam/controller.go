@@ -29,10 +29,10 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 	cloudprovider "k8s.io/cloud-provider"
-	"k8s.io/kubernetes/pkg/cloudprovider/providers/gce"
 	"k8s.io/kubernetes/pkg/controller/nodeipam/ipam/cidrset"
 	nodesync "k8s.io/kubernetes/pkg/controller/nodeipam/ipam/sync"
 	nodeutil "k8s.io/kubernetes/pkg/controller/util/node"
+	"k8s.io/legacy-cloud-providers/gce"
 )
 
 // Config for the IPAM controller.
@@ -92,7 +92,17 @@ func NewController(
 		return nil, err
 	}
 
-	return c, nil
+	//check whether there is a remaining cidr after occupyServiceCIDR
+	cidr, err := c.set.AllocateNext()
+	switch err {
+	case cidrset.ErrCIDRRangeNoCIDRsRemaining:
+		return nil, fmt.Errorf("failed after occupy serviceCIDR: %v", err)
+	case nil:
+		err := c.set.Release(cidr)
+		return c, err
+	default:
+		return nil, fmt.Errorf("unexpected error when check remaining CIDR range: %v", err)
+	}
 }
 
 // Start initializes the Controller with the existing list of nodes and

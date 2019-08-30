@@ -519,7 +519,7 @@ func TestStaticPod(t *testing.T) {
 
 	t.Logf("Create the static pod")
 	m.podManager.AddPod(staticPod)
-	assert.True(t, kubepod.IsStaticPod(staticPod), "SetUp error: staticPod")
+	assert.True(t, kubetypes.IsStaticPod(staticPod), "SetUp error: staticPod")
 
 	status := getRandomPodStatus()
 	now := metav1.Now()
@@ -745,7 +745,7 @@ func TestReconcilePodStatus(t *testing.T) {
 	// If the pod status is the same, only the timestamp is in Rfc3339 format (lower precision without nanosecond),
 	// a reconciliation is not needed, syncBatch should do nothing.
 	// The StartTime should have been set in SetPodStatus().
-	// TODO(random-liu): Remove this later when api becomes consistent for timestamp.
+	// This test is done because the related issue #15262/PR #15263 to move apiserver to RFC339NANO is closed.
 	t.Logf("Syncbatch should do nothing, as a reconciliation is not required")
 	normalizedStartTime := testPod.Status.StartTime.Rfc3339Copy()
 	testPod.Status.StartTime = &normalizedStartTime
@@ -805,7 +805,7 @@ func TestDoNotDeleteMirrorPods(t *testing.T) {
 	m.podManager.AddPod(staticPod)
 	m.podManager.AddPod(mirrorPod)
 	t.Logf("Verify setup.")
-	assert.True(t, kubepod.IsStaticPod(staticPod), "SetUp error: staticPod")
+	assert.True(t, kubetypes.IsStaticPod(staticPod), "SetUp error: staticPod")
 	assert.True(t, kubepod.IsMirrorPod(mirrorPod), "SetUp error: mirrorPod")
 	assert.Equal(t, m.podManager.TranslatePodUID(mirrorPod.UID), kubetypes.ResolvedPodUID(staticPod.UID))
 
@@ -881,10 +881,6 @@ func TestUpdateLastTransitionTime(t *testing.T) {
 
 func getAction() core.GetAction {
 	return core.GetActionImpl{ActionImpl: core.ActionImpl{Verb: "get", Resource: schema.GroupVersionResource{Resource: "pods"}}}
-}
-
-func updateAction() core.UpdateAction {
-	return core.UpdateActionImpl{ActionImpl: core.ActionImpl{Verb: "update", Resource: schema.GroupVersionResource{Resource: "pods"}, Subresource: "status"}}
 }
 
 func patchAction() core.PatchAction {

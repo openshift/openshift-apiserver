@@ -80,8 +80,14 @@ func NodeAddress(nodeIP net.IP, // typically Kubelet.nodeIP
 				}
 				node.ObjectMeta.Annotations[kubeletapis.AnnotationProvidedIPAddr] = nodeIP.String()
 			}
-			// We rely on the external cloud provider to supply the addresses.
-			return nil
+
+			// If --cloud-provider=external and node address is already set,
+			// then we return early because provider set addresses should take precedence.
+			// Otherwise, we try to look up the node IP and let the cloud provider override it later
+			// This should alleviate a lot of the bootstrapping issues with out-of-tree providers
+			if len(node.Status.Addresses) > 0 {
+				return nil
+			}
 		}
 		if cloud != nil {
 			nodeAddresses, err := nodeAddressesFunc()
@@ -744,21 +750,6 @@ func VolumeLimits(volumePluginListFunc func() []volume.VolumePluginWithAttachLim
 				node.Status.Allocatable[v1.ResourceName(limitKey)] = *resource.NewQuantity(value, resource.DecimalSI)
 			}
 		}
-		return nil
-	}
-}
-
-// RemoveOutOfDiskCondition removes stale OutOfDisk condition
-// OutOfDisk condition has been removed from kubelet in 1.12
-func RemoveOutOfDiskCondition() Setter {
-	return func(node *v1.Node) error {
-		var conditions []v1.NodeCondition
-		for i := range node.Status.Conditions {
-			if node.Status.Conditions[i].Type != v1.NodeOutOfDisk {
-				conditions = append(conditions, node.Status.Conditions[i])
-			}
-		}
-		node.Status.Conditions = conditions
 		return nil
 	}
 }

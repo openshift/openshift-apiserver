@@ -36,7 +36,7 @@ import (
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/rest"
-	etcdtesting "k8s.io/apiserver/pkg/storage/etcd/testing"
+	etcd3testing "k8s.io/apiserver/pkg/storage/etcd3/testing"
 	"k8s.io/apiserver/pkg/util/dryrun"
 
 	"k8s.io/kubernetes/pkg/api/service"
@@ -136,14 +136,14 @@ func (s *serviceStorage) Update(ctx context.Context, name string, objInfo rest.U
 	return obj, s.Created, s.Err
 }
 
-func (s *serviceStorage) Delete(ctx context.Context, name string, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
+func (s *serviceStorage) Delete(ctx context.Context, name string, deleteValidation rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
 	if !dryrun.IsDryRun(options.DryRun) {
 		s.DeletedID = name
 	}
 	return s.Service, s.DeletedImmediately, s.Err
 }
 
-func (s *serviceStorage) DeleteCollection(ctx context.Context, options *metav1.DeleteOptions, listOptions *metainternalversion.ListOptions) (runtime.Object, error) {
+func (s *serviceStorage) DeleteCollection(ctx context.Context, deleteValidation rest.ValidateObjectFunc, options *metav1.DeleteOptions, listOptions *metainternalversion.ListOptions) (runtime.Object, error) {
 	panic("not implemented")
 }
 
@@ -167,21 +167,24 @@ func generateRandomNodePort() int32 {
 	return int32(rand.IntnRange(30001, 30999))
 }
 
-func NewTestREST(t *testing.T, endpoints *api.EndpointsList) (*REST, *serviceStorage, *etcdtesting.EtcdTestServer) {
+func NewTestREST(t *testing.T, endpoints *api.EndpointsList) (*REST, *serviceStorage, *etcd3testing.EtcdTestServer) {
 	return NewTestRESTWithPods(t, endpoints, nil)
 }
 
-func NewTestRESTWithPods(t *testing.T, endpoints *api.EndpointsList, pods *api.PodList) (*REST, *serviceStorage, *etcdtesting.EtcdTestServer) {
+func NewTestRESTWithPods(t *testing.T, endpoints *api.EndpointsList, pods *api.PodList) (*REST, *serviceStorage, *etcd3testing.EtcdTestServer) {
 	etcdStorage, server := registrytest.NewEtcdStorage(t, "")
 
 	serviceStorage := &serviceStorage{}
 
-	podStorage := podstore.NewStorage(generic.RESTOptions{
+	podStorage, err := podstore.NewStorage(generic.RESTOptions{
 		StorageConfig:           etcdStorage,
 		Decorator:               generic.UndecoratedStorage,
 		DeleteCollectionWorkers: 3,
 		ResourcePrefix:          "pods",
 	}, nil, nil, nil)
+	if err != nil {
+		t.Fatalf("unexpected error from REST storage: %v", err)
+	}
 	if pods != nil && len(pods.Items) > 0 {
 		ctx := genericapirequest.NewDefaultContext()
 		for ix := range pods.Items {
@@ -191,11 +194,14 @@ func NewTestRESTWithPods(t *testing.T, endpoints *api.EndpointsList, pods *api.P
 			}
 		}
 	}
-	endpointStorage := endpointstore.NewREST(generic.RESTOptions{
+	endpointStorage, err := endpointstore.NewREST(generic.RESTOptions{
 		StorageConfig:  etcdStorage,
 		Decorator:      generic.UndecoratedStorage,
 		ResourcePrefix: "endpoints",
 	})
+	if err != nil {
+		t.Fatalf("unexpected error from REST storage: %v", err)
+	}
 	if endpoints != nil && len(endpoints.Items) > 0 {
 		ctx := genericapirequest.NewDefaultContext()
 		for ix := range endpoints.Items {
@@ -206,10 +212,16 @@ func NewTestRESTWithPods(t *testing.T, endpoints *api.EndpointsList, pods *api.P
 		}
 	}
 
-	r := ipallocator.NewCIDRRange(makeIPNet(t))
+	r, err := ipallocator.NewCIDRRange(makeIPNet(t))
+	if err != nil {
+		t.Fatalf("cannot create CIDR Range %v", err)
+	}
 
 	portRange := utilnet.PortRange{Base: 30000, Size: 1000}
-	portAllocator := portallocator.NewPortAllocator(portRange)
+	portAllocator, err := portallocator.NewPortAllocator(portRange)
+	if err != nil {
+		t.Fatalf("cannot create port allocator %v", err)
+	}
 
 	rest, _ := NewREST(serviceStorage, endpointStorage, podStorage.Pod, r, portAllocator, nil)
 
@@ -949,7 +961,7 @@ func TestServiceRegistryDelete(t *testing.T) {
 		},
 	}
 	registry.Create(ctx, svc, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
-	storage.Delete(ctx, svc.Name, &metav1.DeleteOptions{})
+	storage.Delete(ctx, svc.Name, rest.ValidateAllObjectFunc, &metav1.DeleteOptions{})
 	if e, a := "foo", registry.DeletedID; e != a {
 		t.Errorf("Expected %v, but got %v", e, a)
 	}
@@ -979,7 +991,7 @@ func TestServiceRegistryDeleteDryRun(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Expected no error: %v", err)
 	}
-	_, _, err = storage.Delete(ctx, svc.Name, &metav1.DeleteOptions{DryRun: []string{metav1.DryRunAll}})
+	_, _, err = storage.Delete(ctx, svc.Name, rest.ValidateAllObjectFunc, &metav1.DeleteOptions{DryRun: []string{metav1.DryRunAll}})
 	if err != nil {
 		t.Fatalf("Expected no error: %v", err)
 	}
@@ -1009,7 +1021,7 @@ func TestServiceRegistryDeleteDryRun(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Expected no error: %v", err)
 	}
-	_, _, err = storage.Delete(ctx, svc.Name, &metav1.DeleteOptions{DryRun: []string{metav1.DryRunAll}})
+	_, _, err = storage.Delete(ctx, svc.Name, rest.ValidateAllObjectFunc, &metav1.DeleteOptions{DryRun: []string{metav1.DryRunAll}})
 	if err != nil {
 		t.Fatalf("Expected no error: %v", err)
 	}
@@ -1038,7 +1050,7 @@ func TestServiceRegistryDeleteExternal(t *testing.T) {
 		},
 	}
 	registry.Create(ctx, svc, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
-	storage.Delete(ctx, svc.Name, &metav1.DeleteOptions{})
+	storage.Delete(ctx, svc.Name, rest.ValidateAllObjectFunc, &metav1.DeleteOptions{})
 	if e, a := "foo", registry.DeletedID; e != a {
 		t.Errorf("Expected %v, but got %v", e, a)
 	}
@@ -1180,7 +1192,7 @@ func TestServiceRegistryResourceLocation(t *testing.T) {
 					Containers:    []api.Container{{Name: "bar", Image: "test", ImagePullPolicy: api.PullIfNotPresent, TerminationMessagePolicy: api.TerminationMessageReadFile}},
 				},
 				Status: api.PodStatus{
-					PodIP: "1.2.3.4",
+					PodIPs: []api.PodIP{{IP: "1.2.3.4"}, {IP: "2001:db7::"}},
 				},
 			},
 			{
@@ -1194,7 +1206,7 @@ func TestServiceRegistryResourceLocation(t *testing.T) {
 					Containers:    []api.Container{{Name: "bar", Image: "test", ImagePullPolicy: api.PullIfNotPresent, TerminationMessagePolicy: api.TerminationMessageReadFile}},
 				},
 				Status: api.PodStatus{
-					PodIP: "1.2.3.5",
+					PodIPs: []api.PodIP{{IP: "1.2.3.5"}, {IP: "2001:db8::"}},
 				},
 			},
 		},
@@ -1440,7 +1452,7 @@ func TestServiceRegistryIPReallocation(t *testing.T) {
 		t.Errorf("Unexpected ClusterIP: %s", created_service_1.Spec.ClusterIP)
 	}
 
-	_, _, err := storage.Delete(ctx, created_service_1.Name, &metav1.DeleteOptions{})
+	_, _, err := storage.Delete(ctx, created_service_1.Name, rest.ValidateAllObjectFunc, &metav1.DeleteOptions{})
 	if err != nil {
 		t.Errorf("Unexpected error deleting service: %v", err)
 	}

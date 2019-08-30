@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	units "github.com/docker/go-units"
+	"github.com/docker/go-units"
 )
 
 const (
@@ -103,7 +103,7 @@ func FindCgroupMountpointDir() (string, error) {
 		}
 
 		if postSeparatorFields[0] == "cgroup" {
-			// Check that the mount is properly formatted.
+			// Check that the mount is properly formated.
 			if numPostFields < 3 {
 				return "", fmt.Errorf("Error found less than 3 fields post '-' in %q", text)
 			}
@@ -151,20 +151,19 @@ func getCgroupMountsHelper(ss map[string]bool, mi io.Reader, all bool) ([]Mount,
 			Root:       fields[3],
 		}
 		for _, opt := range strings.Split(fields[len(fields)-1], ",") {
-			seen, known := ss[opt]
-			if !known || (!all && seen) {
+			if !ss[opt] {
 				continue
 			}
-			ss[opt] = true
 			if strings.HasPrefix(opt, cgroupNamePrefix) {
-				opt = opt[len(cgroupNamePrefix):]
+				m.Subsystems = append(m.Subsystems, opt[len(cgroupNamePrefix):])
+			} else {
+				m.Subsystems = append(m.Subsystems, opt)
 			}
-			m.Subsystems = append(m.Subsystems, opt)
-			numFound++
+			if !all {
+				numFound++
+			}
 		}
-		if len(m.Subsystems) > 0 || all {
-			res = append(res, m)
-		}
+		res = append(res, m)
 	}
 	if err := scanner.Err(); err != nil {
 		return nil, err
@@ -188,7 +187,7 @@ func GetCgroupMounts(all bool) ([]Mount, error) {
 
 	allMap := make(map[string]bool)
 	for s := range allSubsystems {
-		allMap[s] = false
+		allMap[s] = true
 	}
 	return getCgroupMountsHelper(allMap, f, all)
 }
@@ -263,7 +262,7 @@ func getCgroupPathHelper(subsystem, cgroup string) (string, error) {
 	}
 
 	// This is needed for nested containers, because in /proc/self/cgroup we
-	// see paths from host, which don't exist in container.
+	// see pathes from host, which don't exist in container.
 	relCgroup, err := filepath.Rel(root, cgroup)
 	if err != nil {
 		return "", err

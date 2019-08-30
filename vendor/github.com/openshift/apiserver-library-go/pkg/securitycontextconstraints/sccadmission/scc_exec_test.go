@@ -99,7 +99,7 @@ func TestExecAdmit(t *testing.T) {
 		p.constraintAdmission.sccLister = cache
 		p.SetExternalKubeClientSet(tc)
 
-		attrs := admission.NewAttributesRecord(nil, nil, coreapi.Kind("Pod").WithVersion("version"), "namespace", "pod-name", coreapi.Resource(v.resource).WithVersion("version"), v.subresource, v.operation, false, &user.DefaultInfo{})
+		attrs := admission.NewAttributesRecord(nil, nil, coreapi.Kind("Pod").WithVersion("version"), "namespace", "pod-name", coreapi.Resource(v.resource).WithVersion("version"), v.subresource, v.operation, nil, false, &user.DefaultInfo{})
 		err := p.Validate(attrs, nil)
 
 		if v.shouldAdmit && err != nil {

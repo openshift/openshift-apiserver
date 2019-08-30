@@ -27,11 +27,11 @@ import (
 	cloudprovider "k8s.io/cloud-provider"
 	volumehelpers "k8s.io/cloud-provider/volume/helpers"
 	"k8s.io/klog"
-	"k8s.io/kubernetes/pkg/cloudprovider/providers/vsphere"
-	"k8s.io/kubernetes/pkg/cloudprovider/providers/vsphere/vclib"
 	"k8s.io/kubernetes/pkg/util/mount"
 	"k8s.io/kubernetes/pkg/volume"
 	volumeutil "k8s.io/kubernetes/pkg/volume/util"
+	"k8s.io/legacy-cloud-providers/vsphere"
+	"k8s.io/legacy-cloud-providers/vsphere/vclib"
 )
 
 const (
@@ -86,7 +86,7 @@ func verifyDevicePath(path string) (string, error) {
 }
 
 // CreateVolume creates a vSphere volume.
-func (util *VsphereDiskUtil) CreateVolume(v *vsphereVolumeProvisioner, selectedZone []string) (volSpec *VolumeSpec, err error) {
+func (util *VsphereDiskUtil) CreateVolume(v *vsphereVolumeProvisioner, selectedNode *v1.Node, selectedZone []string) (volSpec *VolumeSpec, err error) {
 	var fstype string
 	cloud, err := getCloudProvider(v.plugin.host.GetCloudProvider())
 	if err != nil {
@@ -94,11 +94,12 @@ func (util *VsphereDiskUtil) CreateVolume(v *vsphereVolumeProvisioner, selectedZ
 	}
 
 	capacity := v.options.PVC.Spec.Resources.Requests[v1.ResourceName(v1.ResourceStorage)]
-	// vSphere works with kilobytes, convert to KiB with rounding up
-	volSizeKiB, err := volumehelpers.RoundUpToKiBInt(capacity)
+	// vSphere works with KiB, but its minimum allocation unit is 1 MiB
+	volSizeMiB, err := volumehelpers.RoundUpToMiBInt(capacity)
 	if err != nil {
 		return nil, err
 	}
+	volSizeKiB := volSizeMiB * 1024
 	name := volumeutil.GenerateVolumeName(v.options.ClusterName, v.options.PVName, 255)
 	volumeOptions := &vclib.VolumeOptions{
 		CapacityKB: volSizeKiB,
@@ -107,6 +108,7 @@ func (util *VsphereDiskUtil) CreateVolume(v *vsphereVolumeProvisioner, selectedZ
 	}
 
 	volumeOptions.Zone = selectedZone
+	volumeOptions.SelectedNode = selectedNode
 	// Apply Parameters (case-insensitive). We leave validation of
 	// the values to the cloud provider.
 	for parameter, value := range v.options.Parameters {

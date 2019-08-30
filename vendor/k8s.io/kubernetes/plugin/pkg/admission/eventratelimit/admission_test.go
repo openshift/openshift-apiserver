@@ -17,10 +17,12 @@ limitations under the License.
 package eventratelimit
 
 import (
+	"net/http"
 	"testing"
 	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apiserver/pkg/admission"
@@ -46,6 +48,7 @@ func attributesForRequest(rq request) admission.Attributes {
 		api.Resource("resource").WithVersion("version"),
 		"",
 		admission.Create,
+		&metav1.CreateOptions{},
 		rq.dryRun,
 		&user.DefaultInfo{Name: rq.username})
 }
@@ -514,7 +517,7 @@ func TestEventRateLimiting(t *testing.T) {
 				}
 				if err != nil {
 					statusErr, ok := err.(*errors.StatusError)
-					if ok && statusErr.ErrStatus.Code != errors.StatusTooManyRequests {
+					if ok && statusErr.ErrStatus.Code != http.StatusTooManyRequests {
 						t.Fatalf("%v: Request %v should yield a 429 response: %v", tc.name, rqIndex, err)
 					}
 				}
