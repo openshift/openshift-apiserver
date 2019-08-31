@@ -12,7 +12,7 @@ import (
 	kubeinformers "k8s.io/client-go/informers"
 	restclient "k8s.io/client-go/rest"
 
-	// rbacclient "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset/typed/rbac/internalversion"
+	rbacv1client "k8s.io/client-go/kubernetes/typed/rbac/v1"
 	rbacregistryvalidation "k8s.io/kubernetes/pkg/registry/rbac/validation"
 	"k8s.io/kubernetes/plugin/pkg/auth/authorizer/rbac"
 
@@ -108,7 +108,7 @@ func (c *completedConfig) V1RESTStorage() (map[string]rest.Storage, error) {
 }
 
 func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
-	rbacClient, err := rbacclient.NewForConfig(c.ExtraConfig.KubeAPIServerClientConfig)
+	rbacClient, err := rbacv1client.NewForConfig(c.ExtraConfig.KubeAPIServerClientConfig)
 	if err != nil {
 		return nil, err
 	}
