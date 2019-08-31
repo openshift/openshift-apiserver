@@ -8,6 +8,7 @@ import (
 
 	"github.com/emicklei/go-restful"
 
+	corev1 "k8s.io/api/core/v1"
 	kapierror "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
@@ -16,15 +17,13 @@ import (
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericmux "k8s.io/apiserver/pkg/server/mux"
 	kubeinformers "k8s.io/client-go/informers"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/klog"
 	openapicontroller "k8s.io/kube-aggregator/pkg/controllers/openapi"
 	"k8s.io/kube-aggregator/pkg/controllers/openapi/aggregator"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
-	kapi "k8s.io/kubernetes/pkg/apis/core"
-
-	// coreclient "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset/typed/core/internalversion"
 	rbacrest "k8s.io/kubernetes/pkg/registry/rbac/rest"
 	rbacregistryvalidation "k8s.io/kubernetes/pkg/registry/rbac/validation"
 	rbacauthorizer "k8s.io/kubernetes/plugin/pkg/auth/authorizer/rbac"
@@ -604,10 +603,10 @@ func (c *completedConfig) bootstrapSCC(context genericapiserver.PostStartHookCon
 func (c *completedConfig) EnsureOpenShiftInfraNamespace(context genericapiserver.PostStartHookContext) error {
 	namespaceName := bootstrappolicy.DefaultOpenShiftInfraNamespace
 
-	var coreClient coreclient.CoreInterface
+	var coreClient *corev1client.CoreV1Client
 	err := wait.Poll(1*time.Second, 30*time.Second, func() (bool, error) {
 		var err error
-		coreClient, err = coreclient.NewForConfig(c.ExtraConfig.KubeAPIServerClientConfig)
+		coreClient, err = corev1client.NewForConfig(c.ExtraConfig.KubeAPIServerClientConfig)
 		if err != nil {
 			utilruntime.HandleError(fmt.Errorf("unable to initialize client: %v", err))
 			return false, nil
@@ -619,14 +618,14 @@ func (c *completedConfig) EnsureOpenShiftInfraNamespace(context genericapiserver
 		return err
 	}
 
-	_, err = coreClient.Namespaces().Create(&kapi.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceName}})
+	_, err = coreClient.Namespaces().Create(&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceName}})
 	if err != nil && !kapierror.IsAlreadyExists(err) {
 		utilruntime.HandleError(fmt.Errorf("error creating namespace %q: %v", namespaceName, err))
 		return err
 	}
 
 	// Ensure we have the bootstrap SA for Nodes
-	_, err = coreClient.ServiceAccounts(namespaceName).Create(&kapi.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: bootstrappolicy.InfraNodeBootstrapServiceAccountName}})
+	_, err = coreClient.ServiceAccounts(namespaceName).Create(&corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: bootstrappolicy.InfraNodeBootstrapServiceAccountName}})
 	if err != nil && !kapierror.IsAlreadyExists(err) {
 		klog.Errorf("Error creating service account %s/%s: %v", namespaceName, bootstrappolicy.InfraNodeBootstrapServiceAccountName, err)
 	}
