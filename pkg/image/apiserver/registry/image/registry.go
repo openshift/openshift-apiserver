@@ -80,7 +80,7 @@ func (s *storage) UpdateImage(ctx context.Context, image *imageapi.Image) (*imag
 }
 
 func (s *storage) DeleteImage(ctx context.Context, imageID string) error {
-	_, _, err := s.Delete(ctx, imageID, nil)
+	_, _, err := s.Delete(ctx, imageID, nil, nil)
 	return err
 }
 

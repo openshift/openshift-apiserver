@@ -63,8 +63,8 @@ func (s *noWatchStorageErrWrapper) Update(ctx context.Context, name string, objI
 	return obj, created, syncStatusError(ctx, err)
 }
 
-func (s *noWatchStorageErrWrapper) Delete(ctx context.Context, name string, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
-	obj, deleted, err := s.delegate.Delete(ctx, name, options)
+func (s *noWatchStorageErrWrapper) Delete(ctx context.Context, name string, deleteValidation rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
+	obj, deleted, err := s.delegate.Delete(ctx, name, deleteValidation, options)
 	return obj, deleted, syncStatusError(ctx, err)
 }
 
