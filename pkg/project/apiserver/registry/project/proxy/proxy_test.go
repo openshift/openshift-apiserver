@@ -121,7 +121,7 @@ func TestDeleteProject(t *testing.T) {
 	storage := REST{
 		client: mockClient.CoreV1().Namespaces(),
 	}
-	obj, _, err := storage.Delete(apirequest.NewContext(), "foo", nil)
+	obj, _, err := storage.Delete(apirequest.NewContext(), "foo", nil, nil)
 	if obj == nil {
 		t.Error("Unexpected nil obj")
 	}
