@@ -68,6 +68,7 @@ func TestAdmitImageStreamMapping(t *testing.T) {
 			image.Resource("imagestreammappings").WithVersion("version"),
 			"",
 			v.operation,
+			nil,
 			false,
 			nil)
 
@@ -221,7 +222,7 @@ func TestSupports(t *testing.T) {
 	}
 	ilr := plugin.(*imageLimitRangerPlugin)
 	for _, r := range resources {
-		attr := admission.NewAttributesRecord(nil, nil, legacy.Kind("ImageStreamMapping").WithVersion(""), "ns", "name", legacy.Resource(r).WithVersion("version"), "", admission.Create, false, nil)
+		attr := admission.NewAttributesRecord(nil, nil, legacy.Kind("ImageStreamMapping").WithVersion(""), "ns", "name", legacy.Resource(r).WithVersion("version"), "", admission.Create, nil, false, nil)
 		if !ilr.SupportsAttributes(attr) {
 			t.Errorf("plugin is expected to support %#v", r)
 		}
@@ -229,7 +230,7 @@ func TestSupports(t *testing.T) {
 
 	badKinds := []string{"ImageStream", "Image", "Pod", "foo"}
 	for _, k := range badKinds {
-		attr := admission.NewAttributesRecord(nil, nil, legacy.Kind(k).WithVersion(""), "ns", "name", image.Resource("bar").WithVersion("version"), "", admission.Create, false, nil)
+		attr := admission.NewAttributesRecord(nil, nil, legacy.Kind(k).WithVersion(""), "ns", "name", image.Resource("bar").WithVersion("version"), "", admission.Create, nil, false, nil)
 		if ilr.SupportsAttributes(attr) {
 			t.Errorf("plugin is not expected to support %s", k)
 		}
