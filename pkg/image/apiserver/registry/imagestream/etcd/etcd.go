@@ -78,7 +78,7 @@ func NewRESTWithLimitVerifier(
 		NewListFunc:              func() runtime.Object { return &imageapi.ImageStreamList{} },
 		DefaultQualifiedResource: image.Resource("imagestreams"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 	}
 
 	rest := &REST{

@@ -35,7 +35,7 @@ var _ rest.Scoper = &REST{}
 func NewREST(client restclient.Interface) utilregistry.NoWatchStorage {
 	return utilregistry.WrapNoWatchStorageError(&REST{
 		privilegedClient: client,
-		TableConvertor:   printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor:   printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 	})
 }
 

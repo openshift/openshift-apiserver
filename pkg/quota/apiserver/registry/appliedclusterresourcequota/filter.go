@@ -35,7 +35,7 @@ func NewREST(quotaMapper clusterquotamapping.ClusterQuotaMapper, quotaLister quo
 	return &AppliedClusterResourceQuotaREST{
 		quotaMapper:    quotaMapper,
 		quotaLister:    quotaLister,
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 	}
 }
 

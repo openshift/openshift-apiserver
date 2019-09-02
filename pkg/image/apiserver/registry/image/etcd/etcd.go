@@ -28,7 +28,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, error) {
 		NewListFunc:              func() runtime.Object { return &imageapi.ImageList{} },
 		DefaultQualifiedResource: image.Resource("images"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 
 		CreateStrategy: imageregistry.Strategy,
 		UpdateStrategy: imageregistry.Strategy,

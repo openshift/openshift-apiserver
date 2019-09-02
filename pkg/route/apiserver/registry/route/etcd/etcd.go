@@ -41,7 +41,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter, allocator routeinterfaces.Rou
 		NewListFunc:              func() runtime.Object { return &routeapi.RouteList{} },
 		DefaultQualifiedResource: routegroup.Resource("routes"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 
 		CreateStrategy: strategy,
 		UpdateStrategy: strategy,

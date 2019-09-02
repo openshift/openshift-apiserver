@@ -25,7 +25,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, error) {
 		NewListFunc:              func() runtime.Object { return &userapi.GroupList{} },
 		DefaultQualifiedResource: user.Resource("groups"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 
 		CreateStrategy: group.Strategy,
 		UpdateStrategy: group.Strategy,

@@ -28,7 +28,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, error) {
 		NewListFunc:              func() runtime.Object { return &templateapi.TemplateList{} },
 		DefaultQualifiedResource: templategroup.Resource("templates"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 
 		CreateStrategy: template.Strategy,
 		UpdateStrategy: template.Strategy,

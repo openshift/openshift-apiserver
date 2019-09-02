@@ -60,7 +60,7 @@ func NewREST(client corev1client.NamespaceInterface, lister projectauth.Lister, 
 		authCache:    authCache,
 		projectCache: projectCache,
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 	}
 }
 

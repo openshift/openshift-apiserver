@@ -31,7 +31,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter, clientGetter oauthclient.Gett
 		NewListFunc:              func() runtime.Object { return &oauthapi.OAuthAccessTokenList{} },
 		DefaultQualifiedResource: oauth.Resource("oauthaccesstokens"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 
 		TTLFunc: func(obj runtime.Object, existing uint64, update bool) (uint64, error) {
 			token := obj.(*oauthapi.OAuthAccessToken)

@@ -29,7 +29,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, error) {
 		NewListFunc:              func() runtime.Object { return &userapi.IdentityList{} },
 		DefaultQualifiedResource: user.Resource("identities"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 
 		CreateStrategy: identity.Strategy,
 		UpdateStrategy: identity.Strategy,

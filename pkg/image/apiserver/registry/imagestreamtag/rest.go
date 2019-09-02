@@ -42,7 +42,7 @@ func NewREST(imageRegistry image.Registry, imageStreamRegistry imagestream.Regis
 		imageRegistry:       imageRegistry,
 		imageStreamRegistry: imageStreamRegistry,
 		strategy:            NewStrategy(registryWhitelister),
-		TableConvertor:      printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor:      printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 	}
 }
 

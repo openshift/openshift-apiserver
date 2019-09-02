@@ -25,7 +25,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter) *REST {
 		NewListFunc:              func() runtime.Object { return &securityapi.RangeAllocationList{} },
 		DefaultQualifiedResource: security.Resource("rangeallocations"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 
 		CreateStrategy: strategyInstance,
 		UpdateStrategy: strategyInstance,

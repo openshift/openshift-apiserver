@@ -57,7 +57,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, *StatusREST, *ScaleRE
 		NewListFunc:              func() runtime.Object { return &appsapi.DeploymentConfigList{} },
 		DefaultQualifiedResource: apps.Resource("deploymentconfigs"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 
 		CreateStrategy: deployconfig.GroupStrategy,
 		UpdateStrategy: deployconfig.GroupStrategy,

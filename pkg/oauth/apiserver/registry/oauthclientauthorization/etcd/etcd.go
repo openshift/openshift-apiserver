@@ -32,7 +32,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter, clientGetter oauthclient.Gett
 		NewListFunc:              func() runtime.Object { return &oauthapi.OAuthClientAuthorizationList{} },
 		DefaultQualifiedResource: oauth.Resource("oauthclientauthorizations"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTablePrinter(printers.PrintOptions{}).With(printersinternal.AddHandlers)},
 
 		CreateStrategy: strategy,
 		UpdateStrategy: strategy,
