@@ -70,11 +70,11 @@ func (r *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 	return nil, false, errors.NewInternalError(fmt.Errorf("unsupported"))
 }
 
-func (r *REST) Delete(ctx context.Context, name string, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
+func (r *REST) Delete(ctx context.Context, name string, validation rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
 	return nil, false, errors.NewInternalError(fmt.Errorf("unsupported"))
 }
 
-func (r *REST) DeleteCollection(ctx context.Context, options *metav1.DeleteOptions, listOptions *metainternalversion.ListOptions) (runtime.Object, error) {
+func (r *REST) DeleteCollection(ctx context.Context, validation rest.ValidateObjectFunc, options *metav1.DeleteOptions, listOptions *metainternalversion.ListOptions) (runtime.Object, error) {
 	return nil, errors.NewInternalError(fmt.Errorf("unsupported"))
 }
 

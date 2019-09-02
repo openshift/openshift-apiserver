@@ -91,7 +91,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	return &image.Signatures[byName], nil
 }
 
-func (r *REST) Delete(ctx context.Context, name string, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
+func (r *REST) Delete(ctx context.Context, name string, validation rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
 	imageName, _, err := splitImageSignatureName(name)
 	if err != nil {
 		return nil, false, apierrors.NewBadRequest("ImageSignatures must be accessed with <imageName>@<signatureName>")
