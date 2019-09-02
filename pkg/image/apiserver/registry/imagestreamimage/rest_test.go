@@ -5,6 +5,7 @@ import (
 
 	"golang.org/x/net/context"
 
+	etcd "github.com/coreos/etcd/clientv3"
 	authorizationapi "k8s.io/api/authorization/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -13,7 +14,6 @@ import (
 	"k8s.io/apiserver/pkg/registry/generic"
 	etcdtesting "k8s.io/apiserver/pkg/storage/etcd3/testing"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
-	etcd "github.com/coreos/etcd/clientv3"
 
 	imagev1 "github.com/openshift/api/image/v1"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
