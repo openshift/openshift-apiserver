@@ -9,8 +9,9 @@ import (
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
 	"github.com/openshift/api/security"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
+	securityprinters "github.com/openshift/openshift-apiserver/pkg/security/printers/internalversion"
 )
 
 type REST struct {
@@ -25,7 +26,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter) *REST {
 		NewListFunc:              func() runtime.Object { return &securityapi.RangeAllocationList{} },
 		DefaultQualifiedResource: security.Resource("rangeallocations"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(securityprinters.AddSecurityOpenShiftHandler)},
 
 		CreateStrategy: strategyInstance,
 		UpdateStrategy: strategyInstance,

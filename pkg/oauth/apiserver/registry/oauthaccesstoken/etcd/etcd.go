@@ -10,10 +10,11 @@ import (
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
 	"github.com/openshift/api/oauth"
+
 	oauthapi "github.com/openshift/openshift-apiserver/pkg/oauth/apis/oauth"
 	"github.com/openshift/openshift-apiserver/pkg/oauth/apiserver/registry/oauthaccesstoken"
 	"github.com/openshift/openshift-apiserver/pkg/oauth/apiserver/registry/oauthclient"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+	oauthprinters "github.com/openshift/openshift-apiserver/pkg/oauth/printers/internalversion"
 )
 
 // rest implements a RESTStorage for access tokens against etcd
@@ -31,7 +32,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter, clientGetter oauthclient.Gett
 		NewListFunc:              func() runtime.Object { return &oauthapi.OAuthAccessTokenList{} },
 		DefaultQualifiedResource: oauth.Resource("oauthaccesstokens"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(oauthprinters.AddOAuthOpenShiftHandler)},
 
 		TTLFunc: func(obj runtime.Object, existing uint64, update bool) (uint64, error) {
 			token := obj.(*oauthapi.OAuthAccessToken)

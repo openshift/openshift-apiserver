@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
-
 	"k8s.io/klog"
 
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -19,12 +17,14 @@ import (
 
 	imagegroup "github.com/openshift/api/image"
 	"github.com/openshift/library-go/pkg/image/imageutil"
+
 	"github.com/openshift/openshift-apiserver/pkg/api/apihelpers"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+	imageprinters "github.com/openshift/openshift-apiserver/pkg/image/printers/internalversion"
 )
 
 // REST implements the RESTStorage interface for ImageStreamTag
@@ -42,7 +42,7 @@ func NewREST(imageRegistry image.Registry, imageStreamRegistry imagestream.Regis
 		imageRegistry:       imageRegistry,
 		imageStreamRegistry: imageStreamRegistry,
 		strategy:            NewStrategy(registryWhitelister),
-		TableConvertor:      printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor:      printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(imageprinters.AddImageOpenShiftHandlers)},
 	}
 }
 

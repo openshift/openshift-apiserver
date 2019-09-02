@@ -3,8 +3,6 @@ package imagestreamimage
 import (
 	"context"
 
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
-
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -15,10 +13,12 @@ import (
 
 	imagegroup "github.com/openshift/api/image"
 	"github.com/openshift/library-go/pkg/image/imageutil"
+
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+	imageprinters "github.com/openshift/openshift-apiserver/pkg/image/printers/internalversion"
 )
 
 // REST implements the RESTStorage interface in terms of an image registry and
@@ -45,7 +45,7 @@ func NewREST(imageRegistry image.Registry, imageStreamRegistry imagestream.Regis
 	return &REST{
 		imageRegistry,
 		imageStreamRegistry,
-		printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(imageprinters.AddImageOpenShiftHandlers)},
 	}
 }
 
