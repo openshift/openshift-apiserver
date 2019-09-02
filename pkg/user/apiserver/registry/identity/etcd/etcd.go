@@ -10,9 +10,9 @@ import (
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
 	"github.com/openshift/api/user"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
 	userapi "github.com/openshift/openshift-apiserver/pkg/user/apis/user"
 	"github.com/openshift/openshift-apiserver/pkg/user/apiserver/registry/identity"
+	userprinters "github.com/openshift/openshift-apiserver/pkg/user/printers/internalversion"
 )
 
 // REST implements a RESTStorage for identites against etcd
@@ -29,7 +29,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, error) {
 		NewListFunc:              func() runtime.Object { return &userapi.IdentityList{} },
 		DefaultQualifiedResource: user.Resource("identities"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(userprinters.AddUserOpenShiftHandler)},
 
 		CreateStrategy: identity.Strategy,
 		UpdateStrategy: identity.Strategy,

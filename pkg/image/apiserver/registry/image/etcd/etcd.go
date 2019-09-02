@@ -9,9 +9,10 @@ import (
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
 	"github.com/openshift/api/image"
+
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	imageregistry "github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/image"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+	imageprinters "github.com/openshift/openshift-apiserver/pkg/image/printers/internalversion"
 )
 
 // REST implements a RESTStorage for images against etcd.
@@ -28,7 +29,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, error) {
 		NewListFunc:              func() runtime.Object { return &imageapi.ImageList{} },
 		DefaultQualifiedResource: image.Resource("images"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(imageprinters.AddImageOpenShiftHandlers)},
 
 		CreateStrategy: imageregistry.Strategy,
 		UpdateStrategy: imageregistry.Strategy,

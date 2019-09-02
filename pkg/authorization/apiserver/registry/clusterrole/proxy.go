@@ -15,8 +15,8 @@ import (
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 	utilregistry "github.com/openshift/openshift-apiserver/pkg/authorization/apiserver/registry/registry"
 	"github.com/openshift/openshift-apiserver/pkg/authorization/apiserver/registry/util"
+	authprinters "github.com/openshift/openshift-apiserver/pkg/authorization/printers/internalversion"
 	authclient "github.com/openshift/openshift-apiserver/pkg/client/impersonatingclient"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
 )
 
 type REST struct {
@@ -33,7 +33,7 @@ var _ rest.Scoper = &REST{}
 func NewREST(client restclient.Interface) utilregistry.NoWatchStorage {
 	return utilregistry.WrapNoWatchStorageError(&REST{
 		privilegedClient: client,
-		TableConvertor:   printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor:   printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(authprinters.AddAuthorizationOpenShiftHandler)},
 	})
 }
 

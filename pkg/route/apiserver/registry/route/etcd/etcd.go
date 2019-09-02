@@ -14,10 +14,11 @@ import (
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
 	routegroup "github.com/openshift/api/route"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	routeregistry "github.com/openshift/openshift-apiserver/pkg/route/apiserver/registry/route"
 	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeinterfaces"
+	routeprinters "github.com/openshift/openshift-apiserver/pkg/route/printers/internalversion"
 )
 
 type REST struct {
@@ -41,7 +42,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter, allocator routeinterfaces.Rou
 		NewListFunc:              func() runtime.Object { return &routeapi.RouteList{} },
 		DefaultQualifiedResource: routegroup.Resource("routes"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(routeprinters.AddRouteOpenShiftHandlers)},
 
 		CreateStrategy: strategy,
 		UpdateStrategy: strategy,
