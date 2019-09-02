@@ -179,7 +179,7 @@ func (s *REST) createOrUpdate(ctx context.Context, obj runtime.Object, forceCrea
 }
 
 // Delete deletes the user association for the named identity
-func (s *REST) Delete(ctx context.Context, name string, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
+func (s *REST) Delete(ctx context.Context, name string, validation rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
 	identity, _, user, _, _, mappingErr := s.getRelatedObjects(ctx, name, &metav1.GetOptions{})
 
 	if mappingErr != nil {
