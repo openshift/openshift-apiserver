@@ -401,7 +401,7 @@ func TestDeleteImageStreamTag(t *testing.T) {
 			}
 
 			ctx := apirequest.WithUser(apirequest.NewDefaultContext(), &fakeUser{})
-			obj, _, err := storage.Delete(ctx, "test:latest", nil)
+			obj, _, err := storage.Delete(ctx, "test:latest", nil, nil)
 			gotError := err != nil
 			if e, a := testCase.expectError, gotError; e != a {
 				t.Fatalf("%s: expectError=%t, gotError=%t: %s", name, e, a, err)
