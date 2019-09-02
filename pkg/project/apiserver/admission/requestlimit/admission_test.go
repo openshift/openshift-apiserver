@@ -296,6 +296,7 @@ func TestAdmit(t *testing.T) {
 			project.Resource("projectrequests").WithVersion("version"),
 			"",
 			"CREATE",
+			nil,
 			false,
 			&user.DefaultInfo{Name: tc.user}), nil)
 		if err != nil && !tc.expectForbidden {
