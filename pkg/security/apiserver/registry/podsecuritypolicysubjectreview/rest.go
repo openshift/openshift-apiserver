@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"k8s.io/klog"
-
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/kubernetes/pkg/apis/core"
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -16,8 +16,7 @@ import (
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/client-go/kubernetes"
-
-	// kapiref "k8s.io/kubernetes/pkg/api/ref"
+	"k8s.io/client-go/tools/reference"
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/serviceaccount"
 
@@ -122,12 +121,19 @@ func FillPodSecurityPolicySubjectReviewStatus(s *securityapi.PodSecurityPolicySu
 		s.Reason = "CantAssignSecurityContextConstraintProvider"
 		return false, fmt.Errorf("unable to assign SecurityContextConstraints provider: %v", errs.ToAggregate())
 	}
-	ref, err := kapiref.GetReference(scheme, constraint)
+	ref, err := reference.GetReference(scheme, constraint)
 	if err != nil {
 		s.Reason = "CantObtainReference"
 		return false, fmt.Errorf("unable to get SecurityContextConstraints reference: %v", err)
 	}
-	s.AllowedBy = ref
+	if s.AllowedBy == nil {
+		s.AllowedBy = &core.ObjectReference{}
+	}
+	err = scheme.Convert(ref, s.AllowedBy, nil)
+	if err != nil {
+		s.Reason = "CantObtainReference"
+		return false, fmt.Errorf("unable to convert ObjectReference to an internal type: %v", err)
+	}
 
 	if len(spec.ServiceAccountName) > 0 {
 		s.Template.Spec = pod.Spec
