@@ -12,8 +12,7 @@ import (
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	genericregistrytest "k8s.io/apiserver/pkg/registry/generic/testing"
 	"k8s.io/apiserver/pkg/registry/rest"
-
-	// etcdtesting "k8s.io/apiserver/pkg/storage/etcd/testing"
+	 etcdtesting "k8s.io/apiserver/pkg/storage/etcd3/testing"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
