@@ -19,11 +19,11 @@ import (
 	"github.com/openshift/apiserver-library-go/pkg/authorization/scope"
 	"github.com/openshift/openshift-apiserver/pkg/api/apihelpers"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
 	projectapi "github.com/openshift/openshift-apiserver/pkg/project/apis/project"
 	projectregistry "github.com/openshift/openshift-apiserver/pkg/project/apiserver/registry/project"
 	projectauth "github.com/openshift/openshift-apiserver/pkg/project/auth"
 	projectcache "github.com/openshift/openshift-apiserver/pkg/project/cache"
+	projectprinters "github.com/openshift/openshift-apiserver/pkg/project/printers/internalversion"
 	projectutil "github.com/openshift/openshift-apiserver/pkg/project/util"
 )
 
@@ -60,7 +60,7 @@ func NewREST(client corev1client.NamespaceInterface, lister projectauth.Lister, 
 		authCache:    authCache,
 		projectCache: projectCache,
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(projectprinters.AddProjectOpenShiftHandlers)},
 	}
 }
 

@@ -96,11 +96,11 @@ func NewPluginInitializer(
 				}
 				return delegate.ClientConfigFor(server)
 			},
-			ClientConfigForServiceFunc: func(serviceName, serviceNamespace string) (*rest.Config, error) {
-				if serviceName == "kubernetes" && serviceNamespace == "default" {
+			ClientConfigForServiceFunc: func(serviceName, serviceNamespace string, servicePort int) (*rest.Config, error) {
+				if serviceName == "kubernetes" && serviceNamespace == "default" && servicePort == 443 {
 					return rest.CopyConfig(privilegedLoopbackConfig), nil
 				}
-				return delegate.ClientConfigForService(serviceName, serviceNamespace)
+				return delegate.ClientConfigForService(serviceName, serviceNamespace, servicePort)
 			},
 		}
 	}

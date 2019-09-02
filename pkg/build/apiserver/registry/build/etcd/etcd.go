@@ -15,7 +15,7 @@ import (
 	"github.com/openshift/api/build"
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 	buildregistry "github.com/openshift/openshift-apiserver/pkg/build/apiserver/registry/build"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+	buildprinters "github.com/openshift/openshift-apiserver/pkg/build/printers/internalversion"
 )
 
 type REST struct {
@@ -37,7 +37,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, *DetailsREST, error) 
 		NewListFunc:              func() runtime.Object { return &buildapi.BuildList{} },
 		DefaultQualifiedResource: build.Resource("builds"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(buildprinters.AddBuildOpenShiftHandlers)},
 
 		CreateStrategy: buildregistry.Strategy,
 		UpdateStrategy: buildregistry.Strategy,

@@ -13,7 +13,7 @@ import (
 	oauthapi "github.com/openshift/openshift-apiserver/pkg/oauth/apis/oauth"
 	"github.com/openshift/openshift-apiserver/pkg/oauth/apiserver/registry/oauthauthorizetoken"
 	"github.com/openshift/openshift-apiserver/pkg/oauth/apiserver/registry/oauthclient"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+	oauthprinters "github.com/openshift/openshift-apiserver/pkg/oauth/printers/internalversion"
 )
 
 // rest implements a RESTStorage for authorize tokens against etcd
@@ -31,7 +31,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter, clientGetter oauthclient.Gett
 		NewListFunc:              func() runtime.Object { return &oauthapi.OAuthAuthorizeTokenList{} },
 		DefaultQualifiedResource: oauth.Resource("oauthauthorizetokens"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(oauthprinters.AddOAuthOpenShiftHandler)},
 
 		TTLFunc: func(obj runtime.Object, existing uint64, update bool) (uint64, error) {
 			token := obj.(*oauthapi.OAuthAuthorizeToken)

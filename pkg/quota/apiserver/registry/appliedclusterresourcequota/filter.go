@@ -19,10 +19,11 @@ import (
 	"github.com/openshift/api/quota"
 	quotalister "github.com/openshift/client-go/quota/listers/quota/v1"
 	"github.com/openshift/library-go/pkg/quota/clusterquotamapping"
+
 	"github.com/openshift/openshift-apiserver/pkg/api/apihelpers"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
 	quotaapi "github.com/openshift/openshift-apiserver/pkg/quota/apis/quota"
 	quotav1conversions "github.com/openshift/openshift-apiserver/pkg/quota/apis/quota/v1"
+	quotaprinters "github.com/openshift/openshift-apiserver/pkg/quota/printers/internalversion"
 )
 
 type AppliedClusterResourceQuotaREST struct {
@@ -35,7 +36,7 @@ func NewREST(quotaMapper clusterquotamapping.ClusterQuotaMapper, quotaLister quo
 	return &AppliedClusterResourceQuotaREST{
 		quotaMapper:    quotaMapper,
 		quotaLister:    quotaLister,
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(quotaprinters.AddQuotaOpenShiftHandler)},
 	}
 }
 
