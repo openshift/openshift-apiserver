@@ -15,7 +15,7 @@ import (
 	appsapi "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 )
 
-func AddHandlers(h kprinters.PrintHandler) {
+func AddAppsOpenShiftHandlers(h kprinters.PrintHandler) {
 	deploymentConfigColumnDefinitions := []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: metav1.ObjectMeta{}.SwaggerDoc()["name"]},
 		{Name: "Revision", Type: "string", Description: appsv1.DeploymentConfigStatus{}.SwaggerDoc()["latestVersion"]},
