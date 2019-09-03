@@ -1,5 +1,7 @@
 package internalversion
 
+/*
+
 import (
 	"bytes"
 	"io/ioutil"
@@ -435,3 +437,5 @@ func Test_printTagsUpToWidth(t *testing.T) {
 		})
 	}
 }
+
+*/
