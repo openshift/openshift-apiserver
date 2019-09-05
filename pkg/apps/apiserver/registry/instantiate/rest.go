@@ -109,10 +109,10 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		attrs := admission.NewAttributesRecord(config, old, apps.Kind("DeploymentConfig").WithVersion(""), config.Namespace, config.Name, apps.Resource("DeploymentConfig").WithVersion(""), "", admission.Update,
 			nil, false, userInfo)
 		objectInterfaces := admission.NewObjectInterfacesFromScheme(legacyscheme.Scheme)
-		if err := s.admit.(admission.MutationInterface).Admit(attrs, objectInterfaces); err != nil {
+		if err := s.admit.(admission.MutationInterface).Admit(ctx, attrs, objectInterfaces); err != nil {
 			return err
 		}
-		if err := s.admit.(admission.ValidationInterface).Validate(attrs, objectInterfaces); err != nil {
+		if err := s.admit.(admission.ValidationInterface).Validate(ctx, attrs, objectInterfaces); err != nil {
 			return err
 		}
 

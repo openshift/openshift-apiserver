@@ -1,6 +1,7 @@
 package secretinjector
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/url"
@@ -37,11 +38,11 @@ var _ = admissionrestconfig.WantsRESTClientConfig(&secretInjector{})
 var _ = admission.MutationInterface(&secretInjector{})
 var _ = admission.ValidationInterface(&secretInjector{})
 
-func (si *secretInjector) Admit(attr admission.Attributes, _ admission.ObjectInterfaces) (err error) {
+func (si *secretInjector) Admit(ctx context.Context, attr admission.Attributes, _ admission.ObjectInterfaces) (err error) {
 	return si.admit(attr, true)
 }
 
-func (si *secretInjector) Validate(attr admission.Attributes, _ admission.ObjectInterfaces) (err error) {
+func (si *secretInjector) Validate(ctx context.Context, attr admission.Attributes, _ admission.ObjectInterfaces) (err error) {
 	return si.admit(attr, false)
 }
 
