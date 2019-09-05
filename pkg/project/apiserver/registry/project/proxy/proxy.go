@@ -145,7 +145,7 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, creationValidatio
 	if errs := s.createStrategy.Validate(ctx, obj); len(errs) > 0 {
 		return nil, kerrors.NewInvalid(project.Kind("Project"), projectObj.Name, errs)
 	}
-	if err := creationValidation(projectObj.DeepCopyObject()); err != nil {
+	if err := creationValidation(ctx, projectObj.DeepCopyObject()); err != nil {
 		return nil, err
 	}
 
@@ -178,7 +178,7 @@ func (s *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 	if errs := s.updateStrategy.ValidateUpdate(ctx, obj, oldObj); len(errs) > 0 {
 		return nil, false, kerrors.NewInvalid(project.Kind("Project"), projectObj.Name, errs)
 	}
-	if err := updateValidation(obj.DeepCopyObject(), oldObj.DeepCopyObject()); err != nil {
+	if err := updateValidation(ctx, obj.DeepCopyObject(), oldObj.DeepCopyObject()); err != nil {
 		return nil, false, err
 	}
 
