@@ -311,6 +311,7 @@ API rule violation: list_type_missing,github.com/openshift/api/osin/v1,RequestHe
 API rule violation: list_type_missing,github.com/openshift/api/osin/v1,SessionSecrets,Secrets
 API rule violation: list_type_missing,github.com/openshift/api/project/v1,ProjectList,Items
 API rule violation: list_type_missing,github.com/openshift/api/project/v1,ProjectSpec,Finalizers
+API rule violation: list_type_missing,github.com/openshift/api/project/v1,ProjectStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/quota/v1,AppliedClusterResourceQuotaList,Items
 API rule violation: list_type_missing,github.com/openshift/api/quota/v1,ClusterResourceQuotaList,Items
 API rule violation: list_type_missing,github.com/openshift/api/route/v1,RouteIngress,Conditions

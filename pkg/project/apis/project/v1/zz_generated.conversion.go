@@ -13,6 +13,7 @@ import (
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	core "k8s.io/kubernetes/pkg/apis/core"
+	apiscorev1 "k8s.io/kubernetes/pkg/apis/core/v1"
 )
 
 func init() {
@@ -109,7 +110,17 @@ func Convert_project_Project_To_v1_Project(in *project.Project, out *v1.Project,
 
 func autoConvert_v1_ProjectList_To_project_ProjectList(in *v1.ProjectList, out *project.ProjectList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]project.Project)(unsafe.Pointer(&in.Items))
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]project.Project, len(*in))
+		for i := range *in {
+			if err := Convert_v1_Project_To_project_Project(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
 	return nil
 }
 
@@ -120,7 +131,17 @@ func Convert_v1_ProjectList_To_project_ProjectList(in *v1.ProjectList, out *proj
 
 func autoConvert_project_ProjectList_To_v1_ProjectList(in *project.ProjectList, out *v1.ProjectList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1.Project)(unsafe.Pointer(&in.Items))
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]v1.Project, len(*in))
+		for i := range *in {
+			if err := Convert_project_Project_To_v1_Project(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
 	return nil
 }
 
@@ -175,6 +196,17 @@ func Convert_project_ProjectSpec_To_v1_ProjectSpec(in *project.ProjectSpec, out 
 
 func autoConvert_v1_ProjectStatus_To_project_ProjectStatus(in *v1.ProjectStatus, out *project.ProjectStatus, s conversion.Scope) error {
 	out.Phase = core.NamespacePhase(in.Phase)
+	if in.Conditions != nil {
+		in, out := &in.Conditions, &out.Conditions
+		*out = make([]core.NamespaceCondition, len(*in))
+		for i := range *in {
+			if err := apiscorev1.Convert_v1_NamespaceCondition_To_core_NamespaceCondition(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Conditions = nil
+	}
 	return nil
 }
 
@@ -185,6 +217,17 @@ func Convert_v1_ProjectStatus_To_project_ProjectStatus(in *v1.ProjectStatus, out
 
 func autoConvert_project_ProjectStatus_To_v1_ProjectStatus(in *project.ProjectStatus, out *v1.ProjectStatus, s conversion.Scope) error {
 	out.Phase = corev1.NamespacePhase(in.Phase)
+	if in.Conditions != nil {
+		in, out := &in.Conditions, &out.Conditions
+		*out = make([]corev1.NamespaceCondition, len(*in))
+		for i := range *in {
+			if err := apiscorev1.Convert_core_NamespaceCondition_To_v1_NamespaceCondition(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Conditions = nil
+	}
 	return nil
 }
 
