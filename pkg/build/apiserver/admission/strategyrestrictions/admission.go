@@ -1,6 +1,7 @@
 package strategyrestrictions
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strings"
@@ -62,7 +63,7 @@ func NewBuildByStrategy() admission.Interface {
 	}
 }
 
-func (a *buildByStrategy) Validate(attr admission.Attributes, _ admission.ObjectInterfaces) error {
+func (a *buildByStrategy) Validate(ctx context.Context, attr admission.Attributes, _ admission.ObjectInterfaces) error {
 	gr := attr.GetResource().GroupResource()
 	switch gr {
 	case build.Resource("buildconfigs"),

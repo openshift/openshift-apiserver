@@ -2,6 +2,7 @@ package requestlimit
 
 import (
 	"bytes"
+	"context"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -287,7 +288,7 @@ func TestAdmit(t *testing.T) {
 		if err = reqLimit.(admission.InitializationValidator).ValidateInitialization(); err != nil {
 			t.Fatalf("validation error: %v", err)
 		}
-		err = reqLimit.(admission.ValidationInterface).Validate(admission.NewAttributesRecord(
+		err = reqLimit.(admission.ValidationInterface).Validate(context.TODO(), admission.NewAttributesRecord(
 			&projectapi.ProjectRequest{},
 			nil,
 			project.Kind("ProjectRequest").WithVersion("version"),
