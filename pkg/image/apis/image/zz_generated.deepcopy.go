@@ -172,7 +172,7 @@ func (in *ImageLayerData) DeepCopy() *ImageLayerData {
 func (in *ImageList) DeepCopyInto(out *ImageList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]Image, len(*in))
@@ -464,7 +464,7 @@ func (in *ImageStreamLayers) DeepCopyObject() runtime.Object {
 func (in *ImageStreamList) DeepCopyInto(out *ImageStreamList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]ImageStream, len(*in))
@@ -611,7 +611,7 @@ func (in *ImageStreamTag) DeepCopyObject() runtime.Object {
 func (in *ImageStreamTagList) DeepCopyInto(out *ImageStreamTagList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]ImageStreamTag, len(*in))

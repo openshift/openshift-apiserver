@@ -106,6 +106,12 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 				corev1.SetDefaults_HTTPGetAction(a.ReadinessProbe.Handler.HTTPGet)
 			}
 		}
+		if a.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.StartupProbe)
+			if a.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.StartupProbe.Handler.HTTPGet)
+			}
+		}
 		if a.Lifecycle != nil {
 			if a.Lifecycle.PostStart != nil {
 				if a.Lifecycle.PostStart.HTTPGet != nil {
@@ -117,9 +123,6 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 					corev1.SetDefaults_HTTPGetAction(a.Lifecycle.PreStop.HTTPGet)
 				}
 			}
-		}
-		if a.SecurityContext != nil {
-			corev1.SetDefaults_SecurityContext(a.SecurityContext)
 		}
 	}
 	for i := range in.Spec.Template.Spec.Containers {
@@ -151,6 +154,12 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 				corev1.SetDefaults_HTTPGetAction(a.ReadinessProbe.Handler.HTTPGet)
 			}
 		}
+		if a.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.StartupProbe)
+			if a.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.StartupProbe.Handler.HTTPGet)
+			}
+		}
 		if a.Lifecycle != nil {
 			if a.Lifecycle.PostStart != nil {
 				if a.Lifecycle.PostStart.HTTPGet != nil {
@@ -163,10 +172,55 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 				}
 			}
 		}
-		if a.SecurityContext != nil {
-			corev1.SetDefaults_SecurityContext(a.SecurityContext)
+	}
+	for i := range in.Spec.Template.Spec.EphemeralContainers {
+		a := &in.Spec.Template.Spec.EphemeralContainers[i]
+		for j := range a.EphemeralContainerCommon.Ports {
+			b := &a.EphemeralContainerCommon.Ports[j]
+			corev1.SetDefaults_ContainerPort(b)
+		}
+		for j := range a.EphemeralContainerCommon.Env {
+			b := &a.EphemeralContainerCommon.Env[j]
+			if b.ValueFrom != nil {
+				if b.ValueFrom.FieldRef != nil {
+					corev1.SetDefaults_ObjectFieldSelector(b.ValueFrom.FieldRef)
+				}
+			}
+		}
+		corev1.SetDefaults_ResourceList(&a.EphemeralContainerCommon.Resources.Limits)
+		corev1.SetDefaults_ResourceList(&a.EphemeralContainerCommon.Resources.Requests)
+		if a.EphemeralContainerCommon.LivenessProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.LivenessProbe)
+			if a.EphemeralContainerCommon.LivenessProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.LivenessProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.ReadinessProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.ReadinessProbe)
+			if a.EphemeralContainerCommon.ReadinessProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.ReadinessProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.StartupProbe)
+			if a.EphemeralContainerCommon.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.StartupProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.Lifecycle != nil {
+			if a.EphemeralContainerCommon.Lifecycle.PostStart != nil {
+				if a.EphemeralContainerCommon.Lifecycle.PostStart.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.Lifecycle.PostStart.HTTPGet)
+				}
+			}
+			if a.EphemeralContainerCommon.Lifecycle.PreStop != nil {
+				if a.EphemeralContainerCommon.Lifecycle.PreStop.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.Lifecycle.PreStop.HTTPGet)
+				}
+			}
 		}
 	}
+	corev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Overhead)
 	for i := range in.Status.AllowedServiceAccounts {
 		a := &in.Status.AllowedServiceAccounts[i]
 		corev1.SetDefaults_PodSpec(&a.PodSecurityPolicySubjectReviewStatus.Template.Spec)
@@ -250,6 +304,12 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 					corev1.SetDefaults_HTTPGetAction(b.ReadinessProbe.Handler.HTTPGet)
 				}
 			}
+			if b.StartupProbe != nil {
+				corev1.SetDefaults_Probe(b.StartupProbe)
+				if b.StartupProbe.Handler.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(b.StartupProbe.Handler.HTTPGet)
+				}
+			}
 			if b.Lifecycle != nil {
 				if b.Lifecycle.PostStart != nil {
 					if b.Lifecycle.PostStart.HTTPGet != nil {
@@ -261,9 +321,6 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 						corev1.SetDefaults_HTTPGetAction(b.Lifecycle.PreStop.HTTPGet)
 					}
 				}
-			}
-			if b.SecurityContext != nil {
-				corev1.SetDefaults_SecurityContext(b.SecurityContext)
 			}
 		}
 		for j := range a.PodSecurityPolicySubjectReviewStatus.Template.Spec.Containers {
@@ -295,6 +352,12 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 					corev1.SetDefaults_HTTPGetAction(b.ReadinessProbe.Handler.HTTPGet)
 				}
 			}
+			if b.StartupProbe != nil {
+				corev1.SetDefaults_Probe(b.StartupProbe)
+				if b.StartupProbe.Handler.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(b.StartupProbe.Handler.HTTPGet)
+				}
+			}
 			if b.Lifecycle != nil {
 				if b.Lifecycle.PostStart != nil {
 					if b.Lifecycle.PostStart.HTTPGet != nil {
@@ -307,10 +370,55 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 					}
 				}
 			}
-			if b.SecurityContext != nil {
-				corev1.SetDefaults_SecurityContext(b.SecurityContext)
+		}
+		for j := range a.PodSecurityPolicySubjectReviewStatus.Template.Spec.EphemeralContainers {
+			b := &a.PodSecurityPolicySubjectReviewStatus.Template.Spec.EphemeralContainers[j]
+			for k := range b.EphemeralContainerCommon.Ports {
+				c := &b.EphemeralContainerCommon.Ports[k]
+				corev1.SetDefaults_ContainerPort(c)
+			}
+			for k := range b.EphemeralContainerCommon.Env {
+				c := &b.EphemeralContainerCommon.Env[k]
+				if c.ValueFrom != nil {
+					if c.ValueFrom.FieldRef != nil {
+						corev1.SetDefaults_ObjectFieldSelector(c.ValueFrom.FieldRef)
+					}
+				}
+			}
+			corev1.SetDefaults_ResourceList(&b.EphemeralContainerCommon.Resources.Limits)
+			corev1.SetDefaults_ResourceList(&b.EphemeralContainerCommon.Resources.Requests)
+			if b.EphemeralContainerCommon.LivenessProbe != nil {
+				corev1.SetDefaults_Probe(b.EphemeralContainerCommon.LivenessProbe)
+				if b.EphemeralContainerCommon.LivenessProbe.Handler.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(b.EphemeralContainerCommon.LivenessProbe.Handler.HTTPGet)
+				}
+			}
+			if b.EphemeralContainerCommon.ReadinessProbe != nil {
+				corev1.SetDefaults_Probe(b.EphemeralContainerCommon.ReadinessProbe)
+				if b.EphemeralContainerCommon.ReadinessProbe.Handler.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(b.EphemeralContainerCommon.ReadinessProbe.Handler.HTTPGet)
+				}
+			}
+			if b.EphemeralContainerCommon.StartupProbe != nil {
+				corev1.SetDefaults_Probe(b.EphemeralContainerCommon.StartupProbe)
+				if b.EphemeralContainerCommon.StartupProbe.Handler.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(b.EphemeralContainerCommon.StartupProbe.Handler.HTTPGet)
+				}
+			}
+			if b.EphemeralContainerCommon.Lifecycle != nil {
+				if b.EphemeralContainerCommon.Lifecycle.PostStart != nil {
+					if b.EphemeralContainerCommon.Lifecycle.PostStart.HTTPGet != nil {
+						corev1.SetDefaults_HTTPGetAction(b.EphemeralContainerCommon.Lifecycle.PostStart.HTTPGet)
+					}
+				}
+				if b.EphemeralContainerCommon.Lifecycle.PreStop != nil {
+					if b.EphemeralContainerCommon.Lifecycle.PreStop.HTTPGet != nil {
+						corev1.SetDefaults_HTTPGetAction(b.EphemeralContainerCommon.Lifecycle.PreStop.HTTPGet)
+					}
+				}
 			}
 		}
+		corev1.SetDefaults_ResourceList(&a.PodSecurityPolicySubjectReviewStatus.Template.Spec.Overhead)
 	}
 }
 
@@ -396,6 +504,12 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 				corev1.SetDefaults_HTTPGetAction(a.ReadinessProbe.Handler.HTTPGet)
 			}
 		}
+		if a.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.StartupProbe)
+			if a.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.StartupProbe.Handler.HTTPGet)
+			}
+		}
 		if a.Lifecycle != nil {
 			if a.Lifecycle.PostStart != nil {
 				if a.Lifecycle.PostStart.HTTPGet != nil {
@@ -407,9 +521,6 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 					corev1.SetDefaults_HTTPGetAction(a.Lifecycle.PreStop.HTTPGet)
 				}
 			}
-		}
-		if a.SecurityContext != nil {
-			corev1.SetDefaults_SecurityContext(a.SecurityContext)
 		}
 	}
 	for i := range in.Spec.Template.Spec.Containers {
@@ -441,6 +552,12 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 				corev1.SetDefaults_HTTPGetAction(a.ReadinessProbe.Handler.HTTPGet)
 			}
 		}
+		if a.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.StartupProbe)
+			if a.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.StartupProbe.Handler.HTTPGet)
+			}
+		}
 		if a.Lifecycle != nil {
 			if a.Lifecycle.PostStart != nil {
 				if a.Lifecycle.PostStart.HTTPGet != nil {
@@ -453,10 +570,55 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 				}
 			}
 		}
-		if a.SecurityContext != nil {
-			corev1.SetDefaults_SecurityContext(a.SecurityContext)
+	}
+	for i := range in.Spec.Template.Spec.EphemeralContainers {
+		a := &in.Spec.Template.Spec.EphemeralContainers[i]
+		for j := range a.EphemeralContainerCommon.Ports {
+			b := &a.EphemeralContainerCommon.Ports[j]
+			corev1.SetDefaults_ContainerPort(b)
+		}
+		for j := range a.EphemeralContainerCommon.Env {
+			b := &a.EphemeralContainerCommon.Env[j]
+			if b.ValueFrom != nil {
+				if b.ValueFrom.FieldRef != nil {
+					corev1.SetDefaults_ObjectFieldSelector(b.ValueFrom.FieldRef)
+				}
+			}
+		}
+		corev1.SetDefaults_ResourceList(&a.EphemeralContainerCommon.Resources.Limits)
+		corev1.SetDefaults_ResourceList(&a.EphemeralContainerCommon.Resources.Requests)
+		if a.EphemeralContainerCommon.LivenessProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.LivenessProbe)
+			if a.EphemeralContainerCommon.LivenessProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.LivenessProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.ReadinessProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.ReadinessProbe)
+			if a.EphemeralContainerCommon.ReadinessProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.ReadinessProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.StartupProbe)
+			if a.EphemeralContainerCommon.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.StartupProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.Lifecycle != nil {
+			if a.EphemeralContainerCommon.Lifecycle.PostStart != nil {
+				if a.EphemeralContainerCommon.Lifecycle.PostStart.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.Lifecycle.PostStart.HTTPGet)
+				}
+			}
+			if a.EphemeralContainerCommon.Lifecycle.PreStop != nil {
+				if a.EphemeralContainerCommon.Lifecycle.PreStop.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.Lifecycle.PreStop.HTTPGet)
+				}
+			}
 		}
 	}
+	corev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Overhead)
 	corev1.SetDefaults_PodSpec(&in.Status.Template.Spec)
 	for i := range in.Status.Template.Spec.Volumes {
 		a := &in.Status.Template.Spec.Volumes[i]
@@ -538,6 +700,12 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 				corev1.SetDefaults_HTTPGetAction(a.ReadinessProbe.Handler.HTTPGet)
 			}
 		}
+		if a.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.StartupProbe)
+			if a.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.StartupProbe.Handler.HTTPGet)
+			}
+		}
 		if a.Lifecycle != nil {
 			if a.Lifecycle.PostStart != nil {
 				if a.Lifecycle.PostStart.HTTPGet != nil {
@@ -549,9 +717,6 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 					corev1.SetDefaults_HTTPGetAction(a.Lifecycle.PreStop.HTTPGet)
 				}
 			}
-		}
-		if a.SecurityContext != nil {
-			corev1.SetDefaults_SecurityContext(a.SecurityContext)
 		}
 	}
 	for i := range in.Status.Template.Spec.Containers {
@@ -583,6 +748,12 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 				corev1.SetDefaults_HTTPGetAction(a.ReadinessProbe.Handler.HTTPGet)
 			}
 		}
+		if a.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.StartupProbe)
+			if a.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.StartupProbe.Handler.HTTPGet)
+			}
+		}
 		if a.Lifecycle != nil {
 			if a.Lifecycle.PostStart != nil {
 				if a.Lifecycle.PostStart.HTTPGet != nil {
@@ -595,10 +766,55 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 				}
 			}
 		}
-		if a.SecurityContext != nil {
-			corev1.SetDefaults_SecurityContext(a.SecurityContext)
+	}
+	for i := range in.Status.Template.Spec.EphemeralContainers {
+		a := &in.Status.Template.Spec.EphemeralContainers[i]
+		for j := range a.EphemeralContainerCommon.Ports {
+			b := &a.EphemeralContainerCommon.Ports[j]
+			corev1.SetDefaults_ContainerPort(b)
+		}
+		for j := range a.EphemeralContainerCommon.Env {
+			b := &a.EphemeralContainerCommon.Env[j]
+			if b.ValueFrom != nil {
+				if b.ValueFrom.FieldRef != nil {
+					corev1.SetDefaults_ObjectFieldSelector(b.ValueFrom.FieldRef)
+				}
+			}
+		}
+		corev1.SetDefaults_ResourceList(&a.EphemeralContainerCommon.Resources.Limits)
+		corev1.SetDefaults_ResourceList(&a.EphemeralContainerCommon.Resources.Requests)
+		if a.EphemeralContainerCommon.LivenessProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.LivenessProbe)
+			if a.EphemeralContainerCommon.LivenessProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.LivenessProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.ReadinessProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.ReadinessProbe)
+			if a.EphemeralContainerCommon.ReadinessProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.ReadinessProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.StartupProbe)
+			if a.EphemeralContainerCommon.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.StartupProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.Lifecycle != nil {
+			if a.EphemeralContainerCommon.Lifecycle.PostStart != nil {
+				if a.EphemeralContainerCommon.Lifecycle.PostStart.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.Lifecycle.PostStart.HTTPGet)
+				}
+			}
+			if a.EphemeralContainerCommon.Lifecycle.PreStop != nil {
+				if a.EphemeralContainerCommon.Lifecycle.PreStop.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.Lifecycle.PreStop.HTTPGet)
+				}
+			}
 		}
 	}
+	corev1.SetDefaults_ResourceList(&in.Status.Template.Spec.Overhead)
 }
 
 func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySubjectReview) {
@@ -683,6 +899,12 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 				corev1.SetDefaults_HTTPGetAction(a.ReadinessProbe.Handler.HTTPGet)
 			}
 		}
+		if a.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.StartupProbe)
+			if a.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.StartupProbe.Handler.HTTPGet)
+			}
+		}
 		if a.Lifecycle != nil {
 			if a.Lifecycle.PostStart != nil {
 				if a.Lifecycle.PostStart.HTTPGet != nil {
@@ -694,9 +916,6 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 					corev1.SetDefaults_HTTPGetAction(a.Lifecycle.PreStop.HTTPGet)
 				}
 			}
-		}
-		if a.SecurityContext != nil {
-			corev1.SetDefaults_SecurityContext(a.SecurityContext)
 		}
 	}
 	for i := range in.Spec.Template.Spec.Containers {
@@ -728,6 +947,12 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 				corev1.SetDefaults_HTTPGetAction(a.ReadinessProbe.Handler.HTTPGet)
 			}
 		}
+		if a.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.StartupProbe)
+			if a.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.StartupProbe.Handler.HTTPGet)
+			}
+		}
 		if a.Lifecycle != nil {
 			if a.Lifecycle.PostStart != nil {
 				if a.Lifecycle.PostStart.HTTPGet != nil {
@@ -740,10 +965,55 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 				}
 			}
 		}
-		if a.SecurityContext != nil {
-			corev1.SetDefaults_SecurityContext(a.SecurityContext)
+	}
+	for i := range in.Spec.Template.Spec.EphemeralContainers {
+		a := &in.Spec.Template.Spec.EphemeralContainers[i]
+		for j := range a.EphemeralContainerCommon.Ports {
+			b := &a.EphemeralContainerCommon.Ports[j]
+			corev1.SetDefaults_ContainerPort(b)
+		}
+		for j := range a.EphemeralContainerCommon.Env {
+			b := &a.EphemeralContainerCommon.Env[j]
+			if b.ValueFrom != nil {
+				if b.ValueFrom.FieldRef != nil {
+					corev1.SetDefaults_ObjectFieldSelector(b.ValueFrom.FieldRef)
+				}
+			}
+		}
+		corev1.SetDefaults_ResourceList(&a.EphemeralContainerCommon.Resources.Limits)
+		corev1.SetDefaults_ResourceList(&a.EphemeralContainerCommon.Resources.Requests)
+		if a.EphemeralContainerCommon.LivenessProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.LivenessProbe)
+			if a.EphemeralContainerCommon.LivenessProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.LivenessProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.ReadinessProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.ReadinessProbe)
+			if a.EphemeralContainerCommon.ReadinessProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.ReadinessProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.StartupProbe)
+			if a.EphemeralContainerCommon.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.StartupProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.Lifecycle != nil {
+			if a.EphemeralContainerCommon.Lifecycle.PostStart != nil {
+				if a.EphemeralContainerCommon.Lifecycle.PostStart.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.Lifecycle.PostStart.HTTPGet)
+				}
+			}
+			if a.EphemeralContainerCommon.Lifecycle.PreStop != nil {
+				if a.EphemeralContainerCommon.Lifecycle.PreStop.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.Lifecycle.PreStop.HTTPGet)
+				}
+			}
 		}
 	}
+	corev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Overhead)
 	corev1.SetDefaults_PodSpec(&in.Status.Template.Spec)
 	for i := range in.Status.Template.Spec.Volumes {
 		a := &in.Status.Template.Spec.Volumes[i]
@@ -825,6 +1095,12 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 				corev1.SetDefaults_HTTPGetAction(a.ReadinessProbe.Handler.HTTPGet)
 			}
 		}
+		if a.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.StartupProbe)
+			if a.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.StartupProbe.Handler.HTTPGet)
+			}
+		}
 		if a.Lifecycle != nil {
 			if a.Lifecycle.PostStart != nil {
 				if a.Lifecycle.PostStart.HTTPGet != nil {
@@ -836,9 +1112,6 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 					corev1.SetDefaults_HTTPGetAction(a.Lifecycle.PreStop.HTTPGet)
 				}
 			}
-		}
-		if a.SecurityContext != nil {
-			corev1.SetDefaults_SecurityContext(a.SecurityContext)
 		}
 	}
 	for i := range in.Status.Template.Spec.Containers {
@@ -870,6 +1143,12 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 				corev1.SetDefaults_HTTPGetAction(a.ReadinessProbe.Handler.HTTPGet)
 			}
 		}
+		if a.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.StartupProbe)
+			if a.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.StartupProbe.Handler.HTTPGet)
+			}
+		}
 		if a.Lifecycle != nil {
 			if a.Lifecycle.PostStart != nil {
 				if a.Lifecycle.PostStart.HTTPGet != nil {
@@ -882,8 +1161,53 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 				}
 			}
 		}
-		if a.SecurityContext != nil {
-			corev1.SetDefaults_SecurityContext(a.SecurityContext)
+	}
+	for i := range in.Status.Template.Spec.EphemeralContainers {
+		a := &in.Status.Template.Spec.EphemeralContainers[i]
+		for j := range a.EphemeralContainerCommon.Ports {
+			b := &a.EphemeralContainerCommon.Ports[j]
+			corev1.SetDefaults_ContainerPort(b)
+		}
+		for j := range a.EphemeralContainerCommon.Env {
+			b := &a.EphemeralContainerCommon.Env[j]
+			if b.ValueFrom != nil {
+				if b.ValueFrom.FieldRef != nil {
+					corev1.SetDefaults_ObjectFieldSelector(b.ValueFrom.FieldRef)
+				}
+			}
+		}
+		corev1.SetDefaults_ResourceList(&a.EphemeralContainerCommon.Resources.Limits)
+		corev1.SetDefaults_ResourceList(&a.EphemeralContainerCommon.Resources.Requests)
+		if a.EphemeralContainerCommon.LivenessProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.LivenessProbe)
+			if a.EphemeralContainerCommon.LivenessProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.LivenessProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.ReadinessProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.ReadinessProbe)
+			if a.EphemeralContainerCommon.ReadinessProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.ReadinessProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.StartupProbe != nil {
+			corev1.SetDefaults_Probe(a.EphemeralContainerCommon.StartupProbe)
+			if a.EphemeralContainerCommon.StartupProbe.Handler.HTTPGet != nil {
+				corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.StartupProbe.Handler.HTTPGet)
+			}
+		}
+		if a.EphemeralContainerCommon.Lifecycle != nil {
+			if a.EphemeralContainerCommon.Lifecycle.PostStart != nil {
+				if a.EphemeralContainerCommon.Lifecycle.PostStart.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.Lifecycle.PostStart.HTTPGet)
+				}
+			}
+			if a.EphemeralContainerCommon.Lifecycle.PreStop != nil {
+				if a.EphemeralContainerCommon.Lifecycle.PreStop.HTTPGet != nil {
+					corev1.SetDefaults_HTTPGetAction(a.EphemeralContainerCommon.Lifecycle.PreStop.HTTPGet)
+				}
+			}
 		}
 	}
+	corev1.SetDefaults_ResourceList(&in.Status.Template.Spec.Overhead)
 }
