@@ -1,6 +1,7 @@
 package requestlimit
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -84,7 +85,7 @@ var _ = admissionrestconfig.WantsRESTClientConfig(&projectRequestLimit{})
 var _ = admission.ValidationInterface(&projectRequestLimit{})
 
 // Admit ensures that only a configured number of projects can be requested by a particular user.
-func (o *projectRequestLimit) Validate(a admission.Attributes, _ admission.ObjectInterfaces) (err error) {
+func (o *projectRequestLimit) Validate(ctx context.Context, a admission.Attributes, _ admission.ObjectInterfaces) (err error) {
 	if o.config == nil {
 		return nil
 	}
