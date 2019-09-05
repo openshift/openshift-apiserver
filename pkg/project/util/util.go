@@ -10,9 +10,12 @@ import (
 	"k8s.io/apiserver/pkg/registry/generic"
 	apistorage "k8s.io/apiserver/pkg/storage"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
+	v1 "k8s.io/kubernetes/pkg/apis/core/v1"
 
+	projectv1 "github.com/openshift/api/project/v1"
 	oapi "github.com/openshift/openshift-apiserver/pkg/api"
 	projectapi "github.com/openshift/openshift-apiserver/pkg/project/apis/project"
+	projectinternalv1 "github.com/openshift/openshift-apiserver/pkg/project/apis/project/v1"
 )
 
 // ConvertNamespaceFromExternal transforms a versioned Namespace into a Project
@@ -22,7 +25,7 @@ func ConvertNamespaceFromExternal(namespace *corev1.Namespace) *projectapi.Proje
 		internalFinalizers = append(internalFinalizers, kapi.FinalizerName(externalFinalizer))
 	}
 
-	return &projectapi.Project{
+	p := &projectapi.Project{
 		ObjectMeta: namespace.ObjectMeta,
 		Spec: projectapi.ProjectSpec{
 			Finalizers: internalFinalizers,
@@ -31,6 +34,18 @@ func ConvertNamespaceFromExternal(namespace *corev1.Namespace) *projectapi.Proje
 			Phase: kapi.NamespacePhase(namespace.Status.Phase),
 		},
 	}
+	if namespace.Status.Conditions != nil {
+		p.Status.Conditions = []kapi.NamespaceCondition{}
+		status := &kapi.NamespaceStatus{}
+		if err := v1.Convert_v1_NamespaceStatus_To_core_NamespaceStatus(&namespace.Status, status, nil); err != nil {
+			panic(err)
+		}
+		for _, c := range status.Conditions {
+			p.Status.Conditions = append(p.Status.Conditions, c)
+		}
+	}
+
+	return p
 }
 
 func ConvertProjectToExternal(project *projectapi.Project) *corev1.Namespace {
@@ -47,6 +62,16 @@ func ConvertProjectToExternal(project *projectapi.Project) *corev1.Namespace {
 		Status: corev1.NamespaceStatus{
 			Phase: corev1.NamespacePhase(project.Status.Phase),
 		},
+	}
+	if project.Status.Conditions != nil {
+		namespace.Status.Conditions = []corev1.NamespaceCondition{}
+		status := &projectv1.ProjectStatus{}
+		if err := projectinternalv1.Convert_project_ProjectStatus_To_v1_ProjectStatus(&project.Status, status, nil); err != nil {
+			panic(err)
+		}
+		for _, c := range status.Conditions {
+			namespace.Status.Conditions = append(namespace.Status.Conditions, c)
+		}
 	}
 	if namespace.Annotations == nil {
 		namespace.Annotations = map[string]string{}
