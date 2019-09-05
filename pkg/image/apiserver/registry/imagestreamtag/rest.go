@@ -142,7 +142,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
 		return nil, err
 	}
-	if err := createValidation(obj.DeepCopyObject()); err != nil {
+	if err := createValidation(ctx, obj.DeepCopyObject()); err != nil {
 		return nil, err
 	}
 	namespace, ok := apirequest.NamespaceFrom(ctx)
@@ -270,14 +270,14 @@ func (r *REST) Update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 		if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
 			return nil, false, err
 		}
-		if err := createValidation(obj.DeepCopyObject()); err != nil {
+		if err := createValidation(ctx, obj.DeepCopyObject()); err != nil {
 			return nil, false, err
 		}
 	} else {
 		if err := rest.BeforeUpdate(r.strategy, ctx, obj, old); err != nil {
 			return nil, false, err
 		}
-		if err := updateValidation(obj.DeepCopyObject(), old.DeepCopyObject()); err != nil {
+		if err := updateValidation(ctx, obj.DeepCopyObject(), old.DeepCopyObject()); err != nil {
 			return nil, false, err
 		}
 	}

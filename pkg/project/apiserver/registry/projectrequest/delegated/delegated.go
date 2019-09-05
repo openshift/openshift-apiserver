@@ -108,7 +108,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	if err := rest.BeforeCreate(projectrequestregistry.Strategy, ctx, obj); err != nil {
 		return nil, err
 	}
-	if err := createValidation(obj); err != nil {
+	if err := createValidation(ctx, obj); err != nil {
 		return nil, err
 	}
 
