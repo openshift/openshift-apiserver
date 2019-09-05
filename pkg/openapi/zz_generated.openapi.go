@@ -28882,9 +28882,30 @@ func schema_openshift_api_project_v1_ProjectStatus(ref common.ReferenceCallback)
 							Format:      "",
 						},
 					},
+					"conditions": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "type",
+								"x-kubernetes-patch-strategy":  "merge",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Represents the latest available observations of the project current state.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/api/core/v1.NamespaceCondition"),
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.NamespaceCondition"},
 	}
 }
 
