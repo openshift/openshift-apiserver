@@ -31,12 +31,18 @@ func RunOpenShiftAPIServer(serverConfig *openshiftcontrolplanev1.OpenShiftAPISer
 	if err != nil {
 		return err
 	}
-	openshiftAPIServer, err := openshiftAPIServerRuntimeConfig.Complete().New(genericapiserver.NewEmptyDelegate())
+
+	completedOpenshiftAPIServer := openshiftAPIServerRuntimeConfig.Complete()
+	openshiftAPIServer, err := completedOpenshiftAPIServer.New(genericapiserver.NewEmptyDelegate())
 	if err != nil {
 		return err
 	}
-	// this sets up the openapi endpoints
 	preparedOpenshiftAPIServer := openshiftAPIServer.GenericAPIServer.PrepareRun()
+
+	// this **must** be done after PrepareRun() as it sets up the openapi endpoints
+	if err := completedOpenshiftAPIServer.WithOpenAPIAggregationController(preparedOpenshiftAPIServer.GenericAPIServer); err != nil {
+		return err
+	}
 
 	klog.Infof("Starting master on %s (%s)", serverConfig.ServingInfo.BindAddress, version.Get().String())
 
