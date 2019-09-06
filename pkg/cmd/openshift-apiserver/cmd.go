@@ -27,8 +27,6 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/api/legacy"
 )
 
-const RecommendedStartAPIServerName = "openshift-apiserver"
-
 type OpenShiftAPIServer struct {
 	ConfigFile string
 	Output     io.Writer
