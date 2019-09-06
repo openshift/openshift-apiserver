@@ -178,7 +178,7 @@ func (c *completedConfig) withAppsAPIServer(delegateAPIServer genericapiserver.D
 	if err != nil {
 		return nil, err
 	}
-	server.GenericAPIServer.PrepareRun() // this triggers openapi construction
+	server.GenericAPIServer.InstallOpenAPI()
 
 	return server.GenericAPIServer, nil
 }
@@ -200,13 +200,12 @@ func (c *completedConfig) withAuthorizationAPIServer(delegateAPIServer genericap
 	if err != nil {
 		return nil, err
 	}
-	server.GenericAPIServer.PrepareRun() // this triggers openapi construction
+	server.GenericAPIServer.InstallOpenAPI()
 
 	return server.GenericAPIServer, nil
 }
 
 func (c *completedConfig) withBuildAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
-
 	cfg := &buildapiserver.BuildServerConfig{
 		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
 		ExtraConfig: buildapiserver.ExtraConfig{
@@ -220,7 +219,7 @@ func (c *completedConfig) withBuildAPIServer(delegateAPIServer genericapiserver.
 	if err != nil {
 		return nil, err
 	}
-	server.GenericAPIServer.PrepareRun() // this triggers openapi construction
+	server.GenericAPIServer.InstallOpenAPI()
 
 	return server.GenericAPIServer, nil
 }
@@ -243,7 +242,7 @@ func (c *completedConfig) withImageAPIServer(delegateAPIServer genericapiserver.
 	if err != nil {
 		return nil, err
 	}
-	server.GenericAPIServer.PrepareRun() // this triggers openapi construction
+	server.GenericAPIServer.InstallOpenAPI()
 
 	return server.GenericAPIServer, nil
 }
@@ -263,7 +262,8 @@ func (c *completedConfig) withOAuthAPIServer(delegateAPIServer genericapiserver.
 	if err != nil {
 		return nil, err
 	}
-	server.GenericAPIServer.PrepareRun() // this triggers openapi construction
+
+	server.GenericAPIServer.InstallOpenAPI()
 
 	return server.GenericAPIServer, nil
 }
@@ -287,7 +287,8 @@ func (c *completedConfig) withProjectAPIServer(delegateAPIServer genericapiserve
 	if err != nil {
 		return nil, err
 	}
-	server.GenericAPIServer.PrepareRun() // this triggers openapi construction
+
+	server.GenericAPIServer.InstallOpenAPI()
 
 	return server.GenericAPIServer, nil
 }
@@ -307,7 +308,8 @@ func (c *completedConfig) withQuotaAPIServer(delegateAPIServer genericapiserver.
 	if err != nil {
 		return nil, err
 	}
-	server.GenericAPIServer.PrepareRun() // this triggers openapi construction
+
+	server.GenericAPIServer.InstallOpenAPI()
 
 	return server.GenericAPIServer, nil
 }
@@ -327,7 +329,8 @@ func (c *completedConfig) withRouteAPIServer(delegateAPIServer genericapiserver.
 	if err != nil {
 		return nil, err
 	}
-	server.GenericAPIServer.PrepareRun() // this triggers openapi construction
+
+	server.GenericAPIServer.InstallOpenAPI()
 
 	return server.GenericAPIServer, nil
 }
@@ -349,7 +352,8 @@ func (c *completedConfig) withSecurityAPIServer(delegateAPIServer genericapiserv
 	if err != nil {
 		return nil, err
 	}
-	server.GenericAPIServer.PrepareRun() // this triggers openapi construction
+
+	server.GenericAPIServer.InstallOpenAPI()
 
 	return server.GenericAPIServer, nil
 }
@@ -368,7 +372,8 @@ func (c *completedConfig) withTemplateAPIServer(delegateAPIServer genericapiserv
 	if err != nil {
 		return nil, err
 	}
-	server.GenericAPIServer.PrepareRun() // this triggers openapi construction
+
+	server.GenericAPIServer.InstallOpenAPI()
 
 	return server.GenericAPIServer, nil
 }
@@ -386,7 +391,8 @@ func (c *completedConfig) withUserAPIServer(delegateAPIServer genericapiserver.D
 	if err != nil {
 		return nil, err
 	}
-	server.GenericAPIServer.PrepareRun() // this triggers openapi construction
+
+	server.GenericAPIServer.InstallOpenAPI()
 
 	return server.GenericAPIServer, nil
 }
