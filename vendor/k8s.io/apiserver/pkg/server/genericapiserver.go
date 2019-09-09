@@ -279,16 +279,20 @@ type preparedGenericAPIServer struct {
 	*GenericAPIServer
 }
 
+func (s *GenericAPIServer) InstallOpenAPI() {
+	if s.openAPIConfig == nil {
+		return
+	}
+	s.OpenAPIVersionedService, s.StaticOpenAPISpec = routes.OpenAPI{
+		Config: s.openAPIConfig,
+	}.Install(s.Handler.GoRestfulContainer, s.Handler.NonGoRestfulMux)
+}
+
 // PrepareRun does post API installation setup steps. It calls recursively the same function of the delegates.
 func (s *GenericAPIServer) PrepareRun() preparedGenericAPIServer {
 	s.delegationTarget.PrepareRun()
 
-	if s.openAPIConfig != nil {
-		s.OpenAPIVersionedService, s.StaticOpenAPISpec = routes.OpenAPI{
-			Config: s.openAPIConfig,
-		}.Install(s.Handler.GoRestfulContainer, s.Handler.NonGoRestfulMux)
-	}
-
+	s.InstallOpenAPI()
 	s.installHealthz()
 	s.installLivez()
 	err := s.addReadyzShutdownCheck(s.readinessStopCh)
