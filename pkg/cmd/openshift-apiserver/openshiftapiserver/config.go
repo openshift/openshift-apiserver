@@ -35,7 +35,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/version"
 )
 
-func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerConfig) (*OpenshiftAPIConfig, error) {
+func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerConfig, patchServing func(servingOptions *genericapiserveroptions.SecureServingOptionsWithLoopback) error, patchEtcd  func(options *genericapiserveroptions.EtcdOptions) error) (*OpenshiftAPIConfig, error) {
 	kubeClientConfig, err := helpers.GetKubeClientConfig(config.KubeClientConfig)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 
 	openshiftVersion := version.Get()
 
-	restOptsGetter, err := NewRESTOptionsGetter(config.APIServerArguments, config.StorageConfig)
+	restOptsGetter, err := NewRESTOptionsGetter(config.APIServerArguments, config.StorageConfig, patchEtcd)
 	if err != nil {
 		return nil, err
 	}
@@ -114,6 +114,11 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	}
 	if err := servingOptions.ApplyTo(&genericConfig.Config.SecureServing, &genericConfig.Config.LoopbackClientConfig); err != nil {
 		return nil, err
+	}
+	if patchServing != nil {
+		if err := patchServing(servingOptions); err != nil {
+			return nil, err
+		}
 	}
 	authenticationOptions := genericapiserveroptions.NewDelegatingAuthenticationOptions()
 	// keep working for integration tests

@@ -14,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apiserver/pkg/server/options"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/klog"
 	kcmdutil "k8s.io/kubectl/pkg/cmd/util"
@@ -25,11 +26,15 @@ import (
 	"github.com/openshift/library-go/pkg/config/helpers"
 	"github.com/openshift/library-go/pkg/serviceability"
 	"github.com/openshift/openshift-apiserver/pkg/api/legacy"
+	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver"
 )
 
 type OpenShiftAPIServer struct {
 	ConfigFile string
 	Output     io.Writer
+
+	PatchServing func(*options.SecureServingOptionsWithLoopback) error
+	PatchEtcd    func(*options.EtcdOptions) error
 }
 
 var longDescription = templates.LongDesc(`
@@ -49,7 +54,7 @@ func NewOpenShiftAPIServerCommand(name string, out, errout io.Writer, stopCh <-c
 
 			serviceability.StartProfiler()
 
-			if err := options.RunAPIServer(stopCh); err != nil {
+			if err := options.RunAPIServer(nil, stopCh); err != nil {
 				if kerrors.IsInvalid(err) {
 					if details := err.(*kerrors.StatusError).ErrStatus.Details; details != nil {
 						fmt.Fprintf(errout, "Invalid %s %s\n", details.Kind, details.Name)
@@ -82,7 +87,7 @@ func (o *OpenShiftAPIServer) Validate() error {
 }
 
 // RunAPIServer takes the options, starts the API server and waits until stopCh is closed or initial listening fails.
-func (o *OpenShiftAPIServer) RunAPIServer(stopCh <-chan struct{}) error {
+func (o *OpenShiftAPIServer) RunAPIServer(srvCh chan<- *openshiftapiserver.OpenshiftAPIServer, stopCh <-chan struct{}) error {
 	// try to decode into our new types first.  right now there is no validation, no file path resolution.  this unsticks the operator to start.
 	// TODO add those things
 	configContent, err := ioutil.ReadFile(o.ConfigFile)
@@ -110,5 +115,5 @@ func (o *OpenShiftAPIServer) RunAPIServer(stopCh <-chan struct{}) error {
 	}
 	setRecommendedOpenShiftAPIServerConfigDefaults(config)
 
-	return RunOpenShiftAPIServer(config, stopCh)
+	return RunOpenShiftAPIServer(config, o.PatchServing, o.PatchEtcd, srvCh, stopCh)
 }

@@ -2,6 +2,7 @@ package openshift_apiserver
 
 import (
 	"github.com/openshift/library-go/pkg/serviceability"
+	"k8s.io/apiserver/pkg/server/options"
 	"k8s.io/klog"
 
 	genericapiserver "k8s.io/apiserver/pkg/server"
@@ -15,7 +16,7 @@ import (
 	_ "k8s.io/kubernetes/pkg/util/workqueue/prometheus" // for workqueue metric registration
 )
 
-func RunOpenShiftAPIServer(serverConfig *openshiftcontrolplanev1.OpenShiftAPIServerConfig, stopCh <-chan struct{}) error {
+func RunOpenShiftAPIServer(serverConfig *openshiftcontrolplanev1.OpenShiftAPIServerConfig, patchServing func(*options.SecureServingOptionsWithLoopback) error, patchEtcd func(etcdOptions *options.EtcdOptions) error, srvCh chan<- *openshiftapiserver.OpenshiftAPIServer, stopCh <-chan struct{}) error {
 	serviceability.InitLogrusFromKlog()
 	// Allow privileged containers
 	capabilities.Initialize(capabilities.Capabilities{
@@ -27,7 +28,7 @@ func RunOpenShiftAPIServer(serverConfig *openshiftcontrolplanev1.OpenShiftAPISer
 		},
 	})
 
-	openshiftAPIServerRuntimeConfig, err := openshiftapiserver.NewOpenshiftAPIConfig(serverConfig)
+	openshiftAPIServerRuntimeConfig, err := openshiftapiserver.NewOpenshiftAPIConfig(serverConfig, patchServing, patchEtcd)
 	if err != nil {
 		return err
 	}
@@ -40,5 +41,8 @@ func RunOpenShiftAPIServer(serverConfig *openshiftcontrolplanev1.OpenShiftAPISer
 
 	klog.Infof("Starting master on %s (%s)", serverConfig.ServingInfo.BindAddress, version.Get().String())
 
+	if srvCh != nil {
+		srvCh <- openshiftAPIServer
+	}
 	return preparedOpenshiftAPIServer.Run(stopCh)
 }

@@ -15,7 +15,7 @@ import (
 )
 
 // NewConfigGetter returns a restoptions.Getter implemented using information from the provided master config.
-func NewRESTOptionsGetter(startingFlags map[string][]string, storageConfig configv1.EtcdStorageConfig) (genericregistry.RESTOptionsGetter, error) {
+func NewRESTOptionsGetter(startingFlags map[string][]string, storageConfig configv1.EtcdStorageConfig, patch func(*options.EtcdOptions) error) (genericregistry.RESTOptionsGetter, error) {
 	var err error
 	targetRAMMB := 0
 	if targetRamString := startingFlags["target-ram-mb"]; len(targetRamString) == 1 {
@@ -30,6 +30,11 @@ func NewRESTOptionsGetter(startingFlags map[string][]string, storageConfig confi
 		storageConfig,
 		newHeuristicWatchCacheSizes(targetRAMMB),
 	)
+	if patch != nil {
+		if err :=patch(etcdOptions); err != nil {
+			return nil, err
+		}
+	}
 
 	storageFactory := apiserverstorage.NewDefaultStorageFactory(
 		etcdOptions.StorageConfig,
