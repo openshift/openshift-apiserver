@@ -25,7 +25,14 @@ import (
 	"github.com/openshift/library-go/pkg/image/registryclient"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	dockerregistry "github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
+
+type mockRetrieverFunc func(registry *url.URL, repoName string, insecure bool) (distribution.Repository, error)
+
+func (r mockRetrieverFunc) Repository(ctx context.Context, registry *url.URL, repoName string, insecure bool) (distribution.Repository, error) {
+	return r(registry, repoName, insecure)
+}
 
 type mockRetriever struct {
 	repo     distribution.Repository
@@ -201,7 +208,7 @@ func TestDockerV1Fallback(t *testing.T) {
 	}
 
 	retriever := &mockRetriever{err: fmt.Errorf("does not support v2 API")}
-	im := NewImageStreamImporter(retriever, 5, nil, nil)
+	im := NewImageStreamImporter(retriever, nil, 5, nil, nil)
 	if err := im.Import(ctx, isi, nil); err != nil {
 		t.Fatal(err)
 	}
@@ -213,7 +220,7 @@ func TestDockerV1Fallback(t *testing.T) {
 func TestImportNothing(t *testing.T) {
 	ctx := registryclient.NewContext(http.DefaultTransport, http.DefaultTransport).WithCredentials(registryclient.NoCredentials)
 	isi := &imageapi.ImageStreamImport{}
-	i := NewImageStreamImporter(ctx, 5, nil, nil)
+	i := NewImageStreamImporter(ctx, nil, 5, nil, nil)
 	if err := i.Import(nil, isi, nil); err != nil {
 		t.Fatal(err)
 	}
@@ -290,10 +297,10 @@ func TestImport(t *testing.T) {
 				},
 			},
 			expect: func(isi *imageapi.ImageStreamImport, t *testing.T) {
-				if !expectStatusError(isi.Status.Images[0].Status, "Internal error occurred: no such manifest tag") {
+				if !expectStatusError(isi.Status.Images[0].Status, "Internal error occurred: docker.io/library/test:latest: no such manifest tag") {
 					t.Errorf("unexpected status: %#v", isi.Status.Images[0].Status)
 				}
-				if !expectStatusError(isi.Status.Images[1].Status, "Internal error occurred: no such digest") {
+				if !expectStatusError(isi.Status.Images[1].Status, "Internal error occurred: docker.io/library/test@sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855: no such digest") {
 					t.Errorf("unexpected status: %#v", isi.Status.Images[1].Status)
 				}
 				if !expectStatusError(isi.Status.Images[2].Status, ` "" is invalid: from.name: Invalid value: "test///un/parse/able/image": invalid name: invalid reference format`) {
@@ -327,7 +334,7 @@ func TestImport(t *testing.T) {
 				if len(isi.Status.Repository.Images) != 0 {
 					t.Errorf("unexpected number of images: %#v", isi.Status.Repository.Images)
 				}
-				if isi.Status.Repository.Status.Status != metav1.StatusFailure || isi.Status.Repository.Status.Message != "Internal error occurred: error" {
+				if isi.Status.Repository.Status.Status != metav1.StatusFailure || isi.Status.Repository.Status.Message != "Internal error occurred: test: error" {
 					t.Errorf("unexpected status: %#v", isi.Status.Repository.Status)
 				}
 			},
@@ -439,7 +446,7 @@ func TestImport(t *testing.T) {
 				}
 				expectedTags := []string{"3.1", "3", "abc", "other", "v1"}
 				for i, image := range isi.Status.Repository.Images {
-					if image.Status.Status != metav1.StatusFailure || image.Status.Message != "Internal error occurred: no such manifest tag" {
+					if image.Status.Status != metav1.StatusFailure || image.Status.Message != "Internal error occurred: docker.io/library/test:"+image.Tag+": no such manifest tag" {
 						t.Errorf("unexpected status %d: %#v", i, isi.Status.Repository.Images)
 					}
 					if image.Tag != expectedTags[i] {
@@ -450,7 +457,7 @@ func TestImport(t *testing.T) {
 		},
 	}
 	for i, test := range testCases {
-		im := NewImageStreamImporter(test.retriever, 5, nil, nil)
+		im := NewImageStreamImporter(test.retriever, nil, 5, nil, nil)
 		if err := im.Import(nil, &test.isi, &imageapi.ImageStream{}); err != nil {
 			t.Errorf("%d: %v", i, err)
 		}
@@ -458,6 +465,135 @@ func TestImport(t *testing.T) {
 			test.expect(&test.isi, t)
 		}
 	}
+}
+
+func TestImportFromMirror(t *testing.T) {
+	busyboxManifestSchema2 := &schema2.DeserializedManifest{}
+	if err := busyboxManifestSchema2.UnmarshalJSON([]byte(busyboxManifest)); err != nil {
+		t.Fatal(err)
+	}
+	busyboxConfigDigest := godigest.FromBytes([]byte(busyboxManifestConfig))
+	busyboxManifestSchema2.Config = distribution.Descriptor{
+		Digest:    busyboxConfigDigest,
+		Size:      int64(len(busyboxManifestConfig)),
+		MediaType: schema2.MediaTypeImageConfig,
+	}
+	t.Logf("busybox manifest schema 2 digest: %q", godigest.FromBytes([]byte(busyboxManifest)))
+
+	regConf := &sysregistriesv2.V2RegistriesConf{
+		Registries: []sysregistriesv2.Registry{
+			{
+				Prefix: "quay.io/openshift",
+				Endpoint: sysregistriesv2.Endpoint{
+					Location: "quay.io/openshift",
+				},
+				Mirrors: []sysregistriesv2.Endpoint{
+					{
+						Location: "mirror.example.com/openshift4",
+					},
+				},
+				MirrorByDigestOnly: true,
+			},
+		},
+	}
+
+	t.Run("by digest from mirrored repo", func(t *testing.T) {
+		testRetriever := mockRetrieverFunc(func(registry *url.URL, repoName string, insecure bool) (distribution.Repository, error) {
+			if registry.String() == "https://mirror.example.com" && repoName == "openshift4/test" && !insecure {
+				return &mockRepository{
+					blobs: &mockBlobStore{
+						blobs: map[godigest.Digest][]byte{
+							busyboxConfigDigest: []byte(busyboxManifestConfig),
+						},
+					},
+					manifest: busyboxManifestSchema2,
+				}, nil
+			}
+			err := fmt.Errorf("unexpected call to the repository retriever: %v %v %v", registry, repoName, insecure)
+			t.Error(err)
+			return nil, err
+		})
+
+		isi := imageapi.ImageStreamImport{
+			Spec: imageapi.ImageStreamImportSpec{
+				Images: []imageapi.ImageImportSpec{
+					{
+						From: kapi.ObjectReference{Kind: "DockerImage", Name: "quay.io/openshift/test@" + busyboxDigest},
+					},
+				},
+			},
+		}
+
+		im := NewImageStreamImporter(testRetriever, regConf, 5, nil, nil)
+		if err := im.Import(nil, &isi, &imageapi.ImageStream{}); err != nil {
+			t.Fatalf("%v", err)
+		}
+		if len(isi.Status.Images) != 1 {
+			t.Fatalf("unexpected number of images: %#v", isi.Status.Repository.Images)
+		}
+		image := isi.Status.Images[0]
+		if image.Status.Status != metav1.StatusSuccess {
+			t.Fatalf("unexpected status: %#v", image.Status)
+		}
+		if image.Image.Name != busyboxDigest {
+			t.Errorf("unexpected image: %q != %q", image.Image.Name, busyboxDigest)
+		}
+		if image.Image.DockerImageMetadata.Size != busyboxImageSize {
+			t.Errorf("unexpected image size: %d != %d", image.Image.DockerImageMetadata.Size, busyboxImageSize)
+		}
+		if image.Image.DockerImageReference != "quay.io/openshift/test@"+busyboxDigest {
+			t.Errorf("unexpected ref: %#v", image.Image.DockerImageReference)
+		}
+	})
+
+	t.Run("by digest from another repo", func(t *testing.T) {
+		testRetriever := mockRetrieverFunc(func(registry *url.URL, repoName string, insecure bool) (distribution.Repository, error) {
+			if registry.String() == "https://registry-1.docker.io" && repoName == "openshift/test" && !insecure {
+				return &mockRepository{
+					blobs: &mockBlobStore{
+						blobs: map[godigest.Digest][]byte{
+							busyboxConfigDigest: []byte(busyboxManifestConfig),
+						},
+					},
+					manifest: busyboxManifestSchema2,
+				}, nil
+			}
+			err := fmt.Errorf("unexpected call to the repository retriever: %v %v %v", registry, repoName, insecure)
+			t.Error(err)
+			return nil, err
+		})
+
+		isi := imageapi.ImageStreamImport{
+			Spec: imageapi.ImageStreamImportSpec{
+				Images: []imageapi.ImageImportSpec{
+					{
+						From: kapi.ObjectReference{Kind: "DockerImage", Name: "docker.io/openshift/test@" + busyboxDigest},
+					},
+				},
+			},
+		}
+
+		im := NewImageStreamImporter(testRetriever, regConf, 5, nil, nil)
+		if err := im.Import(nil, &isi, &imageapi.ImageStream{}); err != nil {
+			t.Fatalf("%v", err)
+		}
+		if len(isi.Status.Images) != 1 {
+			t.Fatalf("unexpected number of images: %#v", isi.Status.Repository.Images)
+		}
+		image := isi.Status.Images[0]
+		if image.Status.Status != metav1.StatusSuccess {
+			t.Fatalf("unexpected status: %#v", image.Status)
+		}
+		if image.Image.Name != busyboxDigest {
+			t.Errorf("unexpected image: %q != %q", image.Image.Name, busyboxDigest)
+		}
+		if image.Image.DockerImageMetadata.Size != busyboxImageSize {
+			t.Errorf("unexpected image size: %d != %d", image.Image.DockerImageMetadata.Size, busyboxImageSize)
+		}
+		if image.Image.DockerImageReference != "docker.io/openshift/test@"+busyboxDigest {
+			t.Errorf("unexpected ref: %#v", image.Image.DockerImageReference)
+		}
+	})
 }
 
 const etcdManifest = `

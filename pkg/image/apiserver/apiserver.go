@@ -27,6 +27,7 @@ import (
 	imagev1 "github.com/openshift/api/image/v1"
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	imagev1client "github.com/openshift/client-go/image/clientset/versioned"
+	operatorinformers "github.com/openshift/client-go/operator/informers/externalversions"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer"
 	imageimporter "github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer"
@@ -42,6 +43,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestreammapping"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestreamtag"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
 
 type ExtraConfig struct {
@@ -50,6 +52,7 @@ type ExtraConfig struct {
 	AllowedRegistriesForImport         openshiftcontrolplanev1.AllowedRegistries
 	MaxImagesBulkImportedPerRepository int
 	AdditionalTrustedCA                []byte
+	OperatorInformers                  operatorinformers.SharedInformerFactory
 
 	// TODO these should all become local eventually
 	Scheme *runtime.Scheme
@@ -248,8 +251,8 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error building REST storage: %v", err)
 	}
-	importerFn := func(r importer.RepositoryRetriever) imageimporter.Interface {
-		return imageimporter.NewImageStreamImporter(r, c.ExtraConfig.MaxImagesBulkImportedPerRepository, flowcontrol.NewTokenBucketRateLimiter(2.0, 3), &importerCache)
+	importerFn := func(r importer.RepositoryRetriever, regConf *sysregistriesv2.V2RegistriesConf) imageimporter.Interface {
+		return imageimporter.NewImageStreamImporter(r, regConf, c.ExtraConfig.MaxImagesBulkImportedPerRepository, flowcontrol.NewTokenBucketRateLimiter(2.0, 3), &importerCache)
 	}
 	importerDockerClientFn := func() dockerv1client.Client {
 		return dockerv1client.NewClient(20*time.Second, false)
@@ -264,7 +267,9 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 		insecureImportTransport,
 		importerDockerClientFn,
 		whitelister,
-		authorizationClient.SubjectAccessReviews())
+		authorizationClient.SubjectAccessReviews(),
+		c.ExtraConfig.OperatorInformers.Operator().V1alpha1().ImageContentSourcePolicies().Lister(),
+	)
 	imageStreamImageStorage := imagestreamimage.NewREST(imageRegistry, imageStreamRegistry)
 
 	v1Storage := map[string]rest.Storage{}

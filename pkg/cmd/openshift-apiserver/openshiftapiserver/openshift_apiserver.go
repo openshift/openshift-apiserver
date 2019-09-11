@@ -29,6 +29,7 @@ import (
 	rbacauthorizer "k8s.io/kubernetes/plugin/pkg/auth/authorizer/rbac"
 
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
+	operatorinformers "github.com/openshift/client-go/operator/informers/externalversions"
 	quotainformer "github.com/openshift/client-go/quota/informers/externalversions"
 	securityv1client "github.com/openshift/client-go/security/clientset/versioned/typed/security/v1"
 	securityv1informer "github.com/openshift/client-go/security/informers/externalversions"
@@ -65,6 +66,7 @@ type OpenshiftAPIExtraConfig struct {
 
 	QuotaInformers    quotainformer.SharedInformerFactory
 	SecurityInformers securityv1informer.SharedInformerFactory
+	OperatorInformers operatorinformers.SharedInformerFactory
 
 	// these are all required to build our storage
 	RuleResolver   rbacregistryvalidation.AuthorizationRuleResolver
@@ -104,6 +106,9 @@ func (c *OpenshiftAPIExtraConfig) Validate() error {
 	}
 	if c.SecurityInformers == nil {
 		ret = append(ret, fmt.Errorf("SecurityInformers is required"))
+	}
+	if c.OperatorInformers == nil {
+		ret = append(ret, fmt.Errorf("OperatorInformers is required"))
 	}
 	if c.RuleResolver == nil {
 		ret = append(ret, fmt.Errorf("RuleResolver is required"))
@@ -232,6 +237,7 @@ func (c *completedConfig) withImageAPIServer(delegateAPIServer genericapiserver.
 			Codecs:                             legacyscheme.Codecs,
 			Scheme:                             legacyscheme.Scheme,
 			AdditionalTrustedCA:                c.ExtraConfig.AdditionalTrustedCA,
+			OperatorInformers:                  c.ExtraConfig.OperatorInformers,
 		},
 	}
 	config := cfg.Complete()
