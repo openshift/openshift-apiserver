@@ -2,6 +2,7 @@ package importer
 
 import (
 	"fmt"
+	"net"
 	"net/url"
 	"runtime"
 	"strings"
@@ -737,6 +738,11 @@ func imageImportStatus(err error, kind, position string) metav1.Status {
 		return t.Status()
 	case *field.Error:
 		return kapierrors.NewInvalid(image.Kind(kind), position, field.ErrorList{t}).ErrStatus
+	case net.Error:
+		if t.Timeout() {
+			return kapierrors.NewTimeoutError(err.Error(), 0).ErrStatus
+		}
+		return kapierrors.NewInternalError(err).ErrStatus
 	default:
 		return kapierrors.NewInternalError(err).ErrStatus
 	}

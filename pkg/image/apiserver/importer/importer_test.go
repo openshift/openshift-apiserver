@@ -448,6 +448,36 @@ func TestImport(t *testing.T) {
 				}
 			},
 		},
+		{
+			retriever: &mockRetriever{
+				repo: &mockRepository{
+					getErr:      &mockNetError{timeout: true},
+					getTagErr:   &mockNetError{timeout: true},
+					getByTagErr: &mockNetError{timeout: true},
+				},
+			},
+			isi: imageapi.ImageStreamImport{
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{From: kapi.ObjectReference{Kind: "DockerImage", Name: "test@sha256:958608f8ecc1dc62c93b6c610f3a834dae4220c9642e6e8b4e0f2b3ad7cbd238"}},
+						{From: kapi.ObjectReference{Kind: "DockerImage", Name: "test:tag"}},
+					},
+				},
+			},
+			expect: func(isi *imageapi.ImageStreamImport, t *testing.T) {
+				if len(isi.Status.Images) == 0 {
+					t.Errorf("expected non-empty imagestream import status")
+				}
+				for _, image := range isi.Status.Images {
+					if image.Status.Status != metav1.StatusFailure {
+						t.Errorf("expected %s to have status %s, got %s", image.Tag, metav1.StatusFailure, image.Status.Status)
+					}
+					if image.Status.Reason != metav1.StatusReasonTimeout {
+						t.Errorf("expected tag %s to have reason %s, got %s", image.Tag, metav1.StatusReasonTimeout, image.Status.Status)
+					}
+				}
+			},
+		},
 	}
 	for i, test := range testCases {
 		im := NewImageStreamImporter(test.retriever, 5, nil, nil)
@@ -458,6 +488,24 @@ func TestImport(t *testing.T) {
 			test.expect(&test.isi, t)
 		}
 	}
+}
+
+type mockNetError struct {
+	message   string
+	timeout   bool
+	temporary bool
+}
+
+func (e *mockNetError) Error() string {
+	return e.message
+}
+
+func (e *mockNetError) Timeout() bool {
+	return e.timeout
+}
+
+func (e *mockNetError) Temporary() bool {
+	return e.temporary
 }
 
 const etcdManifest = `
