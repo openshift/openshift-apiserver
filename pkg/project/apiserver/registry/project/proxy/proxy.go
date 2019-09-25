@@ -90,7 +90,7 @@ func (s *REST) List(ctx context.Context, options *metainternal.ListOptions) (run
 	if err != nil {
 		return nil, err
 	}
-	return projectutil.ConvertNamespaceList(namespaceList), nil
+	return projectutil.ConvertNamespaceList(namespaceList)
 }
 
 func (s *REST) Watch(ctx context.Context, options *metainternal.ListOptions) (watch.Interface, error) {
@@ -129,7 +129,7 @@ func (s *REST) Get(ctx context.Context, name string, options *metav1.GetOptions)
 	if err != nil {
 		return nil, err
 	}
-	return projectutil.ConvertNamespaceFromExternal(namespace), nil
+	return projectutil.ConvertNamespaceFromExternal(namespace)
 }
 
 var _ = rest.Creater(&REST{})
@@ -148,12 +148,15 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, creationValidatio
 	if err := creationValidation(ctx, projectObj.DeepCopyObject()); err != nil {
 		return nil, err
 	}
-
-	namespace, err := s.client.Create(projectutil.ConvertProjectToExternal(projectObj))
+	projectExternal, err := projectutil.ConvertProjectToExternal(projectObj)
 	if err != nil {
 		return nil, err
 	}
-	return projectutil.ConvertNamespaceFromExternal(namespace), nil
+	namespace, err := s.client.Create(projectExternal)
+	if err != nil {
+		return nil, err
+	}
+	return projectutil.ConvertNamespaceFromExternal(namespace)
 }
 
 var _ = rest.Updater(&REST{})
@@ -182,12 +185,17 @@ func (s *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 		return nil, false, err
 	}
 
-	namespace, err := s.client.Update(projectutil.ConvertProjectToExternal(projectObj))
+	projectExternal, err := projectutil.ConvertProjectToExternal(projectObj)
+	if err != nil {
+		return nil, false, err
+	}
+	namespace, err := s.client.Update(projectExternal)
 	if err != nil {
 		return nil, false, err
 	}
 
-	return projectutil.ConvertNamespaceFromExternal(namespace), false, nil
+	projectInternal, err := projectutil.ConvertNamespaceFromExternal(namespace)
+	return projectInternal, false, err
 }
 
 var _ = rest.GracefulDeleter(&REST{})

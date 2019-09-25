@@ -19,7 +19,7 @@ import (
 )
 
 // ConvertNamespaceFromExternal transforms a versioned Namespace into a Project
-func ConvertNamespaceFromExternal(namespace *corev1.Namespace) *projectapi.Project {
+func ConvertNamespaceFromExternal(namespace *corev1.Namespace) (*projectapi.Project, error) {
 	internalFinalizers := []kapi.FinalizerName{}
 	for _, externalFinalizer := range namespace.Spec.Finalizers {
 		internalFinalizers = append(internalFinalizers, kapi.FinalizerName(externalFinalizer))
@@ -38,17 +38,15 @@ func ConvertNamespaceFromExternal(namespace *corev1.Namespace) *projectapi.Proje
 		p.Status.Conditions = []kapi.NamespaceCondition{}
 		status := &kapi.NamespaceStatus{}
 		if err := v1.Convert_v1_NamespaceStatus_To_core_NamespaceStatus(&namespace.Status, status, nil); err != nil {
-			panic(err)
+			return nil, err
 		}
-		for _, c := range status.Conditions {
-			p.Status.Conditions = append(p.Status.Conditions, c)
-		}
+		p.Status.Conditions = status.Conditions
 	}
 
-	return p
+	return p, nil
 }
 
-func ConvertProjectToExternal(project *projectapi.Project) *corev1.Namespace {
+func ConvertProjectToExternal(project *projectapi.Project) (*corev1.Namespace, error) {
 	externalFinalizers := []corev1.FinalizerName{}
 	for _, internalFinalizer := range project.Spec.Finalizers {
 		externalFinalizers = append(externalFinalizers, corev1.FinalizerName(internalFinalizer))
@@ -67,26 +65,28 @@ func ConvertProjectToExternal(project *projectapi.Project) *corev1.Namespace {
 		namespace.Status.Conditions = []corev1.NamespaceCondition{}
 		status := &projectv1.ProjectStatus{}
 		if err := projectinternalv1.Convert_project_ProjectStatus_To_v1_ProjectStatus(&project.Status, status, nil); err != nil {
-			panic(err)
+			return nil, err
 		}
-		for _, c := range status.Conditions {
-			namespace.Status.Conditions = append(namespace.Status.Conditions, c)
-		}
+		namespace.Status.Conditions = status.Conditions
 	}
 	if namespace.Annotations == nil {
 		namespace.Annotations = map[string]string{}
 	}
 	namespace.Annotations[oapi.OpenShiftDisplayName] = project.Annotations[oapi.OpenShiftDisplayName]
-	return namespace
+	return namespace, nil
 }
 
 // ConvertNamespaceList transforms a NamespaceList into a ProjectList
-func ConvertNamespaceList(namespaceList *corev1.NamespaceList) *projectapi.ProjectList {
+func ConvertNamespaceList(namespaceList *corev1.NamespaceList) (*projectapi.ProjectList, error) {
 	projects := &projectapi.ProjectList{}
 	for _, n := range namespaceList.Items {
-		projects.Items = append(projects.Items, *ConvertNamespaceFromExternal(&n))
+		ns, err := ConvertNamespaceFromExternal(&n)
+		if err != nil {
+			return nil, err
+		}
+		projects.Items = append(projects.Items, *ns)
 	}
-	return projects
+	return projects, nil
 }
 
 // getAttrs returns labels and fields of a given object for filtering purposes.
