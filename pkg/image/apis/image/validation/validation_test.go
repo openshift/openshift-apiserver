@@ -1411,13 +1411,6 @@ func TestValidateImageStreamImport(t *testing.T) {
 						},
 						{
 							From: kapi.ObjectReference{
-								Kind: "DockerImage",
-								Name: "abc@sha256:3c87c572822935df60f0f5d3665bd376841a7fcfeb806b5f212de6a00e9a7b25",
-							},
-							ImportPolicy: imageapi.TagImportPolicy{Scheduled: true},
-						},
-						{
-							From: kapi.ObjectReference{
 								Kind: "ImageStreamTag",
 								Name: "other:latest",
 							},
@@ -1435,9 +1428,8 @@ func TestValidateImageStreamImport(t *testing.T) {
 			},
 			expected: field.ErrorList{
 				field.Invalid(field.NewPath("spec", "images").Index(1).Child("from", "name"), "abc@badid", "invalid reference format"),
-				field.Invalid(field.NewPath("spec", "images").Index(2).Child("from", "name"), "abc@sha256:3c87c572822935df60f0f5d3665bd376841a7fcfeb806b5f212de6a00e9a7b25", "only tags can be scheduled for import"),
-				field.Invalid(field.NewPath("spec", "images").Index(3).Child("from", "kind"), "ImageStreamTag", "only DockerImage is supported"),
-				field.Invalid(field.NewPath("spec", "images").Index(4).Child("from", "kind"), "ImageStreamImage", "only DockerImage is supported"),
+				field.Invalid(field.NewPath("spec", "images").Index(2).Child("from", "kind"), "ImageStreamTag", "only DockerImage is supported"),
+				field.Invalid(field.NewPath("spec", "images").Index(3).Child("from", "kind"), "ImageStreamImage", "only DockerImage is supported"),
 			},
 		},
 		"valid": {

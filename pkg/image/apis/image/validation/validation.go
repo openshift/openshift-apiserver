@@ -264,8 +264,6 @@ func ValidateImageStreamTagReference(
 		case "DockerImage":
 			if ref, err := imageref.Parse(tagRef.From.Name); err != nil && len(tagRef.From.Name) > 0 {
 				errs = append(errs, field.Invalid(fldPath.Child("from", "name"), tagRef.From.Name, err.Error()))
-			} else if len(ref.ID) > 0 && tagRef.ImportPolicy.Scheduled {
-				errs = append(errs, field.Invalid(fldPath.Child("from", "name"), tagRef.From.Name, "only tags can be scheduled for import"))
 			} else if whitelister != nil {
 				transport := getWhitelistTransportForFlag(tagRef.ImportPolicy.Insecure || insecureRepository, true)
 				if err := whitelister.AdmitDockerImageReference(&ref, transport); err != nil {
