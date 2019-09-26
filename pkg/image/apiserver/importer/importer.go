@@ -408,6 +408,18 @@ func manifestFromManifestList(ctx gocontext.Context, manifestList *manifestlist.
 			break
 		}
 	}
+
+	// if we couldn't match the preferred arch/os, and we couldn't match the platform's arch/os, prefer
+	// x86/linux before falling back to "first image in the manifestlist" as a last resort.
+	if manifestDigest == "" {
+		for _, manifestDescriptor := range manifestList.Manifests {
+			if manifestDescriptor.Platform.Architecture == "amd64" && manifestDescriptor.Platform.OS == "linux" {
+				manifestDigest = manifestDescriptor.Digest
+				break
+			}
+		}
+	}
+
 	if manifestDigest == "" {
 		klog.V(5).Infof("unable to find %s/%s manifest in manifest list %s, doing conservative fail by switching to the first one: %#+v", preferOS, preferArch, ref.Exact(), manifestList.Manifests[0])
 		manifestDigest = manifestList.Manifests[0].Digest
