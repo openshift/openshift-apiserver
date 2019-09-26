@@ -9,16 +9,16 @@ import (
 	"path"
 
 	"github.com/spf13/cobra"
-	"k8s.io/klog"
 
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/tools/clientcmd/api"
+	"k8s.io/klog"
+	kcmdutil "k8s.io/kubectl/pkg/cmd/util"
+	"k8s.io/kubectl/pkg/util/templates"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
-	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
-	"k8s.io/kubernetes/pkg/kubectl/util/templates"
 
 	configv1 "github.com/openshift/api/config/v1"
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
@@ -26,8 +26,6 @@ import (
 	"github.com/openshift/library-go/pkg/serviceability"
 	"github.com/openshift/openshift-apiserver/pkg/api/legacy"
 )
-
-const RecommendedStartAPIServerName = "openshift-apiserver"
 
 type OpenShiftAPIServer struct {
 	ConfigFile string

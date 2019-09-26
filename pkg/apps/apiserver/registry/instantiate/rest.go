@@ -106,11 +106,13 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		config.Status.LatestVersion++
 
 		userInfo, _ := apirequest.UserFrom(ctx)
-		attrs := admission.NewAttributesRecord(config, old, apps.Kind("DeploymentConfig").WithVersion(""), config.Namespace, config.Name, apps.Resource("DeploymentConfig").WithVersion(""), "", admission.Update, false, userInfo)
-		if err := s.admit.(admission.MutationInterface).Admit(attrs, &admission.SchemeBasedObjectInterfaces{Scheme: legacyscheme.Scheme}); err != nil {
+		attrs := admission.NewAttributesRecord(config, old, apps.Kind("DeploymentConfig").WithVersion(""), config.Namespace, config.Name, apps.Resource("DeploymentConfig").WithVersion(""), "", admission.Update,
+			options, false, userInfo)
+		objectInterfaces := admission.NewObjectInterfacesFromScheme(legacyscheme.Scheme)
+		if err := s.admit.(admission.MutationInterface).Admit(ctx, attrs, objectInterfaces); err != nil {
 			return err
 		}
-		if err := s.admit.(admission.ValidationInterface).Validate(attrs, &admission.SchemeBasedObjectInterfaces{Scheme: legacyscheme.Scheme}); err != nil {
+		if err := s.admit.(admission.ValidationInterface).Validate(ctx, attrs, objectInterfaces); err != nil {
 			return err
 		}
 
@@ -118,8 +120,8 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 			ctx,
 			config.Name,
 			rest.DefaultUpdatedObjectInfo(config),
-			rest.AdmissionToValidateObjectFunc(s.admit, attrs, &admission.SchemeBasedObjectInterfaces{Scheme: legacyscheme.Scheme}),
-			rest.AdmissionToValidateObjectUpdateFunc(s.admit, attrs, &admission.SchemeBasedObjectInterfaces{Scheme: legacyscheme.Scheme}),
+			rest.AdmissionToValidateObjectFunc(s.admit, attrs, objectInterfaces),
+			rest.AdmissionToValidateObjectUpdateFunc(s.admit, attrs, objectInterfaces),
 			false,
 			&metav1.UpdateOptions{},
 		)

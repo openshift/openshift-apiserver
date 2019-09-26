@@ -61,7 +61,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	if errs := validation.ValidateDeploymentConfigRollback(rollback); len(errs) > 0 {
 		return nil, apierrors.NewInvalid(apps.Kind("DeploymentConfigRollback"), rollback.Name, errs)
 	}
-	if err := createValidation(obj); err != nil {
+	if err := createValidation(ctx, obj); err != nil {
 		return nil, err
 	}
 

@@ -9,9 +9,10 @@ import (
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
 	"github.com/openshift/api/oauth"
+
 	oauthapi "github.com/openshift/openshift-apiserver/pkg/oauth/apis/oauth"
 	"github.com/openshift/openshift-apiserver/pkg/oauth/apiserver/registry/oauthclient"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+	oauthprinters "github.com/openshift/openshift-apiserver/pkg/oauth/printers/internalversion"
 )
 
 // rest implements a RESTStorage for oauth clients against etcd
@@ -28,7 +29,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, error) {
 		NewListFunc:              func() runtime.Object { return &oauthapi.OAuthClientList{} },
 		DefaultQualifiedResource: oauth.Resource("oauthclients"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(oauthprinters.AddOAuthOpenShiftHandler)},
 
 		CreateStrategy: oauthclient.Strategy,
 		UpdateStrategy: oauthclient.Strategy,

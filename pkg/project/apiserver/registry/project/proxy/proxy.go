@@ -19,11 +19,11 @@ import (
 	"github.com/openshift/apiserver-library-go/pkg/authorization/scope"
 	"github.com/openshift/openshift-apiserver/pkg/api/apihelpers"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
 	projectapi "github.com/openshift/openshift-apiserver/pkg/project/apis/project"
 	projectregistry "github.com/openshift/openshift-apiserver/pkg/project/apiserver/registry/project"
 	projectauth "github.com/openshift/openshift-apiserver/pkg/project/auth"
 	projectcache "github.com/openshift/openshift-apiserver/pkg/project/cache"
+	projectprinters "github.com/openshift/openshift-apiserver/pkg/project/printers/internalversion"
 	projectutil "github.com/openshift/openshift-apiserver/pkg/project/util"
 )
 
@@ -60,7 +60,7 @@ func NewREST(client corev1client.NamespaceInterface, lister projectauth.Lister, 
 		authCache:    authCache,
 		projectCache: projectCache,
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(projectprinters.AddProjectOpenShiftHandlers)},
 	}
 }
 
@@ -90,7 +90,7 @@ func (s *REST) List(ctx context.Context, options *metainternal.ListOptions) (run
 	if err != nil {
 		return nil, err
 	}
-	return projectutil.ConvertNamespaceList(namespaceList), nil
+	return projectutil.ConvertNamespaceList(namespaceList)
 }
 
 func (s *REST) Watch(ctx context.Context, options *metainternal.ListOptions) (watch.Interface, error) {
@@ -129,7 +129,7 @@ func (s *REST) Get(ctx context.Context, name string, options *metav1.GetOptions)
 	if err != nil {
 		return nil, err
 	}
-	return projectutil.ConvertNamespaceFromExternal(namespace), nil
+	return projectutil.ConvertNamespaceFromExternal(namespace)
 }
 
 var _ = rest.Creater(&REST{})
@@ -145,15 +145,18 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, creationValidatio
 	if errs := s.createStrategy.Validate(ctx, obj); len(errs) > 0 {
 		return nil, kerrors.NewInvalid(project.Kind("Project"), projectObj.Name, errs)
 	}
-	if err := creationValidation(projectObj.DeepCopyObject()); err != nil {
+	if err := creationValidation(ctx, projectObj.DeepCopyObject()); err != nil {
 		return nil, err
 	}
-
-	namespace, err := s.client.Create(projectutil.ConvertProjectToExternal(projectObj))
+	projectExternal, err := projectutil.ConvertProjectToExternal(projectObj)
 	if err != nil {
 		return nil, err
 	}
-	return projectutil.ConvertNamespaceFromExternal(namespace), nil
+	namespace, err := s.client.Create(projectExternal)
+	if err != nil {
+		return nil, err
+	}
+	return projectutil.ConvertNamespaceFromExternal(namespace)
 }
 
 var _ = rest.Updater(&REST{})
@@ -178,21 +181,26 @@ func (s *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 	if errs := s.updateStrategy.ValidateUpdate(ctx, obj, oldObj); len(errs) > 0 {
 		return nil, false, kerrors.NewInvalid(project.Kind("Project"), projectObj.Name, errs)
 	}
-	if err := updateValidation(obj.DeepCopyObject(), oldObj.DeepCopyObject()); err != nil {
+	if err := updateValidation(ctx, obj.DeepCopyObject(), oldObj.DeepCopyObject()); err != nil {
 		return nil, false, err
 	}
 
-	namespace, err := s.client.Update(projectutil.ConvertProjectToExternal(projectObj))
+	projectExternal, err := projectutil.ConvertProjectToExternal(projectObj)
+	if err != nil {
+		return nil, false, err
+	}
+	namespace, err := s.client.Update(projectExternal)
 	if err != nil {
 		return nil, false, err
 	}
 
-	return projectutil.ConvertNamespaceFromExternal(namespace), false, nil
+	projectInternal, err := projectutil.ConvertNamespaceFromExternal(namespace)
+	return projectInternal, false, err
 }
 
 var _ = rest.GracefulDeleter(&REST{})
 
 // Delete deletes a Project specified by its name
-func (s *REST) Delete(ctx context.Context, name string, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
+func (s *REST) Delete(ctx context.Context, name string, objectFunc rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
 	return &metav1.Status{Status: metav1.StatusSuccess}, false, s.client.Delete(name, nil)
 }

@@ -1,8 +1,7 @@
 language: go
 go:
-  - 1.9.x
-  - 1.10.x
-  - 1.11.x
+  - 1.7.x
+  - 1.8.x
   - tip
 
 matrix:
@@ -21,14 +20,14 @@ env:
     - BUILDTAGS="seccomp apparmor selinux ambient"
 
 before_install:
-  - echo "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
   - sudo apt-get -qq update
-  - sudo apt-get install -y libseccomp-dev/trusty-backports
-  - go get -u golang.org/x/lint/golint
+  - sudo apt-get install -y libseccomp-dev libapparmor-dev
+  - go get -u github.com/golang/lint/golint
   - go get -u github.com/vbatts/git-validation
+  - go get -u github.com/mvdan/sh/cmd/shfmt
   - env | grep TRAVIS_
 
 script:
   - git-validation -run DCO,short-subject -v
   - make BUILDTAGS="${BUILDTAGS}"
-  - make BUILDTAGS="${BUILDTAGS}" clean ci cross
+  - make BUILDTAGS="${BUILDTAGS}" clean ci

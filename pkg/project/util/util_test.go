@@ -33,8 +33,14 @@ func TestProjectFidelity(t *testing.T) {
 		p.Spec.Finalizers = []coreapi.FinalizerName{} // we mutate finalizers
 		p.TypeMeta = metav1.TypeMeta{}                // Ignore TypeMeta
 
-		namespace := ConvertProjectToExternal(p)
-		p2 := ConvertNamespaceFromExternal(namespace)
+		namespace, err := ConvertProjectToExternal(p)
+		if err != nil {
+			t.Fatal(err)
+		}
+		p2, err := ConvertNamespaceFromExternal(namespace)
+		if err != nil {
+			t.Fatal(err)
+		}
 		if !reflect.DeepEqual(p, p2) {
 			t.Errorf("project data not preserved; the diff is %s", diff.ObjectReflectDiff(p, p2))
 		}
@@ -57,8 +63,14 @@ func TestNamespaceFidelity(t *testing.T) {
 		n.Spec.Finalizers = []corev1.FinalizerName{} // we mutate finalizers
 		n.TypeMeta = metav1.TypeMeta{}               // Ignore TypeMeta
 
-		project := ConvertNamespaceFromExternal(n)
-		n2 := ConvertProjectToExternal(project)
+		project, err := ConvertNamespaceFromExternal(n)
+		if err != nil {
+			t.Fatal(err)
+		}
+		n2, err := ConvertProjectToExternal(project)
+		if err != nil {
+			t.Fatal(err)
+		}
 		if !reflect.DeepEqual(n, n2) {
 			t.Errorf("namespace data not preserved; the diff is %s", diff.ObjectReflectDiff(n, n2))
 		}

@@ -13,9 +13,10 @@ import (
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
 	"github.com/openshift/api/template"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+
 	templateapi "github.com/openshift/openshift-apiserver/pkg/template/apis/template"
 	"github.com/openshift/openshift-apiserver/pkg/template/apiserver/registry/templateinstance"
+	templateprinters "github.com/openshift/openshift-apiserver/pkg/template/printers/internalversion"
 )
 
 // REST implements a RESTStorage for templateinstances against etcd
@@ -34,7 +35,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter, authorizationClient authoriza
 		NewListFunc:              func() runtime.Object { return &templateapi.TemplateInstanceList{} },
 		DefaultQualifiedResource: template.Resource("templateinstances"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(templateprinters.AddTemplateOpenShiftHandlers)},
 
 		CreateStrategy: strategy,
 		UpdateStrategy: strategy,

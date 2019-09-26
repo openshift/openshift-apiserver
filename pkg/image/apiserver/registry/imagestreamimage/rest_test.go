@@ -3,17 +3,16 @@ package imagestreamimage
 import (
 	"testing"
 
-	etcd "github.com/coreos/etcd/clientv3"
 	"golang.org/x/net/context"
 
+	etcd "github.com/coreos/etcd/clientv3"
 	authorizationapi "k8s.io/api/authorization/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/generic"
-	"k8s.io/apiserver/pkg/storage/etcd/etcdtest"
-	etcdtesting "k8s.io/apiserver/pkg/storage/etcd/testing"
+	etcdtesting "k8s.io/apiserver/pkg/storage/etcd3/testing"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	imagev1 "github.com/openshift/api/image/v1"
@@ -209,7 +208,7 @@ func TestGet(t *testing.T) {
 				ctx = apirequest.WithNamespace(apirequest.NewContext(), test.repo.Namespace)
 				_, err := client.Put(
 					context.TODO(),
-					etcdtest.AddPrefix("/imagestreams/"+test.repo.Namespace+"/"+test.repo.Name),
+					etcdtesting.AddPrefix("/imagestreams/"+test.repo.Namespace+"/"+test.repo.Name),
 					runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), test.repo),
 				)
 				if err != nil {
@@ -220,7 +219,7 @@ func TestGet(t *testing.T) {
 			if test.image != nil {
 				_, err := client.Put(
 					context.TODO(),
-					etcdtest.AddPrefix("/images/"+test.image.Name),
+					etcdtesting.AddPrefix("/images/"+test.image.Name),
 					runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), test.image),
 				)
 				if err != nil {

@@ -5,10 +5,9 @@ import (
 	"testing"
 	"time"
 
-	etcd "github.com/coreos/etcd/clientv3"
 	"golang.org/x/net/context"
-	"k8s.io/apiserver/pkg/registry/rest"
 
+	etcd "github.com/coreos/etcd/clientv3"
 	authorizationapi "k8s.io/api/authorization/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,8 +16,8 @@ import (
 	"k8s.io/apiserver/pkg/authentication/user"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/generic"
-	"k8s.io/apiserver/pkg/storage/etcd/etcdtest"
-	etcdtesting "k8s.io/apiserver/pkg/storage/etcd/testing"
+	"k8s.io/apiserver/pkg/registry/rest"
+	etcdtesting "k8s.io/apiserver/pkg/storage/etcd3/testing"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 
@@ -192,14 +191,14 @@ func TestGetImageStreamTag(t *testing.T) {
 			if testCase.image != nil {
 				client.Put(
 					context.TODO(),
-					etcdtest.AddPrefix("/images/"+testCase.image.Name),
+					etcdtesting.AddPrefix("/images/"+testCase.image.Name),
 					runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), testCase.image),
 				)
 			}
 			if testCase.repo != nil {
 				client.Put(
 					context.TODO(),
-					etcdtest.AddPrefix("/imagestreams/default/test"),
+					etcdtesting.AddPrefix("/imagestreams/default/test"),
 					runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), testCase.repo),
 				)
 			}
@@ -266,12 +265,12 @@ func TestGetImageStreamTagDIR(t *testing.T) {
 	defer server.Terminate(t)
 	client.Put(
 		context.TODO(),
-		etcdtest.AddPrefix("/images/"+image.Name),
+		etcdtesting.AddPrefix("/images/"+image.Name),
 		runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), image),
 	)
 	client.Put(
 		context.TODO(),
-		etcdtest.AddPrefix("/imagestreams/default/test"),
+		etcdtesting.AddPrefix("/imagestreams/default/test"),
 		runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), repo),
 	)
 	obj, err := storage.Get(apirequest.NewDefaultContext(), "test:latest", &metav1.GetOptions{})
@@ -396,13 +395,13 @@ func TestDeleteImageStreamTag(t *testing.T) {
 			if testCase.repo != nil {
 				client.Put(
 					context.TODO(),
-					etcdtest.AddPrefix("/imagestreams/default/test"),
+					etcdtesting.AddPrefix("/imagestreams/default/test"),
 					runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), testCase.repo),
 				)
 			}
 
 			ctx := apirequest.WithUser(apirequest.NewDefaultContext(), &fakeUser{})
-			obj, _, err := storage.Delete(ctx, "test:latest", nil)
+			obj, _, err := storage.Delete(ctx, "test:latest", nil, nil)
 			gotError := err != nil
 			if e, a := testCase.expectError, gotError; e != a {
 				t.Fatalf("%s: expectError=%t, gotError=%t: %s", name, e, a, err)
@@ -532,7 +531,7 @@ func TestCreateImageStreamTag(t *testing.T) {
 
 			client.Put(
 				context.TODO(),
-				etcdtest.AddPrefix("/imagestreams/default/test"),
+				etcdtesting.AddPrefix("/imagestreams/default/test"),
 				runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion),
 					&imageapi.ImageStream{
 						ObjectMeta: metav1.ObjectMeta{

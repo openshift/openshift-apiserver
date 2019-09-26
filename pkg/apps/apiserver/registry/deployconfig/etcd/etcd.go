@@ -26,7 +26,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/api/legacy"
 	appsapi "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 	"github.com/openshift/openshift-apiserver/pkg/apps/apiserver/registry/deployconfig"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+	appsprinters "github.com/openshift/openshift-apiserver/pkg/apps/printers/internalversion"
 )
 
 // REST contains the REST storage for DeploymentConfig objects.
@@ -57,7 +57,7 @@ func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, *StatusREST, *ScaleRE
 		NewListFunc:              func() runtime.Object { return &appsapi.DeploymentConfigList{} },
 		DefaultQualifiedResource: apps.Resource("deploymentconfigs"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(appsprinters.AddAppsOpenShiftHandlers)},
 
 		CreateStrategy: deployconfig.GroupStrategy,
 		UpdateStrategy: deployconfig.GroupStrategy,

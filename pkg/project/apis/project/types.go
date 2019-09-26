@@ -27,7 +27,8 @@ type ProjectSpec struct {
 
 // ProjectStatus is information about the current status of a Project
 type ProjectStatus struct {
-	Phase core.NamespacePhase
+	Phase      core.NamespacePhase
+	Conditions []core.NamespaceCondition
 }
 
 // +genclient

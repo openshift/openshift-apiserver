@@ -28,20 +28,22 @@ import (
 
 	buildv1 "github.com/openshift/api/build/v1"
 	"github.com/openshift/library-go/pkg/image/imageutil"
+
 	oapps "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
-	build "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
-	image "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
+	"github.com/openshift/openshift-apiserver/pkg/build/apis/build"
+	"github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	oauthapi "github.com/openshift/openshift-apiserver/pkg/oauth/apis/oauth"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 	templateapi "github.com/openshift/openshift-apiserver/pkg/template/apis/template"
 	uservalidation "github.com/openshift/openshift-apiserver/pkg/user/apis/user/validation"
 
+	_ "k8s.io/kubernetes/pkg/apis/core/install"
+
 	// install all APIs
 	_ "github.com/openshift/openshift-apiserver/pkg/api/install"
 	_ "github.com/openshift/openshift-apiserver/pkg/quota/apis/quota/install"
-	_ "k8s.io/kubernetes/pkg/apis/core/install"
 )
 
 func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {

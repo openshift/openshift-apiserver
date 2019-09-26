@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
-
 	"k8s.io/klog"
 
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -19,12 +17,14 @@ import (
 
 	imagegroup "github.com/openshift/api/image"
 	"github.com/openshift/library-go/pkg/image/imageutil"
+
 	"github.com/openshift/openshift-apiserver/pkg/api/apihelpers"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+	imageprinters "github.com/openshift/openshift-apiserver/pkg/image/printers/internalversion"
 )
 
 // REST implements the RESTStorage interface for ImageStreamTag
@@ -42,7 +42,7 @@ func NewREST(imageRegistry image.Registry, imageStreamRegistry imagestream.Regis
 		imageRegistry:       imageRegistry,
 		imageStreamRegistry: imageStreamRegistry,
 		strategy:            NewStrategy(registryWhitelister),
-		TableConvertor:      printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor:      printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(imageprinters.AddImageOpenShiftHandlers)},
 	}
 }
 
@@ -142,7 +142,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
 		return nil, err
 	}
-	if err := createValidation(obj.DeepCopyObject()); err != nil {
+	if err := createValidation(ctx, obj.DeepCopyObject()); err != nil {
 		return nil, err
 	}
 	namespace, ok := apirequest.NamespaceFrom(ctx)
@@ -270,14 +270,14 @@ func (r *REST) Update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 		if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
 			return nil, false, err
 		}
-		if err := createValidation(obj.DeepCopyObject()); err != nil {
+		if err := createValidation(ctx, obj.DeepCopyObject()); err != nil {
 			return nil, false, err
 		}
 	} else {
 		if err := rest.BeforeUpdate(r.strategy, ctx, obj, old); err != nil {
 			return nil, false, err
 		}
-		if err := updateValidation(obj.DeepCopyObject(), old.DeepCopyObject()); err != nil {
+		if err := updateValidation(ctx, obj.DeepCopyObject(), old.DeepCopyObject()); err != nil {
 			return nil, false, err
 		}
 	}
@@ -325,7 +325,7 @@ func (r *REST) Update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 // Delete removes a tag from a stream. `id` is of the format <stream name>:<tag>.
 // The associated image that the tag points to is *not* deleted.
 // The tag history is removed.
-func (r *REST) Delete(ctx context.Context, id string, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
+func (r *REST) Delete(ctx context.Context, id string, objectFunc rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
 	name, tag, err := nameAndTag(id)
 	if err != nil {
 		return nil, false, err

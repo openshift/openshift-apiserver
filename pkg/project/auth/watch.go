@@ -124,7 +124,11 @@ func (w *userProjectWatcher) GroupMembershipChanged(namespaceName string, users,
 
 	hasAccess := users.Has(w.user.GetName()) || groups.HasAny(w.user.GetGroups()...)
 	_, known := w.knownProjects[namespaceName]
-
+	namespaceExternal, err := projectutil.ConvertNamespaceFromExternal(&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceName}})
+	if err != nil {
+		utilruntime.HandleError(err)
+		return
+	}
 	switch {
 	// this means that we were removed from the project
 	case !hasAccess && known:
@@ -133,7 +137,7 @@ func (w *userProjectWatcher) GroupMembershipChanged(namespaceName string, users,
 		select {
 		case w.cacheIncoming <- watch.Event{
 			Type:   watch.Deleted,
-			Object: projectutil.ConvertNamespaceFromExternal(&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceName}}),
+			Object: namespaceExternal,
 		}:
 		default:
 			// remove the watcher so that we wont' be notified again and block
@@ -147,10 +151,14 @@ func (w *userProjectWatcher) GroupMembershipChanged(namespaceName string, users,
 			utilruntime.HandleError(err)
 			return
 		}
-
+		namespaceInternal, err := projectutil.ConvertNamespaceFromExternal(namespace)
+		if err != nil {
+			utilruntime.HandleError(err)
+			return
+		}
 		event := watch.Event{
 			Type:   watch.Added,
-			Object: projectutil.ConvertNamespaceFromExternal(namespace),
+			Object: namespaceInternal,
 		}
 
 		// if we already have this in our list, then we're getting notified because the object changed
@@ -195,10 +203,14 @@ func (w *userProjectWatcher) Watch() {
 			return
 		default:
 		}
-
+		namespaceInternal, err := projectutil.ConvertNamespaceFromExternal(&w.initialProjects[i])
+		if err != nil {
+			w.emit(makeErrorEvent(err))
+			return
+		}
 		w.emit(watch.Event{
 			Type:   watch.Added,
-			Object: projectutil.ConvertNamespaceFromExternal(&w.initialProjects[i]),
+			Object: namespaceInternal,
 		})
 	}
 

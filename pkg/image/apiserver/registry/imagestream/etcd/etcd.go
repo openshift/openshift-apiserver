@@ -24,7 +24,7 @@ import (
 	imageadmission "github.com/openshift/openshift-apiserver/pkg/image/apiserver/admission/limitrange"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
-	printersinternal "github.com/openshift/openshift-apiserver/pkg/printers/internalversion"
+	imageprinters "github.com/openshift/openshift-apiserver/pkg/image/printers/internalversion"
 )
 
 // REST implements a RESTStorage for image streams against etcd.
@@ -78,7 +78,7 @@ func NewRESTWithLimitVerifier(
 		NewListFunc:              func() runtime.Object { return &imageapi.ImageStreamList{} },
 		DefaultQualifiedResource: image.Resource("imagestreams"),
 
-		TableConvertor: printerstorage.TableConvertor{TablePrinter: printers.NewTablePrinter().With(printersinternal.AddHandlers)},
+		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(imageprinters.AddImageOpenShiftHandlers)},
 	}
 
 	rest := &REST{
