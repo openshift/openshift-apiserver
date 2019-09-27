@@ -1458,6 +1458,21 @@ func TestValidateImageStreamImport(t *testing.T) {
 			},
 			expected: field.ErrorList{},
 		},
+		"valid scheduled dockerimage sha/digest ref": {
+			namespace: "namespace",
+			name:      "foo",
+			specTags: map[string]imageapi.TagReference{
+				"tag": {
+					From: &kapi.ObjectReference{
+						Kind: "DockerImage",
+						Name: "abc@sha256:3c87c572822935df60f0f5d3665bd376841a7fcfeb806b5f212de6a00e9a7b25",
+					},
+					ImportPolicy: imageapi.TagImportPolicy{Scheduled: true},
+				},
+			},
+			statusTags: map[string]imageapi.TagEventList{},
+			expected:   field.ErrorList{},
+		},
 		"shortest name components": {
 			namespace: "f",
 			name:      "g",
