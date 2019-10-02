@@ -537,12 +537,8 @@ func ValidateImageStreamImport(isi *imageapi.ImageStreamImport) field.ErrorList 
 				if spec.From.Name == "*" {
 					continue
 				}
-				if ref, err := imageref.Parse(spec.From.Name); err != nil {
+				if _, err := imageref.Parse(spec.From.Name); err != nil {
 					errs = append(errs, field.Invalid(imagesPath.Index(i).Child("from", "name"), spec.From.Name, err.Error()))
-				} else {
-					if len(ref.ID) > 0 && spec.ImportPolicy.Scheduled {
-						errs = append(errs, field.Invalid(imagesPath.Index(i).Child("from", "name"), spec.From.Name, "only tags can be scheduled for import"))
-					}
 				}
 			}
 		default:
