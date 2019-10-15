@@ -13,7 +13,7 @@ ORIGIN_PREFIX="github.com/openshift/openshift-apiserver/"
 
 KUBE_INPUT_DIRS=(
   $(
-    grep --color=never -rl '+k8s:openapi-gen=' vendor/k8s.io/kubernetes | \
+    grep --color=never -rl '+k8s:openapi-gen=' vendor/k8s.io | \
     xargs -n1 dirname | \
     sed "s,^vendor/,," | \
     sort -u | \
