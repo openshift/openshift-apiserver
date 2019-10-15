@@ -127,6 +127,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/build/v1.StepInfo":                                                                  schema_openshift_api_build_v1_StepInfo(ref),
 		"github.com/openshift/api/build/v1.WebHookTrigger":                                                            schema_openshift_api_build_v1_WebHookTrigger(ref),
 		"github.com/openshift/api/config/v1.APIServer":                                                                schema_openshift_api_config_v1_APIServer(ref),
+		"github.com/openshift/api/config/v1.APIServerEncryption":                                                      schema_openshift_api_config_v1_APIServerEncryption(ref),
 		"github.com/openshift/api/config/v1.APIServerList":                                                            schema_openshift_api_config_v1_APIServerList(ref),
 		"github.com/openshift/api/config/v1.APIServerNamedServingCert":                                                schema_openshift_api_config_v1_APIServerNamedServingCert(ref),
 		"github.com/openshift/api/config/v1.APIServerServingCerts":                                                    schema_openshift_api_config_v1_APIServerServingCerts(ref),
@@ -169,6 +170,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.ConsoleSpec":                                                              schema_openshift_api_config_v1_ConsoleSpec(ref),
 		"github.com/openshift/api/config/v1.ConsoleStatus":                                                            schema_openshift_api_config_v1_ConsoleStatus(ref),
 		"github.com/openshift/api/config/v1.CustomFeatureGates":                                                       schema_openshift_api_config_v1_CustomFeatureGates(ref),
+		"github.com/openshift/api/config/v1.CustomTLSProfile":                                                         schema_openshift_api_config_v1_CustomTLSProfile(ref),
 		"github.com/openshift/api/config/v1.DNS":                                                                      schema_openshift_api_config_v1_DNS(ref),
 		"github.com/openshift/api/config/v1.DNSList":                                                                  schema_openshift_api_config_v1_DNSList(ref),
 		"github.com/openshift/api/config/v1.DNSSpec":                                                                  schema_openshift_api_config_v1_DNSSpec(ref),
@@ -211,11 +213,13 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.IngressList":                                                              schema_openshift_api_config_v1_IngressList(ref),
 		"github.com/openshift/api/config/v1.IngressSpec":                                                              schema_openshift_api_config_v1_IngressSpec(ref),
 		"github.com/openshift/api/config/v1.IngressStatus":                                                            schema_openshift_api_config_v1_IngressStatus(ref),
+		"github.com/openshift/api/config/v1.IntermediateTLSProfile":                                                   schema_openshift_api_config_v1_IntermediateTLSProfile(ref),
 		"github.com/openshift/api/config/v1.KeystoneIdentityProvider":                                                 schema_openshift_api_config_v1_KeystoneIdentityProvider(ref),
 		"github.com/openshift/api/config/v1.KubeClientConfig":                                                         schema_openshift_api_config_v1_KubeClientConfig(ref),
 		"github.com/openshift/api/config/v1.LDAPAttributeMapping":                                                     schema_openshift_api_config_v1_LDAPAttributeMapping(ref),
 		"github.com/openshift/api/config/v1.LDAPIdentityProvider":                                                     schema_openshift_api_config_v1_LDAPIdentityProvider(ref),
 		"github.com/openshift/api/config/v1.LeaderElection":                                                           schema_openshift_api_config_v1_LeaderElection(ref),
+		"github.com/openshift/api/config/v1.ModernTLSProfile":                                                         schema_openshift_api_config_v1_ModernTLSProfile(ref),
 		"github.com/openshift/api/config/v1.NamedCertificate":                                                         schema_openshift_api_config_v1_NamedCertificate(ref),
 		"github.com/openshift/api/config/v1.Network":                                                                  schema_openshift_api_config_v1_Network(ref),
 		"github.com/openshift/api/config/v1.NetworkList":                                                              schema_openshift_api_config_v1_NetworkList(ref),
@@ -228,6 +232,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.OAuthStatus":                                                              schema_openshift_api_config_v1_OAuthStatus(ref),
 		"github.com/openshift/api/config/v1.OAuthTemplates":                                                           schema_openshift_api_config_v1_OAuthTemplates(ref),
 		"github.com/openshift/api/config/v1.ObjectReference":                                                          schema_openshift_api_config_v1_ObjectReference(ref),
+		"github.com/openshift/api/config/v1.OldTLSProfile":                                                            schema_openshift_api_config_v1_OldTLSProfile(ref),
 		"github.com/openshift/api/config/v1.OpenIDClaims":                                                             schema_openshift_api_config_v1_OpenIDClaims(ref),
 		"github.com/openshift/api/config/v1.OpenIDIdentityProvider":                                                   schema_openshift_api_config_v1_OpenIDIdentityProvider(ref),
 		"github.com/openshift/api/config/v1.OpenStackPlatformStatus":                                                  schema_openshift_api_config_v1_OpenStackPlatformStatus(ref),
@@ -236,6 +241,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.OperatorHubList":                                                          schema_openshift_api_config_v1_OperatorHubList(ref),
 		"github.com/openshift/api/config/v1.OperatorHubSpec":                                                          schema_openshift_api_config_v1_OperatorHubSpec(ref),
 		"github.com/openshift/api/config/v1.OperatorHubStatus":                                                        schema_openshift_api_config_v1_OperatorHubStatus(ref),
+		"github.com/openshift/api/config/v1.OvirtPlatformStatus":                                                      schema_openshift_api_config_v1_OvirtPlatformStatus(ref),
 		"github.com/openshift/api/config/v1.PlatformStatus":                                                           schema_openshift_api_config_v1_PlatformStatus(ref),
 		"github.com/openshift/api/config/v1.Project":                                                                  schema_openshift_api_config_v1_Project(ref),
 		"github.com/openshift/api/config/v1.ProjectList":                                                              schema_openshift_api_config_v1_ProjectList(ref),
@@ -257,25 +263,13 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.ServingInfo":                                                              schema_openshift_api_config_v1_ServingInfo(ref),
 		"github.com/openshift/api/config/v1.StringSource":                                                             schema_openshift_api_config_v1_StringSource(ref),
 		"github.com/openshift/api/config/v1.StringSourceSpec":                                                         schema_openshift_api_config_v1_StringSourceSpec(ref),
+		"github.com/openshift/api/config/v1.TLSProfileSpec":                                                           schema_openshift_api_config_v1_TLSProfileSpec(ref),
+		"github.com/openshift/api/config/v1.TLSSecurityProfile":                                                       schema_openshift_api_config_v1_TLSSecurityProfile(ref),
 		"github.com/openshift/api/config/v1.TemplateReference":                                                        schema_openshift_api_config_v1_TemplateReference(ref),
 		"github.com/openshift/api/config/v1.TokenConfig":                                                              schema_openshift_api_config_v1_TokenConfig(ref),
 		"github.com/openshift/api/config/v1.Update":                                                                   schema_openshift_api_config_v1_Update(ref),
 		"github.com/openshift/api/config/v1.UpdateHistory":                                                            schema_openshift_api_config_v1_UpdateHistory(ref),
 		"github.com/openshift/api/config/v1.WebhookTokenAuthenticator":                                                schema_openshift_api_config_v1_WebhookTokenAuthenticator(ref),
-		"github.com/openshift/api/console/v1.ApplicationMenuSpec":                                                     schema_openshift_api_console_v1_ApplicationMenuSpec(ref),
-		"github.com/openshift/api/console/v1.ConsoleCLIDownload":                                                      schema_openshift_api_console_v1_ConsoleCLIDownload(ref),
-		"github.com/openshift/api/console/v1.ConsoleCLIDownloadList":                                                  schema_openshift_api_console_v1_ConsoleCLIDownloadList(ref),
-		"github.com/openshift/api/console/v1.ConsoleCLIDownloadSpec":                                                  schema_openshift_api_console_v1_ConsoleCLIDownloadSpec(ref),
-		"github.com/openshift/api/console/v1.ConsoleExternalLogLink":                                                  schema_openshift_api_console_v1_ConsoleExternalLogLink(ref),
-		"github.com/openshift/api/console/v1.ConsoleExternalLogLinkList":                                              schema_openshift_api_console_v1_ConsoleExternalLogLinkList(ref),
-		"github.com/openshift/api/console/v1.ConsoleExternalLogLinkSpec":                                              schema_openshift_api_console_v1_ConsoleExternalLogLinkSpec(ref),
-		"github.com/openshift/api/console/v1.ConsoleLink":                                                             schema_openshift_api_console_v1_ConsoleLink(ref),
-		"github.com/openshift/api/console/v1.ConsoleLinkList":                                                         schema_openshift_api_console_v1_ConsoleLinkList(ref),
-		"github.com/openshift/api/console/v1.ConsoleLinkSpec":                                                         schema_openshift_api_console_v1_ConsoleLinkSpec(ref),
-		"github.com/openshift/api/console/v1.ConsoleNotification":                                                     schema_openshift_api_console_v1_ConsoleNotification(ref),
-		"github.com/openshift/api/console/v1.ConsoleNotificationList":                                                 schema_openshift_api_console_v1_ConsoleNotificationList(ref),
-		"github.com/openshift/api/console/v1.ConsoleNotificationSpec":                                                 schema_openshift_api_console_v1_ConsoleNotificationSpec(ref),
-		"github.com/openshift/api/console/v1.Link":                                                                    schema_openshift_api_console_v1_Link(ref),
 		"github.com/openshift/api/image/v1.DockerImageReference":                                                      schema_openshift_api_image_v1_DockerImageReference(ref),
 		"github.com/openshift/api/image/v1.Image":                                                                     schema_openshift_api_image_v1_Image(ref),
 		"github.com/openshift/api/image/v1.ImageBlobReferences":                                                       schema_openshift_api_image_v1_ImageBlobReferences(ref),
@@ -1402,12 +1396,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/client-go/pkg/apis/clientauthentication/v1beta1.ExecCredential":                                       schema_pkg_apis_clientauthentication_v1beta1_ExecCredential(ref),
 		"k8s.io/client-go/pkg/apis/clientauthentication/v1beta1.ExecCredentialSpec":                                   schema_pkg_apis_clientauthentication_v1beta1_ExecCredentialSpec(ref),
 		"k8s.io/client-go/pkg/apis/clientauthentication/v1beta1.ExecCredentialStatus":                                 schema_pkg_apis_clientauthentication_v1beta1_ExecCredentialStatus(ref),
-		"k8s.io/code-generator/_examples/apiserver/apis/example/v1.TestType":                                          schema_apiserver_apis_example_v1_TestType(ref),
-		"k8s.io/code-generator/_examples/apiserver/apis/example/v1.TestTypeList":                                      schema_apiserver_apis_example_v1_TestTypeList(ref),
-		"k8s.io/code-generator/_examples/apiserver/apis/example/v1.TestTypeStatus":                                    schema_apiserver_apis_example_v1_TestTypeStatus(ref),
-		"k8s.io/code-generator/_examples/apiserver/apis/example2/v1.TestType":                                         schema_apiserver_apis_example2_v1_TestType(ref),
-		"k8s.io/code-generator/_examples/apiserver/apis/example2/v1.TestTypeList":                                     schema_apiserver_apis_example2_v1_TestTypeList(ref),
-		"k8s.io/code-generator/_examples/apiserver/apis/example2/v1.TestTypeStatus":                                   schema_apiserver_apis_example2_v1_TestTypeStatus(ref),
 		"k8s.io/kube-aggregator/pkg/apis/apiregistration/v1.APIService":                                               schema_pkg_apis_apiregistration_v1_APIService(ref),
 		"k8s.io/kube-aggregator/pkg/apis/apiregistration/v1.APIServiceCondition":                                      schema_pkg_apis_apiregistration_v1_APIServiceCondition(ref),
 		"k8s.io/kube-aggregator/pkg/apis/apiregistration/v1.APIServiceList":                                           schema_pkg_apis_apiregistration_v1_APIServiceList(ref),
@@ -1449,64 +1437,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/kube-controller-manager/config/v1alpha1.StatefulSetControllerConfiguration":                           schema_k8sio_kube_controller_manager_config_v1alpha1_StatefulSetControllerConfiguration(ref),
 		"k8s.io/kube-controller-manager/config/v1alpha1.TTLAfterFinishedControllerConfiguration":                      schema_k8sio_kube_controller_manager_config_v1alpha1_TTLAfterFinishedControllerConfiguration(ref),
 		"k8s.io/kube-controller-manager/config/v1alpha1.VolumeConfiguration":                                          schema_k8sio_kube_controller_manager_config_v1alpha1_VolumeConfiguration(ref),
-		"k8s.io/kube-proxy/config/v1alpha1.KubeProxyConfiguration":                                                    schema_k8sio_kube_proxy_config_v1alpha1_KubeProxyConfiguration(ref),
-		"k8s.io/kube-proxy/config/v1alpha1.KubeProxyConntrackConfiguration":                                           schema_k8sio_kube_proxy_config_v1alpha1_KubeProxyConntrackConfiguration(ref),
-		"k8s.io/kube-proxy/config/v1alpha1.KubeProxyIPTablesConfiguration":                                            schema_k8sio_kube_proxy_config_v1alpha1_KubeProxyIPTablesConfiguration(ref),
-		"k8s.io/kube-proxy/config/v1alpha1.KubeProxyIPVSConfiguration":                                                schema_k8sio_kube_proxy_config_v1alpha1_KubeProxyIPVSConfiguration(ref),
-		"k8s.io/kube-proxy/config/v1alpha1.KubeProxyWinkernelConfiguration":                                           schema_k8sio_kube_proxy_config_v1alpha1_KubeProxyWinkernelConfiguration(ref),
-		"k8s.io/kube-scheduler/config/v1alpha1.KubeSchedulerConfiguration":                                            schema_k8sio_kube_scheduler_config_v1alpha1_KubeSchedulerConfiguration(ref),
-		"k8s.io/kube-scheduler/config/v1alpha1.KubeSchedulerLeaderElectionConfiguration":                              schema_k8sio_kube_scheduler_config_v1alpha1_KubeSchedulerLeaderElectionConfiguration(ref),
-		"k8s.io/kube-scheduler/config/v1alpha1.Plugin":                                                                schema_k8sio_kube_scheduler_config_v1alpha1_Plugin(ref),
-		"k8s.io/kube-scheduler/config/v1alpha1.PluginConfig":                                                          schema_k8sio_kube_scheduler_config_v1alpha1_PluginConfig(ref),
-		"k8s.io/kube-scheduler/config/v1alpha1.PluginSet":                                                             schema_k8sio_kube_scheduler_config_v1alpha1_PluginSet(ref),
-		"k8s.io/kube-scheduler/config/v1alpha1.Plugins":                                                               schema_k8sio_kube_scheduler_config_v1alpha1_Plugins(ref),
-		"k8s.io/kube-scheduler/config/v1alpha1.SchedulerAlgorithmSource":                                              schema_k8sio_kube_scheduler_config_v1alpha1_SchedulerAlgorithmSource(ref),
-		"k8s.io/kube-scheduler/config/v1alpha1.SchedulerPolicyConfigMapSource":                                        schema_k8sio_kube_scheduler_config_v1alpha1_SchedulerPolicyConfigMapSource(ref),
-		"k8s.io/kube-scheduler/config/v1alpha1.SchedulerPolicyFileSource":                                             schema_k8sio_kube_scheduler_config_v1alpha1_SchedulerPolicyFileSource(ref),
-		"k8s.io/kube-scheduler/config/v1alpha1.SchedulerPolicySource":                                                 schema_k8sio_kube_scheduler_config_v1alpha1_SchedulerPolicySource(ref),
-		"k8s.io/kubelet/config/v1beta1.KubeletAnonymousAuthentication":                                                schema_k8sio_kubelet_config_v1beta1_KubeletAnonymousAuthentication(ref),
-		"k8s.io/kubelet/config/v1beta1.KubeletAuthentication":                                                         schema_k8sio_kubelet_config_v1beta1_KubeletAuthentication(ref),
-		"k8s.io/kubelet/config/v1beta1.KubeletAuthorization":                                                          schema_k8sio_kubelet_config_v1beta1_KubeletAuthorization(ref),
-		"k8s.io/kubelet/config/v1beta1.KubeletConfiguration":                                                          schema_k8sio_kubelet_config_v1beta1_KubeletConfiguration(ref),
-		"k8s.io/kubelet/config/v1beta1.KubeletWebhookAuthentication":                                                  schema_k8sio_kubelet_config_v1beta1_KubeletWebhookAuthentication(ref),
-		"k8s.io/kubelet/config/v1beta1.KubeletWebhookAuthorization":                                                   schema_k8sio_kubelet_config_v1beta1_KubeletWebhookAuthorization(ref),
-		"k8s.io/kubelet/config/v1beta1.KubeletX509Authentication":                                                     schema_k8sio_kubelet_config_v1beta1_KubeletX509Authentication(ref),
-		"k8s.io/kubelet/config/v1beta1.SerializedNodeConfigSource":                                                    schema_k8sio_kubelet_config_v1beta1_SerializedNodeConfigSource(ref),
 		"k8s.io/kubernetes/cmd/cloud-controller-manager/app/apis/config/v1alpha1.CloudControllerManagerConfiguration": schema_app_apis_config_v1alpha1_CloudControllerManagerConfiguration(ref),
-		"k8s.io/kubernetes/pkg/apis/abac/v1beta1.Policy":                                                              schema_pkg_apis_abac_v1beta1_Policy(ref),
-		"k8s.io/kubernetes/pkg/apis/abac/v1beta1.PolicySpec":                                                          schema_pkg_apis_abac_v1beta1_PolicySpec(ref),
-		"k8s.io/metrics/pkg/apis/custom_metrics/v1beta1.MetricListOptions":                                            schema_pkg_apis_custom_metrics_v1beta1_MetricListOptions(ref),
-		"k8s.io/metrics/pkg/apis/custom_metrics/v1beta1.MetricValue":                                                  schema_pkg_apis_custom_metrics_v1beta1_MetricValue(ref),
-		"k8s.io/metrics/pkg/apis/custom_metrics/v1beta1.MetricValueList":                                              schema_pkg_apis_custom_metrics_v1beta1_MetricValueList(ref),
-		"k8s.io/metrics/pkg/apis/custom_metrics/v1beta2.MetricIdentifier":                                             schema_pkg_apis_custom_metrics_v1beta2_MetricIdentifier(ref),
-		"k8s.io/metrics/pkg/apis/custom_metrics/v1beta2.MetricListOptions":                                            schema_pkg_apis_custom_metrics_v1beta2_MetricListOptions(ref),
-		"k8s.io/metrics/pkg/apis/custom_metrics/v1beta2.MetricValue":                                                  schema_pkg_apis_custom_metrics_v1beta2_MetricValue(ref),
-		"k8s.io/metrics/pkg/apis/custom_metrics/v1beta2.MetricValueList":                                              schema_pkg_apis_custom_metrics_v1beta2_MetricValueList(ref),
-		"k8s.io/metrics/pkg/apis/external_metrics/v1beta1.ExternalMetricValue":                                        schema_pkg_apis_external_metrics_v1beta1_ExternalMetricValue(ref),
-		"k8s.io/metrics/pkg/apis/external_metrics/v1beta1.ExternalMetricValueList":                                    schema_pkg_apis_external_metrics_v1beta1_ExternalMetricValueList(ref),
-		"k8s.io/metrics/pkg/apis/metrics/v1alpha1.ContainerMetrics":                                                   schema_pkg_apis_metrics_v1alpha1_ContainerMetrics(ref),
-		"k8s.io/metrics/pkg/apis/metrics/v1alpha1.NodeMetrics":                                                        schema_pkg_apis_metrics_v1alpha1_NodeMetrics(ref),
-		"k8s.io/metrics/pkg/apis/metrics/v1alpha1.NodeMetricsList":                                                    schema_pkg_apis_metrics_v1alpha1_NodeMetricsList(ref),
-		"k8s.io/metrics/pkg/apis/metrics/v1alpha1.PodMetrics":                                                         schema_pkg_apis_metrics_v1alpha1_PodMetrics(ref),
-		"k8s.io/metrics/pkg/apis/metrics/v1alpha1.PodMetricsList":                                                     schema_pkg_apis_metrics_v1alpha1_PodMetricsList(ref),
-		"k8s.io/metrics/pkg/apis/metrics/v1beta1.ContainerMetrics":                                                    schema_pkg_apis_metrics_v1beta1_ContainerMetrics(ref),
-		"k8s.io/metrics/pkg/apis/metrics/v1beta1.NodeMetrics":                                                         schema_pkg_apis_metrics_v1beta1_NodeMetrics(ref),
-		"k8s.io/metrics/pkg/apis/metrics/v1beta1.NodeMetricsList":                                                     schema_pkg_apis_metrics_v1beta1_NodeMetricsList(ref),
-		"k8s.io/metrics/pkg/apis/metrics/v1beta1.PodMetrics":                                                          schema_pkg_apis_metrics_v1beta1_PodMetrics(ref),
-		"k8s.io/metrics/pkg/apis/metrics/v1beta1.PodMetricsList":                                                      schema_pkg_apis_metrics_v1beta1_PodMetricsList(ref),
-		"k8s.io/node-api/pkg/apis/node/v1alpha1.RuntimeClass":                                                         schema_pkg_apis_node_v1alpha1_RuntimeClass(ref),
-		"k8s.io/node-api/pkg/apis/node/v1alpha1.RuntimeClassList":                                                     schema_pkg_apis_node_v1alpha1_RuntimeClassList(ref),
-		"k8s.io/node-api/pkg/apis/node/v1alpha1.RuntimeClassSpec":                                                     schema_pkg_apis_node_v1alpha1_RuntimeClassSpec(ref),
-		"k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.Fischer":                                                    schema_pkg_apis_wardle_v1alpha1_Fischer(ref),
-		"k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.FischerList":                                                schema_pkg_apis_wardle_v1alpha1_FischerList(ref),
-		"k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.Flunder":                                                    schema_pkg_apis_wardle_v1alpha1_Flunder(ref),
-		"k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.FlunderList":                                                schema_pkg_apis_wardle_v1alpha1_FlunderList(ref),
-		"k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.FlunderSpec":                                                schema_pkg_apis_wardle_v1alpha1_FlunderSpec(ref),
-		"k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.FlunderStatus":                                              schema_pkg_apis_wardle_v1alpha1_FlunderStatus(ref),
-		"k8s.io/sample-apiserver/pkg/apis/wardle/v1beta1.Flunder":                                                     schema_pkg_apis_wardle_v1beta1_Flunder(ref),
-		"k8s.io/sample-apiserver/pkg/apis/wardle/v1beta1.FlunderList":                                                 schema_pkg_apis_wardle_v1beta1_FlunderList(ref),
-		"k8s.io/sample-apiserver/pkg/apis/wardle/v1beta1.FlunderSpec":                                                 schema_pkg_apis_wardle_v1beta1_FlunderSpec(ref),
-		"k8s.io/sample-apiserver/pkg/apis/wardle/v1beta1.FlunderStatus":                                               schema_pkg_apis_wardle_v1beta1_FlunderStatus(ref),
 	}
 }
 
@@ -7123,6 +7054,25 @@ func schema_openshift_api_config_v1_APIServer(ref common.ReferenceCallback) comm
 	}
 }
 
+func schema_openshift_api_config_v1_APIServerEncryption(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "type defines what encryption type should be used to encrypt resources at the datastore layer. When this field is unset (i.e. when it is set to the empty string), identity is implied. The behavior of unset can and will change over time.  Even if encryption is enabled by default, the meaning of unset may change to a different encryption type based on changes in best practices.\n\nWhen encryption is enabled, all sensitive resources shipped with the platform are encrypted. This list of sensitive resources can and will change over time.  The current authoritative list is:\n\n  1. secrets\n  2. configmaps\n  3. routes.route.openshift.io\n  4. oauthaccesstokens.oauth.openshift.io\n  5. oauthauthorizetokens.oauth.openshift.io",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_config_v1_APIServerList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -7264,11 +7214,23 @@ func schema_openshift_api_config_v1_APIServerSpec(ref common.ReferenceCallback) 
 							},
 						},
 					},
+					"encryption": {
+						SchemaProps: spec.SchemaProps{
+							Description: "encryption allows the configuration of encryption of resources at the datastore layer.",
+							Ref:         ref("github.com/openshift/api/config/v1.APIServerEncryption"),
+						},
+					},
+					"tlsSecurityProfile": {
+						SchemaProps: spec.SchemaProps{
+							Description: "tlsSecurityProfile specifies settings for TLS connections for externally exposed servers.\n\nIf unset, a default (which may change between releases) is chosen.",
+							Ref:         ref("github.com/openshift/api/config/v1.TLSSecurityProfile"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.APIServerServingCerts", "github.com/openshift/api/config/v1.ConfigMapNameReference"},
+			"github.com/openshift/api/config/v1.APIServerEncryption", "github.com/openshift/api/config/v1.APIServerServingCerts", "github.com/openshift/api/config/v1.ConfigMapNameReference", "github.com/openshift/api/config/v1.TLSSecurityProfile"},
 	}
 }
 
@@ -7642,6 +7604,13 @@ func schema_openshift_api_config_v1_AzurePlatformStatus(ref common.ReferenceCall
 							Format:      "",
 						},
 					},
+					"networkResourceGroupName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "networkResourceGroupName is the Resource Group for network resources like the Virtual Network and Subnets used by the cluster. If empty, the value is same as ResourceGroupName.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 				},
 				Required: []string{"resourceGroupName"},
 			},
@@ -7653,7 +7622,7 @@ func schema_openshift_api_config_v1_BareMetalPlatformStatus(ref common.Reference
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BareMetalPlatformStatus holds the current status of the BareMetal infrastructure provider.",
+				Description: "BareMetalPlatformStatus holds the current status of the BareMetal infrastructure provider. For more information about the network architecture used with the BareMetal platform type, see: https://github.com/openshift/installer/blob/master/docs/design/baremetal/networking-infrastructure.md",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"apiServerInternalIP": {
@@ -8453,7 +8422,7 @@ func schema_openshift_api_config_v1_ClusterVersionStatus(ref common.ReferenceCal
 					},
 					"observedGeneration": {
 						SchemaProps: spec.SchemaProps{
-							Description: "observedGeneration reports which version of the spec is being synced. If this value is not equal to metadata.generation, then the desired and conditions fields may represent from a previous version.",
+							Description: "observedGeneration reports which version of the spec is being synced. If this value is not equal to metadata.generation, then the desired and conditions fields may represent a previous version.",
 							Type:        []string{"integer"},
 							Format:      "int64",
 						},
@@ -8788,6 +8757,41 @@ func schema_openshift_api_config_v1_CustomFeatureGates(ref common.ReferenceCallb
 						},
 					},
 				},
+			},
+		},
+	}
+}
+
+func schema_openshift_api_config_v1_CustomTLSProfile(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "CustomTLSProfile is a user-defined TLS security profile. Be extremely careful using a custom TLS profile as invalid configurations can be catastrophic.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ciphers": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ciphers is used to specify the cipher algorithms that are negotiated during the TLS handshake.  Operators may remove entries their operands do not support.  For example, to use DES-CBC3-SHA  (yaml):\n\n  ciphers:\n    - DES-CBC3-SHA",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"minTLSVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "minTLSVersion is used to specify the minimal version of the TLS protocol that is negotiated during the TLS handshake. For example, to use TLS versions 1.1, 1.2 and 1.3 (yaml):\n\n  minTLSVersion: TLSv1.1",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"ciphers", "minTLSVersion"},
 			},
 		},
 	}
@@ -10543,6 +10547,17 @@ func schema_openshift_api_config_v1_IngressStatus(ref common.ReferenceCallback) 
 	}
 }
 
+func schema_openshift_api_config_v1_IntermediateTLSProfile(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "IntermediateTLSProfile is a TLS security profile based on: https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28default.29",
+				Type:        []string{"object"},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_config_v1_KeystoneIdentityProvider(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -10796,6 +10811,17 @@ func schema_openshift_api_config_v1_LeaderElection(ref common.ReferenceCallback)
 		},
 		Dependencies: []string{
 			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
+	}
+}
+
+func schema_openshift_api_config_v1_ModernTLSProfile(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ModernTLSProfile is a TLS security profile based on: https://wiki.mozilla.org/Security/Server_Side_TLS#Modern_compatibility",
+				Type:        []string{"object"},
+			},
+		},
 	}
 }
 
@@ -11307,6 +11333,17 @@ func schema_openshift_api_config_v1_ObjectReference(ref common.ReferenceCallback
 	}
 }
 
+func schema_openshift_api_config_v1_OldTLSProfile(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "OldTLSProfile is a TLS security profile based on: https://wiki.mozilla.org/Security/Server_Side_TLS#Old_backward_compatibility",
+				Type:        []string{"object"},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_config_v1_OpenIDClaims(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -11662,6 +11699,40 @@ func schema_openshift_api_config_v1_OperatorHubStatus(ref common.ReferenceCallba
 	}
 }
 
+func schema_openshift_api_config_v1_OvirtPlatformStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "OvirtPlatformStatus holds the current status of the  oVirt infrastructure provider.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"apiServerInternalIP": {
+						SchemaProps: spec.SchemaProps{
+							Description: "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI points to. It is the IP for a self-hosted load balancer in front of the API servers.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"ingressIP": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ingressIP is an external IP which routes to the default ingress controller. The IP is a suitable target of a wildcard DNS record used to resolve default route host names.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"nodeDNSIP": {
+						SchemaProps: spec.SchemaProps{
+							Description: "nodeDNSIP is the IP address for the internal DNS used by the nodes. Unlike the one managed by the DNS operator, `NodeDNSIP` provides name resolution for the nodes themselves. There is no DNS-as-a-service for oVirt deployments. In order to minimize necessary changes to the datacenter DNS, a DNS service is hosted as a static pod to serve those hostnames to the nodes in the cluster.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_config_v1_PlatformStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -11706,12 +11777,18 @@ func schema_openshift_api_config_v1_PlatformStatus(ref common.ReferenceCallback)
 							Ref:         ref("github.com/openshift/api/config/v1.OpenStackPlatformStatus"),
 						},
 					},
+					"ovirt": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Ovirt contains settings specific to the oVirt infrastructure provider.",
+							Ref:         ref("github.com/openshift/api/config/v1.OvirtPlatformStatus"),
+						},
+					},
 				},
 				Required: []string{"type"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.AWSPlatformStatus", "github.com/openshift/api/config/v1.AzurePlatformStatus", "github.com/openshift/api/config/v1.BareMetalPlatformStatus", "github.com/openshift/api/config/v1.GCPPlatformStatus", "github.com/openshift/api/config/v1.OpenStackPlatformStatus"},
+			"github.com/openshift/api/config/v1.AWSPlatformStatus", "github.com/openshift/api/config/v1.AzurePlatformStatus", "github.com/openshift/api/config/v1.BareMetalPlatformStatus", "github.com/openshift/api/config/v1.GCPPlatformStatus", "github.com/openshift/api/config/v1.OpenStackPlatformStatus", "github.com/openshift/api/config/v1.OvirtPlatformStatus"},
 	}
 }
 
@@ -12592,6 +12669,102 @@ func schema_openshift_api_config_v1_StringSourceSpec(ref common.ReferenceCallbac
 	}
 }
 
+func schema_openshift_api_config_v1_TLSProfileSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TLSProfileSpec is the desired behavior of a TLSSecurityProfile.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ciphers": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ciphers is used to specify the cipher algorithms that are negotiated during the TLS handshake.  Operators may remove entries their operands do not support.  For example, to use DES-CBC3-SHA  (yaml):\n\n  ciphers:\n    - DES-CBC3-SHA",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"minTLSVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "minTLSVersion is used to specify the minimal version of the TLS protocol that is negotiated during the TLS handshake. For example, to use TLS versions 1.1, 1.2 and 1.3 (yaml):\n\n  minTLSVersion: TLSv1.1",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"ciphers", "minTLSVersion"},
+			},
+		},
+	}
+}
+
+func schema_openshift_api_config_v1_TLSSecurityProfile(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TLSSecurityProfile defines the schema for a TLS security profile. This object is used by operators to apply TLS security settings to operands.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "type is one of Old, Intermediate, Modern or Custom. Custom provides the ability to specify individual TLS security profile parameters. Old, Intermediate and Modern are TLS security profiles based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Recommended_configurations\n\nThe profiles are intent based, so they may change over time as new ciphers are developed and existing ciphers are found to be insecure.  Depending on precisely which ciphers are available to a process, the list may be reduced.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"old": {
+						SchemaProps: spec.SchemaProps{
+							Description: "old is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Old_backward_compatibility\n\nand looks like this (yaml):\n\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n    - ECDHE-RSA-AES256-GCM-SHA384\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - ECDHE-ECDSA-AES128-SHA256\n    - ECDHE-RSA-AES128-SHA256\n    - ECDHE-ECDSA-AES128-SHA\n    - ECDHE-RSA-AES128-SHA\n    - ECDHE-RSA-AES256-SHA384\n    - ECDHE-ECDSA-AES256-SHA\n    - ECDHE-RSA-AES256-SHA\n    - AES128-GCM-SHA256\n    - AES256-GCM-SHA384\n    - AES128-SHA256\n    - AES128-SHA\n    - AES256-SHA\n    - DES-CBC3-SHA\n  minTLSVersion: TLSv1.0",
+							Ref:         ref("github.com/openshift/api/config/v1.OldTLSProfile"),
+						},
+					},
+					"intermediate": {
+						SchemaProps: spec.SchemaProps{
+							Description: "intermediate is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29\n\nand looks like this (yaml):\n\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n    - ECDHE-RSA-AES256-GCM-SHA384\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n  minTLSVersion: TLSv1.2",
+							Ref:         ref("github.com/openshift/api/config/v1.IntermediateTLSProfile"),
+						},
+					},
+					"modern": {
+						SchemaProps: spec.SchemaProps{
+							Description: "modern is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Modern_compatibility\n\nand looks like this (yaml):\n\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n  minTLSVersion: TLSv1.3",
+							Ref:         ref("github.com/openshift/api/config/v1.ModernTLSProfile"),
+						},
+					},
+					"custom": {
+						SchemaProps: spec.SchemaProps{
+							Description: "custom is a user-defined TLS security profile. Be extremely careful using a custom profile as invalid configurations can be catastrophic. An example custom profile looks like this:\n\n  ciphers:\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n  minTLSVersion: TLSv1.1",
+							Ref:         ref("github.com/openshift/api/config/v1.CustomTLSProfile"),
+						},
+					},
+				},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-unions": []interface{}{
+						map[string]interface{}{
+							"discriminator": "type",
+							"fields-to-discriminateBy": map[string]interface{}{
+								"custom":       "Custom",
+								"intermediate": "Intermediate",
+								"modern":       "Modern",
+								"old":          "Old",
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.CustomTLSProfile", "github.com/openshift/api/config/v1.IntermediateTLSProfile", "github.com/openshift/api/config/v1.ModernTLSProfile", "github.com/openshift/api/config/v1.OldTLSProfile"},
+	}
+}
+
 func schema_openshift_api_config_v1_TemplateReference(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -12750,585 +12923,6 @@ func schema_openshift_api_config_v1_WebhookTokenAuthenticator(ref common.Referen
 		},
 		Dependencies: []string{
 			"github.com/openshift/api/config/v1.SecretNameReference"},
-	}
-}
-
-func schema_openshift_api_console_v1_ApplicationMenuSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ApplicationMenuSpec is the specification of the desired section and icon used for the link in the application menu.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"section": {
-						SchemaProps: spec.SchemaProps{
-							Description: "section is the section of the application menu in which the link should appear.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"imageURL": {
-						SchemaProps: spec.SchemaProps{
-							Description: "imageUrl is the URL for the icon used in front of the link in the application menu. The URL must be an HTTPS URL or a Data URI. The image should be square and will be shown at 24x24 pixels.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"section"},
-			},
-		},
-	}
-}
-
-func schema_openshift_api_console_v1_ConsoleCLIDownload(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ConsoleCLIDownload is an extension for configuring openshift web console command line interface (CLI) downloads.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard object's metadata.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/openshift/api/console/v1.ConsoleCLIDownloadSpec"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/console/v1.ConsoleCLIDownloadSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_openshift_api_console_v1_ConsoleCLIDownloadList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard object's metadata.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/openshift/api/console/v1.ConsoleCLIDownload"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"metadata", "items"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/console/v1.ConsoleCLIDownload", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_openshift_api_console_v1_ConsoleCLIDownloadSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ConsoleCLIDownloadSpec is the desired cli download configuration.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"displayName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "displayName is the display name of the CLI download.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"description": {
-						SchemaProps: spec.SchemaProps{
-							Description: "description is the description of the CLI download (can include markdown).",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"links": {
-						SchemaProps: spec.SchemaProps{
-							Description: "links is a list of objects that provide CLI download link details.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/openshift/api/console/v1.Link"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"displayName", "description", "links"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/console/v1.Link"},
-	}
-}
-
-func schema_openshift_api_console_v1_ConsoleExternalLogLink(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ConsoleExternalLogLink is an extension for customizing OpenShift web console log links.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard object's metadata.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/openshift/api/console/v1.ConsoleExternalLogLinkSpec"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/console/v1.ConsoleExternalLogLinkSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_openshift_api_console_v1_ConsoleExternalLogLinkList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard object's metadata.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/openshift/api/console/v1.ConsoleExternalLogLink"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"metadata", "items"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/console/v1.ConsoleExternalLogLink", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_openshift_api_console_v1_ConsoleExternalLogLinkSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ConsoleExternalLogLinkSpec is the desired log link configuration. The log link will appear on the logs tab of the pod details page.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"text": {
-						SchemaProps: spec.SchemaProps{
-							Description: "text is the display text for the link",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"hrefTemplate": {
-						SchemaProps: spec.SchemaProps{
-							Description: "hrefTemplate is an absolute secure URL (must use https) for the log link including variables to be replaced. Variables are specified in the URL with the format ${variableName}, for instance, ${containerName} and will be replaced with the corresponding values from the resource. Resource is a pod. Supported variables are: - ${resourceName} - name of the resource which containes the logs - ${resourceUID} - UID of the resource which contains the logs\n              - e.g. `11111111-2222-3333-4444-555555555555`\n- ${containerName} - name of the resource's container that contains the logs - ${resourceNamespace} - namespace of the resource that contains the logs - ${podLabels} - JSON representation of labels matching the pod with the logs\n            - e.g. `{\"key1\":\"value1\",\"key2\":\"value2\"}`\n\ne.g., https://example.com/logs?resourceName=${resourceName}&containerName=${containerName}&resourceNamespace=${resourceNamespace}&podLabels=${podLabels}",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"namespaceFilter": {
-						SchemaProps: spec.SchemaProps{
-							Description: "namespaceFilter is a regular expression used to restrict a log link to a matching set of namespaces (e.g., `^openshift-`). The string is converted into a regular expression using the JavaScript RegExp constructor. If not specified, links will be displayed for all the namespaces.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"text", "hrefTemplate"},
-			},
-		},
-	}
-}
-
-func schema_openshift_api_console_v1_ConsoleLink(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ConsoleLink is an extension for customizing OpenShift web console links.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard object's metadata.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/openshift/api/console/v1.ConsoleLinkSpec"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/console/v1.ConsoleLinkSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_openshift_api_console_v1_ConsoleLinkList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard object's metadata.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/openshift/api/console/v1.ConsoleLink"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"metadata", "items"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/console/v1.ConsoleLink", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_openshift_api_console_v1_ConsoleLinkSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ConsoleLinkSpec is the desired console link configuration.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"text": {
-						SchemaProps: spec.SchemaProps{
-							Description: "text is the display text for the link",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"href": {
-						SchemaProps: spec.SchemaProps{
-							Description: "href is the absolute secure URL for the link (must use https)",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"location": {
-						SchemaProps: spec.SchemaProps{
-							Description: "location determines which location in the console the link will be appended to.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"applicationMenu": {
-						SchemaProps: spec.SchemaProps{
-							Description: "applicationMenu holds information about section and icon used for the link in the application menu, and it is applicable only when location is set to ApplicationMenu.",
-							Ref:         ref("github.com/openshift/api/console/v1.ApplicationMenuSpec"),
-						},
-					},
-				},
-				Required: []string{"text", "href", "location"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/console/v1.ApplicationMenuSpec"},
-	}
-}
-
-func schema_openshift_api_console_v1_ConsoleNotification(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ConsoleNotification is the extension for configuring openshift web console notifications.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard object's metadata.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/openshift/api/console/v1.ConsoleNotificationSpec"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/console/v1.ConsoleNotificationSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_openshift_api_console_v1_ConsoleNotificationList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard object's metadata.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/openshift/api/console/v1.ConsoleNotification"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"metadata", "items"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/console/v1.ConsoleNotification", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_openshift_api_console_v1_ConsoleNotificationSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ConsoleNotificationSpec is the desired console notification configuration.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"text": {
-						SchemaProps: spec.SchemaProps{
-							Description: "text is the visible text of the notification.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"location": {
-						SchemaProps: spec.SchemaProps{
-							Description: "location is the location of the notification in the console.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"link": {
-						SchemaProps: spec.SchemaProps{
-							Description: "link is an object that holds notification link details.",
-							Ref:         ref("github.com/openshift/api/console/v1.Link"),
-						},
-					},
-					"color": {
-						SchemaProps: spec.SchemaProps{
-							Description: "color is the color of the text for the notification as CSS data type color.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"backgroundColor": {
-						SchemaProps: spec.SchemaProps{
-							Description: "backgroundColor is the color of the background for the notification as CSS data type color.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"text"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/console/v1.Link"},
-	}
-}
-
-func schema_openshift_api_console_v1_Link(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "Represents a standard link that could be generated in HTML",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"text": {
-						SchemaProps: spec.SchemaProps{
-							Description: "text is the display text for the link",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"href": {
-						SchemaProps: spec.SchemaProps{
-							Description: "href is the absolute secure URL for the link (must use https)",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"text", "href"},
-			},
-		},
 	}
 }
 
@@ -21051,7 +20645,7 @@ func schema_openshift_api_oauth_v1_OAuthClient(ref common.ReferenceCallback) com
 					},
 					"grantMethod": {
 						SchemaProps: spec.SchemaProps{
-							Description: "GrantMethod determines how to handle grants for this client. If no method is provided, the cluster default grant handling method will be used. Valid grant handling methods are:\n - auto:   always approves grant requests, useful for trusted clients\n - prompt: prompts the end user for approval of grant requests, useful for third-party clients\n - deny:   always denies grant requests, useful for black-listed clients",
+							Description: "GrantMethod is a required field which determines how to handle grants for this client. Valid grant handling methods are:\n - auto:   always approves grant requests, useful for trusted clients\n - prompt: prompts the end user for approval of grant requests, useful for third-party clients",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -23247,7 +22841,7 @@ func schema_openshift_api_operator_v1_EndpointPublishingStrategy(ref common.Refe
 				Properties: map[string]spec.Schema{
 					"type": {
 						SchemaProps: spec.SchemaProps{
-							Description: "type is the publishing strategy to use. Valid values are:\n\n* LoadBalancerService\n\nPublishes the ingress controller using a Kubernetes LoadBalancer Service.\n\nIn this configuration, the ingress controller deployment uses container networking. A LoadBalancer Service is created to publish the deployment.\n\nSee: https://kubernetes.io/docs/concepts/services-networking/#loadbalancer\n\nIf domain is set, a wildcard DNS record will be managed to point at the LoadBalancer Service's external name. DNS records are managed only in DNS zones defined by dns.config.openshift.io/cluster .spec.publicZone and .spec.privateZone.\n\nWildcard DNS management is currently supported only on the AWS platform.\n\n* HostNetwork\n\nPublishes the ingress controller on node ports where the ingress controller is deployed.\n\nIn this configuration, the ingress controller deployment uses host networking, bound to node ports 80 and 443. The user is responsible for configuring an external load balancer to publish the ingress controller via the node ports.\n\n* Private\n\nDoes not publish the ingress controller.\n\nIn this configuration, the ingress controller deployment uses container networking, and is not explicitly published. The user must manually publish the ingress controller.",
+							Description: "type is the publishing strategy to use. Valid values are:\n\n* LoadBalancerService\n\nPublishes the ingress controller using a Kubernetes LoadBalancer Service.\n\nIn this configuration, the ingress controller deployment uses container networking. A LoadBalancer Service is created to publish the deployment.\n\nSee: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer\n\nIf domain is set, a wildcard DNS record will be managed to point at the LoadBalancer Service's external name. DNS records are managed only in DNS zones defined by dns.config.openshift.io/cluster .spec.publicZone and .spec.privateZone.\n\nWildcard DNS management is currently supported only on the AWS, Azure, and GCP platforms.\n\n* HostNetwork\n\nPublishes the ingress controller on node ports where the ingress controller is deployed.\n\nIn this configuration, the ingress controller deployment uses host networking, bound to node ports 80 and 443. The user is responsible for configuring an external load balancer to publish the ingress controller via the node ports.\n\n* Private\n\nDoes not publish the ingress controller.\n\nIn this configuration, the ingress controller deployment uses container networking, and is not explicitly published. The user must manually publish the ingress controller.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -23271,6 +22865,7 @@ func schema_openshift_api_operator_v1_EndpointPublishingStrategy(ref common.Refe
 						},
 					},
 				},
+				Required: []string{"type"},
 			},
 			VendorExtensible: spec.VendorExtensible{
 				Extensions: spec.Extensions{
@@ -23756,7 +23351,7 @@ func schema_openshift_api_operator_v1_IngressControllerSpec(ref common.Reference
 					},
 					"endpointPublishingStrategy": {
 						SchemaProps: spec.SchemaProps{
-							Description: "endpointPublishingStrategy is used to publish the ingress controller endpoints to other networks, enable load balancer integrations, etc.\n\nIf unset, the default is based on infrastructure.config.openshift.io/cluster .status.platform:\n\n  AWS:      LoadBalancerService\n  Azure:    LoadBalancerService\n  GCP:      LoadBalancerService\n  Libvirt:  HostNetwork\n\nAny other platform types (including None) default to HostNetwork.\n\nendpointPublishingStrategy cannot be updated.",
+							Description: "endpointPublishingStrategy is used to publish the ingress controller endpoints to other networks, enable load balancer integrations, etc.\n\nIf unset, the default is based on infrastructure.config.openshift.io/cluster .status.platform:\n\n  AWS:      LoadBalancerService (with External scope)\n  Azure:    LoadBalancerService (with External scope)\n  GCP:      LoadBalancerService (with External scope)\n  Libvirt:  HostNetwork\n\nAny other platform types (including None) default to HostNetwork.\n\nendpointPublishingStrategy cannot be updated.",
 							Ref:         ref("github.com/openshift/api/operator/v1.EndpointPublishingStrategy"),
 						},
 					},
@@ -23784,11 +23379,17 @@ func schema_openshift_api_operator_v1_IngressControllerSpec(ref common.Reference
 							Ref:         ref("github.com/openshift/api/operator/v1.NodePlacement"),
 						},
 					},
+					"tlsSecurityProfile": {
+						SchemaProps: spec.SchemaProps{
+							Description: "tlsSecurityProfile specifies settings for TLS connections for ingresscontrollers.\n\nIf unset, the default is based on the apiservers.config.openshift.io/cluster resource.\n\nNote that when using the Old, Intermediate, and Modern profile types, the effective profile configuration is subject to change between releases. For example, given a specification to use the Intermediate profile deployed on release X.Y.Z, an upgrade to release X.Y.Z+1 may cause a new profile configuration to be applied to the ingress controller, resulting in a rollout.",
+							Ref:         ref("github.com/openshift/api/config/v1.TLSSecurityProfile"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/operator/v1.EndpointPublishingStrategy", "github.com/openshift/api/operator/v1.NodePlacement", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
+			"github.com/openshift/api/config/v1.TLSSecurityProfile", "github.com/openshift/api/operator/v1.EndpointPublishingStrategy", "github.com/openshift/api/operator/v1.NodePlacement", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
 	}
 }
 
@@ -23839,12 +23440,18 @@ func schema_openshift_api_operator_v1_IngressControllerStatus(ref common.Referen
 							},
 						},
 					},
+					"tlsProfile": {
+						SchemaProps: spec.SchemaProps{
+							Description: "tlsProfile is the TLS connection configuration that is in effect.",
+							Ref:         ref("github.com/openshift/api/config/v1.TLSProfileSpec"),
+						},
+					},
 				},
 				Required: []string{"availableReplicas", "selector", "domain"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/operator/v1.EndpointPublishingStrategy", "github.com/openshift/api/operator/v1.OperatorCondition"},
+			"github.com/openshift/api/config/v1.TLSProfileSpec", "github.com/openshift/api/operator/v1.EndpointPublishingStrategy", "github.com/openshift/api/operator/v1.OperatorCondition"},
 	}
 }
 
@@ -24647,12 +24254,13 @@ func schema_openshift_api_operator_v1_LoadBalancerStrategy(ref common.ReferenceC
 				Properties: map[string]spec.Schema{
 					"scope": {
 						SchemaProps: spec.SchemaProps{
-							Description: "scope indicates the scope at which the load balancer is exposed. Possible values are \"External\" and \"Internal\".  The default is \"External\".",
+							Description: "scope indicates the scope at which the load balancer is exposed. Possible values are \"External\" and \"Internal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 				},
+				Required: []string{"scope"},
 			},
 		},
 	}
@@ -25091,12 +24699,19 @@ func schema_openshift_api_operator_v1_OVNKubernetesConfig(ref common.ReferenceCa
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ovnKubernetesConfig is the proposed configuration parameters for networks using the ovn-kubernetes network project",
+				Description: "ovnKubernetesConfig contains the configuration parameters for networks using the ovn-kubernetes network project",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"mtu": {
 						SchemaProps: spec.SchemaProps{
 							Description: "mtu is the MTU to use for the tunnel interface. This must be 100 bytes smaller than the uplink mtu. Default is 1400",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"genevePort": {
+						SchemaProps: spec.SchemaProps{
+							Description: "geneve port is the UDP port to be used by geneve encapulation. Default is 6081",
 							Type:        []string{"integer"},
 							Format:      "int64",
 						},
@@ -69309,216 +68924,6 @@ func schema_pkg_apis_clientauthentication_v1beta1_ExecCredentialStatus(ref commo
 	}
 }
 
-func schema_apiserver_apis_example_v1_TestType(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TestType is a top-level type. A client is created for it.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/code-generator/_examples/apiserver/apis/example/v1.TestTypeStatus"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/code-generator/_examples/apiserver/apis/example/v1.TestTypeStatus"},
-	}
-}
-
-func schema_apiserver_apis_example_v1_TestTypeList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TestTypeList is a top-level list type. The client methods for lists are automatically created. You are not supposed to create a separated client for this one.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/code-generator/_examples/apiserver/apis/example/v1.TestType"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/code-generator/_examples/apiserver/apis/example/v1.TestType"},
-	}
-}
-
-func schema_apiserver_apis_example_v1_TestTypeStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"Blah": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-				},
-				Required: []string{"Blah"},
-			},
-		},
-	}
-}
-
-func schema_apiserver_apis_example2_v1_TestType(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TestType is a top-level type. A client is created for it.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/code-generator/_examples/apiserver/apis/example2/v1.TestTypeStatus"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/code-generator/_examples/apiserver/apis/example2/v1.TestTypeStatus"},
-	}
-}
-
-func schema_apiserver_apis_example2_v1_TestTypeList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TestTypeList is a top-level list type. The client methods for lists are automatically created. You are not supposed to create a separated client for this one.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/code-generator/_examples/apiserver/apis/example2/v1.TestType"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/code-generator/_examples/apiserver/apis/example2/v1.TestType"},
-	}
-}
-
-func schema_apiserver_apis_example2_v1_TestTypeStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"Blah": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-				},
-				Required: []string{"Blah"},
-			},
-		},
-	}
-}
-
 func schema_pkg_apis_apiregistration_v1_APIService(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -71263,1708 +70668,6 @@ func schema_k8sio_kube_controller_manager_config_v1alpha1_VolumeConfiguration(re
 	}
 }
 
-func schema_k8sio_kube_proxy_config_v1alpha1_KubeProxyConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "KubeProxyConfiguration contains everything necessary to configure the Kubernetes proxy server.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"featureGates": {
-						SchemaProps: spec.SchemaProps{
-							Description: "featureGates is a map of feature names to bools that enable or disable alpha/experimental features.",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"boolean"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"bindAddress": {
-						SchemaProps: spec.SchemaProps{
-							Description: "bindAddress is the IP address for the proxy server to serve on (set to 0.0.0.0 for all interfaces)",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"healthzBindAddress": {
-						SchemaProps: spec.SchemaProps{
-							Description: "healthzBindAddress is the IP address and port for the health check server to serve on, defaulting to 0.0.0.0:10256",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metricsBindAddress": {
-						SchemaProps: spec.SchemaProps{
-							Description: "metricsBindAddress is the IP address and port for the metrics server to serve on, defaulting to 127.0.0.1:10249 (set to 0.0.0.0 for all interfaces)",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"enableProfiling": {
-						SchemaProps: spec.SchemaProps{
-							Description: "enableProfiling enables profiling via web interface on /debug/pprof handler. Profiling handlers will be handled by metrics server.",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"clusterCIDR": {
-						SchemaProps: spec.SchemaProps{
-							Description: "clusterCIDR is the CIDR range of the pods in the cluster. It is used to bridge traffic coming from outside of the cluster. If not provided, no off-cluster bridging will be performed.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"hostnameOverride": {
-						SchemaProps: spec.SchemaProps{
-							Description: "hostnameOverride, if non-empty, will be used as the identity instead of the actual hostname.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"clientConnection": {
-						SchemaProps: spec.SchemaProps{
-							Description: "clientConnection specifies the kubeconfig file and client connection settings for the proxy server to use when communicating with the apiserver.",
-							Ref:         ref("k8s.io/component-base/config/v1alpha1.ClientConnectionConfiguration"),
-						},
-					},
-					"iptables": {
-						SchemaProps: spec.SchemaProps{
-							Description: "iptables contains iptables-related configuration options.",
-							Ref:         ref("k8s.io/kube-proxy/config/v1alpha1.KubeProxyIPTablesConfiguration"),
-						},
-					},
-					"ipvs": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ipvs contains ipvs-related configuration options.",
-							Ref:         ref("k8s.io/kube-proxy/config/v1alpha1.KubeProxyIPVSConfiguration"),
-						},
-					},
-					"oomScoreAdj": {
-						SchemaProps: spec.SchemaProps{
-							Description: "oomScoreAdj is the oom-score-adj value for kube-proxy process. Values must be within the range [-1000, 1000]",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"mode": {
-						SchemaProps: spec.SchemaProps{
-							Description: "mode specifies which proxy mode to use.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"portRange": {
-						SchemaProps: spec.SchemaProps{
-							Description: "portRange is the range of host ports (beginPort-endPort, inclusive) that may be consumed in order to proxy service traffic. If unspecified (0-0) then ports will be randomly chosen.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"udpIdleTimeout": {
-						SchemaProps: spec.SchemaProps{
-							Description: "udpIdleTimeout is how long an idle UDP connection will be kept open (e.g. '250ms', '2s'). Must be greater than 0. Only applicable for proxyMode=userspace.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"conntrack": {
-						SchemaProps: spec.SchemaProps{
-							Description: "conntrack contains conntrack-related configuration options.",
-							Ref:         ref("k8s.io/kube-proxy/config/v1alpha1.KubeProxyConntrackConfiguration"),
-						},
-					},
-					"configSyncPeriod": {
-						SchemaProps: spec.SchemaProps{
-							Description: "configSyncPeriod is how often configuration from the apiserver is refreshed. Must be greater than 0.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"nodePortAddresses": {
-						SchemaProps: spec.SchemaProps{
-							Description: "nodePortAddresses is the --nodeport-addresses value for kube-proxy process. Values must be valid IP blocks. These values are as a parameter to select the interfaces where nodeport works. In case someone would like to expose a service on localhost for local visit and some other interfaces for particular purpose, a list of IP blocks would do that. If set it to \"127.0.0.0/8\", kube-proxy will only select the loopback interface for NodePort. If set it to a non-zero IP block, kube-proxy will filter that down to just the IPs that applied to the node. An empty string slice is meant to select all network interfaces.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"winkernel": {
-						SchemaProps: spec.SchemaProps{
-							Description: "winkernel contains winkernel-related configuration options.",
-							Ref:         ref("k8s.io/kube-proxy/config/v1alpha1.KubeProxyWinkernelConfiguration"),
-						},
-					},
-				},
-				Required: []string{"bindAddress", "healthzBindAddress", "metricsBindAddress", "enableProfiling", "clusterCIDR", "hostnameOverride", "clientConnection", "iptables", "ipvs", "oomScoreAdj", "mode", "portRange", "udpIdleTimeout", "conntrack", "configSyncPeriod", "nodePortAddresses", "winkernel"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration", "k8s.io/component-base/config/v1alpha1.ClientConnectionConfiguration", "k8s.io/kube-proxy/config/v1alpha1.KubeProxyConntrackConfiguration", "k8s.io/kube-proxy/config/v1alpha1.KubeProxyIPTablesConfiguration", "k8s.io/kube-proxy/config/v1alpha1.KubeProxyIPVSConfiguration", "k8s.io/kube-proxy/config/v1alpha1.KubeProxyWinkernelConfiguration"},
-	}
-}
-
-func schema_k8sio_kube_proxy_config_v1alpha1_KubeProxyConntrackConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "KubeProxyConntrackConfiguration contains conntrack settings for the Kubernetes proxy server.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"maxPerCore": {
-						SchemaProps: spec.SchemaProps{
-							Description: "maxPerCore is the maximum number of NAT connections to track per CPU core (0 to leave the limit as-is and ignore min).",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"min": {
-						SchemaProps: spec.SchemaProps{
-							Description: "min is the minimum value of connect-tracking records to allocate, regardless of conntrackMaxPerCore (set maxPerCore=0 to leave the limit as-is).",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"tcpEstablishedTimeout": {
-						SchemaProps: spec.SchemaProps{
-							Description: "tcpEstablishedTimeout is how long an idle TCP connection will be kept open (e.g. '2s').  Must be greater than 0 to set.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"tcpCloseWaitTimeout": {
-						SchemaProps: spec.SchemaProps{
-							Description: "tcpCloseWaitTimeout is how long an idle conntrack entry in CLOSE_WAIT state will remain in the conntrack table. (e.g. '60s'). Must be greater than 0 to set.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-				},
-				Required: []string{"maxPerCore", "min", "tcpEstablishedTimeout", "tcpCloseWaitTimeout"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
-	}
-}
-
-func schema_k8sio_kube_proxy_config_v1alpha1_KubeProxyIPTablesConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "KubeProxyIPTablesConfiguration contains iptables-related configuration details for the Kubernetes proxy server.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"masqueradeBit": {
-						SchemaProps: spec.SchemaProps{
-							Description: "masqueradeBit is the bit of the iptables fwmark space to use for SNAT if using the pure iptables proxy mode. Values must be within the range [0, 31].",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"masqueradeAll": {
-						SchemaProps: spec.SchemaProps{
-							Description: "masqueradeAll tells kube-proxy to SNAT everything if using the pure iptables proxy mode.",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"syncPeriod": {
-						SchemaProps: spec.SchemaProps{
-							Description: "syncPeriod is the period that iptables rules are refreshed (e.g. '5s', '1m', '2h22m').  Must be greater than 0.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"minSyncPeriod": {
-						SchemaProps: spec.SchemaProps{
-							Description: "minSyncPeriod is the minimum period that iptables rules are refreshed (e.g. '5s', '1m', '2h22m').",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-				},
-				Required: []string{"masqueradeBit", "masqueradeAll", "syncPeriod", "minSyncPeriod"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
-	}
-}
-
-func schema_k8sio_kube_proxy_config_v1alpha1_KubeProxyIPVSConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "KubeProxyIPVSConfiguration contains ipvs-related configuration details for the Kubernetes proxy server.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"syncPeriod": {
-						SchemaProps: spec.SchemaProps{
-							Description: "syncPeriod is the period that ipvs rules are refreshed (e.g. '5s', '1m', '2h22m').  Must be greater than 0.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"minSyncPeriod": {
-						SchemaProps: spec.SchemaProps{
-							Description: "minSyncPeriod is the minimum period that ipvs rules are refreshed (e.g. '5s', '1m', '2h22m').",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"scheduler": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ipvs scheduler",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"excludeCIDRs": {
-						SchemaProps: spec.SchemaProps{
-							Description: "excludeCIDRs is a list of CIDR's which the ipvs proxier should not touch when cleaning up ipvs services.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"strictARP": {
-						SchemaProps: spec.SchemaProps{
-							Description: "strict ARP configure arp_ignore and arp_announce to avoid answering ARP queries from kube-ipvs0 interface",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"syncPeriod", "minSyncPeriod", "scheduler", "excludeCIDRs", "strictARP"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
-	}
-}
-
-func schema_k8sio_kube_proxy_config_v1alpha1_KubeProxyWinkernelConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "KubeProxyWinkernelConfiguration contains Windows/HNS settings for the Kubernetes proxy server.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"networkName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "networkName is the name of the network kube-proxy will use to create endpoints and policies",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"sourceVip": {
-						SchemaProps: spec.SchemaProps{
-							Description: "sourceVip is the IP address of the source VIP endoint used for NAT when loadbalancing",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"enableDSR": {
-						SchemaProps: spec.SchemaProps{
-							Description: "enableDSR tells kube-proxy whether HNS policies should be created with DSR",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"networkName", "sourceVip", "enableDSR"},
-			},
-		},
-	}
-}
-
-func schema_k8sio_kube_scheduler_config_v1alpha1_KubeSchedulerConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "KubeSchedulerConfiguration configures a scheduler",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"schedulerName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "SchedulerName is name of the scheduler, used to select which pods will be processed by this scheduler, based on pod's \"spec.SchedulerName\".",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"algorithmSource": {
-						SchemaProps: spec.SchemaProps{
-							Description: "AlgorithmSource specifies the scheduler algorithm source.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.SchedulerAlgorithmSource"),
-						},
-					},
-					"hardPodAffinitySymmetricWeight": {
-						SchemaProps: spec.SchemaProps{
-							Description: "RequiredDuringScheduling affinity is not symmetric, but there is an implicit PreferredDuringScheduling affinity rule corresponding to every RequiredDuringScheduling affinity rule. HardPodAffinitySymmetricWeight represents the weight of implicit PreferredDuringScheduling affinity rule, in the range 0-100.",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"leaderElection": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LeaderElection defines the configuration of leader election client.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.KubeSchedulerLeaderElectionConfiguration"),
-						},
-					},
-					"clientConnection": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ClientConnection specifies the kubeconfig file and client connection settings for the proxy server to use when communicating with the apiserver.",
-							Ref:         ref("k8s.io/component-base/config/v1alpha1.ClientConnectionConfiguration"),
-						},
-					},
-					"healthzBindAddress": {
-						SchemaProps: spec.SchemaProps{
-							Description: "HealthzBindAddress is the IP address and port for the health check server to serve on, defaulting to 0.0.0.0:10251",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metricsBindAddress": {
-						SchemaProps: spec.SchemaProps{
-							Description: "MetricsBindAddress is the IP address and port for the metrics server to serve on, defaulting to 0.0.0.0:10251.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"enableProfiling": {
-						SchemaProps: spec.SchemaProps{
-							Description: "enableProfiling enables profiling via web interface host:port/debug/pprof/",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"enableContentionProfiling": {
-						SchemaProps: spec.SchemaProps{
-							Description: "enableContentionProfiling enables lock contention profiling, if enableProfiling is true.",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"disablePreemption": {
-						SchemaProps: spec.SchemaProps{
-							Description: "DisablePreemption disables the pod preemption feature.",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"percentageOfNodesToScore": {
-						SchemaProps: spec.SchemaProps{
-							Description: "PercentageOfNodeToScore is the percentage of all nodes that once found feasible for running a pod, the scheduler stops its search for more feasible nodes in the cluster. This helps improve scheduler's performance. Scheduler always tries to find at least \"minFeasibleNodesToFind\" feasible nodes no matter what the value of this flag is. Example: if the cluster size is 500 nodes and the value of this flag is 30, then scheduler stops finding further feasible nodes once it finds 150 feasible ones. When the value is 0, default percentage (5%--50% based on the size of the cluster) of the nodes will be scored.",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"bindTimeoutSeconds": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Duration to wait for a binding operation to complete before timing out Value must be non-negative integer. The value zero indicates no waiting. If this value is nil, the default value will be used.",
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
-					"plugins": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Plugins specify the set of plugins that should be enabled or disabled. Enabled plugins are the ones that should be enabled in addition to the default plugins. Disabled plugins are any of the default plugins that should be disabled. When no enabled or disabled plugin is specified for an extension point, default plugins for that extension point will be used if there is any.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.Plugins"),
-						},
-					},
-					"pluginConfig": {
-						SchemaProps: spec.SchemaProps{
-							Description: "PluginConfig is an optional set of custom plugin arguments for each plugin. Omitting config args for a plugin is equivalent to using the default config for that plugin.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/kube-scheduler/config/v1alpha1.PluginConfig"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"schedulerName", "algorithmSource", "hardPodAffinitySymmetricWeight", "leaderElection", "clientConnection", "healthzBindAddress", "metricsBindAddress", "enableProfiling", "enableContentionProfiling", "disablePreemption", "percentageOfNodesToScore", "bindTimeoutSeconds"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/component-base/config/v1alpha1.ClientConnectionConfiguration", "k8s.io/kube-scheduler/config/v1alpha1.KubeSchedulerLeaderElectionConfiguration", "k8s.io/kube-scheduler/config/v1alpha1.PluginConfig", "k8s.io/kube-scheduler/config/v1alpha1.Plugins", "k8s.io/kube-scheduler/config/v1alpha1.SchedulerAlgorithmSource"},
-	}
-}
-
-func schema_k8sio_kube_scheduler_config_v1alpha1_KubeSchedulerLeaderElectionConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "KubeSchedulerLeaderElectionConfiguration expands LeaderElectionConfiguration to include scheduler specific configuration.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"leaderElect": {
-						SchemaProps: spec.SchemaProps{
-							Description: "leaderElect enables a leader election client to gain leadership before executing the main loop. Enable this when running replicated components for high availability.",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"leaseDuration": {
-						SchemaProps: spec.SchemaProps{
-							Description: "leaseDuration is the duration that non-leader candidates will wait after observing a leadership renewal until attempting to acquire leadership of a led but unrenewed leader slot. This is effectively the maximum duration that a leader can be stopped before it is replaced by another candidate. This is only applicable if leader election is enabled.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"renewDeadline": {
-						SchemaProps: spec.SchemaProps{
-							Description: "renewDeadline is the interval between attempts by the acting master to renew a leadership slot before it stops leading. This must be less than or equal to the lease duration. This is only applicable if leader election is enabled.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"retryPeriod": {
-						SchemaProps: spec.SchemaProps{
-							Description: "retryPeriod is the duration the clients should wait between attempting acquisition and renewal of a leadership. This is only applicable if leader election is enabled.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"resourceLock": {
-						SchemaProps: spec.SchemaProps{
-							Description: "resourceLock indicates the resource object type that will be used to lock during leader election cycles.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"resourceName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "resourceName indicates the name of resource object that will be used to lock during leader election cycles.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"resourceNamespace": {
-						SchemaProps: spec.SchemaProps{
-							Description: "resourceName indicates the namespace of resource object that will be used to lock during leader election cycles.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"lockObjectNamespace": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LockObjectNamespace defines the namespace of the lock object DEPRECATED: will be removed in favor of resourceNamespace",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"lockObjectName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LockObjectName defines the lock object name DEPRECATED: will be removed in favor of resourceName",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"leaderElect", "leaseDuration", "renewDeadline", "retryPeriod", "resourceLock", "resourceName", "resourceNamespace", "lockObjectNamespace", "lockObjectName"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
-	}
-}
-
-func schema_k8sio_kube_scheduler_config_v1alpha1_Plugin(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "Plugin specifies a plugin name and its weight when applicable. Weight is used only for Score plugins.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name defines the name of plugin",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"weight": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Weight defines the weight of plugin, only used for Score plugins.",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-				},
-				Required: []string{"name"},
-			},
-		},
-	}
-}
-
-func schema_k8sio_kube_scheduler_config_v1alpha1_PluginConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "PluginConfig specifies arguments that should be passed to a plugin at the time of initialization. A plugin that is invoked at multiple extension points is initialized once. Args can have arbitrary structure. It is up to the plugin to process these Args.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name defines the name of plugin being configured",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"args": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Args defines the arguments passed to the plugins at the time of initialization. Args can have arbitrary structure.",
-							Ref:         ref("k8s.io/apimachinery/pkg/runtime.Unknown"),
-						},
-					},
-				},
-				Required: []string{"name"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/runtime.Unknown"},
-	}
-}
-
-func schema_k8sio_kube_scheduler_config_v1alpha1_PluginSet(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "PluginSet specifies enabled and disabled plugins for an extension point. If an array is empty, missing, or nil, default plugins at that extension point will be used.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"enabled": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Enabled specifies plugins that should be enabled in addition to default plugins. These are called after default plugins and in the same order specified here.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/kube-scheduler/config/v1alpha1.Plugin"),
-									},
-								},
-							},
-						},
-					},
-					"disabled": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Disabled specifies default plugins that should be disabled. When all default plugins need to be disabled, an array containing only one \"*\" should be provided.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/kube-scheduler/config/v1alpha1.Plugin"),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/kube-scheduler/config/v1alpha1.Plugin"},
-	}
-}
-
-func schema_k8sio_kube_scheduler_config_v1alpha1_Plugins(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "Plugins include multiple extension points. When specified, the list of plugins for a particular extension point are the only ones enabled. If an extension point is omitted from the config, then the default set of plugins is used for that extension point. Enabled plugins are called in the order specified here, after default plugins. If they need to be invoked before default plugins, default plugins must be disabled and re-enabled here in desired order.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"queueSort": {
-						SchemaProps: spec.SchemaProps{
-							Description: "QueueSort is a list of plugins that should be invoked when sorting pods in the scheduling queue.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.PluginSet"),
-						},
-					},
-					"preFilter": {
-						SchemaProps: spec.SchemaProps{
-							Description: "PreFilter is a list of plugins that should be invoked at \"PreFilter\" extension point of the scheduling framework.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.PluginSet"),
-						},
-					},
-					"filter": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Filter is a list of plugins that should be invoked when filtering out nodes that cannot run the Pod.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.PluginSet"),
-						},
-					},
-					"postFilter": {
-						SchemaProps: spec.SchemaProps{
-							Description: "PostFilter is a list of plugins that are invoked after filtering out infeasible nodes.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.PluginSet"),
-						},
-					},
-					"score": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Score is a list of plugins that should be invoked when ranking nodes that have passed the filtering phase.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.PluginSet"),
-						},
-					},
-					"reserve": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Reserve is a list of plugins invoked when reserving a node to run the pod.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.PluginSet"),
-						},
-					},
-					"permit": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Permit is a list of plugins that control binding of a Pod. These plugins can prevent or delay binding of a Pod.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.PluginSet"),
-						},
-					},
-					"preBind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "PreBind is a list of plugins that should be invoked before a pod is bound.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.PluginSet"),
-						},
-					},
-					"bind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Bind is a list of plugins that should be invoked at \"Bind\" extension point of the scheduling framework. The scheduler call these plugins in order. Scheduler skips the rest of these plugins as soon as one returns success.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.PluginSet"),
-						},
-					},
-					"postBind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "PostBind is a list of plugins that should be invoked after a pod is successfully bound.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.PluginSet"),
-						},
-					},
-					"unreserve": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Unreserve is a list of plugins invoked when a pod that was previously reserved is rejected in a later phase.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.PluginSet"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/kube-scheduler/config/v1alpha1.PluginSet"},
-	}
-}
-
-func schema_k8sio_kube_scheduler_config_v1alpha1_SchedulerAlgorithmSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "SchedulerAlgorithmSource is the source of a scheduler algorithm. One source field must be specified, and source fields are mutually exclusive.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"policy": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Policy is a policy based algorithm source.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.SchedulerPolicySource"),
-						},
-					},
-					"provider": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Provider is the name of a scheduling algorithm provider to use.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/kube-scheduler/config/v1alpha1.SchedulerPolicySource"},
-	}
-}
-
-func schema_k8sio_kube_scheduler_config_v1alpha1_SchedulerPolicyConfigMapSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "SchedulerPolicyConfigMapSource is a policy serialized into a config map value under the SchedulerPolicyConfigMapKey key.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"namespace": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Namespace is the namespace of the policy config map.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of hte policy config map.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"namespace", "name"},
-			},
-		},
-	}
-}
-
-func schema_k8sio_kube_scheduler_config_v1alpha1_SchedulerPolicyFileSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "SchedulerPolicyFileSource is a policy serialized to disk and accessed via path.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"path": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Path is the location of a serialized policy.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"path"},
-			},
-		},
-	}
-}
-
-func schema_k8sio_kube_scheduler_config_v1alpha1_SchedulerPolicySource(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "SchedulerPolicySource configures a means to obtain a scheduler Policy. One source field must be specified, and source fields are mutually exclusive.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"file": {
-						SchemaProps: spec.SchemaProps{
-							Description: "File is a file policy source.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.SchedulerPolicyFileSource"),
-						},
-					},
-					"configMap": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ConfigMap is a config map policy source.",
-							Ref:         ref("k8s.io/kube-scheduler/config/v1alpha1.SchedulerPolicyConfigMapSource"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/kube-scheduler/config/v1alpha1.SchedulerPolicyConfigMapSource", "k8s.io/kube-scheduler/config/v1alpha1.SchedulerPolicyFileSource"},
-	}
-}
-
-func schema_k8sio_kubelet_config_v1beta1_KubeletAnonymousAuthentication(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"enabled": {
-						SchemaProps: spec.SchemaProps{
-							Description: "enabled allows anonymous requests to the kubelet server. Requests that are not rejected by another authentication method are treated as anonymous requests. Anonymous requests have a username of system:anonymous, and a group name of system:unauthenticated.",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func schema_k8sio_kubelet_config_v1beta1_KubeletAuthentication(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"x509": {
-						SchemaProps: spec.SchemaProps{
-							Description: "x509 contains settings related to x509 client certificate authentication",
-							Ref:         ref("k8s.io/kubelet/config/v1beta1.KubeletX509Authentication"),
-						},
-					},
-					"webhook": {
-						SchemaProps: spec.SchemaProps{
-							Description: "webhook contains settings related to webhook bearer token authentication",
-							Ref:         ref("k8s.io/kubelet/config/v1beta1.KubeletWebhookAuthentication"),
-						},
-					},
-					"anonymous": {
-						SchemaProps: spec.SchemaProps{
-							Description: "anonymous contains settings related to anonymous authentication",
-							Ref:         ref("k8s.io/kubelet/config/v1beta1.KubeletAnonymousAuthentication"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/kubelet/config/v1beta1.KubeletAnonymousAuthentication", "k8s.io/kubelet/config/v1beta1.KubeletWebhookAuthentication", "k8s.io/kubelet/config/v1beta1.KubeletX509Authentication"},
-	}
-}
-
-func schema_k8sio_kubelet_config_v1beta1_KubeletAuthorization(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"mode": {
-						SchemaProps: spec.SchemaProps{
-							Description: "mode is the authorization mode to apply to requests to the kubelet server. Valid values are AlwaysAllow and Webhook. Webhook mode uses the SubjectAccessReview API to determine authorization.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"webhook": {
-						SchemaProps: spec.SchemaProps{
-							Description: "webhook contains settings related to Webhook authorization.",
-							Ref:         ref("k8s.io/kubelet/config/v1beta1.KubeletWebhookAuthorization"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/kubelet/config/v1beta1.KubeletWebhookAuthorization"},
-	}
-}
-
-func schema_k8sio_kubelet_config_v1beta1_KubeletConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "KubeletConfiguration contains the configuration for the Kubelet",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"staticPodPath": {
-						SchemaProps: spec.SchemaProps{
-							Description: "staticPodPath is the path to the directory containing local (static) pods to run, or the path to a single static pod file. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that the set of static pods specified at the new path may be different than the ones the Kubelet initially started with, and this may disrupt your node. Default: \"\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"syncFrequency": {
-						SchemaProps: spec.SchemaProps{
-							Description: "syncFrequency is the max period between synchronizing running containers and config. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that shortening this duration may have a negative performance impact, especially as the number of Pods on the node increases. Alternatively, increasing this duration will result in longer refresh times for ConfigMaps and Secrets. Default: \"1m\"",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"fileCheckFrequency": {
-						SchemaProps: spec.SchemaProps{
-							Description: "fileCheckFrequency is the duration between checking config files for new data Dynamic Kubelet Config (beta): If dynamically updating this field, consider that shortening the duration will cause the Kubelet to reload local Static Pod configurations more frequently, which may have a negative performance impact. Default: \"20s\"",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"httpCheckFrequency": {
-						SchemaProps: spec.SchemaProps{
-							Description: "httpCheckFrequency is the duration between checking http for new data Dynamic Kubelet Config (beta): If dynamically updating this field, consider that shortening the duration will cause the Kubelet to poll staticPodURL more frequently, which may have a negative performance impact. Default: \"20s\"",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"staticPodURL": {
-						SchemaProps: spec.SchemaProps{
-							Description: "staticPodURL is the URL for accessing static pods to run Dynamic Kubelet Config (beta): If dynamically updating this field, consider that the set of static pods specified at the new URL may be different than the ones the Kubelet initially started with, and this may disrupt your node. Default: \"\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"staticPodURLHeader": {
-						SchemaProps: spec.SchemaProps{
-							Description: "staticPodURLHeader is a map of slices with HTTP headers to use when accessing the podURL Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt the ability to read the latest set of static pods from StaticPodURL. Default: nil",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type: []string{"array"},
-										Items: &spec.SchemaOrArray{
-											Schema: &spec.Schema{
-												SchemaProps: spec.SchemaProps{
-													Type:   []string{"string"},
-													Format: "",
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-					"address": {
-						SchemaProps: spec.SchemaProps{
-							Description: "address is the IP address for the Kubelet to serve on (set to 0.0.0.0 for all interfaces). Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt components that interact with the Kubelet server. Default: \"0.0.0.0\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"port": {
-						SchemaProps: spec.SchemaProps{
-							Description: "port is the port for the Kubelet to serve on. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt components that interact with the Kubelet server. Default: 10250",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"readOnlyPort": {
-						SchemaProps: spec.SchemaProps{
-							Description: "readOnlyPort is the read-only port for the Kubelet to serve on with no authentication/authorization. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt components that interact with the Kubelet server. Default: 0 (disabled)",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"tlsCertFile": {
-						SchemaProps: spec.SchemaProps{
-							Description: "tlsCertFile is the file containing x509 Certificate for HTTPS. (CA cert, if any, concatenated after server cert). If tlsCertFile and tlsPrivateKeyFile are not provided, a self-signed certificate and key are generated for the public address and saved to the directory passed to the Kubelet's --cert-dir flag. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt components that interact with the Kubelet server. Default: \"\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"tlsPrivateKeyFile": {
-						SchemaProps: spec.SchemaProps{
-							Description: "tlsPrivateKeyFile is the file containing x509 private key matching tlsCertFile Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt components that interact with the Kubelet server. Default: \"\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"tlsCipherSuites": {
-						SchemaProps: spec.SchemaProps{
-							Description: "TLSCipherSuites is the list of allowed cipher suites for the server. Values are from tls package constants (https://golang.org/pkg/crypto/tls/#pkg-constants). Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt components that interact with the Kubelet server. Default: nil",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"tlsMinVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "TLSMinVersion is the minimum TLS version supported. Values are from tls package constants (https://golang.org/pkg/crypto/tls/#pkg-constants). Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt components that interact with the Kubelet server. Default: \"\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"rotateCertificates": {
-						SchemaProps: spec.SchemaProps{
-							Description: "rotateCertificates enables client certificate rotation. The Kubelet will request a new certificate from the certificates.k8s.io API. This requires an approver to approve the certificate signing requests. The RotateKubeletClientCertificate feature must be enabled. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that disabling it may disrupt the Kubelet's ability to authenticate with the API server after the current certificate expires. Default: false",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"serverTLSBootstrap": {
-						SchemaProps: spec.SchemaProps{
-							Description: "serverTLSBootstrap enables server certificate bootstrap. Instead of self signing a serving certificate, the Kubelet will request a certificate from the certificates.k8s.io API. This requires an approver to approve the certificate signing requests. The RotateKubeletServerCertificate feature must be enabled. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that disabling it will stop the renewal of Kubelet server certificates, which can disrupt components that interact with the Kubelet server in the long term, due to certificate expiration. Default: false",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"authentication": {
-						SchemaProps: spec.SchemaProps{
-							Description: "authentication specifies how requests to the Kubelet's server are authenticated Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt components that interact with the Kubelet server. Defaults:\n  anonymous:\n    enabled: false\n  webhook:\n    enabled: true\n    cacheTTL: \"2m\"",
-							Ref:         ref("k8s.io/kubelet/config/v1beta1.KubeletAuthentication"),
-						},
-					},
-					"authorization": {
-						SchemaProps: spec.SchemaProps{
-							Description: "authorization specifies how requests to the Kubelet's server are authorized Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt components that interact with the Kubelet server. Defaults:\n  mode: Webhook\n  webhook:\n    cacheAuthorizedTTL: \"5m\"\n    cacheUnauthorizedTTL: \"30s\"",
-							Ref:         ref("k8s.io/kubelet/config/v1beta1.KubeletAuthorization"),
-						},
-					},
-					"registryPullQPS": {
-						SchemaProps: spec.SchemaProps{
-							Description: "registryPullQPS is the limit of registry pulls per second. Set to 0 for no limit. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may impact scalability by changing the amount of traffic produced by image pulls. Default: 5",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"registryBurst": {
-						SchemaProps: spec.SchemaProps{
-							Description: "registryBurst is the maximum size of bursty pulls, temporarily allows pulls to burst to this number, while still not exceeding registryPullQPS. Only used if registryPullQPS > 0. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may impact scalability by changing the amount of traffic produced by image pulls. Default: 10",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"eventRecordQPS": {
-						SchemaProps: spec.SchemaProps{
-							Description: "eventRecordQPS is the maximum event creations per second. If 0, there is no limit enforced. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may impact scalability by changing the amount of traffic produced by event creations. Default: 5",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"eventBurst": {
-						SchemaProps: spec.SchemaProps{
-							Description: "eventBurst is the maximum size of a burst of event creations, temporarily allows event creations to burst to this number, while still not exceeding eventRecordQPS. Only used if eventRecordQPS > 0. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may impact scalability by changing the amount of traffic produced by event creations. Default: 10",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"enableDebuggingHandlers": {
-						SchemaProps: spec.SchemaProps{
-							Description: "enableDebuggingHandlers enables server endpoints for log access and local running of containers and commands, including the exec, attach, logs, and portforward features. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that disabling it may disrupt components that interact with the Kubelet server. Default: true",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"enableContentionProfiling": {
-						SchemaProps: spec.SchemaProps{
-							Description: "enableContentionProfiling enables lock contention profiling, if enableDebuggingHandlers is true. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that enabling it may carry a performance impact. Default: false",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"healthzPort": {
-						SchemaProps: spec.SchemaProps{
-							Description: "healthzPort is the port of the localhost healthz endpoint (set to 0 to disable) Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt components that monitor Kubelet health. Default: 10248",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"healthzBindAddress": {
-						SchemaProps: spec.SchemaProps{
-							Description: "healthzBindAddress is the IP address for the healthz server to serve on Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt components that monitor Kubelet health. Default: \"127.0.0.1\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"oomScoreAdj": {
-						SchemaProps: spec.SchemaProps{
-							Description: "oomScoreAdj is The oom-score-adj value for kubelet process. Values must be within the range [-1000, 1000]. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may impact the stability of nodes under memory pressure. Default: -999",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"clusterDomain": {
-						SchemaProps: spec.SchemaProps{
-							Description: "clusterDomain is the DNS domain for this cluster. If set, kubelet will configure all containers to search this domain in addition to the host's search domains. Dynamic Kubelet Config (beta): Dynamically updating this field is not recommended, as it should be kept in sync with the rest of the cluster. Default: \"\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"clusterDNS": {
-						SchemaProps: spec.SchemaProps{
-							Description: "clusterDNS is a list of IP addresses for the cluster DNS server. If set, kubelet will configure all containers to use this for DNS resolution instead of the host's DNS servers. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that changes will only take effect on Pods created after the update. Draining the node is recommended before changing this field. Default: nil",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"streamingConnectionIdleTimeout": {
-						SchemaProps: spec.SchemaProps{
-							Description: "streamingConnectionIdleTimeout is the maximum time a streaming connection can be idle before the connection is automatically closed. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may impact components that rely on infrequent updates over streaming connections to the Kubelet server. Default: \"4h\"",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"nodeStatusUpdateFrequency": {
-						SchemaProps: spec.SchemaProps{
-							Description: "nodeStatusUpdateFrequency is the frequency that kubelet computes node status. If node lease feature is not enabled, it is also the frequency that kubelet posts node status to master. Note: When node lease feature is not enabled, be cautious when changing the constant, it must work with nodeMonitorGracePeriod in nodecontroller. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may impact node scalability, and also that the node controller's nodeMonitorGracePeriod must be set to N*NodeStatusUpdateFrequency, where N is the number of retries before the node controller marks the node unhealthy. Default: \"10s\"",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"nodeStatusReportFrequency": {
-						SchemaProps: spec.SchemaProps{
-							Description: "nodeStatusReportFrequency is the frequency that kubelet posts node status to master if node status does not change. Kubelet will ignore this frequency and post node status immediately if any change is detected. It is only used when node lease feature is enabled. nodeStatusReportFrequency's default value is 1m. But if nodeStatusUpdateFrequency is set explicitly, nodeStatusReportFrequency's default value will be set to nodeStatusUpdateFrequency for backward compatibility. Default: \"1m\"",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"nodeLeaseDurationSeconds": {
-						SchemaProps: spec.SchemaProps{
-							Description: "nodeLeaseDurationSeconds is the duration the Kubelet will set on its corresponding Lease, when the NodeLease feature is enabled. This feature provides an indicator of node health by having the Kubelet create and periodically renew a lease, named after the node, in the kube-node-lease namespace. If the lease expires, the node can be considered unhealthy. The lease is currently renewed every 10s, per KEP-0009. In the future, the lease renewal interval may be set based on the lease duration. Requires the NodeLease feature gate to be enabled. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that decreasing the duration may reduce tolerance for issues that temporarily prevent the Kubelet from renewing the lease (e.g. a short-lived network issue). Default: 40",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"imageMinimumGCAge": {
-						SchemaProps: spec.SchemaProps{
-							Description: "imageMinimumGCAge is the minimum age for an unused image before it is garbage collected. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may trigger or delay garbage collection, and may change the image overhead on the node. Default: \"2m\"",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"imageGCHighThresholdPercent": {
-						SchemaProps: spec.SchemaProps{
-							Description: "imageGCHighThresholdPercent is the percent of disk usage after which image garbage collection is always run. The percent is calculated as this field value out of 100. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may trigger or delay garbage collection, and may change the image overhead on the node. Default: 85",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"imageGCLowThresholdPercent": {
-						SchemaProps: spec.SchemaProps{
-							Description: "imageGCLowThresholdPercent is the percent of disk usage before which image garbage collection is never run. Lowest disk usage to garbage collect to. The percent is calculated as this field value out of 100. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may trigger or delay garbage collection, and may change the image overhead on the node. Default: 80",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"volumeStatsAggPeriod": {
-						SchemaProps: spec.SchemaProps{
-							Description: "How frequently to calculate and cache volume disk usage for all pods Dynamic Kubelet Config (beta): If dynamically updating this field, consider that shortening the period may carry a performance impact. Default: \"1m\"",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"kubeletCgroups": {
-						SchemaProps: spec.SchemaProps{
-							Description: "kubeletCgroups is the absolute name of cgroups to isolate the kubelet in Dynamic Kubelet Config (beta): This field should not be updated without a full node reboot. It is safest to keep this value the same as the local config. Default: \"\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"systemCgroups": {
-						SchemaProps: spec.SchemaProps{
-							Description: "systemCgroups is absolute name of cgroups in which to place all non-kernel processes that are not already in a container. Empty for no container. Rolling back the flag requires a reboot. Dynamic Kubelet Config (beta): This field should not be updated without a full node reboot. It is safest to keep this value the same as the local config. Default: \"\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"cgroupRoot": {
-						SchemaProps: spec.SchemaProps{
-							Description: "cgroupRoot is the root cgroup to use for pods. This is handled by the container runtime on a best effort basis. Dynamic Kubelet Config (beta): This field should not be updated without a full node reboot. It is safest to keep this value the same as the local config. Default: \"\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"cgroupsPerQOS": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Enable QoS based Cgroup hierarchy: top level cgroups for QoS Classes And all Burstable and BestEffort pods are brought up under their specific top level QoS cgroup. Dynamic Kubelet Config (beta): This field should not be updated without a full node reboot. It is safest to keep this value the same as the local config. Default: true",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"cgroupDriver": {
-						SchemaProps: spec.SchemaProps{
-							Description: "driver that the kubelet uses to manipulate cgroups on the host (cgroupfs or systemd) Dynamic Kubelet Config (beta): This field should not be updated without a full node reboot. It is safest to keep this value the same as the local config. Default: \"cgroupfs\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"cpuManagerPolicy": {
-						SchemaProps: spec.SchemaProps{
-							Description: "CPUManagerPolicy is the name of the policy to use. Requires the CPUManager feature gate to be enabled. Dynamic Kubelet Config (beta): This field should not be updated without a full node reboot. It is safest to keep this value the same as the local config. Default: \"none\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"cpuManagerReconcilePeriod": {
-						SchemaProps: spec.SchemaProps{
-							Description: "CPU Manager reconciliation period. Requires the CPUManager feature gate to be enabled. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that shortening the period may carry a performance impact. Default: \"10s\"",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"topologyManagerPolicy": {
-						SchemaProps: spec.SchemaProps{
-							Description: "TopologyManagerPolicy is the name of the policy to use. Policies other than \"none\" require the TopologyManager feature gate to be enabled. Dynamic Kubelet Config (beta): This field should not be updated without a full node reboot. It is safest to keep this value the same as the local config. Default: \"none\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"qosReserved": {
-						SchemaProps: spec.SchemaProps{
-							Description: "qosReserved is a set of resource name to percentage pairs that specify the minimum percentage of a resource reserved for exclusive use by the guaranteed QoS tier. Currently supported resources: \"memory\" Requires the QOSReserved feature gate to be enabled. Dynamic Kubelet Config (beta): This field should not be updated without a full node reboot. It is safest to keep this value the same as the local config. Default: nil",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"runtimeRequestTimeout": {
-						SchemaProps: spec.SchemaProps{
-							Description: "runtimeRequestTimeout is the timeout for all runtime requests except long running requests - pull, logs, exec and attach. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may disrupt components that interact with the Kubelet server. Default: \"2m\"",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"hairpinMode": {
-						SchemaProps: spec.SchemaProps{
-							Description: "hairpinMode specifies how the Kubelet should configure the container bridge for hairpin packets. Setting this flag allows endpoints in a Service to loadbalance back to themselves if they should try to access their own Service. Values:\n  \"promiscuous-bridge\": make the container bridge promiscuous.\n  \"hairpin-veth\":       set the hairpin flag on container veth interfaces.\n  \"none\":               do nothing.\nGenerally, one must set --hairpin-mode=hairpin-veth to achieve hairpin NAT, because promiscuous-bridge assumes the existence of a container bridge named cbr0. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may require a node reboot, depending on the network plugin. Default: \"promiscuous-bridge\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"maxPods": {
-						SchemaProps: spec.SchemaProps{
-							Description: "maxPods is the number of pods that can run on this Kubelet. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that changes may cause Pods to fail admission on Kubelet restart, and may change the value reported in Node.Status.Capacity[v1.ResourcePods], thus affecting future scheduling decisions. Increasing this value may also decrease performance, as more Pods can be packed into a single node. Default: 110",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"podCIDR": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The CIDR to use for pod IP addresses, only used in standalone mode. In cluster mode, this is obtained from the master. Dynamic Kubelet Config (beta): This field should always be set to the empty default. It should only set for standalone Kubelets, which cannot use Dynamic Kubelet Config. Default: \"\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"podPidsLimit": {
-						SchemaProps: spec.SchemaProps{
-							Description: "PodPidsLimit is the maximum number of pids in any pod. Requires the SupportPodPidsLimit feature gate to be enabled. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that lowering it may prevent container processes from forking after the change. Default: -1",
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
-					"resolvConf": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ResolverConfig is the resolver configuration file used as the basis for the container DNS resolution configuration. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that changes will only take effect on Pods created after the update. Draining the node is recommended before changing this field. Default: \"/etc/resolv.conf\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"cpuCFSQuota": {
-						SchemaProps: spec.SchemaProps{
-							Description: "cpuCFSQuota enables CPU CFS quota enforcement for containers that specify CPU limits. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that disabling it may reduce node stability. Default: true",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"cpuCFSQuotaPeriod": {
-						SchemaProps: spec.SchemaProps{
-							Description: "CPUCFSQuotaPeriod is the CPU CFS quota period value, cpu.cfs_period_us. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that limits set for containers will result in different cpu.cfs_quota settings. This will trigger container restarts on the node being reconfigured. Default: \"100ms\"",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"maxOpenFiles": {
-						SchemaProps: spec.SchemaProps{
-							Description: "maxOpenFiles is Number of files that can be opened by Kubelet process. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may impact the ability of the Kubelet to interact with the node's filesystem. Default: 1000000",
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
-					"contentType": {
-						SchemaProps: spec.SchemaProps{
-							Description: "contentType is contentType of requests sent to apiserver. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may impact the ability for the Kubelet to communicate with the API server. If the Kubelet loses contact with the API server due to a change to this field, the change cannot be reverted via dynamic Kubelet config. Default: \"application/vnd.kubernetes.protobuf\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"kubeAPIQPS": {
-						SchemaProps: spec.SchemaProps{
-							Description: "kubeAPIQPS is the QPS to use while talking with kubernetes apiserver Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may impact scalability by changing the amount of traffic the Kubelet sends to the API server. Default: 5",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"kubeAPIBurst": {
-						SchemaProps: spec.SchemaProps{
-							Description: "kubeAPIBurst is the burst to allow while talking with kubernetes apiserver Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may impact scalability by changing the amount of traffic the Kubelet sends to the API server. Default: 10",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"serializeImagePulls": {
-						SchemaProps: spec.SchemaProps{
-							Description: "serializeImagePulls when enabled, tells the Kubelet to pull images one at a time. We recommend *not* changing the default value on nodes that run docker daemon with version  < 1.9 or an Aufs storage backend. Issue #10959 has more details. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may impact the performance of image pulls. Default: true",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"evictionHard": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Map of signal names to quantities that defines hard eviction thresholds. For example: {\"memory.available\": \"300Mi\"}. To explicitly disable, pass a 0% or 100% threshold on an arbitrary resource. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may trigger or delay Pod evictions. Default:\n  memory.available:  \"100Mi\"\n  nodefs.available:  \"10%\"\n  nodefs.inodesFree: \"5%\"\n  imagefs.available: \"15%\"",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"evictionSoft": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Map of signal names to quantities that defines soft eviction thresholds. For example: {\"memory.available\": \"300Mi\"}. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may trigger or delay Pod evictions, and may change the allocatable reported by the node. Default: nil",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"evictionSoftGracePeriod": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Map of signal names to quantities that defines grace periods for each soft eviction signal. For example: {\"memory.available\": \"30s\"}. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may trigger or delay Pod evictions. Default: nil",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"evictionPressureTransitionPeriod": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Duration for which the kubelet has to wait before transitioning out of an eviction pressure condition. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that lowering it may decrease the stability of the node when the node is overcommitted. Default: \"5m\"",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"evictionMaxPodGracePeriod": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Maximum allowed grace period (in seconds) to use when terminating pods in response to a soft eviction threshold being met. This value effectively caps the Pod's TerminationGracePeriodSeconds value during soft evictions. Note: Due to issue #64530, the behavior has a bug where this value currently just overrides the grace period during soft eviction, which can increase the grace period from what is set on the Pod. This bug will be fixed in a future release. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that lowering it decreases the amount of time Pods will have to gracefully clean up before being killed during a soft eviction. Default: 0",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"evictionMinimumReclaim": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Map of signal names to quantities that defines minimum reclaims, which describe the minimum amount of a given resource the kubelet will reclaim when performing a pod eviction while that resource is under pressure. For example: {\"imagefs.available\": \"2Gi\"} Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may change how well eviction can manage resource pressure. Default: nil",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"podsPerCore": {
-						SchemaProps: spec.SchemaProps{
-							Description: "podsPerCore is the maximum number of pods per core. Cannot exceed MaxPods. If 0, this field is ignored. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that changes may cause Pods to fail admission on Kubelet restart, and may change the value reported in Node.Status.Capacity[v1.ResourcePods], thus affecting future scheduling decisions. Increasing this value may also decrease performance, as more Pods can be packed into a single node. Default: 0",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"enableControllerAttachDetach": {
-						SchemaProps: spec.SchemaProps{
-							Description: "enableControllerAttachDetach enables the Attach/Detach controller to manage attachment/detachment of volumes scheduled to this node, and disables kubelet from executing any attach/detach operations Dynamic Kubelet Config (beta): If dynamically updating this field, consider that changing which component is responsible for volume management on a live node may result in volumes refusing to detach if the node is not drained prior to the update, and if Pods are scheduled to the node before the volumes.kubernetes.io/controller-managed-attach-detach annotation is updated by the Kubelet. In general, it is safest to leave this value set the same as local config. Default: true",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"protectKernelDefaults": {
-						SchemaProps: spec.SchemaProps{
-							Description: "protectKernelDefaults, if true, causes the Kubelet to error if kernel flags are not as it expects. Otherwise the Kubelet will attempt to modify kernel flags to match its expectation. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that enabling it may cause the Kubelet to crash-loop if the Kernel is not configured as Kubelet expects. Default: false",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"makeIPTablesUtilChains": {
-						SchemaProps: spec.SchemaProps{
-							Description: "If true, Kubelet ensures a set of iptables rules are present on host. These rules will serve as utility rules for various components, e.g. KubeProxy. The rules will be created based on IPTablesMasqueradeBit and IPTablesDropBit. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that disabling it will prevent the Kubelet from healing locally misconfigured iptables rules. Default: true",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"iptablesMasqueradeBit": {
-						SchemaProps: spec.SchemaProps{
-							Description: "iptablesMasqueradeBit is the bit of the iptables fwmark space to mark for SNAT Values must be within the range [0, 31]. Must be different from other mark bits. Warning: Please match the value of the corresponding parameter in kube-proxy. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it needs to be coordinated with other components, like kube-proxy, and the update will only be effective if MakeIPTablesUtilChains is enabled. Default: 14",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"iptablesDropBit": {
-						SchemaProps: spec.SchemaProps{
-							Description: "iptablesDropBit is the bit of the iptables fwmark space to mark for dropping packets. Values must be within the range [0, 31]. Must be different from other mark bits. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it needs to be coordinated with other components, like kube-proxy, and the update will only be effective if MakeIPTablesUtilChains is enabled. Default: 15",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"featureGates": {
-						SchemaProps: spec.SchemaProps{
-							Description: "featureGates is a map of feature names to bools that enable or disable alpha/experimental features. This field modifies piecemeal the built-in default values from \"k8s.io/kubernetes/pkg/features/kube_features.go\". Dynamic Kubelet Config (beta): If dynamically updating this field, consider the documentation for the features you are enabling or disabling. While we encourage feature developers to make it possible to dynamically enable and disable features, some changes may require node reboots, and some features may require careful coordination to retroactively disable. Default: nil",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"boolean"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"failSwapOn": {
-						SchemaProps: spec.SchemaProps{
-							Description: "failSwapOn tells the Kubelet to fail to start if swap is enabled on the node. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that setting it to true will cause the Kubelet to crash-loop if swap is enabled. Default: true",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"containerLogMaxSize": {
-						SchemaProps: spec.SchemaProps{
-							Description: "A quantity defines the maximum size of the container log file before it is rotated. For example: \"5Mi\" or \"256Ki\". Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may trigger log rotation. Default: \"10Mi\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"containerLogMaxFiles": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Maximum number of container log files that can be present for a container. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that lowering it may cause log files to be deleted. Default: 5",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"configMapAndSecretChangeDetectionStrategy": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ConfigMapAndSecretChangeDetectionStrategy is a mode in which config map and secret managers are running. Default: \"Watch\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"systemReserved": {
-						SchemaProps: spec.SchemaProps{
-							Description: "systemReserved is a set of ResourceName=ResourceQuantity (e.g. cpu=200m,memory=150G) pairs that describe resources reserved for non-kubernetes components. Currently only cpu and memory are supported. See http://kubernetes.io/docs/user-guide/compute-resources for more detail. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may not be possible to increase the reserved resources, because this requires resizing cgroups. Always look for a NodeAllocatableEnforced event after updating this field to ensure that the update was successful. Default: nil",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"kubeReserved": {
-						SchemaProps: spec.SchemaProps{
-							Description: "A set of ResourceName=ResourceQuantity (e.g. cpu=200m,memory=150G) pairs that describe resources reserved for kubernetes system components. Currently cpu, memory and local storage for root file system are supported. See http://kubernetes.io/docs/user-guide/compute-resources for more detail. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that it may not be possible to increase the reserved resources, because this requires resizing cgroups. Always look for a NodeAllocatableEnforced event after updating this field to ensure that the update was successful. Default: nil",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"systemReservedCgroup": {
-						SchemaProps: spec.SchemaProps{
-							Description: "This flag helps kubelet identify absolute name of top level cgroup used to enforce `SystemReserved` compute resource reservation for OS system daemons. Refer to [Node Allocatable](https://git.k8s.io/community/contributors/design-proposals/node/node-allocatable.md) doc for more information. Dynamic Kubelet Config (beta): This field should not be updated without a full node reboot. It is safest to keep this value the same as the local config. Default: \"\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"kubeReservedCgroup": {
-						SchemaProps: spec.SchemaProps{
-							Description: "This flag helps kubelet identify absolute name of top level cgroup used to enforce `KubeReserved` compute resource reservation for Kubernetes node system daemons. Refer to [Node Allocatable](https://git.k8s.io/community/contributors/design-proposals/node/node-allocatable.md) doc for more information. Dynamic Kubelet Config (beta): This field should not be updated without a full node reboot. It is safest to keep this value the same as the local config. Default: \"\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"enforceNodeAllocatable": {
-						SchemaProps: spec.SchemaProps{
-							Description: "This flag specifies the various Node Allocatable enforcements that Kubelet needs to perform. This flag accepts a list of options. Acceptable options are `none`, `pods`, `system-reserved` & `kube-reserved`. If `none` is specified, no other options may be specified. Refer to [Node Allocatable](https://git.k8s.io/community/contributors/design-proposals/node/node-allocatable.md) doc for more information. Dynamic Kubelet Config (beta): If dynamically updating this field, consider that removing enforcements may reduce the stability of the node. Alternatively, adding enforcements may reduce the stability of components which were using more than the reserved amount of resources; for example, enforcing kube-reserved may cause Kubelets to OOM if it uses more than the reserved resources, and enforcing system-reserved may cause system daemons to OOM if they use more than the reserved resources. Default: [\"pods\"]",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"allowedUnsafeSysctls": {
-						SchemaProps: spec.SchemaProps{
-							Description: "A comma separated whitelist of unsafe sysctls or sysctl patterns (ending in *). Unsafe sysctl groups are kernel.shm*, kernel.msg*, kernel.sem, fs.mqueue.*, and net.*. These sysctls are namespaced but not allowed by default.  For example: \"kernel.msg*,net.ipv4.route.min_pmtu\" Default: []",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration", "k8s.io/kubelet/config/v1beta1.KubeletAuthentication", "k8s.io/kubelet/config/v1beta1.KubeletAuthorization"},
-	}
-}
-
-func schema_k8sio_kubelet_config_v1beta1_KubeletWebhookAuthentication(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"enabled": {
-						SchemaProps: spec.SchemaProps{
-							Description: "enabled allows bearer token authentication backed by the tokenreviews.authentication.k8s.io API",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"cacheTTL": {
-						SchemaProps: spec.SchemaProps{
-							Description: "cacheTTL enables caching of authentication results",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
-	}
-}
-
-func schema_k8sio_kubelet_config_v1beta1_KubeletWebhookAuthorization(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"cacheAuthorizedTTL": {
-						SchemaProps: spec.SchemaProps{
-							Description: "cacheAuthorizedTTL is the duration to cache 'authorized' responses from the webhook authorizer.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"cacheUnauthorizedTTL": {
-						SchemaProps: spec.SchemaProps{
-							Description: "cacheUnauthorizedTTL is the duration to cache 'unauthorized' responses from the webhook authorizer.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
-	}
-}
-
-func schema_k8sio_kubelet_config_v1beta1_KubeletX509Authentication(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"clientCAFile": {
-						SchemaProps: spec.SchemaProps{
-							Description: "clientCAFile is the path to a PEM-encoded certificate bundle. If set, any request presenting a client certificate signed by one of the authorities in the bundle is authenticated with a username corresponding to the CommonName, and groups corresponding to the Organization in the client certificate.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func schema_k8sio_kubelet_config_v1beta1_SerializedNodeConfigSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "SerializedNodeConfigSource allows us to serialize v1.NodeConfigSource. This type is used internally by the Kubelet for tracking checkpointed dynamic configs. It exists in the kubeletconfig API group because it is classified as a versioned input to the Kubelet.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"source": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Source is the source that we are serializing",
-							Ref:         ref("k8s.io/api/core/v1.NodeConfigSource"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/api/core/v1.NodeConfigSource"},
-	}
-}
-
 func schema_app_apis_config_v1alpha1_CloudControllerManagerConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -73015,1532 +70718,5 @@ func schema_app_apis_config_v1alpha1_CloudControllerManagerConfiguration(ref com
 		},
 		Dependencies: []string{
 			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration", "k8s.io/kube-controller-manager/config/v1alpha1.GenericControllerManagerConfiguration", "k8s.io/kube-controller-manager/config/v1alpha1.KubeCloudSharedConfiguration", "k8s.io/kube-controller-manager/config/v1alpha1.ServiceControllerConfiguration"},
-	}
-}
-
-func schema_pkg_apis_abac_v1beta1_Policy(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "Policy contains a single ABAC policy rule",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec describes the policy rule",
-							Ref:         ref("k8s.io/kubernetes/pkg/apis/abac/v1beta1.PolicySpec"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/kubernetes/pkg/apis/abac/v1beta1.PolicySpec"},
-	}
-}
-
-func schema_pkg_apis_abac_v1beta1_PolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "PolicySpec contains the attributes for a policy rule",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"user": {
-						SchemaProps: spec.SchemaProps{
-							Description: "User is the username this rule applies to. Either user or group is required to match the request. \"*\" matches all users.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"group": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Group is the group this rule applies to. Either user or group is required to match the request. \"*\" matches all groups.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"readonly": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Readonly matches readonly requests when true, and all requests when false",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"apiGroup": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIGroup is the name of an API group. APIGroup, Resource, and Namespace are required to match resource requests. \"*\" matches all API groups",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"resource": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Resource is the name of a resource. APIGroup, Resource, and Namespace are required to match resource requests. \"*\" matches all resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"namespace": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Namespace is the name of a namespace. APIGroup, Resource, and Namespace are required to match resource requests. \"*\" matches all namespaces (including unnamespaced requests)",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"nonResourcePath": {
-						SchemaProps: spec.SchemaProps{
-							Description: "NonResourcePath matches non-resource request paths. \"*\" matches all paths \"/foo/*\" matches all subpaths of foo",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func schema_pkg_apis_custom_metrics_v1beta1_MetricListOptions(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "MetricListOptions is used to select metrics by their label selectors",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"labelSelector": {
-						SchemaProps: spec.SchemaProps{
-							Description: "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metricLabelSelector": {
-						SchemaProps: spec.SchemaProps{
-							Description: "A selector to restrict the list of returned metrics by their labels",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func schema_pkg_apis_custom_metrics_v1beta1_MetricValue(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "MetricValue is a metric value for some object",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"describedObject": {
-						SchemaProps: spec.SchemaProps{
-							Description: "a reference to the described object",
-							Ref:         ref("k8s.io/api/core/v1.ObjectReference"),
-						},
-					},
-					"metricName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "the name of the metric",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"timestamp": {
-						SchemaProps: spec.SchemaProps{
-							Description: "indicates the time at which the metrics were produced",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-					"window": {
-						SchemaProps: spec.SchemaProps{
-							Description: "indicates the window ([Timestamp-Window, Timestamp]) from which these metrics were calculated, when returning rate metrics calculated from cumulative metrics (or zero for non-calculated instantaneous metrics).",
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
-					"value": {
-						SchemaProps: spec.SchemaProps{
-							Description: "the value of the metric for this",
-							Ref:         ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-						},
-					},
-					"selector": {
-						SchemaProps: spec.SchemaProps{
-							Description: "selector represents the label selector that could be used to select this metric, and will generally just be the selector passed in to the query used to fetch this metric. When left blank, only the metric's Name will be used to gather metrics.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
-						},
-					},
-				},
-				Required: []string{"describedObject", "metricName", "timestamp", "value"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/api/core/v1.ObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
-	}
-}
-
-func schema_pkg_apis_custom_metrics_v1beta1_MetricValueList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "MetricValueList is a list of values for a given metric for some set of objects",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Description: "the value of the metric across the described objects",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/metrics/pkg/apis/custom_metrics/v1beta1.MetricValue"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/metrics/pkg/apis/custom_metrics/v1beta1.MetricValue"},
-	}
-}
-
-func schema_pkg_apis_custom_metrics_v1beta2_MetricIdentifier(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "MetricIdentifier identifies a metric by name and, optionally, selector",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "name is the name of the given metric",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"selector": {
-						SchemaProps: spec.SchemaProps{
-							Description: "selector represents the label selector that could be used to select this metric, and will generally just be the selector passed in to the query used to fetch this metric. When left blank, only the metric's Name will be used to gather metrics.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
-						},
-					},
-				},
-				Required: []string{"name"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
-	}
-}
-
-func schema_pkg_apis_custom_metrics_v1beta2_MetricListOptions(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "MetricListOptions is used to select metrics by their label selectors",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"labelSelector": {
-						SchemaProps: spec.SchemaProps{
-							Description: "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metricLabelSelector": {
-						SchemaProps: spec.SchemaProps{
-							Description: "A selector to restrict the list of returned metrics by their labels",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func schema_pkg_apis_custom_metrics_v1beta2_MetricValue(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "MetricValue is the metric value for some object",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"describedObject": {
-						SchemaProps: spec.SchemaProps{
-							Description: "a reference to the described object",
-							Ref:         ref("k8s.io/api/core/v1.ObjectReference"),
-						},
-					},
-					"metric": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/metrics/pkg/apis/custom_metrics/v1beta2.MetricIdentifier"),
-						},
-					},
-					"timestamp": {
-						SchemaProps: spec.SchemaProps{
-							Description: "indicates the time at which the metrics were produced",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-					"windowSeconds": {
-						SchemaProps: spec.SchemaProps{
-							Description: "indicates the window ([Timestamp-Window, Timestamp]) from which these metrics were calculated, when returning rate metrics calculated from cumulative metrics (or zero for non-calculated instantaneous metrics).",
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
-					"value": {
-						SchemaProps: spec.SchemaProps{
-							Description: "the value of the metric for this",
-							Ref:         ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-						},
-					},
-				},
-				Required: []string{"describedObject", "metric", "timestamp", "value"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/api/core/v1.ObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity", "k8s.io/apimachinery/pkg/apis/meta/v1.Time", "k8s.io/metrics/pkg/apis/custom_metrics/v1beta2.MetricIdentifier"},
-	}
-}
-
-func schema_pkg_apis_custom_metrics_v1beta2_MetricValueList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "MetricValueList is a list of values for a given metric for some set of objects",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Description: "the value of the metric across the described objects",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/metrics/pkg/apis/custom_metrics/v1beta2.MetricValue"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/metrics/pkg/apis/custom_metrics/v1beta2.MetricValue"},
-	}
-}
-
-func schema_pkg_apis_external_metrics_v1beta1_ExternalMetricValue(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ExternalMetricValue is a metric value for external metric A single metric value is identified by metric name and a set of string labels. For one metric there can be multiple values with different sets of labels.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metricName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "the name of the metric",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metricLabels": {
-						SchemaProps: spec.SchemaProps{
-							Description: "a set of labels that identify a single time series for the metric",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"timestamp": {
-						SchemaProps: spec.SchemaProps{
-							Description: "indicates the time at which the metrics were produced",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-					"window": {
-						SchemaProps: spec.SchemaProps{
-							Description: "indicates the window ([Timestamp-Window, Timestamp]) from which these metrics were calculated, when returning rate metrics calculated from cumulative metrics (or zero for non-calculated instantaneous metrics).",
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
-					"value": {
-						SchemaProps: spec.SchemaProps{
-							Description: "the value of the metric",
-							Ref:         ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-						},
-					},
-				},
-				Required: []string{"metricName", "metricLabels", "timestamp", "value"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/api/resource.Quantity", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
-	}
-}
-
-func schema_pkg_apis_external_metrics_v1beta1_ExternalMetricValueList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ExternalMetricValueList is a list of values for a given metric for some set labels",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Description: "value of the metric matching a given set of labels",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/metrics/pkg/apis/external_metrics/v1beta1.ExternalMetricValue"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/metrics/pkg/apis/external_metrics/v1beta1.ExternalMetricValue"},
-	}
-}
-
-func schema_pkg_apis_metrics_v1alpha1_ContainerMetrics(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ContainerMetrics sets resource usage metrics of a container.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Container name corresponding to the one from pod.spec.containers.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"usage": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The memory usage is the memory working set.",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"name", "usage"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/api/resource.Quantity"},
-	}
-}
-
-func schema_pkg_apis_metrics_v1alpha1_NodeMetrics(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "NodeMetrics sets resource usage metrics of a node.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"timestamp": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The following fields define time interval from which metrics were collected from the interval [Timestamp-Window, Timestamp].",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-					"window": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"usage": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The memory usage is the memory working set.",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"timestamp", "window", "usage"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/api/resource.Quantity", "k8s.io/apimachinery/pkg/apis/meta/v1.Duration", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
-	}
-}
-
-func schema_pkg_apis_metrics_v1alpha1_NodeMetricsList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "NodeMetricsList is a list of NodeMetrics.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Description: "List of node metrics.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/metrics/pkg/apis/metrics/v1alpha1.NodeMetrics"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/metrics/pkg/apis/metrics/v1alpha1.NodeMetrics"},
-	}
-}
-
-func schema_pkg_apis_metrics_v1alpha1_PodMetrics(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "PodMetrics sets resource usage metrics of a pod.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"timestamp": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The following fields define time interval from which metrics were collected from the interval [Timestamp-Window, Timestamp].",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-					"window": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"containers": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Metrics for all containers are collected within the same time window.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/metrics/pkg/apis/metrics/v1alpha1.ContainerMetrics"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"timestamp", "window", "containers"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/apimachinery/pkg/apis/meta/v1.Time", "k8s.io/metrics/pkg/apis/metrics/v1alpha1.ContainerMetrics"},
-	}
-}
-
-func schema_pkg_apis_metrics_v1alpha1_PodMetricsList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "PodMetricsList is a list of PodMetrics.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Description: "List of pod metrics.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/metrics/pkg/apis/metrics/v1alpha1.PodMetrics"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/metrics/pkg/apis/metrics/v1alpha1.PodMetrics"},
-	}
-}
-
-func schema_pkg_apis_metrics_v1beta1_ContainerMetrics(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ContainerMetrics sets resource usage metrics of a container.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Container name corresponding to the one from pod.spec.containers.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"usage": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The memory usage is the memory working set.",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"name", "usage"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/api/resource.Quantity"},
-	}
-}
-
-func schema_pkg_apis_metrics_v1beta1_NodeMetrics(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "NodeMetrics sets resource usage metrics of a node.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"timestamp": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The following fields define time interval from which metrics were collected from the interval [Timestamp-Window, Timestamp].",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-					"window": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"usage": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The memory usage is the memory working set.",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"timestamp", "window", "usage"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/api/resource.Quantity", "k8s.io/apimachinery/pkg/apis/meta/v1.Duration", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
-	}
-}
-
-func schema_pkg_apis_metrics_v1beta1_NodeMetricsList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "NodeMetricsList is a list of NodeMetrics.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Description: "List of node metrics.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/metrics/pkg/apis/metrics/v1beta1.NodeMetrics"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/metrics/pkg/apis/metrics/v1beta1.NodeMetrics"},
-	}
-}
-
-func schema_pkg_apis_metrics_v1beta1_PodMetrics(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "PodMetrics sets resource usage metrics of a pod.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"timestamp": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The following fields define time interval from which metrics were collected from the interval [Timestamp-Window, Timestamp].",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-					"window": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-						},
-					},
-					"containers": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Metrics for all containers are collected within the same time window.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/metrics/pkg/apis/metrics/v1beta1.ContainerMetrics"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"timestamp", "window", "containers"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/apimachinery/pkg/apis/meta/v1.Time", "k8s.io/metrics/pkg/apis/metrics/v1beta1.ContainerMetrics"},
-	}
-}
-
-func schema_pkg_apis_metrics_v1beta1_PodMetricsList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "PodMetricsList is a list of PodMetrics.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Description: "List of pod metrics.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/metrics/pkg/apis/metrics/v1beta1.PodMetrics"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/metrics/pkg/apis/metrics/v1beta1.PodMetrics"},
-	}
-}
-
-func schema_pkg_apis_node_v1alpha1_RuntimeClass(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to select or configure the container runtime that is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Specification of the RuntimeClass More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
-							Ref:         ref("k8s.io/node-api/pkg/apis/node/v1alpha1.RuntimeClassSpec"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/node-api/pkg/apis/node/v1alpha1.RuntimeClassSpec"},
-	}
-}
-
-func schema_pkg_apis_node_v1alpha1_RuntimeClassList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "RuntimeClassList is a list of RuntimeClass objects.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Items is a list of schema objects.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/node-api/pkg/apis/node/v1alpha1.RuntimeClass"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/node-api/pkg/apis/node/v1alpha1.RuntimeClass"},
-	}
-}
-
-func schema_pkg_apis_node_v1alpha1_RuntimeClassSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "RuntimeClassSpec is a specification of a RuntimeClass. It contains parameters that required to describe the RuntimeClass to the Container Runtime Interface (CRI) implementation, as well as any other components that need to understand how the pod will be run. The RuntimeClassSpec should be treated as immutable.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"runtimeHandler": {
-						SchemaProps: spec.SchemaProps{
-							Description: "RuntimeHandler specifies the underlying runtime and configuration that the CRI implementation will use to handle pods of this class. The possible values are specific to the node configuration & CRI implementation.  It is assumed that all handlers are available on every node, and handlers of the same name are equivalent on every node. For example, a handler called \"runc\" might specify that the runc OCI runtime (using native Linux containers) should be used to run the containers in a pod. If this is not specified (or empty), a default will be chosen by the implementation.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func schema_pkg_apis_wardle_v1alpha1_Fischer(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"disallowedFlunders": {
-						SchemaProps: spec.SchemaProps{
-							Description: "DisallowedFlunders holds a list of Flunder.Names that are disallowed.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_pkg_apis_wardle_v1alpha1_FischerList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "FischerList is a list of Fischer objects.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.Fischer"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.Fischer"},
-	}
-}
-
-func schema_pkg_apis_wardle_v1alpha1_Flunder(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.FlunderSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.FlunderStatus"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.FlunderSpec", "k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.FlunderStatus"},
-	}
-}
-
-func schema_pkg_apis_wardle_v1alpha1_FlunderList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "FlunderList is a list of Flunder objects.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.Flunder"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.Flunder"},
-	}
-}
-
-func schema_pkg_apis_wardle_v1alpha1_FlunderSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"reference": {
-						SchemaProps: spec.SchemaProps{
-							Description: "A name of another flunder or fischer, depending on the reference type.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"referenceType": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The reference type, defaults to \"Flunder\" if reference is set.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func schema_pkg_apis_wardle_v1alpha1_FlunderStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-			},
-		},
-	}
-}
-
-func schema_pkg_apis_wardle_v1beta1_Flunder(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "Flunder is an example type with a spec and a status.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/sample-apiserver/pkg/apis/wardle/v1beta1.FlunderSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/sample-apiserver/pkg/apis/wardle/v1beta1.FlunderStatus"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/sample-apiserver/pkg/apis/wardle/v1beta1.FlunderSpec", "k8s.io/sample-apiserver/pkg/apis/wardle/v1beta1.FlunderStatus"},
-	}
-}
-
-func schema_pkg_apis_wardle_v1beta1_FlunderList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "FlunderList is a list of Flunder objects.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/sample-apiserver/pkg/apis/wardle/v1beta1.Flunder"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/sample-apiserver/pkg/apis/wardle/v1beta1.Flunder"},
-	}
-}
-
-func schema_pkg_apis_wardle_v1beta1_FlunderSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "FlunderSpec is the specification of a Flunder.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"flunderReference": {
-						SchemaProps: spec.SchemaProps{
-							Description: "A name of another flunder, mutually exclusive to the FischerReference.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"fischerReference": {
-						SchemaProps: spec.SchemaProps{
-							Description: "A name of a fischer, mutually exclusive to the FlunderReference.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"referenceType": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The reference type.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func schema_pkg_apis_wardle_v1beta1_FlunderStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "FlunderStatus is the status of a Flunder.",
-				Type:        []string{"object"},
-			},
-		},
 	}
 }
