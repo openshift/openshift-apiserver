@@ -1,8 +1,8 @@
-hash: e18e74da1b68e9b371d48dae285e0a738171ae0c126f550d69688587fcbcd1e2
-updated: 2019-08-08T14:50:46.822488+02:00
+hash: f28da7cfa9beb7c0d705aa5319b4b586ce20db6e5d53d7d920a731d80424eb99
+updated: 2019-10-17T11:05:23.38319+02:00
 imports:
 - name: bitbucket.org/ww/goautoneg
-  version: 2ae31c8b6b30d2f4c8100c20d527b571e9c433bb
+  version: a7dc8b61c822528f973a5e4e7b272055c6fdb43e
   repo: https://github.com/munnerz/goautoneg.git
 - name: github.com/asaskevich/govalidator
   version: f9ffefc3facfbe0caee3fea233cbb6e8208f4541
@@ -19,7 +19,7 @@ imports:
 - name: github.com/certifi/gocertifi
   version: ee1a9a0726d2ae45f54118cac878c990d4016ded
 - name: github.com/containerd/continuity
-  version: aaeac12a7ffcd198ae25440a9dff125c2e2703a7
+  version: 75bee3e2ccb6402e3a986ab8bd3b17003fc0fdec
   subpackages:
   - pathdriver
 - name: github.com/coreos/bbolt
@@ -173,7 +173,7 @@ imports:
   - sockets
   - tlsconfig
 - name: github.com/docker/go-metrics
-  version: b84716841b82eab644a0c64fc8b42d480e49add5
+  version: b619b3592b65de4f087d9f16863a7e6ff905973c
 - name: github.com/docker/go-units
   version: 9e638d38cf6977a37a8ea0078f3ee75a7cdb2dd1
 - name: github.com/docker/libnetwork
@@ -364,7 +364,7 @@ imports:
   - libcontainer/user
   - libcontainer/utils
 - name: github.com/openshift/api
-  version: d2972510af76418506bf0374bc2e73b0b9e538ce
+  version: d4a64ec2cbd86f11ea74dfdcf6520d5833d0c6cd
   subpackages:
   - annotations
   - apps
@@ -431,7 +431,7 @@ imports:
   - pkg/securitycontextconstraints/util
   - pkg/securitycontextconstraints/util/sort
 - name: github.com/openshift/client-go
-  version: e9678e3b850da36470c5554609c6cd110aace47e
+  version: 5a5508328169b8a6992ea4ef711add89ddce3c6d
   subpackages:
   - apps/clientset/versioned
   - apps/clientset/versioned/fake
@@ -510,7 +510,7 @@ imports:
   - user/informers/externalversions/user/v1
   - user/listers/user/v1
 - name: github.com/openshift/library-go
-  version: 4d03f355b0f22570586e3bf4b4a4a7c1332813c3
+  version: 27b03247913b2f6a0abcea95cb9b6c896adc2531
   subpackages:
   - pkg/apiserver/admission/admissionregistrationtesting
   - pkg/apiserver/admission/admissionrestconfig
@@ -543,7 +543,7 @@ imports:
   - pkg/template/templateprocessing
   - pkg/template/templateprocessingclient
 - name: github.com/openshift/source-to-image
-  version: 2a579ecd66dfaf9ee21bbc860fcde8e4d1d12301
+  version: 0b950e4c21af8838c0f523e77114a19b061deaba
   subpackages:
   - pkg/api/constants
   - pkg/errors
@@ -674,7 +674,7 @@ imports:
   - unicode/norm
   - width
 - name: golang.org/x/time
-  version: 9d24e82272b4f38b78bc8cff74fa936d31ccd8ef
+  version: c4c64cad1fd0a1a8dab2523e04e61d35308e131e
   subpackages:
   - rate
 - name: golang.org/x/tools
@@ -682,7 +682,7 @@ imports:
   subpackages:
   - imports
 - name: google.golang.org/appengine
-  version: fb139bde60fa77cede04f226b4d5a3cf68dcce27
+  version: 16bce7d3dc4e458f2f6f56a1349cbbfcdc8a8fdf
   subpackages:
   - internal
   - internal/base
@@ -735,7 +735,7 @@ imports:
   - json
   - jwt
 - name: gopkg.in/yaml.v2
-  version: 5420a8b6744d3b0345ab293f6fcba19c978f1183
+  version: f221b8435cfb71e54062f6c6e99e9ade30b124d5
 - name: k8s.io/api
   version: 40a48860b5abbba9aa891b02b32da429b08d96a0
   subpackages:
@@ -1279,7 +1279,7 @@ imports:
 - name: k8s.io/kubelet
   version: f6da02f583256d1a15cc44a101c80bfa2080a46f
 - name: k8s.io/kubernetes
-  version: a76fdb0577a008c3105c14f4613f014a21b3fb20
+  version: b03ce1b8eb86db833f0b438a505ca86d87f9e97e
   repo: https://github.com/openshift/kubernetes.git
   subpackages:
   - cmd/cloud-controller-manager/app/apis/config

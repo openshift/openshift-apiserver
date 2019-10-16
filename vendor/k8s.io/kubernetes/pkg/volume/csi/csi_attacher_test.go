@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 	"time"
 
@@ -33,6 +34,7 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	utilfeaturetesting "k8s.io/apiserver/pkg/util/feature/testing"
+	"k8s.io/client-go/informers"
 	clientset "k8s.io/client-go/kubernetes"
 	fakeclient "k8s.io/client-go/kubernetes/fake"
 	core "k8s.io/client-go/testing"
@@ -1024,6 +1026,14 @@ func TestAttacherMountDevice(t *testing.T) {
 			spec:            volume.NewSpecFromPersistentVolume(makeTestPV(pvName, 10, testDriver, "test-vol1"), false),
 		},
 		{
+			testName:        "normal PV with mount options",
+			volName:         "test-vol1",
+			devicePath:      "path1",
+			deviceMountPath: "path2",
+			stageUnstageSet: true,
+			spec:            volume.NewSpecFromPersistentVolume(makeTestPVWithMountOptions(pvName, 10, testDriver, "test-vol1", []string{"test-op"}), false),
+		},
+		{
 			testName:        "no vol name",
 			volName:         "",
 			devicePath:      "path1",
@@ -1131,6 +1141,9 @@ func TestAttacherMountDevice(t *testing.T) {
 			}
 			if vol.Path != tc.deviceMountPath {
 				t.Errorf("expected mount path: %s. got: %s", tc.deviceMountPath, vol.Path)
+			}
+			if !reflect.DeepEqual(vol.MountFlags, tc.spec.PersistentVolume.Spec.MountOptions) {
+				t.Errorf("expected mount options: %v, got: %v", tc.spec.PersistentVolume.Spec.MountOptions, vol.MountFlags)
 			}
 		}
 	}
@@ -1435,12 +1448,20 @@ func newTestWatchPlugin(t *testing.T, fakeClient *fakeclient.Clientset) (*csiPlu
 		fakeClient = fakeclient.NewSimpleClientset()
 	}
 	fakeWatcher := watch.NewRaceFreeFake()
-	fakeClient.Fake.AddWatchReactor("*", core.DefaultWatchReactor(fakeWatcher, nil))
+	fakeClient.Fake.PrependWatchReactor("volumeattachments", core.DefaultWatchReactor(fakeWatcher, nil))
+
+	// Start informer for CSIDrivers.
+	factory := informers.NewSharedInformerFactory(fakeClient, csiResyncPeriod)
+	csiDriverInformer := factory.Storage().V1beta1().CSIDrivers()
+	csiDriverLister := csiDriverInformer.Lister()
+	go factory.Start(wait.NeverStop)
+
 	host := volumetest.NewFakeVolumeHostWithCSINodeName(
 		tmpDir,
 		fakeClient,
 		nil,
 		"node",
+		csiDriverLister,
 	)
 	plugMgr := &volume.VolumePluginMgr{}
 	plugMgr.InitPlugins(ProbeVolumePlugins(), nil /* prober */, host)
@@ -1458,7 +1479,7 @@ func newTestWatchPlugin(t *testing.T, fakeClient *fakeclient.Clientset) (*csiPlu
 	if utilfeature.DefaultFeatureGate.Enabled(features.CSIDriverRegistry) {
 		// Wait until the informer in CSI volume plugin has all CSIDrivers.
 		wait.PollImmediate(testInformerSyncPeriod, testInformerSyncTimeout, func() (bool, error) {
-			return csiPlug.csiDriverInformer.Informer().HasSynced(), nil
+			return csiDriverInformer.Informer().HasSynced(), nil
 		})
 	}
 
