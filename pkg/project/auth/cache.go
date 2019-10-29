@@ -496,7 +496,7 @@ func (ac *AuthorizationCache) List(userInfo user.Info, selector labels.Selector)
 
 	allowedNamespaces, err := scope.ScopesToVisibleNamespaces(userInfo.GetExtra()[authorizationapi.ScopesKey], ac.clusterRoleLister, true)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to compute visible namespace for user %q: %v", userInfo.GetName(), err)
 	}
 
 	namespaceList := &corev1.NamespaceList{}
