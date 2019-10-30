@@ -449,7 +449,7 @@ func (ac *AuthorizationCache) syncRequest(request *reviewRequest, userSubjectRec
 	namespace := request.namespace
 	review, err := ac.reviewer.Review(namespace)
 	if err != nil {
-		return err
+		return fmt.Errorf("review for namespace %s failed: %v", namespace, err)
 	}
 
 	usersToRemove := sets.NewString()
