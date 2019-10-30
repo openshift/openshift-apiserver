@@ -449,7 +449,7 @@ func (ac *AuthorizationCache) syncRequest(request *reviewRequest, userSubjectRec
 	namespace := request.namespace
 	review, err := ac.reviewer.Review(namespace)
 	if err != nil {
-		return err
+		return fmt.Errorf("review for namespace %s failed: %v", namespace, err)
 	}
 
 	usersToRemove := sets.NewString()
@@ -496,7 +496,7 @@ func (ac *AuthorizationCache) List(userInfo user.Info, selector labels.Selector)
 
 	allowedNamespaces, err := scope.ScopesToVisibleNamespaces(userInfo.GetExtra()[authorizationapi.ScopesKey], ac.clusterRoleLister, true)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to compute visible namespaces for user %q: %v", userInfo.GetName(), err)
 	}
 
 	namespaceList := &corev1.NamespaceList{}
