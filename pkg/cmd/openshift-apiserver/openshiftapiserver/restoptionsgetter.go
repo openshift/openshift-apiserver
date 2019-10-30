@@ -6,6 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/server/options"
+	"k8s.io/apiserver/pkg/server/options/encryptionconfig"
 	apiserverstorage "k8s.io/apiserver/pkg/server/storage"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
@@ -39,6 +40,17 @@ func NewRESTOptionsGetter(startingFlags map[string][]string, storageConfig confi
 		&serverstorage.ResourceConfig{},
 		specialDefaultResourcePrefixes,
 	)
+
+	if len(etcdOptions.EncryptionProviderConfigFilepath) != 0 {
+		transformerOverrides, err := encryptionconfig.GetTransformerOverrides(etcdOptions.EncryptionProviderConfigFilepath)
+		if err != nil {
+			return nil, err
+		}
+		for groupResource, transformer := range transformerOverrides {
+			storageFactory.SetTransformer(groupResource, transformer)
+		}
+	}
+
 	restOptionsGetter := &options.StorageFactoryRestOptionsFactory{
 		Options:        *etcdOptions,
 		StorageFactory: storageFactory,
