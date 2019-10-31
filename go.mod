@@ -69,7 +69,7 @@ replace (
 	k8s.io/api => k8s.io/api v0.0.0-20190918155943-95b840bb6a1f
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190918161926-8f644eb6e783
 	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190913080033-27d36303b655
-	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20190923094949-f446a5f26430
+	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20191031131608-0caf1f34c3d9
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.0.0-20190918162238-f783a3654da8
 	k8s.io/client-go => k8s.io/client-go v0.0.0-20190918160344-1fbdaa4c8d90
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.0.0-20190918163234-a9c1f33e9fb9

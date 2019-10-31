@@ -361,6 +361,8 @@ github.com/openshift/kubernetes v1.16.0-beta.0.0.20190926205813-ab72ed558cb1 h1:
 github.com/openshift/kubernetes v1.16.0-beta.0.0.20190926205813-ab72ed558cb1/go.mod h1:Pxu84k7Qq7ukfmAmaLn0IOzGLHTxwC2Foe0ec5lAUcU=
 github.com/openshift/kubernetes-apiserver v0.0.0-20190923094949-f446a5f26430 h1:1ey0gM0NJAZGHYxwEgJBrZ+cPdjbxraT2ZR00cS7Tek=
 github.com/openshift/kubernetes-apiserver v0.0.0-20190923094949-f446a5f26430/go.mod h1:XPCXEwhjaFN29a8NldXA901ElnKeKLrLtREO9ZhFyhg=
+github.com/openshift/kubernetes-apiserver v0.0.0-20191031131608-0caf1f34c3d9 h1:ZssrwAiw2isKOLTgSfBc1JBl4oW344CwlX6hLKxfpkM=
+github.com/openshift/kubernetes-apiserver v0.0.0-20191031131608-0caf1f34c3d9/go.mod h1:7OqfAolfWxUM/jJ/HBLyE+cdaWFBUoo5Q5pHgJVj2ws=
 github.com/openshift/library-go v0.0.0-20191014125628-e7604f697814 h1:OEnq/Yu+a/6N4WIypM7dtO6kXkT7x9OygwGciT9uc3A=
 github.com/openshift/library-go v0.0.0-20191014125628-e7604f697814/go.mod h1:NBttNjZpWwup/nthuLbPAPSYC8Qyo+BBK5bCtFoyYjo=
 github.com/openshift/source-to-image v0.0.0-20190924185145-0b950e4c21af h1:EpZMN73/+AwTVbpr3t9rcdtlLCBnmbGld8rXWsJO8mY=
@@ -585,6 +587,8 @@ gopkg.in/warnings.v0 v0.1.1/go.mod h1:jksf8JmL6Qr/oQM2OXTHunEvvTAsrWBLb6OOjuVWRN
 gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.2 h1:ZCJp+EgiOT7lHqUV2J862kp8Qj64Jo6az82+3Td9dZw=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
+gopkg.in/yaml.v2 v2.2.4 h1:/eiJrUcujPVeJ3xlSWaiNi3uSVmDGBK1pDHUHAnao1I=
+gopkg.in/yaml.v2 v2.2.4/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gotest.tools v2.1.0+incompatible/go.mod h1:DsYFclhRJ6vuDpmuTbkuFWG+y2sxOXAzmJt81HFBacw=
 gotest.tools v2.2.0+incompatible h1:VsBPFP1AI068pPrMxtb/S8Zkgf9xEmTLJjfM+P5UIEo=
 gotest.tools v2.2.0+incompatible/go.mod h1:DsYFclhRJ6vuDpmuTbkuFWG+y2sxOXAzmJt81HFBacw=
