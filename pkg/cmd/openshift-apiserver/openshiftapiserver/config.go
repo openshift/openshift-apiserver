@@ -236,6 +236,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 			KubeInformers:                      kubeInformers, // TODO remove this and use the one from the genericconfig
 			QuotaInformers:                     informers.quotaInformers,
 			SecurityInformers:                  informers.securityInformers,
+			OperatorInformers:                  informers.operatorInformers,
 			RuleResolver:                       ruleResolver,
 			SubjectLocator:                     subjectLocator,
 			RegistryHostnameRetriever:          registryHostnameRetriever,

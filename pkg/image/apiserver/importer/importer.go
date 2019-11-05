@@ -19,6 +19,7 @@ import (
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/client-go/util/flowcontrol"
@@ -31,6 +32,7 @@ import (
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
 
 // Add a dockerregistry.Client to the passed context with this key to support v1 container image registry importing
@@ -55,6 +57,7 @@ type ImageStreamImporter struct {
 
 	retriever RepositoryRetriever
 	limiter   flowcontrol.RateLimiter
+	regConf   *sysregistriesv2.V2RegistriesConf
 
 	digestToRepositoryCache map[gocontext.Context]map[manifestKey]*imageapi.Image
 
@@ -64,7 +67,7 @@ type ImageStreamImporter struct {
 
 // NewImageStreamImport creates an importer that will load images from a remote container image registry into an
 // ImageStreamImport object. Limiter may be nil.
-func NewImageStreamImporter(retriever RepositoryRetriever, maximumTagsPerRepo int, limiter flowcontrol.RateLimiter, cache *ImageStreamLayerCache) *ImageStreamImporter {
+func NewImageStreamImporter(retriever RepositoryRetriever, regConf *sysregistriesv2.V2RegistriesConf, maximumTagsPerRepo int, limiter flowcontrol.RateLimiter, cache *ImageStreamLayerCache) *ImageStreamImporter {
 	if limiter == nil {
 		limiter = flowcontrol.NewFakeAlwaysRateLimiter()
 	}
@@ -76,6 +79,7 @@ func NewImageStreamImporter(retriever RepositoryRetriever, maximumTagsPerRepo in
 
 		retriever: retriever,
 		limiter:   limiter,
+		regConf:   regConf,
 
 		digestToRepositoryCache: make(map[gocontext.Context]map[manifestKey]*imageapi.Image),
 		digestToLayerSizeCache:  cache,
@@ -331,21 +335,41 @@ func applyErrorToRepository(repository *importRepository, err error) {
 	for i := range repository.Tags {
 		repository.Tags[i].Err = err
 	}
-	for i := range repository.Digests {
-		repository.Digests[i].Err = err
-	}
+
+	// repository.Digests are handled independedly because they might be
+	// accessed from a mirror.
 }
 
-func formatRepositoryError(ref imageapi.DockerImageReference, err error) error {
+func formatPingError(imageRef imageref.DockerImageReference, insecure bool, err error) error {
+	switch {
+	case err == reference.ErrReferenceInvalidFormat:
+		err = field.Invalid(field.NewPath("from", "name"), imageRef.RepositoryName(), "the provided repository name is not valid")
+	case isDockerError(err, v2.ErrorCodeNameUnknown):
+		err = kapierrors.NewNotFound(image.Resource("dockerimage"), imageRef.Exact())
+	case isDockerError(err, errcode.ErrorCodeUnauthorized):
+		err = kapierrors.NewUnauthorized(fmt.Sprintf("you may not have access to the container image %q", imageRef.Exact()))
+	case strings.Contains(err.Error(), "tls: oversized record received with length") && !insecure:
+		err = kapierrors.NewBadRequest(fmt.Sprintf("the repository %s is HTTP only and requires the insecure flag to import", imageRef.RepositoryName()))
+	case strings.HasSuffix(err.Error(), "no basic auth credentials"):
+		err = kapierrors.NewUnauthorized(fmt.Sprintf("you may not have access to the container image %q and did not have credentials to the repository", imageRef.Exact()))
+	default:
+		err = fmt.Errorf("%s: %s", imageRef.Exact(), err)
+	}
+	return err
+}
+
+func formatRepositoryError(ref reference.Named, err error) error {
 	switch {
 	case isDockerError(err, v2.ErrorCodeManifestUnknown):
-		err = kapierrors.NewNotFound(image.Resource("dockerimage"), ref.Exact())
+		err = kapierrors.NewNotFound(image.Resource("dockerimage"), ref.String())
 	case isDockerError(err, errcode.ErrorCodeUnauthorized):
-		err = kapierrors.NewUnauthorized(fmt.Sprintf("you may not have access to the container image %q", ref.Exact()))
+		err = kapierrors.NewUnauthorized(fmt.Sprintf("you may not have access to the container image %q", ref.String()))
 	case strings.HasSuffix(err.Error(), "no basic auth credentials"):
-		err = kapierrors.NewUnauthorized(fmt.Sprintf("you may not have access to the container image %q", ref.Exact()))
+		err = kapierrors.NewUnauthorized(fmt.Sprintf("you may not have access to the container image %q", ref.String()))
 	case strings.HasSuffix(err.Error(), "incorrect username or password"):
-		err = kapierrors.NewUnauthorized(fmt.Sprintf("incorrect username or password for image %q", ref.Exact()))
+		err = kapierrors.NewUnauthorized(fmt.Sprintf("incorrect username or password for image %q", ref.String()))
+	default:
+		err = fmt.Errorf("%s: %s", ref.String(), err)
 	}
 	return err
 }
@@ -389,9 +413,139 @@ func (isi *ImageStreamImporter) calculateImageSize(ctx gocontext.Context, bs dis
 	return nil
 }
 
-func manifestFromManifestList(ctx gocontext.Context, manifestList *manifestlist.DeserializedManifestList, ref imageapi.DockerImageReference, s distribution.ManifestService, preferArch, preferOS string) (distribution.Manifest, error) {
+func isSubrepo(repo, ancestor string) bool {
+	if repo == ancestor {
+		return true
+	}
+	if len(repo) > len(ancestor) {
+		return strings.HasPrefix(repo, ancestor) && repo[len(ancestor)] == '/'
+	}
+	return false
+}
+
+func (isi *ImageStreamImporter) findRegistryConfiguration(ref reference.Named) *sysregistriesv2.Registry {
+	if isi.regConf == nil || len(isi.regConf.Registries) == 0 {
+		return nil
+	}
+
+	repoName := ref.Name()
+
+	var bestMatch *sysregistriesv2.Registry
+	for i := range isi.regConf.Registries {
+		// XXX We cannot use `i, reg := range` here and `&reg` later.
+		// Otherwise the value will be changed on the next loop iteration.
+		reg := isi.regConf.Registries[i]
+
+		if bestMatch == nil || len(reg.Prefix) > len(bestMatch.Prefix) {
+			if isSubrepo(repoName, reg.Prefix) {
+				bestMatch = &reg
+			}
+		}
+	}
+	return bestMatch
+}
+
+// getPullSources returns a list of possible sources for ref. In case of
+// errors, the returned list still can be used and contains at least one
+// element.
+func (isi *ImageStreamImporter) getPullSources(ref reference.Named) ([]sysregistriesv2.PullSource, error) {
+	reg := isi.findRegistryConfiguration(ref)
+	if reg == nil {
+		return []sysregistriesv2.PullSource{{Reference: ref}}, nil
+	}
+
+	pullSources, err := reg.PullSourcesFromReference(ref)
+	if err != nil {
+		return []sysregistriesv2.PullSource{{Reference: ref}}, fmt.Errorf("unable to get all pull sources for %s: %v", ref.String(), err)
+	}
+
+	return pullSources, nil
+}
+
+// getManifestFromSource pulls a manifest from the source that is referenced by
+// ref. Also it returns the manifest service and the blob store so that
+// additional resources (an image configuration for schema 2 manifests or
+// another manifest for manifest lists) can be pulled.
+func (isi *ImageStreamImporter) getManifestFromSource(ctx gocontext.Context, retriever RepositoryRetriever, ref reference.Named, insecure bool) (distribution.Manifest, distribution.ManifestService, distribution.BlobStore, error) {
+	imageRef, err := imageref.Parse(ref.String())
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("unable to parse reference %q: %v", ref.String(), err)
+	}
+
+	repo, err := retriever.Repository(ctx, imageRef.RegistryURL(), imageRef.RepositoryName(), insecure)
+	if err != nil {
+		return nil, nil, nil, formatPingError(imageRef, insecure, err)
+	}
+
+	ms, err := repo.Manifests(ctx)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("unable to create manifests service for %s: %v", ref.String(), err)
+	}
+
+	var dgst godigest.Digest
+	var opts []distribution.ManifestServiceOption
+	if digestRef, ok := ref.(reference.Digested); ok {
+		dgst = digestRef.Digest()
+	} else if taggedRef, ok := ref.(reference.Tagged); ok {
+		opts = append(opts, distribution.WithTag(taggedRef.Tag()))
+	} else {
+		opts = append(opts, distribution.WithTag("latest"))
+	}
+
+	manifest, err := ms.Get(ctx, dgst, opts...)
+	if err != nil {
+		return nil, nil, nil, formatRepositoryError(ref, err)
+	}
+
+	return manifest, ms, repo.Blobs(ctx), nil
+}
+
+// getManifestFromSource pulls a manifest from the source respecting
+// V2RegistriesConf.
+func (isi *ImageStreamImporter) getManifest(ctx gocontext.Context, retriever RepositoryRetriever, ref reference.Named, insecure bool) (distribution.Manifest, distribution.ManifestService, distribution.BlobStore, error) {
+	var errs []error
+
+	pullSources, err := isi.getPullSources(ref)
+	if err != nil {
+		errs = append(errs, err)
+	}
+
+	if klog.V(5) {
+		out := make([]string, len(pullSources))
+		for i, pullSource := range pullSources {
+			out[i] = pullSource.Reference.String()
+		}
+		klog.Infof("importing %s: going to try next pull sources in order: %v", ref, out)
+	}
+
+	for _, pullSource := range pullSources {
+		klog.V(5).Infof("importing %s: trying to fetch manifest from %s...", ref, pullSource.Reference)
+
+		manifest, ms, bs, err := isi.getManifestFromSource(ctx, retriever, pullSource.Reference, insecure)
+		if err != nil {
+			klog.V(5).Infof("importing %s: failed to get manifest from %s: %s", ref, pullSource.Reference, err)
+			errs = append(errs, err)
+			continue
+		}
+
+		klog.V(5).Infof("importing %s: got manifest from %s", ref.String(), pullSource.Reference)
+
+		return manifest, ms, bs, nil
+	}
+
+	if len(errs) == 1 {
+		// getManifestFromSource can return StatusError (for example,
+		// Unauthorized) that provides a meaningful Reason. NewAggregate will
+		// hide this Reason, so it's better to not aggregate a single error.
+		// Eventually we need a better way to aggregate errors.
+		return nil, nil, nil, errs[0]
+	}
+	return nil, nil, nil, utilerrors.NewAggregate(errs)
+}
+
+func manifestFromManifestList(ctx gocontext.Context, manifestList *manifestlist.DeserializedManifestList, ref reference.Named, s distribution.ManifestService, preferArch, preferOS string) (distribution.Manifest, error) {
 	if len(manifestList.Manifests) == 0 {
-		return nil, fmt.Errorf("no manifests in manifest list %s", ref.Exact())
+		return nil, fmt.Errorf("no manifests in manifest list")
 	}
 
 	if preferArch == "" {
@@ -421,23 +575,23 @@ func manifestFromManifestList(ctx gocontext.Context, manifestList *manifestlist.
 	}
 
 	if manifestDigest == "" {
-		klog.V(5).Infof("unable to find %s/%s manifest in manifest list %s, doing conservative fail by switching to the first one: %#+v", preferOS, preferArch, ref.Exact(), manifestList.Manifests[0])
+		klog.V(5).Infof("unable to find %s/%s manifest in manifest list %s, doing conservative fail by switching to the first one: %#+v", preferOS, preferArch, ref.String(), manifestList.Manifests[0])
 		manifestDigest = manifestList.Manifests[0].Digest
 	}
 
 	manifest, err := s.Get(ctx, manifestDigest)
 	if err != nil {
-		klog.V(5).Infof("unable to get %s/%s manifest by digest %q for image %s: %#v", preferOS, preferArch, manifestDigest, ref.Exact(), err)
-		return nil, formatRepositoryError(ref, err)
+		klog.V(5).Infof("unable to get %s/%s manifest by digest %q for image %s: %#v", preferOS, preferArch, manifestDigest, ref.String(), err)
+		return nil, err
 	}
 	return manifest, err
 }
 
-func (isi *ImageStreamImporter) importManifest(ctx gocontext.Context, manifest distribution.Manifest, ref imageapi.DockerImageReference, d godigest.Digest, s distribution.ManifestService, b distribution.BlobStore, preferArch, preferOS string) (image *imageapi.Image, err error) {
+func (isi *ImageStreamImporter) importManifest(ctx gocontext.Context, manifest distribution.Manifest, ref reference.Named, d godigest.Digest, s distribution.ManifestService, b distribution.BlobStore, preferArch, preferOS string) (image *imageapi.Image, err error) {
 	if manifestList, ok := manifest.(*manifestlist.DeserializedManifestList); ok {
 		manifest, err = manifestFromManifestList(ctx, manifestList, ref, s, preferArch, preferOS)
 		if err != nil {
-			return nil, err
+			return nil, formatRepositoryError(ref, err)
 		}
 	}
 
@@ -446,7 +600,7 @@ func (isi *ImageStreamImporter) importManifest(ctx gocontext.Context, manifest d
 	} else if deserializedManifest, isSchema2 := manifest.(*schema2.DeserializedManifest); isSchema2 {
 		imageConfig, getImportConfigErr := b.Get(ctx, deserializedManifest.Config.Digest)
 		if getImportConfigErr != nil {
-			klog.V(5).Infof("unable to get image config by digest %q for image %s: %#v", d, ref.Exact(), getImportConfigErr)
+			klog.V(5).Infof("unable to get image config by digest %q for image %s: %#v", d, ref.String(), getImportConfigErr)
 			return image, formatRepositoryError(ref, getImportConfigErr)
 		}
 		image, err = schema2ToImage(deserializedManifest, imageConfig, d)
@@ -474,50 +628,57 @@ func (isi *ImageStreamImporter) importManifest(ctx gocontext.Context, manifest d
 // optional rate limiter.  Errors are set onto the individual tags and digest objects.
 func (isi *ImageStreamImporter) importRepositoryFromDocker(ctx gocontext.Context, retriever RepositoryRetriever, repository *importRepository, limiter flowcontrol.RateLimiter) {
 	klog.V(5).Infof("importing remote Docker repository registry=%s repository=%s insecure=%t", repository.Registry, repository.Name, repository.Insecure)
-	// retrieve the repository
-	repo, err := retriever.Repository(ctx, repository.Registry, repository.Name, repository.Insecure)
-	if err != nil {
-		klog.V(5).Infof("unable to access repository %#v: %#v", repository, err)
-		switch {
-		case err == reference.ErrReferenceInvalidFormat:
-			err = field.Invalid(field.NewPath("from", "name"), repository.Name, "the provided repository name is not valid")
-		case isDockerError(err, v2.ErrorCodeNameUnknown):
-			err = kapierrors.NewNotFound(image.Resource("dockerimage"), repository.Ref.Exact())
-		case isDockerError(err, errcode.ErrorCodeUnauthorized):
-			err = kapierrors.NewUnauthorized(fmt.Sprintf("you may not have access to the container image %q", repository.Ref.Exact()))
-		case strings.Contains(err.Error(), "tls: oversized record received with length") && !repository.Insecure:
-			err = kapierrors.NewBadRequest("this repository is HTTP only and requires the insecure flag to import")
-		case strings.HasSuffix(err.Error(), "no basic auth credentials"):
-			err = kapierrors.NewUnauthorized(fmt.Sprintf("you may not have access to the container image %q and did not have credentials to the repository", repository.Ref.Exact()))
-		case strings.HasSuffix(err.Error(), "does not support v2 API"):
-			importRepositoryFromDockerV1(ctx, repository, limiter)
-			return
-		}
-		applyErrorToRepository(repository, err)
-		return
-	}
 
-	// get a manifest context
-	s, err := repo.Manifests(ctx)
-	if err != nil {
-		klog.V(5).Infof("unable to access manifests for repository %#v: %#v", repository, err)
-		switch {
-		case isDockerError(err, v2.ErrorCodeNameUnknown):
-			err = kapierrors.NewNotFound(image.Resource("dockerimage"), repository.Ref.Exact())
-		case isDockerError(err, errcode.ErrorCodeUnauthorized):
-			err = kapierrors.NewUnauthorized(fmt.Sprintf("you may not have access to the container image %q", repository.Ref.Exact()))
-		case strings.HasSuffix(err.Error(), "no basic auth credentials"):
-			err = kapierrors.NewUnauthorized(fmt.Sprintf("you may not have access to the container image %q and did not have credentials to the repository", repository.Ref.Exact()))
+	// load digests
+	for i := range repository.Digests {
+		importDigest := &repository.Digests[i]
+		if importDigest.Err != nil || importDigest.Image != nil {
+			continue
 		}
-		applyErrorToRepository(repository, err)
-		return
-	}
 
-	// get a blob context
-	b := repo.Blobs(ctx)
+		d, err := godigest.Parse(importDigest.Name)
+		if err != nil {
+			importDigest.Err = err
+			continue
+		}
+
+		ref := repository.Ref
+		ref.Tag = ""
+		ref.ID = string(d)
+
+		dockerRef, err := reference.ParseNormalizedNamed(ref.Exact())
+		if err != nil {
+			importDigest.Err = fmt.Errorf("unable to parse docker reference %s: %v", ref.Exact(), err)
+			continue
+		}
+
+		limiter.Accept()
+
+		manifest, ms, bs, err := isi.getManifest(ctx, retriever, dockerRef, repository.Insecure)
+		if err != nil {
+			klog.V(5).Infof("unable to get manifest by digest %s for image %s: %v", d, ref.Exact(), err)
+			importDigest.Err = err
+			continue
+		}
+
+		importDigest.Image, importDigest.Err = isi.importManifest(ctx, manifest, dockerRef, d, ms, bs, "", "")
+	}
 
 	// if repository import is requested (MaximumTags), attempt to load the tags, sort them, and request the first N
 	if count := repository.MaximumTags; count > 0 || count == -1 {
+		// retrieve the repository
+		repo, err := retriever.Repository(ctx, repository.Registry, repository.Name, repository.Insecure)
+		if err != nil {
+			klog.V(5).Infof("unable to access repository %#v: %#v", repository, err)
+			if strings.HasSuffix(err.Error(), "does not support v2 API") {
+				importRepositoryFromDockerV1(ctx, repository, limiter)
+				return
+			}
+			err = formatPingError(repository.Ref, repository.Insecure, err)
+			applyErrorToRepository(repository, err)
+			return
+		}
+
 		tags, err := repo.Tags(ctx).All(ctx)
 		if err != nil {
 			klog.V(5).Infof("unable to access tags for repository %#v: %#v", repository, err)
@@ -551,35 +712,6 @@ func (isi *ImageStreamImporter) importRepositoryFromDocker(ctx gocontext.Context
 		}
 	}
 
-	// load digests
-	for i := range repository.Digests {
-		importDigest := &repository.Digests[i]
-		if importDigest.Err != nil || importDigest.Image != nil {
-			continue
-		}
-
-		d, err := godigest.Parse(importDigest.Name)
-		if err != nil {
-			importDigest.Err = err
-			continue
-		}
-
-		ref := repository.Ref
-		ref.Tag = ""
-		ref.ID = string(d)
-
-		limiter.Accept()
-
-		manifest, err := s.Get(ctx, d)
-		if err != nil {
-			klog.V(5).Infof("unable to get manifest by digest %q for image %s: %#v", d, ref.Exact(), err)
-			importDigest.Err = formatRepositoryError(ref, err)
-			continue
-		}
-
-		importDigest.Image, importDigest.Err = isi.importManifest(ctx, manifest, ref, d, s, b, "", "")
-	}
-
 	for i := range repository.Tags {
 		importTag := &repository.Tags[i]
 		if importTag.Err != nil || importTag.Image != nil {
@@ -590,16 +722,22 @@ func (isi *ImageStreamImporter) importRepositoryFromDocker(ctx gocontext.Context
 		ref.Tag = importTag.Name
 		ref.ID = ""
 
-		limiter.Accept()
-
-		manifest, err := s.Get(ctx, "", distribution.WithTag(importTag.Name))
+		dockerRef, err := reference.ParseNormalizedNamed(ref.Exact())
 		if err != nil {
-			klog.V(5).Infof("unable to get manifest by tag %q for image %s: %#v", importTag.Name, ref.Exact(), err)
-			importTag.Err = formatRepositoryError(ref, err)
+			importTag.Err = fmt.Errorf("unable to parse docker reference %s: %v", ref.Exact(), err)
 			continue
 		}
 
-		importTag.Image, importTag.Err = isi.importManifest(ctx, manifest, ref, "", s, b, importTag.PreferArch, importTag.PreferOS)
+		limiter.Accept()
+
+		manifest, ms, bs, err := isi.getManifest(ctx, retriever, dockerRef, repository.Insecure)
+		if err != nil {
+			klog.V(5).Infof("unable to get manifest by tag %q for image %s: %#v", importTag.Name, ref.Exact(), err)
+			importTag.Err = err
+			continue
+		}
+
+		importTag.Image, importTag.Err = isi.importManifest(ctx, manifest, dockerRef, "", ms, bs, importTag.PreferArch, importTag.PreferOS)
 	}
 }
 

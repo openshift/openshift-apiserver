@@ -9,6 +9,8 @@ import (
 	imagev1informer "github.com/openshift/client-go/image/informers/externalversions"
 	oauthv1client "github.com/openshift/client-go/oauth/clientset/versioned"
 	oauthv1informer "github.com/openshift/client-go/oauth/informers/externalversions"
+	operatorclient "github.com/openshift/client-go/operator/clientset/versioned"
+	operatorinformers "github.com/openshift/client-go/operator/informers/externalversions"
 	quotaclient "github.com/openshift/client-go/quota/clientset/versioned"
 	quotainformer "github.com/openshift/client-go/quota/informers/externalversions"
 	routev1client "github.com/openshift/client-go/route/clientset/versioned"
@@ -35,6 +37,7 @@ type InformerHolder struct {
 	routeInformers         routev1informer.SharedInformerFactory
 	securityInformers      securityv1informer.SharedInformerFactory
 	userInformers          userv1informer.SharedInformerFactory
+	operatorInformers      operatorinformers.SharedInformerFactory
 }
 
 // NewInformers is only exposed for the build's integration testing until it can be fixed more appropriately.
@@ -67,6 +70,10 @@ func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeCl
 	if err != nil {
 		return nil, err
 	}
+	operatorClient, err := operatorclient.NewForConfig(nonProtobufConfig(kubeClientConfig))
+	if err != nil {
+		return nil, err
+	}
 
 	// TODO find a single place to create and start informers.  During the 1.7 rebase this will come more naturally in a config object,
 	// before then we should try to eliminate our direct to storage access.  It's making us do weird things.
@@ -81,6 +88,7 @@ func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeCl
 		routeInformers:         routev1informer.NewSharedInformerFactory(routerClient, defaultInformerResyncPeriod),
 		securityInformers:      securityv1informer.NewSharedInformerFactory(securityClient, defaultInformerResyncPeriod),
 		userInformers:          userv1informer.NewSharedInformerFactory(userClient, defaultInformerResyncPeriod),
+		operatorInformers:      operatorinformers.NewSharedInformerFactory(operatorClient, defaultInformerResyncPeriod),
 	}, nil
 }
 
@@ -128,4 +136,5 @@ func (i *InformerHolder) Start(stopCh <-chan struct{}) {
 	i.routeInformers.Start(stopCh)
 	i.securityInformers.Start(stopCh)
 	i.userInformers.Start(stopCh)
+	i.operatorInformers.Start(stopCh)
 }

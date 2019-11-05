@@ -13,6 +13,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/diff"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -27,6 +28,7 @@ import (
 	"github.com/openshift/api/image"
 	imagev1 "github.com/openshift/api/image/v1"
 	imageclientv1 "github.com/openshift/client-go/image/clientset/versioned/typed/image/v1"
+	operatorv1lister "github.com/openshift/client-go/operator/listers/operator/v1alpha1"
 	"github.com/openshift/library-go/pkg/authorization/authorizationutil"
 	"github.com/openshift/library-go/pkg/image/reference"
 	"github.com/openshift/library-go/pkg/image/registryclient"
@@ -37,11 +39,13 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registries"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
 
 // ImporterFunc returns an instance of the importer that should be used per invocation.
-type ImporterFunc func(r importer.RepositoryRetriever) importer.Interface
+type ImporterFunc func(r importer.RepositoryRetriever, regConf *sysregistriesv2.V2RegistriesConf) importer.Interface
 
 // ImporterDockerRegistryFunc returns an instance of a docker client that should be used per invocation of import,
 // may be nil if no legacy import capability is required.
@@ -59,6 +63,7 @@ type REST struct {
 	clientFn          ImporterDockerRegistryFunc
 	strategy          *strategy
 	sarClient         authorizationclient.SubjectAccessReviewInterface
+	icspLister        operatorv1lister.ImageContentSourcePolicyLister
 }
 
 var _ rest.Creater = &REST{}
@@ -74,6 +79,7 @@ func NewREST(importFn ImporterFunc, streams imagestream.Registry, internalStream
 	clientFn ImporterDockerRegistryFunc,
 	registryWhitelister whitelist.RegistryWhitelister,
 	sarClient authorizationclient.SubjectAccessReviewInterface,
+	icspLister operatorv1lister.ImageContentSourcePolicyLister,
 ) *REST {
 	return &REST{
 		importFn:          importFn,
@@ -86,6 +92,7 @@ func NewREST(importFn ImporterFunc, streams imagestream.Registry, internalStream
 		clientFn:          clientFn,
 		strategy:          NewStrategy(registryWhitelister),
 		sarClient:         sarClient,
+		icspLister:        icspLister,
 	}
 }
 
@@ -195,6 +202,20 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		}
 	}
 
+	icspRules, err := r.icspLister.List(labels.Everything())
+	if err != nil {
+		klog.Warningf("failed to load ImageContentSourcePolicy resources, mirrored images will not be found: %v", err)
+	}
+
+	v2regConf := &sysregistriesv2.V2RegistriesConf{}
+	err = registries.EditRegistriesConfig(v2regConf, nil, nil, icspRules)
+	if err != nil {
+		klog.Warningf("failed to merge ImageContentSourcePolicy resources, mirrored images will not be found: %v", err)
+	}
+	for i, reg := range v2regConf.Registries {
+		v2regConf.Registries[i].Prefix = reg.Location
+	}
+
 	// only load secrets if we need them
 	credentials := importer.NewLazyCredentialsForSecrets(func() ([]corev1.Secret, error) {
 		secrets, err := r.isV1Client.ImageStreams(namespace).Secrets(isi.Name, metav1.GetOptions{})
@@ -204,7 +225,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		return secrets.Items, nil
 	})
 	importCtx := registryclient.NewContext(r.transport, r.insecureTransport).WithCredentials(credentials)
-	imports := r.importFn(importCtx)
+	imports := r.importFn(importCtx, v2regConf)
 	if err := imports.Import(ctx.(gocontext.Context), isi, stream); err != nil {
 		return nil, kapierrors.NewInternalError(err)
 	}
@@ -225,7 +246,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	// try import IS without auth if it failed before
 	if importFailed {
 		importCtx := registryclient.NewContext(r.transport, r.insecureTransport).WithCredentials(nil)
-		imports := r.importFn(importCtx)
+		imports := r.importFn(importCtx, v2regConf)
 		if err := imports.Import(ctx.(gocontext.Context), isi, stream); err != nil {
 			return nil, kapierrors.NewInternalError(err)
 		}

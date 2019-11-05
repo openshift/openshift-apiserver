@@ -27,12 +27,15 @@ require (
 	github.com/openshift/client-go v0.0.0-20190923180330-3b6373338c9b
 	github.com/openshift/library-go v0.0.0-20190924092619-a8c1174d4ee7
 	github.com/openshift/source-to-image v1.1.15-0.20190924185145-0b950e4c21af
+	github.com/pkg/errors v0.8.1
 	github.com/pkg/profile v1.3.0 // indirect
 	github.com/prometheus/client_golang v1.1.0
+	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.3
 	go.uber.org/multierr v1.1.1-0.20180122172545-ddea229ff1df // indirect
 	golang.org/x/net v0.0.0-20190812203447-cdfb69ac37fc
+	golang.org/x/tools v0.0.0-20191022074931-774d2ec196ee // indirect
 	k8s.io/api v0.0.0
 	k8s.io/apiextensions-apiserver v0.0.0
 	k8s.io/apimachinery v0.0.0
