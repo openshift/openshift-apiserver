@@ -1,4 +1,6 @@
-package system // import "github.com/docker/docker/pkg/system"
+// +build windows
+
+package system
 
 import (
 	"time"

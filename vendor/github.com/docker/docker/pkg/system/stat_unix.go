@@ -1,9 +1,8 @@
 // +build !windows
 
-package system // import "github.com/docker/docker/pkg/system"
+package system
 
 import (
-	"os"
 	"syscall"
 )
 
@@ -48,11 +47,6 @@ func (s StatT) Mtim() syscall.Timespec {
 	return s.mtim
 }
 
-// IsDir reports whether s describes a directory.
-func (s StatT) IsDir() bool {
-	return s.mode&syscall.S_IFDIR != 0
-}
-
 // Stat takes a path to a file and returns
 // a system.StatT type pertaining to that file.
 //
@@ -60,7 +54,7 @@ func (s StatT) IsDir() bool {
 func Stat(path string) (*StatT, error) {
 	s := &syscall.Stat_t{}
 	if err := syscall.Stat(path, s); err != nil {
-		return nil, &os.PathError{Op: "Stat", Path: path, Err: err}
+		return nil, err
 	}
 	return fromStatT(s)
 }
