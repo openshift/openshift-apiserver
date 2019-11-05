@@ -257,11 +257,13 @@ API rule violation: list_type_missing,github.com/openshift/api/operator/v1,Conso
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,EtcdList,Items
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,HybridOverlayConfig,HybridClusterNetwork
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,IngressControllerList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,IngressControllerStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,KubeAPIServerList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,KubeControllerManagerList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,KubeSchedulerList,Items
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,KubeStorageVersionMigratorList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,NetworkList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,NetworkSpec,AdditionalNetworks
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,NetworkSpec,ClusterNetwork
@@ -348,8 +350,6 @@ API rule violation: list_type_missing,github.com/openshift/api/user/v1,IdentityL
 API rule violation: list_type_missing,github.com/openshift/api/user/v1,User,Groups
 API rule violation: list_type_missing,github.com/openshift/api/user/v1,User,Identities
 API rule violation: list_type_missing,github.com/openshift/api/user/v1,UserList,Items
-API rule violation: list_type_missing,github.com/openshift/api/webconsole/v1,ExtensionsConfiguration,ScriptURLs
-API rule violation: list_type_missing,github.com/openshift/api/webconsole/v1,ExtensionsConfiguration,StylesheetURLs
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,MutatingWebhook,AdmissionReviewVersions
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,MutatingWebhook,Rules
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,MutatingWebhookConfiguration,Webhooks
