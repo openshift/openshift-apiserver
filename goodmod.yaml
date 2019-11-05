@@ -1,0 +1,51 @@
+# goodmod.yaml
+# This file is tracking branches and tags used in go.mod file replaces
+# Please follow https://github.com/mfojtik/goodmod#installation to get the tool.
+# Run `$ goodmod replace --apply` to apply these rules on `go.mod`
+#
+rules:
+  # k8s.io paths that are tracking "oc-4.3-kubernetes-1.16.2" branch
+  - paths:
+    - k8s.io/apiserver
+    branch: openshift-apiserver-4.3-kubernetes-1.16.2
+  # k8s.io paths that are tracking "kubernetes-1.16.2" tag
+  - paths:
+    - k8s.io/*
+    excludes:
+    # exclude all paths we track in rule above + klog and utils as they don't follow k8s tag
+    - k8s.io/kubernetes
+    - k8s.io/apiserver
+    - k8s.io/klog
+    - k8s.io/utils
+    - k8s.io/kube-openapi
+    tag: kubernetes-1.16.2
+  # k8s.io/kubernetes does not have any carry patches for openshift-apiserver
+  - paths:
+    - k8s.io/kubernetes
+    tag: v1.16.2
+
+  # github.com/openshift/* paths that are tracking "master" branch
+  - paths:
+    - github.com/openshift/*
+    branch: master
+
+  # apiserver team:
+  - paths:
+    - github.com/ghodss/yaml
+    commit: c7ce16629ff4cd059ed96ed06419dd3856fd3577
+
+  # devexp team:
+  - paths:
+    - github.com/docker/distribution
+    commit: d4c35485a70df4dce2179bc227b1393a69edb809
+  - paths:
+    - github.com/moby/buildkit
+    commit: da2b9dc7dab99e824b2b1067ad7d0523e32dd2d9
+  - paths:
+    - github.com/docker/docker
+    branch: openshift-3.10-docker-b68221c
+
+  # monitoring team:
+  - paths:
+    - github.com/prometheus/client_golang
+    tag: v0.9.2
