@@ -5,9 +5,8 @@ import (
 
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	rbacv1helpers "k8s.io/kubernetes/pkg/apis/rbac/v1"
-
 	"k8s.io/klog"
+	rbacv1helpers "k8s.io/kubernetes/pkg/apis/rbac/v1"
 )
 
 func addNamespaceRole(namespaceRoles map[string][]rbacv1.Role, namespace string, role rbacv1.Role) {
@@ -61,6 +60,8 @@ func buildNamespaceRolesAndBindings() (map[string][]rbacv1.Role, map[string][]rb
 				rbacv1helpers.NewRule(read...).Groups(imageGroup, legacyImageGroup).Resources("imagestreams", "imagestreamtags", "imagestreamimages").RuleOrDie(),
 				// so anyone can pull from openshift/* image streams
 				rbacv1helpers.NewRule("get").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/layers").RuleOrDie(),
+				// so anyone can view from openshift/* configmaps. e.g. The motd configmap
+				rbacv1helpers.NewRule("get").Groups("").Resources("configmaps").RuleOrDie(),
 			},
 		})
 
