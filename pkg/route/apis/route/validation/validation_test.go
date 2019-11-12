@@ -536,6 +536,93 @@ func TestValidateRoute(t *testing.T) {
 			expectedErrors: 1,
 		},
 		{
+			name: "Valid subdomain",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+				},
+				Spec: routeapi.RouteSpec{
+					Subdomain: "api.ci",
+					To:        createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Valid subdomain (253 chars)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+				},
+				Spec: routeapi.RouteSpec{
+					Subdomain: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s12345678.test.com",
+					To:        createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Invalid subdomain (279 chars)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+				},
+				Spec: routeapi.RouteSpec{
+					Subdomain: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s1234567890.t1234567890.u1234567890.test.com",
+					To:        createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 1,
+		},
+		{
+			name: "Invalid DNS 952 subdomain",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+				},
+				Spec: routeapi.RouteSpec{
+					Subdomain: "**",
+					To:        createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 1,
+		},
+		{
+			name: "Valid subdomain (conform DNS host name - 253 chars)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+				},
+				Spec: routeapi.RouteSpec{
+					Subdomain: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s123456789.t1.test.com",
+					To:        createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Invalid subdomain (does conform DNS host name - 254 chars)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Subdomain: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s1234567890.t12.test.com",
+					To:        createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 1,
+		},
+		{
 			name: "No service name",
 			route: &routeapi.Route{
 				ObjectMeta: metav1.ObjectMeta{
