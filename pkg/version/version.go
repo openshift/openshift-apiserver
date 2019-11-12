@@ -20,7 +20,8 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/prometheus/client_golang/prometheus"
+	"k8s.io/component-base/metrics"
+	"k8s.io/component-base/metrics/legacyregistry"
 
 	"k8s.io/apimachinery/pkg/version"
 )
@@ -59,8 +60,8 @@ func Get() version.Info {
 }
 
 func init() {
-	buildInfo := prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
+	buildInfo := metrics.NewGaugeVec(
+		&metrics.GaugeOpts{
 			Name: "openshift_build_info",
 			Help: "A metric with a constant '1' value labeled by major, minor, git commit & git version from which OpenShift was built.",
 		},
@@ -69,5 +70,5 @@ func init() {
 	buildInfo.WithLabelValues(majorFromGit, minorFromGit, commitFromGit, versionFromGit).Set(1)
 
 	// we're ok with an error here for now because test-integration illegally runs the same process
-	prometheus.Register(buildInfo)
+	legacyregistry.MustRegister(buildInfo)
 }
