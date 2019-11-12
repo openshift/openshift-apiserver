@@ -25,7 +25,6 @@ type RouteSpec struct {
 	// Host is an alias/DNS that points to the service. Optional
 	// Must follow DNS952 subdomain conventions.
 	Host string
-
 	// Subdomain is a DNS subdomain that is requested within the ingress controller's
 	// domain (as a subdomain). If host is set this field is ignored. An ingress
 	// controller may choose to ignore this suggested name, in which case the controller
@@ -33,13 +32,11 @@ type RouteSpec struct {
 	// route. If this value is set and the server does not support this field host will
 	// be populated automatically. Otherwise host is left empty. The field may have
 	// multiple parts separated by a dot, but not all ingress controllers may honor
-	// the request. This field may not be changed after creation except by a user with
-	// the update routes/custom-host permission.
+	// the request.
 	//
 	// Example: subdomain `frontend` automatically receives the router subdomain
 	// `apps.mycluster.com` to have a full hostname `frontend.apps.mycluster.com`.
 	Subdomain string
-
 	// Path that the router watches for, to route traffic for to the service. Optional
 	Path string
 
