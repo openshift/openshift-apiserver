@@ -27,18 +27,17 @@ func ValidateRoute(route *routeapi.Route) field.ErrorList {
 }
 
 // validateRoute tests if required fields in the route are set.
-func validateRoute(route *routeapi.Route, check_hostname bool) field.ErrorList {
+func validateRoute(route *routeapi.Route, checkHostname bool) field.ErrorList {
 	//ensure meta is set properly
 	result := validation.ValidateObjectMeta(&route.ObjectMeta, true, ValidateRouteName, field.NewPath("metadata"))
 
 	specPath := field.NewPath("spec")
 
-	if check_hostname && len(route.Spec.Host) > 0 {
+	if checkHostname {
 		if err := validateHost(route); err != nil {
 			result = append(result, err...)
 		}
 	}
-
 	if err := validateWildcardPolicy(route.Spec.Host, route.Spec.WildcardPolicy, specPath.Child("wildcardPolicy")); err != nil {
 		result = append(result, err)
 	}
@@ -93,15 +92,19 @@ func validateRoute(route *routeapi.Route, check_hostname bool) field.ErrorList {
 	return result
 }
 
-// validateHost checks that a route's host name meets DNS requirements.
+// validateHost checks that a route's host name and subdomain meets DNS requirements.
 func validateHost(route *routeapi.Route) field.ErrorList {
-	result := field.ErrorList{}
-	if len(route.Spec.Host) == 0 {
-		return result
+
+	var result field.ErrorList
+	if len(route.Spec.Host) > 0 {
+		lenient, _ := route.Annotations[routev1.AllowNonDNSCompliantHostAnnotation]
+		result = append(result, library.ValidateHost(route.Spec.Host, lenient, field.NewPath("spec.host"))...)
 	}
-	hostPath := field.NewPath("spec.host")
-	lenient, _ := route.Annotations[routev1.AllowNonDNSCompliantHostAnnotation]
-	result = library.ValidateHost(route.Spec.Host, lenient, hostPath)
+	if len(route.Spec.Subdomain) > 0 {
+		// Subdomain is not lenient because it was never used outside of routes
+		// TODO: fix library-go ValidateHost to take a boolean
+		result = append(result, library.ValidateHost(route.Spec.Host, "", field.NewPath("spec.subdomain"))...)
+	}
 
 	return result
 }
