@@ -4,10 +4,15 @@
 # Run `$ goodmod replace --apply` to apply these rules on `go.mod`
 #
 rules:
-  # k8s.io paths that are tracking "oc-4.3-kubernetes-1.16.2" branch
+  - paths:
+    - k8s.io/kubernetes
+    tag: v1.17.0-beta.2
+
   - paths:
     - k8s.io/apiserver
-    branch: openshift-apiserver-4.3-kubernetes-1.16.2
+    branch: openshift-apiserver-4.3-kubernetes-1.17.0-beta.2
+
+
   # k8s.io paths that are tracking "kubernetes-1.16.2" tag
   - paths:
     - k8s.io/*
@@ -18,21 +23,23 @@ rules:
     - k8s.io/klog
     - k8s.io/utils
     - k8s.io/kube-openapi
-    tag: kubernetes-1.16.2
-  # k8s.io/kubernetes does not have any carry patches for openshift-apiserver
-  - paths:
-    - k8s.io/kubernetes
-    tag: v1.16.2
+    tag: kubernetes-1.17.0-beta.2
 
   # github.com/openshift/* paths that are tracking "master" branch
   - paths:
-    - github.com/openshift/*
+    - github.com/openshift/api
+    - github.com/openshift/client-go
+    - github.com/openshift/library-go
     branch: master
+
+  - paths:
+    - github.com/openshift/apiserver-library-go
+    branch: openshift-apiserver-4.3-kubernetes-1.17.0-beta.2
 
   # apiserver team:
   - paths:
     - github.com/ghodss/yaml
-    commit: c7ce16629ff4cd059ed96ed06419dd3856fd3577
+    tag: v1.0.0
 
   # devexp team:
   - paths:
