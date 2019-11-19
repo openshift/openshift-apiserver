@@ -77,7 +77,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 		users = append(users, serviceaccount.UserInfo(ns, saName, ""))
 	}
 
-	matchedConstraints, err := r.sccMatcher.FindApplicableSCCs(ns, users...)
+	matchedConstraints, err := r.sccMatcher.FindApplicableSCCs(ctx, ns, users...)
 	if err != nil {
 		return nil, kapierrors.NewBadRequest(fmt.Sprintf("unable to find SecurityContextConstraints: %v", err))
 	}
