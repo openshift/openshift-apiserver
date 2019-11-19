@@ -1,6 +1,7 @@
 package etcd
 
 import (
+	"context"
 	"testing"
 
 	authorizationapi "k8s.io/api/authorization/v1"
@@ -50,6 +51,10 @@ func (f *fakeSubjectAccessReviewRegistry) Create(subjectAccessReview *authorizat
 			Allowed: f.allow,
 		},
 	}, f.err
+}
+
+func (f *fakeSubjectAccessReviewRegistry) CreateContext(ctx context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview) (*authorizationapi.SubjectAccessReview, error) {
+	return f.Create(subjectAccessReview)
 }
 
 func newStorage(t *testing.T) (*REST, *StatusREST, *InternalREST, *etcdtesting.EtcdTestServer) {
