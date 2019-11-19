@@ -18,7 +18,7 @@ func GetEtcdOptions(startingFlags map[string][]string, serializedConfig configv1
 	storageConfig.Transport.ServerList = serializedConfig.URLs
 	storageConfig.Transport.KeyFile = serializedConfig.KeyFile
 	storageConfig.Transport.CertFile = serializedConfig.CertFile
-	storageConfig.Transport.CAFile = serializedConfig.CA
+	storageConfig.Transport.TrustedCAFile = serializedConfig.CA
 
 	etcdOptions := options.NewEtcdOptions(storageConfig)
 	etcdOptions.DefaultStorageMediaType = "application/vnd.kubernetes.protobuf"
