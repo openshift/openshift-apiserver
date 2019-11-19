@@ -1,6 +1,7 @@
 package localresourceaccessreview
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
@@ -32,7 +33,7 @@ type testAuthorizer struct {
 	actualAttributes kauthorizer.Attributes
 }
 
-func (a *testAuthorizer) Authorize(attributes kauthorizer.Attributes) (decision kauthorizer.Decision, reason string, err error) {
+func (a *testAuthorizer) Authorize(ctx context.Context, attributes kauthorizer.Attributes) (decision kauthorizer.Decision, reason string, err error) {
 	// allow the initial check for "can I run this RAR at all"
 	if attributes.GetResource() == "localresourceaccessreviews" {
 		return kauthorizer.DecisionAllow, "", nil
