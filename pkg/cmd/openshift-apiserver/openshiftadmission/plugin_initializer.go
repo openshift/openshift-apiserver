@@ -14,6 +14,7 @@ import (
 	kexternalinformers "k8s.io/client-go/informers"
 	kubeclientgoclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/component-base/featuregate"
 	aggregatorapiserver "k8s.io/kube-aggregator/pkg/apiserver"
 	kadmission "k8s.io/kubernetes/pkg/kubeapiserver/admission"
 	"k8s.io/kubernetes/pkg/quota/v1/generic"
@@ -46,6 +47,7 @@ func NewPluginInitializer(
 	privilegedLoopbackConfig *rest.Config,
 	informers InformerAccess,
 	authorizer authorizer.Authorizer,
+	featureGates featuregate.FeatureGate,
 	restMapper meta.RESTMapper,
 	clusterQuotaMappingController *clusterquotamapping.ClusterQuotaMappingController,
 ) (admission.PluginInitializer, error) {
@@ -82,6 +84,7 @@ func NewPluginInitializer(
 		kubeClient,
 		informers.GetKubernetesInformers(),
 		authorizer,
+		featureGates,
 	)
 	kubePluginInitializer := kadmission.NewPluginInitializer(
 		cloudConfig,
