@@ -137,7 +137,7 @@ func TestAllowed(t *testing.T) {
 
 		csf := fake.NewSimpleClientset(namespace, serviceAccount)
 		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), csf}
-		ctx := apirequest.WithNamespace(apirequest.NewContext(), metav1.NamespaceAll)
+		ctx := apirequest.WithNamespace(apirequest.NewContext(), metav1.NamespaceDefault)
 		obj, err := storage.Create(ctx, reviewRequest, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
 		if err != nil {
 			t.Errorf("%s - Unexpected error: %v", testName, err)
