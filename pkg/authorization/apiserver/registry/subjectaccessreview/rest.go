@@ -62,7 +62,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 	if namespace := apirequest.NamespaceValue(ctx); len(namespace) > 0 {
 		subjectAccessReview.Action.Namespace = namespace
 
-	} else if err := r.isAllowed(requestingUser, subjectAccessReview); err != nil {
+	} else if err := r.isAllowed(ctx, requestingUser, subjectAccessReview); err != nil {
 		// this check is mutually exclusive to the condition above.  localSAR and localRAR both clear the namespace before delegating their calls
 		// We only need to check if the SAR is allowed **again** if the authorizer didn't already approve the request for a legacy call.
 		return nil, err
@@ -115,7 +115,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 	}
 
 	attributes := util.ToDefaultAuthorizationAttributes(userToCheck, subjectAccessReview.Action.Namespace, subjectAccessReview.Action)
-	authorized, reason, err := r.authorizer.Authorize(attributes)
+	authorized, reason, err := r.authorizer.Authorize(ctx, attributes)
 	response := &authorizationapi.SubjectAccessReviewResponse{
 		Namespace: subjectAccessReview.Action.Namespace,
 		Allowed:   authorized == kauthorizer.DecisionAllow,
@@ -129,7 +129,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 }
 
 // isAllowed checks to see if the current user has rights to issue a LocalSubjectAccessReview on the namespace they're attempting to access
-func (r *REST) isAllowed(user user.Info, sar *authorizationapi.SubjectAccessReview) error {
+func (r *REST) isAllowed(ctx context.Context, user user.Info, sar *authorizationapi.SubjectAccessReview) error {
 	var localSARAttributes kauthorizer.AttributesRecord
 	// if they are running a personalSAR, create synthentic check for selfSAR
 	if isPersonalAccessReviewFromSAR(sar) {
@@ -151,7 +151,7 @@ func (r *REST) isAllowed(user user.Info, sar *authorizationapi.SubjectAccessRevi
 		}
 	}
 
-	authorized, reason, err := r.authorizer.Authorize(localSARAttributes)
+	authorized, reason, err := r.authorizer.Authorize(context.TODO(), localSARAttributes)
 
 	if err != nil {
 		return kapierrors.NewForbidden(authorization.Resource(localSARAttributes.GetResource()), localSARAttributes.GetName(), err)

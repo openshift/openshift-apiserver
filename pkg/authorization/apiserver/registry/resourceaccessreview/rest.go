@@ -66,7 +66,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 	if namespace := apirequest.NamespaceValue(ctx); len(namespace) > 0 {
 		resourceAccessReview.Action.Namespace = namespace
 
-	} else if err := r.isAllowed(user, resourceAccessReview); err != nil {
+	} else if err := r.isAllowed(ctx, user, resourceAccessReview); err != nil {
 		// this check is mutually exclusive to the condition above.  localSAR and localRAR both clear the namespace before delegating their calls
 		// We only need to check if the RAR is allowed **again** if the authorizer didn't already approve the request for a legacy call.
 		return nil, err
@@ -89,7 +89,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 }
 
 // isAllowed checks to see if the current user has rights to issue a LocalSubjectAccessReview on the namespace they're attempting to access
-func (r *REST) isAllowed(user user.Info, rar *authorizationapi.ResourceAccessReview) error {
+func (r *REST) isAllowed(ctx context.Context, user user.Info, rar *authorizationapi.ResourceAccessReview) error {
 	localRARAttributes := kauthorizer.AttributesRecord{
 		User:            user,
 		Verb:            "create",
@@ -97,7 +97,7 @@ func (r *REST) isAllowed(user user.Info, rar *authorizationapi.ResourceAccessRev
 		Resource:        "localresourceaccessreviews",
 		ResourceRequest: true,
 	}
-	authorized, reason, err := r.authorizer.Authorize(localRARAttributes)
+	authorized, reason, err := r.authorizer.Authorize(ctx, localRARAttributes)
 
 	if err != nil {
 		return kapierrors.NewForbidden(authorization.Resource(localRARAttributes.GetResource()), localRARAttributes.GetName(), err)
