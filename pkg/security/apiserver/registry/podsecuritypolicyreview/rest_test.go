@@ -1,6 +1,7 @@
 package podsecuritypolicyreview
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
@@ -421,6 +422,6 @@ func TestSpecificSAs(t *testing.T) {
 
 type noopTestAuthorizer struct{}
 
-func (s *noopTestAuthorizer) Authorize(a authorizer.Attributes) (authorizer.Decision, string, error) {
+func (s *noopTestAuthorizer) Authorize(ctx context.Context, a authorizer.Attributes) (authorizer.Decision, string, error) {
 	return authorizer.DecisionNoOpinion, "", nil
 }
