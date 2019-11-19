@@ -151,7 +151,7 @@ func (r *REST) isAllowed(ctx context.Context, user user.Info, sar *authorization
 		}
 	}
 
-	authorized, reason, err := r.authorizer.Authorize(context.TODO(), localSARAttributes)
+	authorized, reason, err := r.authorizer.Authorize(ctx, localSARAttributes)
 
 	if err != nil {
 		return kapierrors.NewForbidden(authorization.Resource(localSARAttributes.GetResource()), localSARAttributes.GetName(), err)
