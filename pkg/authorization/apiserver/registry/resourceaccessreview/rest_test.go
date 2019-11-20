@@ -1,6 +1,7 @@
 package resourceaccessreview
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
@@ -9,13 +10,15 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/diff"
 	"k8s.io/apimachinery/pkg/util/sets"
+	kapi "k8s.io/kubernetes/pkg/apis/core"
+
 	"k8s.io/apiserver/pkg/authentication/user"
 	kauthorizer "k8s.io/apiserver/pkg/authorization/authorizer"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	apiserverrest "k8s.io/apiserver/pkg/registry/rest"
-	kapi "k8s.io/kubernetes/pkg/apis/core"
 
 	"github.com/openshift/library-go/pkg/authorization/authorizationutil"
+
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 	"github.com/openshift/openshift-apiserver/pkg/authorization/apiserver/registry/util"
 )
@@ -33,7 +36,7 @@ type testAuthorizer struct {
 	actualAttributes kauthorizer.Attributes
 }
 
-func (a *testAuthorizer) Authorize(attributes kauthorizer.Attributes) (allowed kauthorizer.Decision, reason string, err error) {
+func (a *testAuthorizer) Authorize(ctx context.Context, attributes kauthorizer.Attributes) (allowed kauthorizer.Decision, reason string, err error) {
 	// allow the initial check for "can I run this RAR at all"
 	if attributes.GetResource() == "localresourceaccessreviews" {
 		if len(a.deniedNamespaces) != 0 && a.deniedNamespaces.Has(attributes.GetNamespace()) {

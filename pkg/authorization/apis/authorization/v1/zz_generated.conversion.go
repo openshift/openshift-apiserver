@@ -46,16 +46,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ClusterRoleBinding)(nil), (*authorization.ClusterRoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ClusterRoleBinding_To_authorization_ClusterRoleBinding(a.(*v1.ClusterRoleBinding), b.(*authorization.ClusterRoleBinding), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*authorization.ClusterRoleBinding)(nil), (*v1.ClusterRoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_ClusterRoleBinding_To_v1_ClusterRoleBinding(a.(*authorization.ClusterRoleBinding), b.(*v1.ClusterRoleBinding), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*v1.ClusterRoleBindingList)(nil), (*authorization.ClusterRoleBindingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_ClusterRoleBindingList_To_authorization_ClusterRoleBindingList(a.(*v1.ClusterRoleBindingList), b.(*authorization.ClusterRoleBindingList), scope)
 	}); err != nil {
@@ -106,26 +96,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.LocalSubjectAccessReview)(nil), (*authorization.LocalSubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_LocalSubjectAccessReview_To_authorization_LocalSubjectAccessReview(a.(*v1.LocalSubjectAccessReview), b.(*authorization.LocalSubjectAccessReview), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*authorization.LocalSubjectAccessReview)(nil), (*v1.LocalSubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_LocalSubjectAccessReview_To_v1_LocalSubjectAccessReview(a.(*authorization.LocalSubjectAccessReview), b.(*v1.LocalSubjectAccessReview), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1.PolicyRule)(nil), (*authorization.PolicyRule)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PolicyRule_To_authorization_PolicyRule(a.(*v1.PolicyRule), b.(*authorization.PolicyRule), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*authorization.PolicyRule)(nil), (*v1.PolicyRule)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_PolicyRule_To_v1_PolicyRule(a.(*authorization.PolicyRule), b.(*v1.PolicyRule), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*v1.ResourceAccessReview)(nil), (*authorization.ResourceAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview(a.(*v1.ResourceAccessReview), b.(*authorization.ResourceAccessReview), scope)
 	}); err != nil {
@@ -136,16 +106,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ResourceAccessReviewResponse)(nil), (*authorization.ResourceAccessReviewResponse)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ResourceAccessReviewResponse_To_authorization_ResourceAccessReviewResponse(a.(*v1.ResourceAccessReviewResponse), b.(*authorization.ResourceAccessReviewResponse), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*authorization.ResourceAccessReviewResponse)(nil), (*v1.ResourceAccessReviewResponse)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_ResourceAccessReviewResponse_To_v1_ResourceAccessReviewResponse(a.(*authorization.ResourceAccessReviewResponse), b.(*v1.ResourceAccessReviewResponse), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*v1.Role)(nil), (*authorization.Role)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_Role_To_authorization_Role(a.(*v1.Role), b.(*authorization.Role), scope)
 	}); err != nil {
@@ -153,16 +113,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*authorization.Role)(nil), (*v1.Role)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_authorization_Role_To_v1_Role(a.(*authorization.Role), b.(*v1.Role), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1.RoleBinding)(nil), (*authorization.RoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_RoleBinding_To_authorization_RoleBinding(a.(*v1.RoleBinding), b.(*authorization.RoleBinding), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*authorization.RoleBinding)(nil), (*v1.RoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_RoleBinding_To_v1_RoleBinding(a.(*authorization.RoleBinding), b.(*v1.RoleBinding), scope)
 	}); err != nil {
 		return err
 	}
@@ -226,16 +176,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SelfSubjectRulesReviewSpec)(nil), (*authorization.SelfSubjectRulesReviewSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SelfSubjectRulesReviewSpec_To_authorization_SelfSubjectRulesReviewSpec(a.(*v1.SelfSubjectRulesReviewSpec), b.(*authorization.SelfSubjectRulesReviewSpec), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*authorization.SelfSubjectRulesReviewSpec)(nil), (*v1.SelfSubjectRulesReviewSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_SelfSubjectRulesReviewSpec_To_v1_SelfSubjectRulesReviewSpec(a.(*authorization.SelfSubjectRulesReviewSpec), b.(*v1.SelfSubjectRulesReviewSpec), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*v1.ServiceAccountReference)(nil), (*authorization.ServiceAccountReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_ServiceAccountReference_To_authorization_ServiceAccountReference(a.(*v1.ServiceAccountReference), b.(*authorization.ServiceAccountReference), scope)
 	}); err != nil {
@@ -253,16 +193,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*authorization.ServiceAccountRestriction)(nil), (*v1.ServiceAccountRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_authorization_ServiceAccountRestriction_To_v1_ServiceAccountRestriction(a.(*authorization.ServiceAccountRestriction), b.(*v1.ServiceAccountRestriction), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1.SubjectAccessReview)(nil), (*authorization.SubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SubjectAccessReview_To_authorization_SubjectAccessReview(a.(*v1.SubjectAccessReview), b.(*authorization.SubjectAccessReview), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*authorization.SubjectAccessReview)(nil), (*v1.SubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_SubjectAccessReview_To_v1_SubjectAccessReview(a.(*authorization.SubjectAccessReview), b.(*v1.SubjectAccessReview), scope)
 	}); err != nil {
 		return err
 	}

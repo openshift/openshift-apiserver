@@ -174,16 +174,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.DeploymentTriggerImageChangeParams)(nil), (*apps.DeploymentTriggerImageChangeParams)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_DeploymentTriggerImageChangeParams_To_apps_DeploymentTriggerImageChangeParams(a.(*v1.DeploymentTriggerImageChangeParams), b.(*apps.DeploymentTriggerImageChangeParams), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*apps.DeploymentTriggerImageChangeParams)(nil), (*v1.DeploymentTriggerImageChangeParams)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apps_DeploymentTriggerImageChangeParams_To_v1_DeploymentTriggerImageChangeParams(a.(*apps.DeploymentTriggerImageChangeParams), b.(*v1.DeploymentTriggerImageChangeParams), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*v1.DeploymentTriggerPolicy)(nil), (*apps.DeploymentTriggerPolicy)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_DeploymentTriggerPolicy_To_apps_DeploymentTriggerPolicy(a.(*v1.DeploymentTriggerPolicy), b.(*apps.DeploymentTriggerPolicy), scope)
 	}); err != nil {
@@ -221,16 +211,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*apps.RecreateDeploymentStrategyParams)(nil), (*v1.RecreateDeploymentStrategyParams)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_apps_RecreateDeploymentStrategyParams_To_v1_RecreateDeploymentStrategyParams(a.(*apps.RecreateDeploymentStrategyParams), b.(*v1.RecreateDeploymentStrategyParams), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1.RollingDeploymentStrategyParams)(nil), (*apps.RollingDeploymentStrategyParams)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_RollingDeploymentStrategyParams_To_apps_RollingDeploymentStrategyParams(a.(*v1.RollingDeploymentStrategyParams), b.(*apps.RollingDeploymentStrategyParams), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*apps.RollingDeploymentStrategyParams)(nil), (*v1.RollingDeploymentStrategyParams)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apps_RollingDeploymentStrategyParams_To_v1_RollingDeploymentStrategyParams(a.(*apps.RollingDeploymentStrategyParams), b.(*v1.RollingDeploymentStrategyParams), scope)
 	}); err != nil {
 		return err
 	}
@@ -1119,8 +1099,12 @@ func autoConvert_v1_RollingDeploymentStrategyParams_To_apps_RollingDeploymentStr
 	out.UpdatePeriodSeconds = (*int64)(unsafe.Pointer(in.UpdatePeriodSeconds))
 	out.IntervalSeconds = (*int64)(unsafe.Pointer(in.IntervalSeconds))
 	out.TimeoutSeconds = (*int64)(unsafe.Pointer(in.TimeoutSeconds))
-	// WARNING: in.MaxUnavailable requires manual conversion: inconvertible types (*k8s.io/apimachinery/pkg/util/intstr.IntOrString vs k8s.io/apimachinery/pkg/util/intstr.IntOrString)
-	// WARNING: in.MaxSurge requires manual conversion: inconvertible types (*k8s.io/apimachinery/pkg/util/intstr.IntOrString vs k8s.io/apimachinery/pkg/util/intstr.IntOrString)
+	if err := metav1.Convert_Pointer_intstr_IntOrString_To_intstr_IntOrString(&in.MaxUnavailable, &out.MaxUnavailable, s); err != nil {
+		return err
+	}
+	if err := metav1.Convert_Pointer_intstr_IntOrString_To_intstr_IntOrString(&in.MaxSurge, &out.MaxSurge, s); err != nil {
+		return err
+	}
 	if in.Pre != nil {
 		in, out := &in.Pre, &out.Pre
 		*out = new(apps.LifecycleHook)
@@ -1146,8 +1130,12 @@ func autoConvert_apps_RollingDeploymentStrategyParams_To_v1_RollingDeploymentStr
 	out.UpdatePeriodSeconds = (*int64)(unsafe.Pointer(in.UpdatePeriodSeconds))
 	out.IntervalSeconds = (*int64)(unsafe.Pointer(in.IntervalSeconds))
 	out.TimeoutSeconds = (*int64)(unsafe.Pointer(in.TimeoutSeconds))
-	// WARNING: in.MaxUnavailable requires manual conversion: inconvertible types (k8s.io/apimachinery/pkg/util/intstr.IntOrString vs *k8s.io/apimachinery/pkg/util/intstr.IntOrString)
-	// WARNING: in.MaxSurge requires manual conversion: inconvertible types (k8s.io/apimachinery/pkg/util/intstr.IntOrString vs *k8s.io/apimachinery/pkg/util/intstr.IntOrString)
+	if err := metav1.Convert_intstr_IntOrString_To_Pointer_intstr_IntOrString(&in.MaxUnavailable, &out.MaxUnavailable, s); err != nil {
+		return err
+	}
+	if err := metav1.Convert_intstr_IntOrString_To_Pointer_intstr_IntOrString(&in.MaxSurge, &out.MaxSurge, s); err != nil {
+		return err
+	}
 	if in.Pre != nil {
 		in, out := &in.Pre, &out.Pre
 		*out = new(v1.LifecycleHook)

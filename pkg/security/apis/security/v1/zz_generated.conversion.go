@@ -173,16 +173,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SecurityContextConstraints)(nil), (*security.SecurityContextConstraints)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SecurityContextConstraints_To_security_SecurityContextConstraints(a.(*v1.SecurityContextConstraints), b.(*security.SecurityContextConstraints), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*security.SecurityContextConstraints)(nil), (*v1.SecurityContextConstraints)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_security_SecurityContextConstraints_To_v1_SecurityContextConstraints(a.(*security.SecurityContextConstraints), b.(*v1.SecurityContextConstraints), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*v1.SecurityContextConstraintsList)(nil), (*security.SecurityContextConstraintsList)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_SecurityContextConstraintsList_To_security_SecurityContextConstraintsList(a.(*v1.SecurityContextConstraintsList), b.(*security.SecurityContextConstraintsList), scope)
 	}); err != nil {

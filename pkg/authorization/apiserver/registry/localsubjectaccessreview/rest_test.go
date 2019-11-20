@@ -1,6 +1,7 @@
 package localsubjectaccessreview
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
@@ -8,12 +9,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/diff"
 	"k8s.io/apimachinery/pkg/util/sets"
+
 	"k8s.io/apiserver/pkg/authentication/user"
 	kauthorizer "k8s.io/apiserver/pkg/authorization/authorizer"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	apiserverrest "k8s.io/apiserver/pkg/registry/rest"
 
 	authorizationv1 "github.com/openshift/api/authorization/v1"
+
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 	"github.com/openshift/openshift-apiserver/pkg/authorization/apiserver/registry/subjectaccessreview"
 	"github.com/openshift/openshift-apiserver/pkg/authorization/apiserver/registry/util"
@@ -36,7 +39,7 @@ type testAuthorizer struct {
 	actualAttributes kauthorizer.Attributes
 }
 
-func (a *testAuthorizer) Authorize(passedAttributes kauthorizer.Attributes) (authorized kauthorizer.Decision, reason string, err error) {
+func (a *testAuthorizer) Authorize(ctx context.Context, passedAttributes kauthorizer.Attributes) (authorized kauthorizer.Decision, reason string, err error) {
 	// allow the initial check for "can I run this SAR at all"
 	if passedAttributes.GetResource() == "localsubjectaccessreviews" {
 		return kauthorizer.DecisionAllow, "", nil

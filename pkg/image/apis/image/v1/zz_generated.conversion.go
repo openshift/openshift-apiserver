@@ -24,16 +24,6 @@ func init() {
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterConversions(s *runtime.Scheme) error {
-	if err := s.AddGeneratedConversionFunc((*v1.Image)(nil), (*image.Image)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Image_To_image_Image(a.(*v1.Image), b.(*image.Image), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*image.Image)(nil), (*v1.Image)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_image_Image_To_v1_Image(a.(*image.Image), b.(*v1.Image), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*v1.ImageBlobReferences)(nil), (*image.ImageBlobReferences)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_ImageBlobReferences_To_image_ImageBlobReferences(a.(*v1.ImageBlobReferences), b.(*image.ImageBlobReferences), scope)
 	}); err != nil {
@@ -191,26 +181,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*image.ImageStreamMapping)(nil), (*v1.ImageStreamMapping)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_image_ImageStreamMapping_To_v1_ImageStreamMapping(a.(*image.ImageStreamMapping), b.(*v1.ImageStreamMapping), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1.ImageStreamSpec)(nil), (*image.ImageStreamSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ImageStreamSpec_To_image_ImageStreamSpec(a.(*v1.ImageStreamSpec), b.(*image.ImageStreamSpec), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*image.ImageStreamSpec)(nil), (*v1.ImageStreamSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_image_ImageStreamSpec_To_v1_ImageStreamSpec(a.(*image.ImageStreamSpec), b.(*v1.ImageStreamSpec), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1.ImageStreamStatus)(nil), (*image.ImageStreamStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ImageStreamStatus_To_image_ImageStreamStatus(a.(*v1.ImageStreamStatus), b.(*image.ImageStreamStatus), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*image.ImageStreamStatus)(nil), (*v1.ImageStreamStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_image_ImageStreamStatus_To_v1_ImageStreamStatus(a.(*image.ImageStreamStatus), b.(*v1.ImageStreamStatus), scope)
 	}); err != nil {
 		return err
 	}

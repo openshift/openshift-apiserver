@@ -2120,7 +2120,9 @@ func TestInstantiateBuildTriggerCauseBitbucketWebHook(t *testing.T) {
 func TestOverrideDockerStrategyNoCacheOption(t *testing.T) {
 	buildConfigFunc := func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.BuildConfig, error) {
 		return &buildv1.BuildConfig{
-			ObjectMeta: metav1.ObjectMeta{},
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: metav1.NamespaceDefault,
+			},
 			Spec: buildv1.BuildConfigSpec{
 				CommonSpec: buildv1.CommonSpec{
 					Source: MockSource(),
@@ -2153,7 +2155,9 @@ func TestOverrideSourceStrategyIncrementalOption(t *testing.T) {
 	myTrue := true
 	buildConfigFunc := func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.BuildConfig, error) {
 		return &buildv1.BuildConfig{
-			ObjectMeta: metav1.ObjectMeta{},
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: metav1.NamespaceDefault,
+			},
 			Spec: buildv1.BuildConfigSpec{
 				CommonSpec: buildv1.CommonSpec{
 					Source: MockSource(),

@@ -65,11 +65,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.BuildConfig)(nil), (*build.BuildConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_BuildConfig_To_build_BuildConfig(a.(*v1.BuildConfig), b.(*build.BuildConfig), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*build.BuildConfig)(nil), (*v1.BuildConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_build_BuildConfig_To_v1_BuildConfig(a.(*build.BuildConfig), b.(*v1.BuildConfig), scope)
 	}); err != nil {
@@ -135,11 +130,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.BuildOutput)(nil), (*build.BuildOutput)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_BuildOutput_To_build_BuildOutput(a.(*v1.BuildOutput), b.(*build.BuildOutput), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*build.BuildOutput)(nil), (*v1.BuildOutput)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_build_BuildOutput_To_v1_BuildOutput(a.(*build.BuildOutput), b.(*v1.BuildOutput), scope)
 	}); err != nil {
@@ -167,11 +157,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*v1.BuildSource)(nil), (*build.BuildSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_BuildSource_To_build_BuildSource(a.(*v1.BuildSource), b.(*build.BuildSource), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*build.BuildSource)(nil), (*v1.BuildSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_build_BuildSource_To_v1_BuildSource(a.(*build.BuildSource), b.(*v1.BuildSource), scope)
 	}); err != nil {
 		return err
 	}
@@ -220,11 +205,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*build.BuildStrategy)(nil), (*v1.BuildStrategy)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_build_BuildStrategy_To_v1_BuildStrategy(a.(*build.BuildStrategy), b.(*v1.BuildStrategy), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*v1.BuildTriggerCause)(nil), (*build.BuildTriggerCause)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_BuildTriggerCause_To_build_BuildTriggerCause(a.(*v1.BuildTriggerCause), b.(*build.BuildTriggerCause), scope)
 	}); err != nil {
@@ -232,11 +212,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*build.BuildTriggerCause)(nil), (*v1.BuildTriggerCause)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_build_BuildTriggerCause_To_v1_BuildTriggerCause(a.(*build.BuildTriggerCause), b.(*v1.BuildTriggerCause), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1.BuildTriggerPolicy)(nil), (*build.BuildTriggerPolicy)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_BuildTriggerPolicy_To_build_BuildTriggerPolicy(a.(*v1.BuildTriggerPolicy), b.(*build.BuildTriggerPolicy), scope)
 	}); err != nil {
 		return err
 	}
@@ -275,18 +250,8 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.CustomBuildStrategy)(nil), (*build.CustomBuildStrategy)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_CustomBuildStrategy_To_build_CustomBuildStrategy(a.(*v1.CustomBuildStrategy), b.(*build.CustomBuildStrategy), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*build.CustomBuildStrategy)(nil), (*v1.CustomBuildStrategy)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_build_CustomBuildStrategy_To_v1_CustomBuildStrategy(a.(*build.CustomBuildStrategy), b.(*v1.CustomBuildStrategy), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1.DockerBuildStrategy)(nil), (*build.DockerBuildStrategy)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_DockerBuildStrategy_To_build_DockerBuildStrategy(a.(*v1.DockerBuildStrategy), b.(*build.DockerBuildStrategy), scope)
 	}); err != nil {
 		return err
 	}
@@ -485,11 +450,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SourceBuildStrategy)(nil), (*build.SourceBuildStrategy)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SourceBuildStrategy_To_build_SourceBuildStrategy(a.(*v1.SourceBuildStrategy), b.(*build.SourceBuildStrategy), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*build.SourceBuildStrategy)(nil), (*v1.SourceBuildStrategy)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_build_SourceBuildStrategy_To_v1_SourceBuildStrategy(a.(*build.SourceBuildStrategy), b.(*v1.SourceBuildStrategy), scope)
 	}); err != nil {
@@ -507,11 +467,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*v1.SourceRevision)(nil), (*build.SourceRevision)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_SourceRevision_To_build_SourceRevision(a.(*v1.SourceRevision), b.(*build.SourceRevision), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*build.SourceRevision)(nil), (*v1.SourceRevision)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_build_SourceRevision_To_v1_SourceRevision(a.(*build.SourceRevision), b.(*v1.SourceRevision), scope)
 	}); err != nil {
 		return err
 	}

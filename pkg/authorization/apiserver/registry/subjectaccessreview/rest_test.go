@@ -1,6 +1,7 @@
 package subjectaccessreview
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
@@ -36,7 +37,7 @@ type testAuthorizer struct {
 	actualAttributes kauthorizer.Attributes
 }
 
-func (a *testAuthorizer) Authorize(passedAttributes kauthorizer.Attributes) (allowed kauthorizer.Decision, reason string, err error) {
+func (a *testAuthorizer) Authorize(ctx context.Context, passedAttributes kauthorizer.Attributes) (allowed kauthorizer.Decision, reason string, err error) {
 	// allow the initial check for "can I run this SAR at all"
 	if passedAttributes.GetResource() == "localsubjectaccessreviews" {
 		if len(a.deniedNamespaces) != 0 && a.deniedNamespaces.Has(passedAttributes.GetNamespace()) {

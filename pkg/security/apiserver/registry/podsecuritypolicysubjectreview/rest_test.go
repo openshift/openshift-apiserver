@@ -1,6 +1,7 @@
 package podsecuritypolicysubjectreview
 
 import (
+	"context"
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -136,7 +137,7 @@ func TestAllowed(t *testing.T) {
 
 		csf := fake.NewSimpleClientset(namespace, serviceAccount)
 		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), csf}
-		ctx := apirequest.WithNamespace(apirequest.NewContext(), metav1.NamespaceAll)
+		ctx := apirequest.WithNamespace(apirequest.NewContext(), metav1.NamespaceDefault)
 		obj, err := storage.Create(ctx, reviewRequest, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
 		if err != nil {
 			t.Errorf("%s - Unexpected error: %v", testName, err)
@@ -154,7 +155,7 @@ func TestAllowed(t *testing.T) {
 			}
 		}
 		if pspsr.Status.AllowedBy == nil {
-			t.Errorf("testcase '%s' is failing AllowedBy shoult be not nil\n", testName)
+			t.Errorf("testcase '%s' is failing AllowedBy should be not nil\n", testName)
 		}
 	}
 }
@@ -280,6 +281,6 @@ func TestRequests(t *testing.T) {
 
 type noopTestAuthorizer struct{}
 
-func (s *noopTestAuthorizer) Authorize(a authorizer.Attributes) (authorizer.Decision, string, error) {
+func (s *noopTestAuthorizer) Authorize(ctx context.Context, a authorizer.Attributes) (authorizer.Decision, string, error) {
 	return authorizer.DecisionNoOpinion, "", nil
 }

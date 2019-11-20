@@ -94,6 +94,10 @@ func (f *fakeMultiSubjectAccessReviewRegistry) Create(subjectAccessReview *autho
 	}
 }
 
+func (f *fakeMultiSubjectAccessReviewRegistry) CreateContext(ctx context.Context, sar *authorizationv1.SubjectAccessReview) (result *authorizationv1.SubjectAccessReview, err error) {
+	return f.Create(sar)
+}
+
 type fakeSubjectAccessReviewRegistry struct {
 	subjectAccessReviewRecord
 }
@@ -106,6 +110,10 @@ func (f *fakeSubjectAccessReviewRegistry) Create(subjectAccessReview *authorizat
 			Allowed: f.allow,
 		},
 	}, f.err
+}
+
+func (f *fakeSubjectAccessReviewRegistry) CreateContext(ctx context.Context, sar *authorizationv1.SubjectAccessReview) (result *authorizationv1.SubjectAccessReview, err error) {
+	return f.Create(sar)
 }
 
 func TestPublicDockerImageRepository(t *testing.T) {
