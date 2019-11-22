@@ -16,6 +16,11 @@ import (
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 )
 
+// canonicalRepository returns a canonicalal representation for a repository.
+func canonicalRepository(ref reference.DockerImageReference) string {
+	return ref.DockerClientDefaults().AsRepository().Exact()
+}
+
 // WhitelistTransport says whether the associated registry host shall be treated as secure or insecure.
 type WhitelistTransport string
 
@@ -29,23 +34,22 @@ const (
 type RegistryWhitelister interface {
 	// AdmitHostname returns error if the given host is not allowed by the whitelist.
 	AdmitHostname(host string, transport WhitelistTransport) error
-	// AdmitPullSpec returns error if the given pull spec is allowed neither by the whitelist nor by the
-	// collected whitelisted pull specs.
+	// AdmitPullSpec returns error if the given pull spec is not allowed by the whitelist.
 	AdmitPullSpec(pullSpec string, transport WhitelistTransport) error
-	// AdmitDockerImageReference returns error if the given reference is allowed neither by the whitelist nor
-	// by the collected whitelisted pull specs.
-	AdmitDockerImageReference(ref *imageapi.DockerImageReference, transport WhitelistTransport) error
+	// AdmitDockerImageReference returns error if the given reference is not allowed by the whitelist.
+	AdmitDockerImageReference(ref imageapi.DockerImageReference, transport WhitelistTransport) error
 	// WhitelistRegistry extends internal whitelist for additional registry domain name. Accepted values are:
 	//  <host>, <host>:<port>
 	// where each component can contain wildcards like '*' or '??' to match wide range of registries. If the
 	// port is omitted, the default will be appended based on the given transport. If the transport is "any",
 	// the given glob will match hosts with both :80 and :443 ports.
 	WhitelistRegistry(hostPortGlob string, transport WhitelistTransport) error
-	// WhitelistPullSpecs allows to whitelist particular pull specs. References must match exactly one of the
-	// given pull specs for it to be whitelisted.
-	WhitelistPullSpecs(pullSpecs ...string)
+	// WhitelistRepository extracts a repository from pullSpec and adds it to
+	// the internal whitelist. If pullSpec cannot be parsed, an error is
+	// returned.
+	WhitelistRepository(pullSpec string) error
 	// Copy returns a deep copy of the whitelister. This is useful for temporarily whitelisting additional
-	// registries/pullSpecs before a specific validation.
+	// registries/repositories before a specific validation.
 	Copy() RegistryWhitelister
 }
 
@@ -63,7 +67,7 @@ type allowedHostPortGlobs struct {
 
 type registryWhitelister struct {
 	whitelist             []allowedHostPortGlobs
-	pullSpecs             sets.String
+	repositories          sets.String
 	registryHostRetriever RegistryHostnameRetriever
 }
 
@@ -78,7 +82,7 @@ func NewRegistryWhitelister(
 	errs := []error{}
 	rw := registryWhitelister{
 		whitelist:             make([]allowedHostPortGlobs, 0, len(whitelist)),
-		pullSpecs:             sets.NewString(),
+		repositories:          sets.NewString(),
 		registryHostRetriever: registryHostRetriever,
 	}
 	// iterate in reversed order to make the patterns appear in the same order as given (patterns are prepended)
@@ -104,13 +108,13 @@ func NewRegistryWhitelister(
 // TODO: make a new implementation of RegistryWhitelister instead that will not bother with pull specs
 func WhitelistAllRegistries() RegistryWhitelister {
 	return &registryWhitelister{
-		whitelist: []allowedHostPortGlobs{{host: "*", port: "*"}},
-		pullSpecs: sets.NewString(),
+		whitelist:    []allowedHostPortGlobs{{host: "*", port: "*"}},
+		repositories: sets.NewString(),
 	}
 }
 
 func (rw *registryWhitelister) AdmitHostname(hostname string, transport WhitelistTransport) error {
-	return rw.AdmitDockerImageReference(&imageapi.DockerImageReference{Registry: hostname}, transport)
+	return rw.AdmitDockerImageReference(imageapi.DockerImageReference{Registry: hostname}, transport)
 }
 
 func (rw *registryWhitelister) AdmitPullSpec(pullSpec string, transport WhitelistTransport) error {
@@ -118,13 +122,13 @@ func (rw *registryWhitelister) AdmitPullSpec(pullSpec string, transport Whitelis
 	if err != nil {
 		return err
 	}
-	return rw.AdmitDockerImageReference(&ref, transport)
+	return rw.AdmitDockerImageReference(ref, transport)
 }
 
-func (rw *registryWhitelister) AdmitDockerImageReference(ref *imageapi.DockerImageReference, transport WhitelistTransport) error {
+func (rw *registryWhitelister) AdmitDockerImageReference(ref imageapi.DockerImageReference, transport WhitelistTransport) error {
 	const showMax = 5
-	if rw.pullSpecs.Len() > 0 {
-		if rw.pullSpecs.Has(ref.Exact()) || rw.pullSpecs.Has(ref.DockerClientDefaults().Exact()) || rw.pullSpecs.Has(ref.DaemonMinimal().Exact()) {
+	if rw.repositories.Len() > 0 {
+		if rw.repositories.Has(canonicalRepository(ref)) {
 			return nil
 		}
 	}
@@ -249,14 +253,20 @@ addHPsLoop:
 	return nil
 }
 
-func (rw *registryWhitelister) WhitelistPullSpecs(pullSpecs ...string) {
-	rw.pullSpecs.Insert(pullSpecs...)
+func (rw *registryWhitelister) WhitelistRepository(pullSpec string) error {
+	ref, err := reference.Parse(pullSpec)
+	if err != nil {
+		return err
+	}
+
+	rw.repositories.Insert(canonicalRepository(ref))
+	return nil
 }
 
 func (rw *registryWhitelister) Copy() RegistryWhitelister {
 	newRW := registryWhitelister{
 		whitelist:             make([]allowedHostPortGlobs, len(rw.whitelist)),
-		pullSpecs:             sets.NewString(rw.pullSpecs.List()...),
+		repositories:          sets.NewString(rw.repositories.List()...),
 		registryHostRetriever: rw.registryHostRetriever,
 	}
 	copy(newRW.whitelist, rw.whitelist)

@@ -606,8 +606,7 @@ func TestValidateImageStream(t *testing.T) {
 	}
 }
 
-// TODO: disabled per devexp team request
-func disabledTestValidateImageStreamWithWhitelister(t *testing.T) {
+func TestValidateImageStreamWithWhitelister(t *testing.T) {
 	for name, test := range map[string]struct {
 		namespace             string
 		name                  string
@@ -852,8 +851,7 @@ func disabledTestValidateImageStreamWithWhitelister(t *testing.T) {
 	}
 }
 
-// TODO: disabled per devexp team request
-func disabledTestValidateImageStreamUpdateWithWhitelister(t *testing.T) {
+func TestValidateImageStreamUpdateWithWhitelister(t *testing.T) {
 	for _, tc := range []struct {
 		name                     string
 		whitelist                openshiftcontrolplanev1.AllowedRegistries
@@ -1178,10 +1176,6 @@ func TestValidateISTUpdateWithWhitelister(t *testing.T) {
 			newTagRef: &imageapi.TagReference{
 				From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar:baz"},
 				ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.LocalTagReferencePolicy},
-			},
-			expected: field.ErrorList{
-				field.Forbidden(field.NewPath("tag", "from", "name"),
-					`registry "docker.io:443" not allowed by whitelist: "example.com:*"`),
 			},
 		},
 

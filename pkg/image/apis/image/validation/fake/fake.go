@@ -13,13 +13,15 @@ func (rw *RegistryWhitelister) AdmitHostname(host string, transport whitelist.Wh
 func (rw *RegistryWhitelister) AdmitPullSpec(pullSpec string, transport whitelist.WhitelistTransport) error {
 	return nil
 }
-func (rw *RegistryWhitelister) AdmitDockerImageReference(ref *imageapi.DockerImageReference, transport whitelist.WhitelistTransport) error {
+func (rw *RegistryWhitelister) AdmitDockerImageReference(ref imageapi.DockerImageReference, transport whitelist.WhitelistTransport) error {
 	return nil
 }
 func (rw *RegistryWhitelister) WhitelistRegistry(hostPortGlob string, transport whitelist.WhitelistTransport) error {
 	return nil
 }
-func (rw *RegistryWhitelister) WhitelistPullSpecs(pullSpec ...string) {}
+func (rw *RegistryWhitelister) WhitelistRepository(pullSpec string) error {
+	return nil
+}
 func (rw *RegistryWhitelister) Copy() whitelist.RegistryWhitelister {
 	return &RegistryWhitelister{}
 }
