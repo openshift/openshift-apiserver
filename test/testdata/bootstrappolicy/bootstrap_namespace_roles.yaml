@@ -25,6 +25,7 @@ items:
     - imagestreamimages
     - imagestreams
     - imagestreamtags
+    - imagetags
     verbs:
     - get
     - list

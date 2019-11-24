@@ -699,6 +699,7 @@ items:
     - imagestreams
     - imagestreams/secrets
     - imagestreamtags
+    - imagetags
     verbs:
     - create
     - delete
@@ -950,6 +951,7 @@ items:
     - imagestreams
     - imagestreams/secrets
     - imagestreamtags
+    - imagetags
     verbs:
     - create
     - delete
@@ -1146,6 +1148,7 @@ items:
     - imagestreammappings
     - imagestreams
     - imagestreamtags
+    - imagetags
     verbs:
     - get
     - list
@@ -1628,6 +1631,7 @@ items:
     - image.openshift.io
     resources:
     - imagestreamtags
+    - imagetags
     verbs:
     - create
     - update
@@ -1736,6 +1740,7 @@ items:
     resources:
     - images
     - imagestreamtags
+    - imagetags
     verbs:
     - delete
     - get
@@ -1998,6 +2003,7 @@ items:
     - imagestreams
     - imagestreams/secrets
     - imagestreamtags
+    - imagetags
     verbs:
     - create
     - delete
@@ -2121,6 +2127,7 @@ items:
     - imagestreams
     - imagestreams/secrets
     - imagestreamtags
+    - imagetags
     verbs:
     - create
     - delete
@@ -2176,6 +2183,7 @@ items:
     - imagestreammappings
     - imagestreams
     - imagestreamtags
+    - imagetags
     verbs:
     - get
     - list
