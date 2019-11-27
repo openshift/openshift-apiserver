@@ -60,3 +60,405 @@ func TestBuildStrategy(t *testing.T) {
 		t.Errorf("Expected error validating")
 	}
 }
+
+type test struct {
+	input          *buildapi.Build
+	expectedCreate *buildapi.Build
+	expectedUpdate *buildapi.Build
+}
+
+func TestManageConditions(t *testing.T) {
+	now := metav1.Now()
+	tests := []test{
+		// 0 - empty build, prepare for create should add condition new
+		{
+			input: &buildapi.Build{},
+			expectedCreate: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseNew),
+							Status:             kapi.ConditionTrue,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "",
+							Message:            "",
+						},
+					},
+				},
+			},
+			expectedUpdate: &buildapi.Build{},
+		},
+		// 1 - empty condition array populated w/ current phase
+		{
+			input: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Phase: buildapi.BuildPhaseNew,
+				},
+			},
+			expectedCreate: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseNew),
+							Status:             kapi.ConditionTrue,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "",
+							Message:            "",
+						},
+					},
+				},
+			},
+			expectedUpdate: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseNew),
+							Status:             kapi.ConditionTrue,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "",
+							Message:            "",
+						},
+					},
+				},
+			},
+		},
+		// 2 - empty condition array populated w/ current phase, reason, message
+		{
+			input: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Phase:   buildapi.BuildPhaseRunning,
+					Reason:  "reason",
+					Message: "message",
+				},
+			},
+			expectedCreate: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseRunning),
+							Status:             kapi.ConditionTrue,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "reason",
+							Message:            "message",
+						},
+					},
+				},
+			},
+			expectedUpdate: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseRunning),
+							Status:             kapi.ConditionTrue,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "reason",
+							Message:            "message",
+						},
+					},
+				},
+			},
+		},
+		// 3 - existing (false) condition untouched, existing true condition transitioned to false,
+		// new phase added to conditions.
+		{
+			input: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Phase:   buildapi.BuildPhaseComplete,
+					Reason:  "creason",
+					Message: "cmessage",
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseNew),
+							Status:  kapi.ConditionFalse,
+							Reason:  "nreason",
+							Message: "nmessage",
+						},
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseRunning),
+							Status:             kapi.ConditionTrue,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "rreason",
+							Message:            "rmessage",
+						},
+					},
+				},
+			},
+			expectedCreate: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseNew),
+							Status:  kapi.ConditionFalse,
+							Reason:  "nreason",
+							Message: "nmessage",
+						},
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseRunning),
+							Status:             kapi.ConditionFalse,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "",
+							Message:            "",
+						},
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseComplete),
+							Status:             kapi.ConditionTrue,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "creason",
+							Message:            "cmessage",
+						},
+					},
+				},
+			},
+			expectedUpdate: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseNew),
+							Status:  kapi.ConditionFalse,
+							Reason:  "nreason",
+							Message: "nmessage",
+						},
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseRunning),
+							Status:             kapi.ConditionFalse,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "",
+							Message:            "",
+						},
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseComplete),
+							Status:             kapi.ConditionTrue,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "creason",
+							Message:            "cmessage",
+						},
+					},
+				},
+			},
+		},
+		// 4 - existing (false) condition untouched, existing true condition transitioned to false,
+		// existing false condition transitioned to true.
+		{
+			input: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Phase:   buildapi.BuildPhaseComplete,
+					Reason:  "creason",
+					Message: "cmessage",
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseNew),
+							Status:  kapi.ConditionFalse,
+							Reason:  "nreason",
+							Message: "nmessage",
+						},
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseRunning),
+							Status:             kapi.ConditionTrue,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "rreason",
+							Message:            "rmessage",
+						},
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseComplete),
+							Status:             kapi.ConditionFalse,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "creason",
+							Message:            "cmessage",
+						},
+					},
+				},
+			},
+			expectedCreate: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseNew),
+							Status:  kapi.ConditionFalse,
+							Reason:  "nreason",
+							Message: "nmessage",
+						},
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseRunning),
+							Status:             kapi.ConditionFalse,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "",
+							Message:            "",
+						},
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseComplete),
+							Status:             kapi.ConditionTrue,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "creason",
+							Message:            "cmessage",
+						},
+					},
+				},
+			},
+			expectedUpdate: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseNew),
+							Status:  kapi.ConditionFalse,
+							Reason:  "nreason",
+							Message: "nmessage",
+						},
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseRunning),
+							Status:             kapi.ConditionFalse,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "",
+							Message:            "",
+						},
+						{
+							Type:               buildapi.BuildConditionType(buildapi.BuildPhaseComplete),
+							Status:             kapi.ConditionTrue,
+							LastUpdateTime:     now,
+							LastTransitionTime: now,
+							Reason:             "creason",
+							Message:            "cmessage",
+						},
+					},
+				},
+			},
+		},
+		// 5 - all existing conditions untouched
+		{
+			input: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Phase:   buildapi.BuildPhaseComplete,
+					Reason:  "creason",
+					Message: "cmessage",
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseNew),
+							Status:  kapi.ConditionFalse,
+							Reason:  "nreason",
+							Message: "nmessage",
+						},
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseRunning),
+							Status:  kapi.ConditionFalse,
+							Reason:  "rreason",
+							Message: "rmessage",
+						},
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseComplete),
+							Status:  kapi.ConditionTrue,
+							Reason:  "creason",
+							Message: "cmessage",
+						},
+					},
+				},
+			},
+			expectedCreate: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseNew),
+							Status:  kapi.ConditionFalse,
+							Reason:  "nreason",
+							Message: "nmessage",
+						},
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseRunning),
+							Status:  kapi.ConditionFalse,
+							Reason:  "rreason",
+							Message: "rmessage",
+						},
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseComplete),
+							Status:  kapi.ConditionTrue,
+							Reason:  "creason",
+							Message: "cmessage",
+						},
+					},
+				},
+			},
+			expectedUpdate: &buildapi.Build{
+				Status: buildapi.BuildStatus{
+					Conditions: []buildapi.BuildCondition{
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseNew),
+							Status:  kapi.ConditionFalse,
+							Reason:  "nreason",
+							Message: "nmessage",
+						},
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseRunning),
+							Status:  kapi.ConditionFalse,
+							Reason:  "rreason",
+							Message: "rmessage",
+						},
+						{
+							Type:    buildapi.BuildConditionType(buildapi.BuildPhaseComplete),
+							Status:  kapi.ConditionTrue,
+							Reason:  "creason",
+							Message: "cmessage",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for n, test := range tests {
+		build := test.input.DeepCopy()
+		Strategy.PrepareForCreate(apirequest.NewDefaultContext(), build)
+
+		if len(build.Status.Conditions) != len(test.expectedCreate.Status.Conditions) {
+			t.Fatalf("Test[%d]PrepareForCreate] differing number of conditions.  Got:\n%v\nexpected\n%v", n, build.Status.Conditions, test.expectedCreate.Status.Conditions)
+		}
+		for i, result := range build.Status.Conditions {
+			expectedCreate := test.expectedCreate.Status.Conditions[i]
+			if result.Type != expectedCreate.Type ||
+				result.Status != expectedCreate.Status ||
+				result.Reason != expectedCreate.Reason ||
+				result.Message != expectedCreate.Message ||
+				(!result.LastUpdateTime.IsZero() && expectedCreate.LastUpdateTime.IsZero()) ||
+				(!result.LastTransitionTime.IsZero() && expectedCreate.LastTransitionTime.IsZero()) ||
+				(!result.LastUpdateTime.IsZero() && !result.LastUpdateTime.After(expectedCreate.LastUpdateTime.Time)) ||
+				(!result.LastTransitionTime.IsZero() && !result.LastTransitionTime.After(expectedCreate.LastTransitionTime.Time)) {
+				t.Errorf("Test[%d][PrepateForCreate] conditions differed from expected.  Got:\n%v\nexpected\n%v", n, result, expectedCreate)
+			}
+		}
+	}
+
+	for n, test := range tests {
+		build := test.input.DeepCopy()
+		Strategy.PrepareForUpdate(apirequest.NewDefaultContext(), build, build)
+
+		if len(build.Status.Conditions) != len(test.expectedUpdate.Status.Conditions) {
+			t.Fatalf("[%d]PrepareForUpdate] differing number of conditions.  Got:\n%v\nexpected\n%v", n, build.Status.Conditions, test.expectedUpdate.Status.Conditions)
+		}
+		for i, result := range build.Status.Conditions {
+			expectedUpdate := test.expectedUpdate.Status.Conditions[i]
+			if result.Type != expectedUpdate.Type ||
+				result.Status != expectedUpdate.Status ||
+				result.Reason != expectedUpdate.Reason ||
+				result.Message != expectedUpdate.Message ||
+				(!result.LastUpdateTime.IsZero() && expectedUpdate.LastUpdateTime.IsZero()) ||
+				(!result.LastTransitionTime.IsZero() && expectedUpdate.LastTransitionTime.IsZero()) ||
+				(!result.LastUpdateTime.IsZero() && !result.LastUpdateTime.After(expectedUpdate.LastUpdateTime.Time)) ||
+				(!result.LastTransitionTime.IsZero() && !result.LastTransitionTime.After(expectedUpdate.LastTransitionTime.Time)) {
+				t.Errorf("Test[%d][PrepateForUpdate] conditions differed from expected.  Got:\n%v\nexpected\n%v", n, result, expectedUpdate)
+			}
+		}
+	}
+
+}

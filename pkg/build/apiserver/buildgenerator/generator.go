@@ -502,6 +502,7 @@ func (g *BuildGenerator) generateBuildFromConfig(ctx context.Context, bc *buildv
 	// the build object which could be (will be) modified later.
 	buildName := getNextBuildName(bc)
 	bcCopy := bc.DeepCopy()
+	now := metav1.Now()
 	serviceAccount := bcCopy.Spec.ServiceAccount
 	if len(serviceAccount) == 0 {
 		serviceAccount = bootstrappolicy.BuilderServiceAccountName
@@ -536,6 +537,12 @@ func (g *BuildGenerator) generateBuildFromConfig(ctx context.Context, bc *buildv
 		},
 		Status: buildv1.BuildStatus{
 			Phase: buildv1.BuildPhaseNew,
+			Conditions: []buildv1.BuildCondition{{
+				Type:               buildv1.BuildConditionType(buildv1.BuildPhaseNew),
+				Status:             corev1.ConditionTrue,
+				LastUpdateTime:     now,
+				LastTransitionTime: now,
+			}},
 			Config: &corev1.ObjectReference{
 				Kind:      "BuildConfig",
 				Name:      bcCopy.Name,
@@ -869,7 +876,7 @@ func updateCustomImageEnv(strategy *buildv1.CustomBuildStrategy, newImage string
 // generateBuildFromBuild creates a new build based on a given Build.
 func generateBuildFromBuild(build *buildv1.Build, buildConfig *buildv1.BuildConfig) *buildv1.Build {
 	buildCopy := build.DeepCopy()
-
+	now := metav1.Now()
 	newBuild := &buildv1.Build{
 		Spec: buildCopy.Spec,
 		ObjectMeta: metav1.ObjectMeta{
@@ -879,7 +886,13 @@ func generateBuildFromBuild(build *buildv1.Build, buildConfig *buildv1.BuildConf
 			OwnerReferences: buildCopy.ObjectMeta.OwnerReferences,
 		},
 		Status: buildv1.BuildStatus{
-			Phase:  buildv1.BuildPhaseNew,
+			Phase: buildv1.BuildPhaseNew,
+			Conditions: []buildv1.BuildCondition{{
+				Type:               buildv1.BuildConditionType(buildv1.BuildPhaseNew),
+				Status:             corev1.ConditionTrue,
+				LastUpdateTime:     now,
+				LastTransitionTime: now,
+			}},
 			Config: buildCopy.Status.Config,
 		},
 	}

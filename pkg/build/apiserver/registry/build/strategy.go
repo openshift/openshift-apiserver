@@ -9,6 +9,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
+	kapi "k8s.io/kubernetes/pkg/apis/core"
 
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 	buildinternalhelpers "github.com/openshift/openshift-apiserver/pkg/build/apis/build/internal_helpers"
@@ -37,12 +38,59 @@ func (strategy) AllowUnconditionalUpdate() bool {
 	return false
 }
 
+// manageConditions updates the build argument to make the conditions array match the current
+// build phase/reason/message information in the build object.  It will set existing conditions
+// to false other than the condition representing the current phase, and it will add a new
+// condition representing the current phase if no such condition exists.
+func manageConditions(build *buildapi.Build) {
+	// if we have no phase information, we can't reasonably update the conditions
+	if len(build.Status.Phase) == 0 {
+		return
+	}
+	now := metav1.Now()
+	found := false
+	for i, c := range build.Status.Conditions {
+		if buildapi.BuildPhase(c.Type) == build.Status.Phase {
+			found = true
+			if c.Status != kapi.ConditionTrue || c.Reason != string(build.Status.Reason) || c.Message != build.Status.Message {
+				if c.Status != kapi.ConditionTrue {
+					build.Status.Conditions[i].Status = kapi.ConditionTrue
+					build.Status.Conditions[i].LastTransitionTime = now
+				}
+				build.Status.Conditions[i].LastUpdateTime = now
+				build.Status.Conditions[i].Reason = string(build.Status.Reason)
+				build.Status.Conditions[i].Message = build.Status.Message
+			}
+		} else {
+			if c.Status != kapi.ConditionFalse {
+				build.Status.Conditions[i].Status = kapi.ConditionFalse
+				build.Status.Conditions[i].LastTransitionTime = now
+				build.Status.Conditions[i].LastUpdateTime = now
+				build.Status.Conditions[i].Reason = ""
+				build.Status.Conditions[i].Message = ""
+			}
+		}
+	}
+	if !found {
+		condition := buildapi.BuildCondition{
+			Type:               buildapi.BuildConditionType(build.Status.Phase),
+			Status:             kapi.ConditionTrue,
+			LastUpdateTime:     now,
+			LastTransitionTime: now,
+			Reason:             string(build.Status.Reason),
+			Message:            build.Status.Message,
+		}
+		build.Status.Conditions = append(build.Status.Conditions, condition)
+	}
+}
+
 // PrepareForCreate clears fields that are not allowed to be set by end users on creation.
 func (strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 	build := obj.(*buildapi.Build)
 	if len(build.Status.Phase) == 0 {
 		build.Status.Phase = buildapi.BuildPhaseNew
 	}
+	manageConditions(build)
 }
 
 // PrepareForUpdate clears fields that are not allowed to be set by end users on update.
@@ -61,6 +109,7 @@ func (strategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
 		newBuild.Status.Reason = oldBuild.Status.Reason
 		newBuild.Status.Message = oldBuild.Status.Message
 	}
+	manageConditions(newBuild)
 }
 
 // Canonicalize normalizes the object after validation.
@@ -111,6 +160,7 @@ func (detailsStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 	newBuild.Status.Reason = reason
 	newBuild.Status.Message = message
 	newBuild.Status.Output.To = outputTo
+	manageConditions(newBuild)
 }
 
 // Validates that an update is valid by ensuring that no Revision exists and that it's not getting updated to blank
