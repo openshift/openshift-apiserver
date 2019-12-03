@@ -9,11 +9,14 @@ import (
 	"path"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/klog"
 	kcmdutil "k8s.io/kubectl/pkg/cmd/util"
@@ -30,13 +33,20 @@ import (
 type OpenShiftAPIServer struct {
 	ConfigFile string
 	Output     io.Writer
+
+	Authentication *genericapiserveroptions.DelegatingAuthenticationOptions
+	Authorization  *genericapiserveroptions.DelegatingAuthorizationOptions
 }
 
 var longDescription = templates.LongDesc(`
 	Start an apiserver that contains the OpenShift resources`)
 
 func NewOpenShiftAPIServerCommand(name string, out, errout io.Writer, stopCh <-chan struct{}) *cobra.Command {
-	options := &OpenShiftAPIServer{Output: out}
+	options := &OpenShiftAPIServer{
+		Output:         out,
+		Authentication: genericapiserveroptions.NewDelegatingAuthenticationOptions(),
+		Authorization:  genericapiserveroptions.NewDelegatingAuthorizationOptions().WithAlwaysAllowPaths("/healthz", "/healthz/").WithAlwaysAllowGroups("system:masters"),
+	}
 
 	cmd := &cobra.Command{
 		Use:   name,
@@ -64,21 +74,29 @@ func NewOpenShiftAPIServerCommand(name string, out, errout io.Writer, stopCh <-c
 		},
 	}
 
-	flags := cmd.Flags()
-	// This command only supports reading from config
-	flags.StringVar(&options.ConfigFile, "config", "", "Location of the master configuration file to run from.")
-	cmd.MarkFlagFilename("config", "yaml", "yml")
-	cmd.MarkFlagRequired("config")
+	options.AddFlags(cmd.Flags())
 
 	return cmd
 }
 
-func (o *OpenShiftAPIServer) Validate() error {
-	if len(o.ConfigFile) == 0 {
-		return errors.New("--config is required for this command")
-	}
+func (o *OpenShiftAPIServer) AddFlags(flags *pflag.FlagSet) {
+	// This command only supports reading from config
+	flags.StringVar(&o.ConfigFile, "config", "", "Location of the master configuration file to run from.")
+	cobra.MarkFlagFilename(flags, "config", "yaml", "yml")
+	cobra.MarkFlagRequired(flags, "config")
 
-	return nil
+	o.Authentication.AddFlags(flags)
+	o.Authorization.AddFlags(flags)
+}
+
+func (o *OpenShiftAPIServer) Validate() error {
+	errs := []error{}
+	if len(o.ConfigFile) == 0 {
+		errs = append(errs, errors.New("--config is required for this command"))
+	}
+	errs = append(errs, o.Authentication.Validate()...)
+	errs = append(errs, o.Authorization.Validate()...)
+	return utilerrors.NewAggregate(errs)
 }
 
 // RunAPIServer takes the options, starts the API server and waits until stopCh is closed or initial listening fails.
@@ -110,5 +128,5 @@ func (o *OpenShiftAPIServer) RunAPIServer(stopCh <-chan struct{}) error {
 	}
 	setRecommendedOpenShiftAPIServerConfigDefaults(config)
 
-	return RunOpenShiftAPIServer(config, stopCh)
+	return RunOpenShiftAPIServer(config, o.Authentication, o.Authorization, stopCh)
 }
