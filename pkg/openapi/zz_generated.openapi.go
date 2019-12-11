@@ -2705,7 +2705,7 @@ func schema_openshift_api_authorization_v1_Action(ref common.ReferenceCallback) 
 					},
 					"isNonResourceURL": {
 						SchemaProps: spec.SchemaProps{
-							Description: "IsNonResourceURL is true if this is a request for a non-resource URL (outside of the resource hieraarchy)",
+							Description: "IsNonResourceURL is true if this is a request for a non-resource URL (outside of the resource hierarchy)",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -2853,7 +2853,7 @@ func schema_openshift_api_authorization_v1_ClusterRoleBinding(ref common.Referen
 						},
 					},
 				},
-				Required: []string{"userNames", "groupNames", "subjects", "roleRef"},
+				Required: []string{"subjects", "roleRef"},
 			},
 		},
 		Dependencies: []string{
@@ -3099,7 +3099,7 @@ func schema_openshift_api_authorization_v1_LocalResourceAccessReview(ref common.
 					},
 					"isNonResourceURL": {
 						SchemaProps: spec.SchemaProps{
-							Description: "IsNonResourceURL is true if this is a request for a non-resource URL (outside of the resource hieraarchy)",
+							Description: "IsNonResourceURL is true if this is a request for a non-resource URL (outside of the resource hierarchy)",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -3191,7 +3191,7 @@ func schema_openshift_api_authorization_v1_LocalSubjectAccessReview(ref common.R
 					},
 					"isNonResourceURL": {
 						SchemaProps: spec.SchemaProps{
-							Description: "IsNonResourceURL is true if this is a request for a non-resource URL (outside of the resource hieraarchy)",
+							Description: "IsNonResourceURL is true if this is a request for a non-resource URL (outside of the resource hierarchy)",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -3526,7 +3526,7 @@ func schema_openshift_api_authorization_v1_ResourceAccessReview(ref common.Refer
 					},
 					"isNonResourceURL": {
 						SchemaProps: spec.SchemaProps{
-							Description: "IsNonResourceURL is true if this is a request for a non-resource URL (outside of the resource hieraarchy)",
+							Description: "IsNonResourceURL is true if this is a request for a non-resource URL (outside of the resource hierarchy)",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -3738,7 +3738,7 @@ func schema_openshift_api_authorization_v1_RoleBinding(ref common.ReferenceCallb
 						},
 					},
 				},
-				Required: []string{"userNames", "groupNames", "subjects", "roleRef"},
+				Required: []string{"subjects", "roleRef"},
 			},
 		},
 		Dependencies: []string{
@@ -4178,7 +4178,7 @@ func schema_openshift_api_authorization_v1_SubjectAccessReview(ref common.Refere
 					},
 					"isNonResourceURL": {
 						SchemaProps: spec.SchemaProps{
-							Description: "IsNonResourceURL is true if this is a request for a non-resource URL (outside of the resource hieraarchy)",
+							Description: "IsNonResourceURL is true if this is a request for a non-resource URL (outside of the resource hierarchy)",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -4689,7 +4689,7 @@ func schema_openshift_api_build_v1_BuildConfig(ref common.ReferenceCallback) com
 						},
 					},
 				},
-				Required: []string{"spec", "status"},
+				Required: []string{"spec"},
 			},
 		},
 		Dependencies: []string{
@@ -4852,7 +4852,7 @@ func schema_openshift_api_build_v1_BuildConfigSpec(ref common.ReferenceCallback)
 						},
 					},
 				},
-				Required: []string{"triggers", "strategy", "nodeSelector"},
+				Required: []string{"triggers", "strategy"},
 			},
 		},
 		Dependencies: []string{
@@ -5426,7 +5426,7 @@ func schema_openshift_api_build_v1_BuildSpec(ref common.ReferenceCallback) commo
 						},
 					},
 				},
-				Required: []string{"strategy", "nodeSelector", "triggeredBy"},
+				Required: []string{"strategy", "triggeredBy"},
 			},
 		},
 		Dependencies: []string{
@@ -5802,7 +5802,7 @@ func schema_openshift_api_build_v1_CommonSpec(ref common.ReferenceCallback) comm
 						},
 					},
 				},
-				Required: []string{"strategy", "nodeSelector"},
+				Required: []string{"strategy"},
 			},
 		},
 		Dependencies: []string{
@@ -12971,7 +12971,7 @@ func schema_openshift_api_image_v1_Image(ref common.ReferenceCallback) common.Op
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Image is an immutable representation of a container image and metadata at a point in time.",
+				Description: "Image is an immutable representation of a container image and metadata at a point in time. Images are named by taking a hash of their contents (metadata and content) and any change in format, content, or metadata results in a new name. The images resource is primarily for use by cluster administrators and integrations like the cluster image registry - end users instead access images via the imagestreamtags or imagestreamimages resources. While image metadata is stored in the API, any integration that implements the container image registry API must provide its own storage for the raw manifest data, image config, and layer contents.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -13461,7 +13461,7 @@ func schema_openshift_api_image_v1_ImageStream(ref common.ReferenceCallback) com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageStream stores a mapping of tags to images, metadata overrides that are applied when images are tagged in a stream, and an optional reference to a container image repository on a registry.",
+				Description: "An ImageStream stores a mapping of tags to images, metadata overrides that are applied when images are tagged in a stream, and an optional reference to a container image repository on a registry. Users typically update the spec.tags field to point to external images which are imported from container registries using credentials in your namespace with the pull secret type, or to existing image stream tags and images which are immediately accessible for tagging or pulling. The history of images applied to a tag is visible in the status.tags field and any user who can view an image stream is allowed to tag that image into their own image streams. Access to pull images from the integrated registry is granted by having the \"get imagestreams/layers\" permission on a given image stream. Users may remove a tag by deleting the imagestreamtag resource, which causes both spec and status for that tag to be removed. Image stream history is retained until an administrator runs the prune operation, which removes references that are no longer in use. To preserve a historical image, ensure there is a tag in spec pointing to that image by its digest.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -13508,7 +13508,7 @@ func schema_openshift_api_image_v1_ImageStreamImage(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageStreamImage represents an Image that is retrieved by image name from an ImageStream.",
+				Description: "ImageStreamImage represents an Image that is retrieved by image name from an ImageStream. User interfaces and regular users can use this resource to access the metadata details of a tagged image in the image stream history for viewing, since Image resources are not directly accessible to end users. A not found error will be returned if no such image is referenced by a tag within the ImageStream. Images are created when spec tags are set on an image stream that represent an image in an external registry, when pushing to the integrated registry, or when tagging an existing image from one image stream to another. The name of an image stream image is in the form \"<STREAM>@<DIGEST>\", where the digest is the content addressible identifier for the image (sha256:xxxxx...). You can use ImageStreamImages as the from.kind of an image stream spec tag to reference an image exactly. The only operations supported on the imagestreamimage endpoint are retrieving the image.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -13789,7 +13789,7 @@ func schema_openshift_api_image_v1_ImageStreamMapping(ref common.ReferenceCallba
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageStreamMapping represents a mapping from a single tag to a container image as well as the reference to the container image stream the image came from.",
+				Description: "ImageStreamMapping represents a mapping from a single image stream tag to a container image as well as the reference to the container image stream the image came from. This resource is used by privileged integrators to create an image resource and to associate it with an image stream in the status tags field. Creating an ImageStreamMapping will allow any user who can view the image stream to tag or pull that image, so only create mappings where the user has proven they have access to the image contents directly. The only operation supported for this resource is create and the metadata name and namespace should be set to the image stream containing the tag that should be updated.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -13933,7 +13933,7 @@ func schema_openshift_api_image_v1_ImageStreamTag(ref common.ReferenceCallback) 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageStreamTag represents an Image that is retrieved by tag name from an ImageStream.",
+				Description: "ImageStreamTag represents an Image that is retrieved by tag name from an ImageStream. Use this resource to interact with the tags and images in an image stream by tag, or to see the image details for a particular tag. The image associated with this resource is the most recently successfully tagged, imported, or pushed image (as described in the image stream status.tags.items list for this tag). If an import is in progress or has failed the previous image will be shown. Deleting an image stream tag clears both the status and spec fields of an image stream. If no image can be retrieved for a given tag, a not found error will be returned.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23526,12 +23526,14 @@ func schema_openshift_api_operator_v1_KubeAPIServer(ref common.ReferenceCallback
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/openshift/api/operator/v1.KubeAPIServerSpec"),
+							Description: "spec is the specification of the desired behavior of the Kubernetes API Server",
+							Ref:         ref("github.com/openshift/api/operator/v1.KubeAPIServerSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/openshift/api/operator/v1.KubeAPIServerStatus"),
+							Description: "status is the most recently observed status of the Kubernetes API Server",
+							Ref:         ref("github.com/openshift/api/operator/v1.KubeAPIServerStatus"),
 						},
 					},
 				},
@@ -23777,12 +23779,14 @@ func schema_openshift_api_operator_v1_KubeControllerManager(ref common.Reference
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/openshift/api/operator/v1.KubeControllerManagerSpec"),
+							Description: "spec is the specification of the desired behavior of the Kubernetes Controller Manager",
+							Ref:         ref("github.com/openshift/api/operator/v1.KubeControllerManagerSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/openshift/api/operator/v1.KubeControllerManagerStatus"),
+							Description: "status is the most recently observed status of the Kubernetes Controller Manager",
+							Ref:         ref("github.com/openshift/api/operator/v1.KubeControllerManagerStatus"),
 						},
 					},
 				},
@@ -24028,12 +24032,14 @@ func schema_openshift_api_operator_v1_KubeScheduler(ref common.ReferenceCallback
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/openshift/api/operator/v1.KubeSchedulerSpec"),
+							Description: "spec is the specification of the desired behavior of the Kubernetes Scheduler",
+							Ref:         ref("github.com/openshift/api/operator/v1.KubeSchedulerSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/openshift/api/operator/v1.KubeSchedulerStatus"),
+							Description: "status is the most recently observed status of the Kubernetes Scheduler",
+							Ref:         ref("github.com/openshift/api/operator/v1.KubeSchedulerStatus"),
 						},
 					},
 				},
@@ -29257,7 +29263,7 @@ func schema_openshift_api_route_v1_Route(ref common.ReferenceCallback) common.Op
 						},
 					},
 				},
-				Required: []string{"spec", "status"},
+				Required: []string{"spec"},
 			},
 		},
 		Dependencies: []string{
@@ -29508,7 +29514,7 @@ func schema_openshift_api_route_v1_RouteSpec(ref common.ReferenceCallback) commo
 						},
 					},
 				},
-				Required: []string{"host", "to"},
+				Required: []string{"to"},
 			},
 		},
 		Dependencies: []string{
@@ -29574,7 +29580,7 @@ func schema_openshift_api_route_v1_RouteTargetReference(ref common.ReferenceCall
 						},
 					},
 				},
-				Required: []string{"kind", "name", "weight"},
+				Required: []string{"kind", "name"},
 			},
 		},
 	}
@@ -31671,7 +31677,7 @@ func schema_openshift_api_template_v1_TemplateInstance(ref common.ReferenceCallb
 						},
 					},
 				},
-				Required: []string{"spec", "status"},
+				Required: []string{"spec"},
 			},
 		},
 		Dependencies: []string{
@@ -31887,7 +31893,7 @@ func schema_openshift_api_template_v1_TemplateInstanceSpec(ref common.ReferenceC
 						},
 					},
 				},
-				Required: []string{"template", "requester"},
+				Required: []string{"template"},
 			},
 		},
 		Dependencies: []string{

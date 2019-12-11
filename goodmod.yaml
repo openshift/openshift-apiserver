@@ -30,7 +30,7 @@ rules:
     - github.com/openshift/api
     - github.com/openshift/client-go
     - github.com/openshift/library-go
-    branch: master
+    branch: release-4.3
 
   - paths:
     - github.com/openshift/apiserver-library-go
