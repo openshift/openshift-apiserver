@@ -6,6 +6,7 @@ require (
 	github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd
 	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/certifi/gocertifi v0.0.0-20180905225744-ee1a9a0726d2 // indirect
+	github.com/coreos/etcd v3.3.18+incompatible // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/docker/distribution v2.7.1+incompatible
 	github.com/docker/docker v1.4.2-0.20190327010347-be7ac8be2ae0 // indirect
@@ -30,7 +31,7 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
-	go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738
+	go.etcd.io/etcd v3.3.17+incompatible
 	go.uber.org/multierr v1.1.1-0.20180122172545-ddea229ff1df // indirect
 	golang.org/x/net v0.0.0-20191004110552-13f9640d40b9
 	golang.org/x/tools v0.0.0-20191022074931-774d2ec196ee // indirect
@@ -60,6 +61,7 @@ replace (
 	github.com/openshift/library-go => github.com/openshift/library-go v0.0.0-20191209154952-998f403c47c2
 	github.com/openshift/source-to-image => github.com/openshift/source-to-image v0.0.0-20191104225151-1877e115164b
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.0.0-20181207105117-505eaef01726
+	go.etcd.io/etcd => go.etcd.io/etcd v3.3.17+incompatible
 	k8s.io/api => k8s.io/api v0.0.0-20191118180058-457dff596cdb
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20191118182517-73c803b45f89
 	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20191117110801-62c7b2358269
