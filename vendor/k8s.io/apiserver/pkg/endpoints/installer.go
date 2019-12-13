@@ -550,17 +550,17 @@ func (a *APIInstaller) registerResourceHandlers(path string, storage rest.Storag
 		reqScope.MetaGroupVersion = *a.group.MetaGroupVersion
 	}
 	if a.group.OpenAPIModels != nil && utilfeature.DefaultFeatureGate.Enabled(features.ServerSideApply) {
-		reqScope.FieldManager, err = fieldmanager.NewDefaultFieldManager(
+		fm, err := fieldmanager.NewFieldManager(
 			a.group.OpenAPIModels,
 			a.group.UnsafeConvertor,
 			a.group.Defaulter,
-			a.group.Creater,
-			fqKindToRegister,
+			fqKindToRegister.GroupVersion(),
 			reqScope.HubGroupVersion,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create field manager: %v", err)
 		}
+		reqScope.FieldManager = fm
 	}
 	for _, action := range actions {
 		producedObject := storageMeta.ProducesObject(action.Verb)

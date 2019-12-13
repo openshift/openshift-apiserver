@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/spf13/pflag"
-	"k8s.io/apiserver/pkg/util/feature"
 
 	"k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -173,9 +172,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	clusterQuotaMappingController := NewClusterQuotaMappingController(informers.kubernetesInformers.Core().V1().Namespaces(), informers.quotaInformers.Quota().V1().ClusterResourceQuotas())
 	discoveryClient := cacheddiscovery.NewMemCacheClient(kubeClient.Discovery())
 	restMapper := restmapper.NewDeferredDiscoveryRESTMapper(discoveryClient)
-
-	admissionInitializer, err := openshiftadmission.NewPluginInitializer(config.ImagePolicyConfig.InternalRegistryHostname, config.CloudProviderFile, kubeClientConfig, informers,
-		genericConfig.Authorization.Authorizer, feature.DefaultFeatureGate, restMapper, clusterQuotaMappingController)
+	admissionInitializer, err := openshiftadmission.NewPluginInitializer(config.ImagePolicyConfig.InternalRegistryHostname, config.CloudProviderFile, kubeClientConfig, informers, genericConfig.Authorization.Authorizer, restMapper, clusterQuotaMappingController)
 	if err != nil {
 		return nil, err
 	}
@@ -196,10 +193,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	admissionOptions.EnablePlugins = config.AdmissionConfig.EnabledAdmissionPlugins
 	admissionOptions.DisablePlugins = config.AdmissionConfig.DisabledAdmissionPlugins
 	admissionOptions.ConfigFile = admissionConfigFile
-	// TODO:
-	if err := admissionOptions.ApplyTo(&genericConfig.Config, kubeInformers, kubeClientConfig, nil, admissionInitializer); err != nil {
-		return nil, err
-	}
+	admissionOptions.ApplyTo(&genericConfig.Config, kubeInformers, kubeClientConfig, admissionInitializer)
 
 	var externalRegistryHostname string
 	if len(config.ImagePolicyConfig.ExternalRegistryHostnames) > 0 {

@@ -234,6 +234,13 @@ func acceptMediaTypeOptions(params map[string]string, accepts *runtime.Serialize
 	return options, true
 }
 
+type candidateMediaType struct {
+	accepted *runtime.SerializerInfo
+	clauses  goautoneg.Accept
+}
+
+type candidateMediaTypeSlice []candidateMediaType
+
 // NegotiateMediaTypeOptions returns the most appropriate content type given the accept header and
 // a list of alternatives along with the accepted media type parameters.
 func NegotiateMediaTypeOptions(header string, accepted []runtime.SerializerInfo, endpoint EndpointRestrictions) (MediaTypeOptions, bool) {
@@ -243,19 +250,23 @@ func NegotiateMediaTypeOptions(header string, accepted []runtime.SerializerInfo,
 		}, true
 	}
 
+	var candidates candidateMediaTypeSlice
 	clauses := goautoneg.ParseAccept(header)
-	for i := range clauses {
-		clause := &clauses[i]
+	for _, clause := range clauses {
 		for i := range accepted {
 			accepts := &accepted[i]
 			switch {
 			case clause.Type == accepts.MediaTypeType && clause.SubType == accepts.MediaTypeSubType,
 				clause.Type == accepts.MediaTypeType && clause.SubType == "*",
 				clause.Type == "*" && clause.SubType == "*":
-				if retVal, ret := acceptMediaTypeOptions(clause.Params, accepts, endpoint); ret {
-					return retVal, true
-				}
+				candidates = append(candidates, candidateMediaType{accepted: accepts, clauses: clause})
 			}
+		}
+	}
+
+	for _, v := range candidates {
+		if retVal, ret := acceptMediaTypeOptions(v.clauses.Params, v.accepted, endpoint); ret {
+			return retVal, true
 		}
 	}
 

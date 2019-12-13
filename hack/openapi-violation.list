@@ -255,10 +255,8 @@ API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolp
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,AuthenticationList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ConsoleList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSList,Items
-API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSSpec,Servers
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,EtcdList,Items
-API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ForwardPlugin,Upstreams
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,HybridOverlayConfig,HybridClusterNetwork
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,IngressControllerList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,IngressControllerStatus,Conditions
@@ -276,7 +274,6 @@ API rule violation: list_type_missing,github.com/openshift/api/operator/v1,OpenS
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,OpenShiftControllerManagerList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,OperatorStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,OperatorStatus,Generations
-API rule violation: list_type_missing,github.com/openshift/api/operator/v1,Server,Zones
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ServiceCAList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ServiceCatalogAPIServerList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ServiceCatalogControllerManagerList,Items
@@ -320,14 +317,6 @@ API rule violation: list_type_missing,github.com/openshift/api/route/v1,RouteIng
 API rule violation: list_type_missing,github.com/openshift/api/route/v1,RouteList,Items
 API rule violation: list_type_missing,github.com/openshift/api/route/v1,RouteSpec,AlternateBackends
 API rule violation: list_type_missing,github.com/openshift/api/route/v1,RouteStatus,Ingress
-API rule violation: list_type_missing,github.com/openshift/api/samples/v1,ConfigList,Items
-API rule violation: list_type_missing,github.com/openshift/api/samples/v1,ConfigSpec,Architectures
-API rule violation: list_type_missing,github.com/openshift/api/samples/v1,ConfigSpec,SkippedImagestreams
-API rule violation: list_type_missing,github.com/openshift/api/samples/v1,ConfigSpec,SkippedTemplates
-API rule violation: list_type_missing,github.com/openshift/api/samples/v1,ConfigStatus,Architectures
-API rule violation: list_type_missing,github.com/openshift/api/samples/v1,ConfigStatus,Conditions
-API rule violation: list_type_missing,github.com/openshift/api/samples/v1,ConfigStatus,SkippedImagestreams
-API rule violation: list_type_missing,github.com/openshift/api/samples/v1,ConfigStatus,SkippedTemplates
 API rule violation: list_type_missing,github.com/openshift/api/security/v1,FSGroupStrategyOptions,Ranges
 API rule violation: list_type_missing,github.com/openshift/api/security/v1,PodSecurityPolicyReviewSpec,ServiceAccountNames
 API rule violation: list_type_missing,github.com/openshift/api/security/v1,PodSecurityPolicyReviewStatus,AllowedServiceAccounts
@@ -577,7 +566,6 @@ API rule violation: list_type_missing,k8s.io/api/core/v1,ServiceAccountList,Item
 API rule violation: list_type_missing,k8s.io/api/core/v1,ServiceList,Items
 API rule violation: list_type_missing,k8s.io/api/core/v1,ServiceSpec,ExternalIPs
 API rule violation: list_type_missing,k8s.io/api/core/v1,ServiceSpec,LoadBalancerSourceRanges
-API rule violation: list_type_missing,k8s.io/api/core/v1,ServiceSpec,TopologyKeys
 API rule violation: list_type_missing,k8s.io/api/core/v1,TopologySelectorLabelRequirement,Values
 API rule violation: list_type_missing,k8s.io/api/core/v1,TopologySelectorTerm,MatchLabelExpressions
 API rule violation: list_type_missing,k8s.io/api/events/v1beta1,EventList,Items
@@ -703,9 +691,6 @@ API rule violation: list_type_missing,k8s.io/api/settings/v1alpha1,PodPresetSpec
 API rule violation: list_type_missing,k8s.io/api/settings/v1alpha1,PodPresetSpec,EnvFrom
 API rule violation: list_type_missing,k8s.io/api/settings/v1alpha1,PodPresetSpec,VolumeMounts
 API rule violation: list_type_missing,k8s.io/api/settings/v1alpha1,PodPresetSpec,Volumes
-API rule violation: list_type_missing,k8s.io/api/storage/v1,CSINodeDriver,TopologyKeys
-API rule violation: list_type_missing,k8s.io/api/storage/v1,CSINodeList,Items
-API rule violation: list_type_missing,k8s.io/api/storage/v1,CSINodeSpec,Drivers
 API rule violation: list_type_missing,k8s.io/api/storage/v1,StorageClass,AllowedTopologies
 API rule violation: list_type_missing,k8s.io/api/storage/v1,StorageClass,MountOptions
 API rule violation: list_type_missing,k8s.io/api/storage/v1,StorageClassList,Items
@@ -943,7 +928,7 @@ API rule violation: names_match,k8s.io/api/core/v1,ISCSIPersistentVolumeSource,S
 API rule violation: names_match,k8s.io/api/core/v1,ISCSIVolumeSource,DiscoveryCHAPAuth
 API rule violation: names_match,k8s.io/api/core/v1,ISCSIVolumeSource,SessionCHAPAuth
 API rule violation: names_match,k8s.io/api/core/v1,NodeResources,Capacity
-API rule violation: names_match,k8s.io/api/core/v1,NodeSpec,DoNotUseExternalID
+API rule violation: names_match,k8s.io/api/core/v1,NodeSpec,DoNotUse_ExternalID
 API rule violation: names_match,k8s.io/api/core/v1,PersistentVolumeSource,CephFS
 API rule violation: names_match,k8s.io/api/core/v1,PersistentVolumeSource,StorageOS
 API rule violation: names_match,k8s.io/api/core/v1,PodSpec,DeprecatedServiceAccount
@@ -965,7 +950,6 @@ API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiexten
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaProps,XIntOrString
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaProps,XListMapKeys
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaProps,XListType
-API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaProps,XMapType
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaProps,XPreserveUnknownFields
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaPropsOrArray,JSONSchemas
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaPropsOrArray,Schema
@@ -981,7 +965,6 @@ API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiexten
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaProps,XIntOrString
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaProps,XListMapKeys
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaProps,XListType
-API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaProps,XMapType
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaProps,XPreserveUnknownFields
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaPropsOrArray,JSONSchemas
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaPropsOrArray,Schema
@@ -1086,8 +1069,6 @@ API rule violation: names_match,k8s.io/kube-controller-manager/config/v1alpha1,K
 API rule violation: names_match,k8s.io/kube-controller-manager/config/v1alpha1,NamespaceControllerConfiguration,ConcurrentNamespaceSyncs
 API rule violation: names_match,k8s.io/kube-controller-manager/config/v1alpha1,NamespaceControllerConfiguration,NamespaceSyncPeriod
 API rule violation: names_match,k8s.io/kube-controller-manager/config/v1alpha1,NodeIPAMControllerConfiguration,NodeCIDRMaskSize
-API rule violation: names_match,k8s.io/kube-controller-manager/config/v1alpha1,NodeIPAMControllerConfiguration,NodeCIDRMaskSizeIPv4
-API rule violation: names_match,k8s.io/kube-controller-manager/config/v1alpha1,NodeIPAMControllerConfiguration,NodeCIDRMaskSizeIPv6
 API rule violation: names_match,k8s.io/kube-controller-manager/config/v1alpha1,NodeIPAMControllerConfiguration,SecondaryServiceCIDR
 API rule violation: names_match,k8s.io/kube-controller-manager/config/v1alpha1,NodeIPAMControllerConfiguration,ServiceCIDR
 API rule violation: names_match,k8s.io/kube-controller-manager/config/v1alpha1,NodeLifecycleControllerConfiguration,EnableTaintManager

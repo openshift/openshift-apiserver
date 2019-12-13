@@ -32,7 +32,7 @@ import (
 	certificatesv1beta1 "k8s.io/api/certificates/v1beta1"
 	coordinationv1 "k8s.io/api/coordination/v1"
 	apiv1 "k8s.io/api/core/v1"
-	discoveryv1beta1 "k8s.io/api/discovery/v1beta1"
+	discoveryv1alpha1 "k8s.io/api/discovery/v1alpha1"
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	policyv1beta1 "k8s.io/api/policy/v1beta1"
 	rbacv1beta1 "k8s.io/api/rbac/v1beta1"
@@ -410,9 +410,6 @@ func AddHandlers(h printers.PrintHandler) {
 	storageClassColumnDefinitions := []metav1beta1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: metav1.ObjectMeta{}.SwaggerDoc()["name"]},
 		{Name: "Provisioner", Type: "string", Description: storagev1.StorageClass{}.SwaggerDoc()["provisioner"]},
-		{Name: "ReclaimPolicy", Type: "string", Description: storagev1.StorageClass{}.SwaggerDoc()["reclaimPolicy"]},
-		{Name: "VolumeBindingMode", Type: "string", Description: storagev1.StorageClass{}.SwaggerDoc()["volumeBindingMode"]},
-		{Name: "AllowVolumeExpansion", Type: "string", Description: storagev1.StorageClass{}.SwaggerDoc()["allowVolumeExpansion"]},
 		{Name: "Age", Type: "string", Description: metav1.ObjectMeta{}.SwaggerDoc()["creationTimestamp"]},
 	}
 
@@ -475,9 +472,9 @@ func AddHandlers(h printers.PrintHandler) {
 
 	endpointSliceColumnDefinitions := []metav1beta1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: metav1.ObjectMeta{}.SwaggerDoc()["name"]},
-		{Name: "AddressType", Type: "string", Description: discoveryv1beta1.EndpointSlice{}.SwaggerDoc()["addressType"]},
-		{Name: "Ports", Type: "string", Description: discoveryv1beta1.EndpointSlice{}.SwaggerDoc()["ports"]},
-		{Name: "Endpoints", Type: "string", Description: discoveryv1beta1.EndpointSlice{}.SwaggerDoc()["endpoints"]},
+		{Name: "AddressType", Type: "string", Description: discoveryv1alpha1.EndpointSlice{}.SwaggerDoc()["addressType"]},
+		{Name: "Ports", Type: "string", Description: discoveryv1alpha1.EndpointSlice{}.SwaggerDoc()["ports"]},
+		{Name: "Endpoints", Type: "string", Description: discoveryv1alpha1.EndpointSlice{}.SwaggerDoc()["endpoints"]},
 		{Name: "Age", Type: "string", Description: metav1.ObjectMeta{}.SwaggerDoc()["creationTimestamp"]},
 	}
 	h.TableHandler(endpointSliceColumnDefinitions, printEndpointSlice)
@@ -1173,7 +1170,11 @@ func printEndpointSlice(obj *discovery.EndpointSlice, options printers.GenerateO
 	row := metav1beta1.TableRow{
 		Object: runtime.RawExtension{Object: obj},
 	}
-	row.Cells = append(row.Cells, obj.Name, string(obj.AddressType), formatDiscoveryPorts(obj.Ports), formatDiscoveryEndpoints(obj.Endpoints), translateTimestampSince(obj.CreationTimestamp))
+	addressType := "<unset>"
+	if obj.AddressType != nil {
+		addressType = string(*obj.AddressType)
+	}
+	row.Cells = append(row.Cells, obj.Name, addressType, formatDiscoveryPorts(obj.Ports), formatDiscoveryEndpoints(obj.Endpoints), translateTimestampSince(obj.CreationTimestamp))
 	return []metav1beta1.TableRow{row}, nil
 }
 
@@ -1856,23 +1857,7 @@ func printStorageClass(obj *storage.StorageClass, options printers.GenerateOptio
 		name += " (default)"
 	}
 	provtype := obj.Provisioner
-	reclaimPolicy := string(api.PersistentVolumeReclaimDelete)
-	if obj.ReclaimPolicy != nil {
-		reclaimPolicy = string(*obj.ReclaimPolicy)
-	}
-
-	volumeBindingMode := string(storage.VolumeBindingImmediate)
-	if obj.VolumeBindingMode != nil {
-		volumeBindingMode = string(*obj.VolumeBindingMode)
-	}
-
-	allowVolumeExpansion := false
-	if obj.AllowVolumeExpansion != nil {
-		allowVolumeExpansion = *obj.AllowVolumeExpansion
-	}
-
-	row.Cells = append(row.Cells, name, provtype, reclaimPolicy, volumeBindingMode, allowVolumeExpansion,
-		translateTimestampSince(obj.CreationTimestamp))
+	row.Cells = append(row.Cells, name, provtype, translateTimestampSince(obj.CreationTimestamp))
 
 	return []metav1beta1.TableRow{row}, nil
 }

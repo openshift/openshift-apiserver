@@ -123,7 +123,6 @@ const (
 	// owner: @wojtek-t
 	// alpha: v1.15
 	// beta: v1.16
-	// GA: v1.17
 	//
 	// Enables support for watch bookmark events.
 	WatchBookmark featuregate.Feature = "WatchBookmark"
@@ -133,7 +132,7 @@ const (
 	//
 	//
 	// Enables managing request concurrency with prioritization and fairness at each server
-	APIPriorityAndFairness featuregate.Feature = "APIPriorityAndFairness"
+	RequestManagement featuregate.Feature = "RequestManagement"
 
 	// owner: @wojtek-t
 	// alpha: v1.16
@@ -162,7 +161,7 @@ var defaultKubernetesFeatureGates = map[featuregate.Feature]featuregate.FeatureS
 	StorageVersionHash:      {Default: true, PreRelease: featuregate.Beta},
 	WinOverlay:              {Default: false, PreRelease: featuregate.Alpha},
 	WinDSR:                  {Default: false, PreRelease: featuregate.Alpha},
-	WatchBookmark:           {Default: true, PreRelease: featuregate.GA, LockToDefault: true},
-	APIPriorityAndFairness:  {Default: false, PreRelease: featuregate.Alpha},
+	WatchBookmark:           {Default: true, PreRelease: featuregate.Beta},
+	RequestManagement:       {Default: false, PreRelease: featuregate.Alpha},
 	RemoveSelfLink:          {Default: false, PreRelease: featuregate.Alpha},
 }

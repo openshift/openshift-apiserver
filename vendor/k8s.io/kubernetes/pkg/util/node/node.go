@@ -26,7 +26,7 @@ import (
 
 	"k8s.io/klog"
 
-	v1 "k8s.io/api/core/v1"
+	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -139,62 +139,33 @@ func GetNodeIP(client clientset.Interface, hostname string) net.IP {
 
 // GetZoneKey is a helper function that builds a string identifier that is unique per failure-zone;
 // it returns empty-string for no zone.
-// Since there are currently two separate zone keys:
-//   * "failure-domain.beta.kubernetes.io/zone"
-//   * "topology.kubernetes.io/zone"
-// GetZoneKey will first check failure-domain.beta.kubernetes.io/zone and if not exists, will then check
-// topology.kubernetes.io/zone
 func GetZoneKey(node *v1.Node) string {
 	labels := node.Labels
 	if labels == nil {
 		return ""
 	}
 
-	// TODO: prefer stable labels for zone in v1.18
-	zone, ok := labels[v1.LabelZoneFailureDomain]
-	if !ok {
-		zone, _ = labels[v1.LabelZoneFailureDomainStable]
-	}
+	region, _ := labels[v1.LabelZoneRegion]
+	failureDomain, _ := labels[v1.LabelZoneFailureDomain]
 
-	// TODO: prefer stable labels for region in v1.18
-	region, ok := labels[v1.LabelZoneRegion]
-	if !ok {
-		region, _ = labels[v1.LabelZoneRegionStable]
-	}
-
-	if region == "" && zone == "" {
+	if region == "" && failureDomain == "" {
 		return ""
 	}
 
 	// We include the null character just in case region or failureDomain has a colon
 	// (We do assume there's no null characters in a region or failureDomain)
 	// As a nice side-benefit, the null character is not printed by fmt.Print or glog
-	return region + ":\x00:" + zone
-}
-
-type nodeForConditionPatch struct {
-	Status nodeStatusForPatch `json:"status"`
-}
-
-type nodeStatusForPatch struct {
-	Conditions []v1.NodeCondition `json:"conditions"`
+	return region + ":\x00:" + failureDomain
 }
 
 // SetNodeCondition updates specific node condition with patch operation.
 func SetNodeCondition(c clientset.Interface, node types.NodeName, condition v1.NodeCondition) error {
 	generatePatch := func(condition v1.NodeCondition) ([]byte, error) {
-		patch := nodeForConditionPatch{
-			Status: nodeStatusForPatch{
-				Conditions: []v1.NodeCondition{
-					condition,
-				},
-			},
-		}
-		patchBytes, err := json.Marshal(&patch)
+		raw, err := json.Marshal(&[]v1.NodeCondition{condition})
 		if err != nil {
 			return nil, err
 		}
-		return patchBytes, nil
+		return []byte(fmt.Sprintf(`{"status":{"conditions":%s}}`, raw)), nil
 	}
 	condition.LastHeartbeatTime = metav1.NewTime(time.Now())
 	patch, err := generatePatch(condition)
@@ -205,26 +176,14 @@ func SetNodeCondition(c clientset.Interface, node types.NodeName, condition v1.N
 	return err
 }
 
-type nodeForCIDRMergePatch struct {
-	Spec nodeSpecForMergePatch `json:"spec"`
-}
-
-type nodeSpecForMergePatch struct {
-	PodCIDR  string   `json:"podCIDR"`
-	PodCIDRs []string `json:"podCIDRs,omitempty"`
-}
-
 // PatchNodeCIDR patches the specified node's CIDR to the given value.
 func PatchNodeCIDR(c clientset.Interface, node types.NodeName, cidr string) error {
-	patch := nodeForCIDRMergePatch{
-		Spec: nodeSpecForMergePatch{
-			PodCIDR: cidr,
-		},
-	}
-	patchBytes, err := json.Marshal(&patch)
+	raw, err := json.Marshal(cidr)
 	if err != nil {
 		return fmt.Errorf("failed to json.Marshal CIDR: %v", err)
 	}
+
+	patchBytes := []byte(fmt.Sprintf(`{"spec":{"podCIDR":%s}}`, raw))
 
 	if _, err := c.CoreV1().Nodes().Patch(string(node), types.StrategicMergePatchType, patchBytes); err != nil {
 		return fmt.Errorf("failed to patch node CIDR: %v", err)
@@ -234,18 +193,18 @@ func PatchNodeCIDR(c clientset.Interface, node types.NodeName, cidr string) erro
 
 // PatchNodeCIDRs patches the specified node.CIDR=cidrs[0] and node.CIDRs to the given value.
 func PatchNodeCIDRs(c clientset.Interface, node types.NodeName, cidrs []string) error {
-	// set the pod cidrs list and set the old pod cidr field
-	patch := nodeForCIDRMergePatch{
-		Spec: nodeSpecForMergePatch{
-			PodCIDR:  cidrs[0],
-			PodCIDRs: cidrs,
-		},
+	rawCidrs, err := json.Marshal(cidrs)
+	if err != nil {
+		return fmt.Errorf("failed to json.Marshal CIDRs: %v", err)
 	}
 
-	patchBytes, err := json.Marshal(&patch)
+	rawCidr, err := json.Marshal(cidrs[0])
 	if err != nil {
 		return fmt.Errorf("failed to json.Marshal CIDR: %v", err)
 	}
+
+	// set the pod cidrs list and set the old pod cidr field
+	patchBytes := []byte(fmt.Sprintf(`{"spec":{"podCIDR":%s , "podCIDRs":%s}}`, rawCidr, rawCidrs))
 	klog.V(4).Infof("cidrs patch bytes are:%s", string(patchBytes))
 	if _, err := c.CoreV1().Nodes().Patch(string(node), types.StrategicMergePatchType, patchBytes); err != nil {
 		return fmt.Errorf("failed to patch node CIDR: %v", err)
