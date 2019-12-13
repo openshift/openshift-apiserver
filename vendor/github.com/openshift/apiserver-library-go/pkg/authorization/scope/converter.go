@@ -24,7 +24,6 @@ const (
 	kubeAuthorizationGroupName      = "authorization.k8s.io"
 	openshiftAuthorizationGroupName = "authorization.openshift.io"
 	imageGroupName                  = "image.openshift.io"
-	networkGroupName                = "network.openshift.io"
 	oauthGroupName                  = "oauth.openshift.io"
 	projectGroupName                = "project.openshift.io"
 	userGroupName                   = "user.openshift.io"
@@ -267,8 +266,6 @@ var escalatingScopeResources = []schema.GroupResource{
 	{Group: openshiftAuthorizationGroupName, Resource: "rolebindings"},
 	{Group: openshiftAuthorizationGroupName, Resource: "clusterroles"},
 	{Group: openshiftAuthorizationGroupName, Resource: "clusterrolebindings"},
-	// used in Service admission to create a service with external IP outside the allowed range
-	{Group: networkGroupName, Resource: "service"},
 
 	{Group: legacyGroupName, Resource: "imagestreams/secrets"},
 	{Group: legacyGroupName, Resource: "oauthauthorizetokens"},

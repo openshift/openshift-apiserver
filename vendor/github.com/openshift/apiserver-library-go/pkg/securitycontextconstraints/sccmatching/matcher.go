@@ -1,7 +1,6 @@
 package sccmatching
 
 import (
-	"context"
 	"fmt"
 	"sort"
 	"strings"
@@ -20,13 +19,12 @@ import (
 	"github.com/openshift/api/security"
 	securityv1 "github.com/openshift/api/security/v1"
 	sccsort "github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/util/sort"
-
 	securityv1listers "github.com/openshift/client-go/security/listers/security/v1"
 	"github.com/openshift/library-go/pkg/security/uid"
 )
 
 type SCCMatcher interface {
-	FindApplicableSCCs(ctx context.Context, namespace string, user ...user.Info) ([]*securityv1.SecurityContextConstraints, error)
+	FindApplicableSCCs(namespace string, user ...user.Info) ([]*securityv1.SecurityContextConstraints, error)
 }
 
 type defaultSCCMatcher struct {
@@ -41,7 +39,7 @@ func NewDefaultSCCMatcher(c securityv1listers.SecurityContextConstraintsLister, 
 // FindApplicableSCCs implements SCCMatcher interface
 // It finds all SCCs that the subjects in the `users` argument may use.
 // The returned SCCs are sorted by priority.
-func (d *defaultSCCMatcher) FindApplicableSCCs(ctx context.Context, namespace string, users ...user.Info) ([]*securityv1.SecurityContextConstraints, error) {
+func (d *defaultSCCMatcher) FindApplicableSCCs(namespace string, users ...user.Info) ([]*securityv1.SecurityContextConstraints, error) {
 	var matchedConstraints []*securityv1.SecurityContextConstraints
 	constraints, err := d.cache.List(labels.Everything())
 	if err != nil {
@@ -54,7 +52,7 @@ func (d *defaultSCCMatcher) FindApplicableSCCs(ctx context.Context, namespace st
 	} else {
 		for _, constraint := range constraints {
 			for _, user := range users {
-				if ConstraintAppliesTo(ctx, constraint.Name, constraint.Users, constraint.Groups, user, namespace, d.authorizer) {
+				if ConstraintAppliesTo(constraint.Name, constraint.Users, constraint.Groups, user, namespace, d.authorizer) {
 					matchedConstraints = append(matchedConstraints, constraint)
 					break
 				}
@@ -68,7 +66,7 @@ func (d *defaultSCCMatcher) FindApplicableSCCs(ctx context.Context, namespace st
 }
 
 // authorizedForSCC returns true if info is authorized to perform the "use" verb on the SCC resource.
-func authorizedForSCC(ctx context.Context, sccName string, info user.Info, namespace string, a authorizer.Authorizer) bool {
+func authorizedForSCC(sccName string, info user.Info, namespace string, a authorizer.Authorizer) bool {
 	// check against the namespace that the pod is being created in to allow per-namespace SCC grants.
 	attr := authorizer.AttributesRecord{
 		User:            info,
@@ -79,7 +77,7 @@ func authorizedForSCC(ctx context.Context, sccName string, info user.Info, names
 		Resource:        "securitycontextconstraints",
 		ResourceRequest: true,
 	}
-	decision, reason, err := a.Authorize(ctx, attr)
+	decision, reason, err := a.Authorize(attr)
 	if err != nil {
 		klog.V(5).Infof("cannot authorize for SCC: %v %q %v", decision, reason, err)
 		return false
@@ -90,7 +88,7 @@ func authorizedForSCC(ctx context.Context, sccName string, info user.Info, names
 // ConstraintAppliesTo inspects the constraint's users and groups against the userInfo to determine
 // if it is usable by the userInfo.
 // Anything we do here needs to work with a deny authorizer so the choices are limited to SAR / Authorizer
-func ConstraintAppliesTo(ctx context.Context, sccName string, sccUsers, sccGroups []string, userInfo user.Info, namespace string, a authorizer.Authorizer) bool {
+func ConstraintAppliesTo(sccName string, sccUsers, sccGroups []string, userInfo user.Info, namespace string, a authorizer.Authorizer) bool {
 	for _, user := range sccUsers {
 		if userInfo.GetName() == user {
 			return true
@@ -102,7 +100,7 @@ func ConstraintAppliesTo(ctx context.Context, sccName string, sccUsers, sccGroup
 		}
 	}
 	if a != nil {
-		return authorizedForSCC(ctx, sccName, userInfo, namespace, a)
+		return authorizedForSCC(sccName, userInfo, namespace, a)
 	}
 	return false
 }
