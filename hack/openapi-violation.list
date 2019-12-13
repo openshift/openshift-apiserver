@@ -48,7 +48,6 @@ API rule violation: list_type_missing,github.com/openshift/api/build/v1,BuildSou
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,BuildSource,Images
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,BuildSource,Secrets
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,BuildSpec,TriggeredBy
-API rule violation: list_type_missing,github.com/openshift/api/build/v1,BuildStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,BuildStatus,Stages
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,CustomBuildStrategy,Env
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,CustomBuildStrategy,Secrets

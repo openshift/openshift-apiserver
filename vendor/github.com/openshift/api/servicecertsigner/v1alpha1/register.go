@@ -31,6 +31,9 @@ func Resource(resource string) schema.GroupResource {
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(GroupVersion,
+		&ServiceServingCertSignerConfig{},
+		&APIServiceCABundleInjectorConfig{},
+		&ConfigMapCABundleInjectorConfig{},
 		&ServiceCertSignerOperatorConfig{},
 		&ServiceCertSignerOperatorConfigList{},
 	)

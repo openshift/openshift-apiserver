@@ -509,8 +509,6 @@ github.com/openshift/api v0.0.0-20191119170142-082f8e2a947e h1:PdaVXCFxrT4tSVp5z
 github.com/openshift/api v0.0.0-20191119170142-082f8e2a947e/go.mod h1:dh9o4Fs58gpFXGSYfnVxGR9PnV53I8TW84pQaJDdGiY=
 github.com/openshift/api v3.9.1-0.20191209132752-992bc3a41fe6+incompatible h1:5ph0t7cWGSw70fzMvxru56/CLHHaxoE43+QoFqkkOz0=
 github.com/openshift/api v3.9.1-0.20191209132752-992bc3a41fe6+incompatible/go.mod h1:dh9o4Fs58gpFXGSYfnVxGR9PnV53I8TW84pQaJDdGiY=
-github.com/openshift/api v3.9.1-0.20191213091414-3fbf6bcf78e8+incompatible h1:bPZ3JyH/fLfWBgBW62qmmdrk+dzCe/VRLhXODigts/0=
-github.com/openshift/api v3.9.1-0.20191213091414-3fbf6bcf78e8+incompatible/go.mod h1:dh9o4Fs58gpFXGSYfnVxGR9PnV53I8TW84pQaJDdGiY=
 github.com/openshift/apiserver-library-go v0.0.0-20191121105954-72a8df0fc9cc h1:lQEjPGy3b/wBEK0ycuGnMMVYUQPMPCQtxb0rdsMbnnU=
 github.com/openshift/apiserver-library-go v0.0.0-20191121105954-72a8df0fc9cc/go.mod h1:A0BzV6de/6xHVTn1WxtulCsz3+6bUb9TxDRN8YbyhdE=
 github.com/openshift/client-go v0.0.0-20191022152013-2823239d2298 h1:wg5VfVIEtKI0yaBNeHNM1N01EjwTGg7JW0Gp+jqnYGQ=
