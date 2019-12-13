@@ -137,7 +137,6 @@ message TemplateInstance {
   optional TemplateInstanceSpec spec = 2;
 
   // status describes the current state of this TemplateInstance.
-  // +optional
   optional TemplateInstanceStatus status = 3;
 }
 
@@ -208,7 +207,6 @@ message TemplateInstanceSpec {
 
   // requester holds the identity of the agent requesting the template
   // instantiation.
-  // +optional
   optional TemplateInstanceRequester requester = 3;
 }
 
