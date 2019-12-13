@@ -77,6 +77,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/build/v1.BinaryBuildSource":                                                         schema_openshift_api_build_v1_BinaryBuildSource(ref),
 		"github.com/openshift/api/build/v1.BitbucketWebHookCause":                                                     schema_openshift_api_build_v1_BitbucketWebHookCause(ref),
 		"github.com/openshift/api/build/v1.Build":                                                                     schema_openshift_api_build_v1_Build(ref),
+		"github.com/openshift/api/build/v1.BuildCondition":                                                            schema_openshift_api_build_v1_BuildCondition(ref),
 		"github.com/openshift/api/build/v1.BuildConfig":                                                               schema_openshift_api_build_v1_BuildConfig(ref),
 		"github.com/openshift/api/build/v1.BuildConfigList":                                                           schema_openshift_api_build_v1_BuildConfigList(ref),
 		"github.com/openshift/api/build/v1.BuildConfigSpec":                                                           schema_openshift_api_build_v1_BuildConfigSpec(ref),
@@ -624,13 +625,10 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/security/v1.SecurityContextConstraintsList":                                         schema_openshift_api_security_v1_SecurityContextConstraintsList(ref),
 		"github.com/openshift/api/security/v1.ServiceAccountPodSecurityPolicyReviewStatus":                            schema_openshift_api_security_v1_ServiceAccountPodSecurityPolicyReviewStatus(ref),
 		"github.com/openshift/api/security/v1.SupplementalGroupsStrategyOptions":                                      schema_openshift_api_security_v1_SupplementalGroupsStrategyOptions(ref),
-		"github.com/openshift/api/servicecertsigner/v1alpha1.APIServiceCABundleInjectorConfig":                        schema_openshift_api_servicecertsigner_v1alpha1_APIServiceCABundleInjectorConfig(ref),
-		"github.com/openshift/api/servicecertsigner/v1alpha1.ConfigMapCABundleInjectorConfig":                         schema_openshift_api_servicecertsigner_v1alpha1_ConfigMapCABundleInjectorConfig(ref),
 		"github.com/openshift/api/servicecertsigner/v1alpha1.ServiceCertSignerOperatorConfig":                         schema_openshift_api_servicecertsigner_v1alpha1_ServiceCertSignerOperatorConfig(ref),
 		"github.com/openshift/api/servicecertsigner/v1alpha1.ServiceCertSignerOperatorConfigList":                     schema_openshift_api_servicecertsigner_v1alpha1_ServiceCertSignerOperatorConfigList(ref),
 		"github.com/openshift/api/servicecertsigner/v1alpha1.ServiceCertSignerOperatorConfigSpec":                     schema_openshift_api_servicecertsigner_v1alpha1_ServiceCertSignerOperatorConfigSpec(ref),
 		"github.com/openshift/api/servicecertsigner/v1alpha1.ServiceCertSignerOperatorConfigStatus":                   schema_openshift_api_servicecertsigner_v1alpha1_ServiceCertSignerOperatorConfigStatus(ref),
-		"github.com/openshift/api/servicecertsigner/v1alpha1.ServiceServingCertSignerConfig":                          schema_openshift_api_servicecertsigner_v1alpha1_ServiceServingCertSignerConfig(ref),
 		"github.com/openshift/api/template/v1.BrokerTemplateInstance":                                                 schema_openshift_api_template_v1_BrokerTemplateInstance(ref),
 		"github.com/openshift/api/template/v1.BrokerTemplateInstanceList":                                             schema_openshift_api_template_v1_BrokerTemplateInstanceList(ref),
 		"github.com/openshift/api/template/v1.BrokerTemplateInstanceSpec":                                             schema_openshift_api_template_v1_BrokerTemplateInstanceSpec(ref),
@@ -4650,6 +4648,62 @@ func schema_openshift_api_build_v1_Build(ref common.ReferenceCallback) common.Op
 	}
 }
 
+func schema_openshift_api_build_v1_BuildCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BuildCondition describes the state of a build at a certain point.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type of build condition.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status of the condition, one of True, False, Unknown.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"lastUpdateTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The last time this condition was updated.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+					"lastTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The last time the condition transitioned from one status to another.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+					"reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The reason for the condition's last transition.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "A human readable message indicating details about the transition.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"type", "status"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
 func schema_openshift_api_build_v1_BuildConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -5527,12 +5581,31 @@ func schema_openshift_api_build_v1_BuildStatus(ref common.ReferenceCallback) com
 							Format:      "",
 						},
 					},
+					"conditions": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "type",
+								"x-kubernetes-patch-strategy":  "merge",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Conditions represents the latest available observations of a build's current state.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/openshift/api/build/v1.BuildCondition"),
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"phase"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/build/v1.BuildStatusOutput", "github.com/openshift/api/build/v1.StageInfo", "k8s.io/api/core/v1.ObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"github.com/openshift/api/build/v1.BuildCondition", "github.com/openshift/api/build/v1.BuildStatusOutput", "github.com/openshift/api/build/v1.StageInfo", "k8s.io/api/core/v1.ObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 
@@ -13496,7 +13569,6 @@ func schema_openshift_api_image_v1_ImageStream(ref common.ReferenceCallback) com
 						},
 					},
 				},
-				Required: []string{"spec"},
 			},
 		},
 		Dependencies: []string{
@@ -30951,128 +31023,6 @@ func schema_openshift_api_security_v1_SupplementalGroupsStrategyOptions(ref comm
 	}
 }
 
-func schema_openshift_api_servicecertsigner_v1alpha1_APIServiceCABundleInjectorConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "APIServiceCABundleInjectorConfig provides information to configure an APIService CA Bundle Injector controller",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"servingInfo": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ServingInfo is the HTTP serving information for the controller's endpoints",
-							Ref:         ref("github.com/openshift/api/config/v1.HTTPServingInfo"),
-						},
-					},
-					"leaderElection": {
-						SchemaProps: spec.SchemaProps{
-							Description: "leaderElection provides information to elect a leader. Only override this if you have a specific need",
-							Ref:         ref("github.com/openshift/api/config/v1.LeaderElection"),
-						},
-					},
-					"authentication": {
-						SchemaProps: spec.SchemaProps{
-							Description: "authentication allows configuration of authentication for the endpoints",
-							Ref:         ref("github.com/openshift/api/config/v1.DelegatedAuthentication"),
-						},
-					},
-					"authorization": {
-						SchemaProps: spec.SchemaProps{
-							Description: "authorization allows configuration of authentication for the endpoints",
-							Ref:         ref("github.com/openshift/api/config/v1.DelegatedAuthorization"),
-						},
-					},
-					"caBundleFile": {
-						SchemaProps: spec.SchemaProps{
-							Description: "caBundleFile holds the ca bundle to apply to APIServices.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"servingInfo", "leaderElection", "authentication", "authorization", "caBundleFile"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/config/v1.DelegatedAuthentication", "github.com/openshift/api/config/v1.DelegatedAuthorization", "github.com/openshift/api/config/v1.HTTPServingInfo", "github.com/openshift/api/config/v1.LeaderElection"},
-	}
-}
-
-func schema_openshift_api_servicecertsigner_v1alpha1_ConfigMapCABundleInjectorConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ConfigMapCABundleInjectorConfig provides information to configure a ConfigMap CA Bundle Injector controller",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"servingInfo": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ServingInfo is the HTTP serving information for the controller's endpoints",
-							Ref:         ref("github.com/openshift/api/config/v1.HTTPServingInfo"),
-						},
-					},
-					"leaderElection": {
-						SchemaProps: spec.SchemaProps{
-							Description: "leaderElection provides information to elect a leader. Only override this if you have a specific need",
-							Ref:         ref("github.com/openshift/api/config/v1.LeaderElection"),
-						},
-					},
-					"authentication": {
-						SchemaProps: spec.SchemaProps{
-							Description: "authentication allows configuration of authentication for the endpoints",
-							Ref:         ref("github.com/openshift/api/config/v1.DelegatedAuthentication"),
-						},
-					},
-					"authorization": {
-						SchemaProps: spec.SchemaProps{
-							Description: "authorization allows configuration of authentication for the endpoints",
-							Ref:         ref("github.com/openshift/api/config/v1.DelegatedAuthorization"),
-						},
-					},
-					"caBundleFile": {
-						SchemaProps: spec.SchemaProps{
-							Description: "caBundleFile holds the ca bundle to apply to ConfigMaps.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"servingInfo", "leaderElection", "authentication", "authorization", "caBundleFile"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/config/v1.DelegatedAuthentication", "github.com/openshift/api/config/v1.DelegatedAuthorization", "github.com/openshift/api/config/v1.HTTPServingInfo", "github.com/openshift/api/config/v1.LeaderElection"},
-	}
-}
-
 func schema_openshift_api_servicecertsigner_v1alpha1_ServiceCertSignerOperatorConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -31205,26 +31155,8 @@ func schema_openshift_api_servicecertsigner_v1alpha1_ServiceCertSignerOperatorCo
 							Ref:         ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
 						},
 					},
-					"serviceServingCertSignerConfig": {
-						SchemaProps: spec.SchemaProps{
-							Description: "serviceServingCertSignerConfig holds a sparse config that the user wants for this component.  It only needs to be the overrides from the defaults it will end up overlaying in the following order: 1. hardcoded default 2. this config",
-							Ref:         ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
-						},
-					},
-					"apiServiceCABundleInjectorConfig": {
-						SchemaProps: spec.SchemaProps{
-							Description: "apiServiceCABundleInjectorConfig holds a sparse config that the user wants for this component.  It only needs to be the overrides from the defaults it will end up overlaying in the following order: 1. hardcoded default 2. this config",
-							Ref:         ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
-						},
-					},
-					"configMapCABundleInjectorConfig": {
-						SchemaProps: spec.SchemaProps{
-							Description: "configMapCABundleInjectorConfig holds a sparse config that the user wants for this component.  It only needs to be the overrides from the defaults it will end up overlaying in the following order: 1. hardcoded default 2. this config",
-							Ref:         ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
-						},
-					},
 				},
-				Required: []string{"managementState", "serviceServingCertSignerConfig", "apiServiceCABundleInjectorConfig", "configMapCABundleInjectorConfig"},
+				Required: []string{"managementState"},
 			},
 		},
 		Dependencies: []string{
@@ -31291,73 +31223,6 @@ func schema_openshift_api_servicecertsigner_v1alpha1_ServiceCertSignerOperatorCo
 		},
 		Dependencies: []string{
 			"github.com/openshift/api/operator/v1.GenerationStatus", "github.com/openshift/api/operator/v1.OperatorCondition"},
-	}
-}
-
-func schema_openshift_api_servicecertsigner_v1alpha1_ServiceServingCertSignerConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ServiceServingCertSignerConfig provides information to configure a serving serving cert signing controller",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"servingInfo": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ServingInfo is the HTTP serving information for the controller's endpoints",
-							Ref:         ref("github.com/openshift/api/config/v1.HTTPServingInfo"),
-						},
-					},
-					"leaderElection": {
-						SchemaProps: spec.SchemaProps{
-							Description: "leaderElection provides information to elect a leader. Only override this if you have a specific need",
-							Ref:         ref("github.com/openshift/api/config/v1.LeaderElection"),
-						},
-					},
-					"authentication": {
-						SchemaProps: spec.SchemaProps{
-							Description: "authentication allows configuration of authentication for the endpoints",
-							Ref:         ref("github.com/openshift/api/config/v1.DelegatedAuthentication"),
-						},
-					},
-					"authorization": {
-						SchemaProps: spec.SchemaProps{
-							Description: "authorization allows configuration of authentication for the endpoints",
-							Ref:         ref("github.com/openshift/api/config/v1.DelegatedAuthorization"),
-						},
-					},
-					"signer": {
-						SchemaProps: spec.SchemaProps{
-							Description: "signer holds the signing information used to automatically sign serving certificates.",
-							Ref:         ref("github.com/openshift/api/config/v1.CertInfo"),
-						},
-					},
-					"intermediateCertFile": {
-						SchemaProps: spec.SchemaProps{
-							Description: "IntermediateCertFile is the name of a file containing a PEM-encoded certificate. Only required if the initial CA has been rotated. The certificate should consist of the public key of the current CA signed by the private key of the previous CA. When included with a serving cert generated by the current CA, this certificate should allow clients with a stale CA bundle to trust the serving cert.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"servingInfo", "leaderElection", "authentication", "authorization", "signer"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/config/v1.CertInfo", "github.com/openshift/api/config/v1.DelegatedAuthentication", "github.com/openshift/api/config/v1.DelegatedAuthorization", "github.com/openshift/api/config/v1.HTTPServingInfo", "github.com/openshift/api/config/v1.LeaderElection"},
 	}
 }
 
