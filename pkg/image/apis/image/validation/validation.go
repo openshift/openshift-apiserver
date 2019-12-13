@@ -211,7 +211,7 @@ func ValidateImageStreamWithWhitelister(
 			}
 		}
 		if isValid && whitelister != nil {
-			if err := whitelister.AdmitDockerImageReference(ref, getWhitelistTransportForFlag(insecureRepository, true)); err != nil {
+			if err := whitelister.AdmitDockerImageReference(&ref, getWhitelistTransportForFlag(insecureRepository, true)); err != nil {
 				result = append(result, field.Forbidden(dockerImageRepositoryPath, err.Error()))
 			}
 		}
@@ -237,7 +237,7 @@ func ValidateImageStreamWithWhitelister(
 					insecure = tr.ImportPolicy.Insecure
 				}
 				transport := getWhitelistTransportForFlag(insecure || insecureRepository, true)
-				if err := whitelister.AdmitDockerImageReference(ref, transport); err != nil {
+				if err := whitelister.AdmitDockerImageReference(&ref, transport); err != nil {
 					result = append(result, field.Forbidden(field.NewPath("status", "tags").Key(tag).Child("items").Index(i).Child("dockerImageReference"), err.Error()))
 				}
 			}
@@ -266,7 +266,7 @@ func ValidateImageStreamTagReference(
 				errs = append(errs, field.Invalid(fldPath.Child("from", "name"), tagRef.From.Name, err.Error()))
 			} else if whitelister != nil {
 				transport := getWhitelistTransportForFlag(tagRef.ImportPolicy.Insecure || insecureRepository, true)
-				if err := whitelister.AdmitDockerImageReference(ref, transport); err != nil {
+				if err := whitelister.AdmitDockerImageReference(&ref, transport); err != nil {
 					errs = append(errs, field.Forbidden(fldPath.Child("from", "name"), err.Error()))
 				}
 			}
@@ -303,27 +303,20 @@ func ValidateImageStreamUpdateWithWhitelister(
 	if whitelister != nil {
 		// whitelist old pull specs no longer present on the whitelist
 		whitelister = whitelister.Copy()
-		for pullSpec := range collectImageStreamSpecImageReferences(oldStream) {
-			err := whitelister.WhitelistRepository(pullSpec)
-			if err != nil {
-				// We should allow users to delete invalid image references
-				// from image streams, therefore we cannot return this error.
-				klog.V(4).Infof("image stream %s/%s: unable to add pull spec %q to whitelist: %s", oldStream.Namespace, oldStream.Name, pullSpec, err)
-				continue
-			}
-		}
-		for pullSpec := range collectImageStreamStatusImageReferences(oldStream) {
-			err := whitelister.WhitelistRepository(pullSpec)
-			if err != nil {
-				klog.V(4).Infof("image stream %s/%s: unable to add pull spec %q to whitelist: %s", oldStream.Namespace, oldStream.Name, pullSpec, err)
-				continue
-			}
+		whitelister.WhitelistPullSpecs(collectImageStreamSpecImageReferences(oldStream).List()...)
+		for ref := range collectImageStreamStatusImageReferences(oldStream) {
+			whitelister.WhitelistPullSpecs(ref)
 		}
 	}
 
 	result = append(result, ValidateImageStreamWithWhitelister(whitelister, newStream)...)
 
 	return result
+}
+
+// ValidateImageStreamStatusUpdate tests required fields for an ImageStream status update.
+func ValidateImageStreamStatusUpdate(newStream, oldStream *imageapi.ImageStream) field.ErrorList {
+	return ValidateImageStreamStatusUpdateWithWhitelister(nil, newStream, oldStream)
 }
 
 // ValidateImageStreamStatusUpdateWithWhitelister tests required fields for an ImageStream status update.
@@ -365,7 +358,7 @@ func ValidateImageStreamStatusUpdateWithWhitelister(
 			}
 		}
 		transport := getWhitelistTransportForFlag(insecure, true)
-		if err := whitelister.AdmitDockerImageReference(ref, transport); err != nil {
+		if err := whitelister.AdmitDockerImageReference(&ref, transport); err != nil {
 			// TODO: should we whitelist references imported based on whitelisted/old spec?
 			// report error for each tag/history item having this reference
 			for _, rf := range rfs {
@@ -488,10 +481,7 @@ func ValidateImageStreamTagUpdateWithWhitelister(
 
 	if whitelister != nil && oldIST.Tag != nil && oldIST.Tag.From != nil && oldIST.Tag.From.Kind == "DockerImage" {
 		whitelister = whitelister.Copy()
-		err := whitelister.WhitelistRepository(oldIST.Tag.From.Name)
-		if err != nil {
-			klog.V(4).Infof("image stream tag %s/%s: unable to add pull spec %q to whitelist: %s", oldIST.Namespace, oldIST.Name, oldIST.Tag.From.Name, err)
-		}
+		whitelister.WhitelistPullSpecs(oldIST.Tag.From.Name)
 	}
 
 	if newIST.Tag != nil {

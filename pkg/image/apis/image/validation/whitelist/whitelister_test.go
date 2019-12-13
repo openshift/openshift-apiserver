@@ -7,32 +7,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/diff"
 
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
-	"github.com/openshift/library-go/pkg/image/reference"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 )
-
-func TestCanonicalRepository(t *testing.T) {
-	testcases := map[string]string{
-		"busybox":       "docker.io/library/busybox",
-		"busybox:glibc": "docker.io/library/busybox",
-		"docker.io/busybox@sha256:1303dbf110c57f3edf68d9f5a16c082ec06c4cf7604831669faf2c712260b5a0":        "docker.io/library/busybox",
-		"docker.io/busybox:latest@sha256:1303dbf110c57f3edf68d9f5a16c082ec06c4cf7604831669faf2c712260b5a0": "docker.io/library/busybox",
-		"library/busybox:1": "docker.io/library/busybox",
-		"image-registry.openshift-image-registry.svc:5000/openshift/httpd@sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": "image-registry.openshift-image-registry.svc:5000/openshift/httpd",
-	}
-	for pullSpec, want := range testcases {
-		t.Run(pullSpec, func(t *testing.T) {
-			ref, err := reference.Parse(pullSpec)
-			if err != nil {
-				t.Fatal(err)
-			}
-			got := canonicalRepository(ref)
-			if got != want {
-				t.Errorf("got %q, want %q", got, want)
-			}
-		})
-	}
-}
 
 func mkAllowed(insecure bool, regs ...string) openshiftcontrolplanev1.AllowedRegistries {
 	ret := make(openshiftcontrolplanev1.AllowedRegistries, 0, len(regs))
@@ -294,7 +270,7 @@ func TestRegistryWhitelister(t *testing.T) {
 
 			for dif, expErr := range tc.difs {
 				t.Run("dockerImageReference "+dif.String(), func(t *testing.T) {
-					err := rw.AdmitDockerImageReference(dif, tc.transport)
+					err := rw.AdmitDockerImageReference(&dif, tc.transport)
 					assertExpectedError(t, err, expErr)
 				})
 			}
@@ -384,63 +360,5 @@ func assertExpectedError(t *testing.T, a, e error) {
 		t.Errorf("got unexpected error: %q", a)
 	case a != nil && e != nil && a.Error() != e.Error():
 		t.Errorf("got unexpected error: %s", diff.ObjectGoPrintDiff(a, e))
-	}
-}
-
-func TestWhitelistRepository(t *testing.T) {
-	registries := mkAllowed(false, "registry.example.org:5000")
-	whitelister, err := NewRegistryWhitelister(registries, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for _, tc := range []struct {
-		name         string
-		addPullSpecs []string
-		check        string
-		err          error
-	}{
-		{
-			name:         "reject by default",
-			addPullSpecs: []string{},
-			check:        "example.com/image@sha256:01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
-			err:          fmt.Errorf("registry \"example.com\" not allowed by whitelist: \"registry.example.org:5000\""),
-		},
-		{
-			name: "whitelist new digests by a digest",
-			addPullSpecs: []string{
-				"example.com/image@sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-			},
-			check: "example.com/image@sha256:01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
-			err:   nil,
-		},
-		{
-			name: "whitelist new digests by a tag",
-			addPullSpecs: []string{
-				"example.com/image:tag",
-			},
-			check: "example.com/image@sha256:01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
-			err:   nil,
-		},
-		{
-			name: "reject another repository",
-			addPullSpecs: []string{
-				"example.com/foo:tag",
-			},
-			check: "example.com/bar@sha256:01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
-			err:   fmt.Errorf("registry \"example.com\" not allowed by whitelist: \"registry.example.org:5000\""),
-		},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			wl := whitelister.Copy()
-			for _, pullSpec := range tc.addPullSpecs {
-				err = wl.WhitelistRepository(pullSpec)
-				if err != nil {
-					t.Error(err)
-				}
-			}
-			err = wl.AdmitPullSpec(tc.check, WhitelistTransportSecure)
-			assertExpectedError(t, err, tc.err)
-		})
 	}
 }
