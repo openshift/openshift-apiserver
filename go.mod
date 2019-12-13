@@ -21,7 +21,7 @@ require (
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible
 	github.com/opencontainers/go-digest v1.0.0-rc1
 	github.com/openshift/api v3.9.1-0.20190924102528-32369d4db2ad+incompatible
-	github.com/openshift/apiserver-library-go v0.0.0-20191121105954-72a8df0fc9cc
+	github.com/openshift/apiserver-library-go v0.0.0-20190924100232-623481f36143
 	github.com/openshift/client-go v0.0.0-20190923180330-3b6373338c9b
 	github.com/openshift/library-go v0.0.0-20190924092619-a8c1174d4ee7
 	github.com/openshift/source-to-image v1.1.15-0.20190924185145-0b950e4c21af
@@ -55,7 +55,7 @@ replace (
 	github.com/golang/glog => github.com/openshift/golang-glog v0.0.0-20190322123450-3c92600d7533
 	github.com/moby/buildkit => github.com/dmcgowan/buildkit v0.0.0-20170731200553-da2b9dc7dab9
 	github.com/openshift/api => github.com/openshift/api v0.0.0-20191119170142-082f8e2a947e
-	github.com/openshift/apiserver-library-go => github.com/openshift/apiserver-library-go v0.0.0-20191121105954-72a8df0fc9cc
+	github.com/openshift/apiserver-library-go => github.com/openshift/apiserver-library-go v0.0.0-20191119121620-ae1c23a23e53
 	github.com/openshift/client-go => github.com/openshift/client-go v0.0.0-20191022152013-2823239d2298
 	github.com/openshift/library-go => github.com/openshift/library-go v0.0.0-20191118102510-4e2c7112d252
 	github.com/openshift/source-to-image => github.com/openshift/source-to-image v0.0.0-20191104225151-1877e115164b
