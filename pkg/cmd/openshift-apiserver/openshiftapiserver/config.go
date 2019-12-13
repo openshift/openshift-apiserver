@@ -36,7 +36,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/version"
 )
 
-func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerConfig, authenticationOptions *genericapiserveroptions.DelegatingAuthenticationOptions, authorizationOptions *genericapiserveroptions.DelegatingAuthorizationOptions) (*OpenshiftAPIConfig, error) {
+func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerConfig) (*OpenshiftAPIConfig, error) {
 	kubeClientConfig, err := helpers.GetKubeClientConfig(config.KubeClientConfig)
 	if err != nil {
 		return nil, err
@@ -116,9 +116,11 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	if err := servingOptions.ApplyTo(&genericConfig.Config.SecureServing, &genericConfig.Config.LoopbackClientConfig); err != nil {
 		return nil, err
 	}
+	authenticationOptions := genericapiserveroptions.NewDelegatingAuthenticationOptions()
 	if err := authenticationOptions.ApplyTo(&genericConfig.Authentication, genericConfig.SecureServing, genericConfig.OpenAPIConfig); err != nil {
 		return nil, err
 	}
+	authorizationOptions := genericapiserveroptions.NewDelegatingAuthorizationOptions().WithAlwaysAllowPaths("/healthz", "/healthz/").WithAlwaysAllowGroups("system:masters")
 	if err := authorizationOptions.ApplyTo(&genericConfig.Authorization); err != nil {
 		return nil, err
 	}
