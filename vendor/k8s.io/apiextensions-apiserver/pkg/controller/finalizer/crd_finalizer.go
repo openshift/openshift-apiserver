@@ -149,7 +149,8 @@ func (c *CRDFinalizer) sync(key string) error {
 		cond, deleteErr := c.deleteInstances(crd)
 		apiextensions.SetCRDCondition(crd, cond)
 		if deleteErr != nil {
-			if _, err = c.crdClient.CustomResourceDefinitions().UpdateStatus(crd); err != nil {
+			crd, err = c.crdClient.CustomResourceDefinitions().UpdateStatus(crd)
+			if err != nil {
 				utilruntime.HandleError(err)
 			}
 			return deleteErr
@@ -164,9 +165,19 @@ func (c *CRDFinalizer) sync(key string) error {
 	}
 
 	apiextensions.CRDRemoveFinalizer(crd, apiextensions.CustomResourceCleanupFinalizer)
-	_, err = c.crdClient.CustomResourceDefinitions().UpdateStatus(crd)
+	crd, err = c.crdClient.CustomResourceDefinitions().UpdateStatus(crd)
 	if apierrors.IsNotFound(err) || apierrors.IsConflict(err) {
 		// deleted or changed in the meantime, we'll get called again
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	// and now issue another delete, which should clean it all up if no finalizers remain or no-op if they do
+	// TODO(liggitt): just return in 1.16, once n-1 apiservers automatically delete when finalizers are all removed
+	err = c.crdClient.CustomResourceDefinitions().Delete(crd.Name, nil)
+	if apierrors.IsNotFound(err) {
 		return nil
 	}
 	return err

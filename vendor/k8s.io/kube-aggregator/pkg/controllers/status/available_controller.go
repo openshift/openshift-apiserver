@@ -210,7 +210,6 @@ func (c *AvailableConditionController) sync(key string) error {
 			if port.Port == *servicePort {
 				foundPort = true
 				portName = port.Name
-				break
 			}
 		}
 		if !foundPort {
@@ -239,7 +238,6 @@ func (c *AvailableConditionController) sync(key string) error {
 			return err
 		}
 		hasActiveEndpoints := false
-	outer:
 		for _, subset := range endpoints.Subsets {
 			if len(subset.Addresses) == 0 {
 				continue
@@ -247,7 +245,6 @@ func (c *AvailableConditionController) sync(key string) error {
 			for _, endpointPort := range subset.Ports {
 				if endpointPort.Name == portName {
 					hasActiveEndpoints = true
-					break outer
 				}
 			}
 		}

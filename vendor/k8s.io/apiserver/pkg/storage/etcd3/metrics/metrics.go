@@ -52,10 +52,9 @@ var (
 
 	deprecatedEtcdRequestLatenciesSummary = compbasemetrics.NewSummaryVec(
 		&compbasemetrics.SummaryOpts{
-			Name:              "etcd_request_latencies_summary",
-			Help:              "Etcd request latency summary in microseconds for each operation and object type.",
-			StabilityLevel:    compbasemetrics.ALPHA,
-			DeprecatedVersion: "1.14.0",
+			Name:           "etcd_request_latencies_summary",
+			Help:           "(Deprecated) Etcd request latency summary in microseconds for each operation and object type.",
+			StabilityLevel: compbasemetrics.ALPHA,
 		},
 		[]string{"operation", "type"},
 	)

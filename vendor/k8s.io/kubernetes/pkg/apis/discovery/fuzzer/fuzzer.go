@@ -30,8 +30,11 @@ var Funcs = func(codecs runtimeserializer.CodecFactory) []interface{} {
 		func(obj *discovery.EndpointSlice, c fuzz.Continue) {
 			c.FuzzNoCustom(obj) // fuzz self without calling this function again
 
-			addressTypes := []discovery.AddressType{discovery.AddressTypeIPv4, discovery.AddressTypeIPv6, discovery.AddressTypeFQDN}
-			obj.AddressType = addressTypes[c.Rand.Intn(len(addressTypes))]
+			// match defaults
+			if obj.AddressType == nil {
+				ipAddressType := discovery.AddressTypeIP
+				obj.AddressType = &ipAddressType
+			}
 
 			for i, endpointPort := range obj.Ports {
 				if endpointPort.Name == nil {

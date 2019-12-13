@@ -22,7 +22,7 @@ type ClusterOperator struct {
 	Spec ClusterOperatorSpec `json:"spec"`
 
 	// status holds the information about the state of an operator.  It is consistent with status information across
-	// the Kubernetes ecosystem.
+	// the kube ecosystem.
 	// +optional
 	Status ClusterOperatorStatus `json:"status"`
 }
@@ -34,15 +34,15 @@ type ClusterOperatorSpec struct {
 // ClusterOperatorStatus provides information about the status of the operator.
 // +k8s:deepcopy-gen=true
 type ClusterOperatorStatus struct {
-	// conditions describes the state of the operator's managed and monitored components.
+	// conditions describes the state of the operator's reconciliation functionality.
 	// +patchMergeKey=type
 	// +patchStrategy=merge
 	// +optional
 	Conditions []ClusterOperatorStatusCondition `json:"conditions,omitempty"  patchStrategy:"merge" patchMergeKey:"type"`
 
-	// versions is a slice of operator and operand version tuples.  Operators which manage multiple operands will have multiple
-	// operand entries in the array.  Available operators must report the version of the operator itself with the name "operator".
-	// An operator reports a new "operator" version when it has rolled out the new version to all of its operands.
+	// versions is a slice of operand version tuples.  Operators which manage multiple operands will have multiple
+	// entries in the array.  If an operator is Available, it must have at least one entry.  You must report the version of
+	// the operator itself with the name "operator".
 	// +optional
 	Versions []OperandVersion `json:"versions,omitempty"`
 
@@ -67,8 +67,8 @@ type OperandVersion struct {
 	// +required
 	Name string `json:"name"`
 
-	// version indicates which version of a particular operand is currently being managed.  It must always match the Available
-	// operand.  If 1.0.0 is Available, then this must indicate 1.0.0 even if the operator is trying to rollout
+	// version indicates which version of a particular operand is currently being manage.  It must always match the Available
+	// condition.  If 1.0.0 is Available, then this must indicate 1.0.0 even if the operator is trying to rollout
 	// 1.1.0
 	// +kubebuilder:validation:Required
 	// +required
@@ -107,10 +107,10 @@ const (
 )
 
 // ClusterOperatorStatusCondition represents the state of the operator's
-// managed and monitored components.
+// reconciliation functionality.
 // +k8s:deepcopy-gen=true
 type ClusterOperatorStatusCondition struct {
-	// type specifies the aspect reported by this condition.
+	// type specifies the state of the operator's reconciliation functionality.
 	// +kubebuilder:validation:Required
 	// +required
 	Type ClusterStatusConditionType `json:"type"`
@@ -120,12 +120,12 @@ type ClusterOperatorStatusCondition struct {
 	// +required
 	Status ConditionStatus `json:"status"`
 
-	// lastTransitionTime is the time of the last update to the current status property.
+	// lastTransitionTime is the time of the last update to the current status object.
 	// +kubebuilder:validation:Required
 	// +required
 	LastTransitionTime metav1.Time `json:"lastTransitionTime"`
 
-	// reason is the CamelCase reason for the condition's current status.
+	// reason is the reason for the condition's last transition.  Reasons are CamelCase
 	// +optional
 	Reason string `json:"reason,omitempty"`
 
@@ -135,20 +135,19 @@ type ClusterOperatorStatusCondition struct {
 	Message string `json:"message,omitempty"`
 }
 
-// ClusterStatusConditionType is an aspect of operator state.
+// ClusterStatusConditionType is the state of the operator's reconciliation functionality.
 type ClusterStatusConditionType string
 
 const (
-	// Available indicates that the operand (eg: openshift-apiserver for the
+	// Available indicates that the binary maintained by the operator (eg: openshift-apiserver for the
 	// openshift-apiserver-operator), is functional and available in the cluster.
 	OperatorAvailable ClusterStatusConditionType = "Available"
 
-	// Progressing indicates that the operator is actively rolling out new code,
-	// propagating config changes, or otherwise moving from one steady state to
-	// another.  Operators should not report progressing when they are reconciling
-	// a previously known state.
+	// Progressing indicates that the operator is actively making changes to the binary maintained by the
+	// operator (eg: openshift-apiserver for the openshift-apiserver-operator).
 	OperatorProgressing ClusterStatusConditionType = "Progressing"
 
+<<<<<<< HEAD
 	// Degraded indicates that the operator's current state does not match its
 	// desired state over a period of time resulting in a lower quality of service.
 	// The period of time may vary by component, but a Degraded state represents
@@ -165,6 +164,11 @@ const (
 	// and must be replaced.  An operator should report Degraded if unexpected
 	// errors occur over a period, but the expectation is that all unexpected errors
 	// are handled as operators mature.
+=======
+	// Degraded indicates that the operand is not functioning completely. An example of a degraded state
+	// would be if there should be 5 copies of the operand running but only 4 are running. It may still be available,
+	// but it is degraded
+>>>>>>> parent of 2e7b3f676... Merge pull request #44 from mfojtik/bump-kube-1.17
 	OperatorDegraded ClusterStatusConditionType = "Degraded"
 
 	// Upgradeable indicates whether the operator is in a state that is safe to upgrade. When status is `False`

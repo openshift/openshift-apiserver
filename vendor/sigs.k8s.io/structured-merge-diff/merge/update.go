@@ -41,12 +41,12 @@ func (s *Updater) EnableUnionFeature() {
 	s.enableUnions = true
 }
 
-func (s *Updater) update(oldObject, newObject *typed.TypedValue, version fieldpath.APIVersion, managers fieldpath.ManagedFields, workflow string, force bool) (fieldpath.ManagedFields, *typed.Comparison, error) {
+func (s *Updater) update(oldObject, newObject *typed.TypedValue, version fieldpath.APIVersion, managers fieldpath.ManagedFields, workflow string, force bool) (fieldpath.ManagedFields, error) {
 	conflicts := fieldpath.ManagedFields{}
 	removed := fieldpath.ManagedFields{}
 	compare, err := oldObject.Compare(newObject)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to compare objects: %v", err)
+		return nil, fmt.Errorf("failed to compare objects: %v", err)
 	}
 
 	versions := map[fieldpath.APIVersion]*typed.Comparison{
@@ -66,7 +66,7 @@ func (s *Updater) update(oldObject, newObject *typed.TypedValue, version fieldpa
 					delete(managers, manager)
 					continue
 				}
-				return nil, nil, fmt.Errorf("failed to convert old object: %v", err)
+				return nil, fmt.Errorf("failed to convert old object: %v", err)
 			}
 			versionedNewObject, err := s.Converter.Convert(newObject, managerSet.APIVersion())
 			if err != nil {
@@ -74,11 +74,11 @@ func (s *Updater) update(oldObject, newObject *typed.TypedValue, version fieldpa
 					delete(managers, manager)
 					continue
 				}
-				return nil, nil, fmt.Errorf("failed to convert new object: %v", err)
+				return nil, fmt.Errorf("failed to convert new object: %v", err)
 			}
 			compare, err = versionedOldObject.Compare(versionedNewObject)
 			if err != nil {
-				return nil, nil, fmt.Errorf("failed to compare objects: %v", err)
+				return nil, fmt.Errorf("failed to compare objects: %v", err)
 			}
 			versions[managerSet.APIVersion()] = compare
 		}
@@ -94,7 +94,7 @@ func (s *Updater) update(oldObject, newObject *typed.TypedValue, version fieldpa
 	}
 
 	if !force && len(conflicts) != 0 {
-		return nil, nil, ConflictsFromManagers(conflicts)
+		return nil, ConflictsFromManagers(conflicts)
 	}
 
 	for manager, conflictSet := range conflicts {
@@ -111,7 +111,7 @@ func (s *Updater) update(oldObject, newObject *typed.TypedValue, version fieldpa
 		}
 	}
 
-	return managers, compare, nil
+	return managers, nil
 }
 
 // Update is the method you should call once you've merged your final
@@ -128,9 +128,13 @@ func (s *Updater) Update(liveObject, newObject *typed.TypedValue, version fieldp
 		}
 	}
 	managers = shallowCopyManagers(managers)
-	managers, compare, err := s.update(liveObject, newObject, version, managers, manager, true)
+	managers, err = s.update(liveObject, newObject, version, managers, manager, true)
 	if err != nil {
 		return nil, fieldpath.ManagedFields{}, err
+	}
+	compare, err := liveObject.Compare(newObject)
+	if err != nil {
+		return nil, fieldpath.ManagedFields{}, fmt.Errorf("failed to compare live and new objects: %v", err)
 	}
 	if _, ok := managers[manager]; !ok {
 		managers[manager] = fieldpath.NewVersionedSet(fieldpath.NewSet(), version, false)
@@ -178,7 +182,7 @@ func (s *Updater) Apply(liveObject, configObject *typed.TypedValue, version fiel
 	if err != nil {
 		return nil, fieldpath.ManagedFields{}, fmt.Errorf("failed to prune fields: %v", err)
 	}
-	managers, _, err = s.update(liveObject, newObject, version, managers, manager, force)
+	managers, err = s.update(liveObject, newObject, version, managers, manager, force)
 	if err != nil {
 		return nil, fieldpath.ManagedFields{}, err
 	}

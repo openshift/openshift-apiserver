@@ -34,7 +34,7 @@ import (
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// ReplicationControllerDummy : Dummy definition
+// Dummy definition
 type ReplicationControllerDummy struct {
 	metav1.TypeMeta
 }

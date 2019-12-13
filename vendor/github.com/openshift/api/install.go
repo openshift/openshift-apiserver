@@ -48,7 +48,6 @@ import (
 	"github.com/openshift/api/project"
 	"github.com/openshift/api/quota"
 	"github.com/openshift/api/route"
-	"github.com/openshift/api/samples"
 	"github.com/openshift/api/security"
 	"github.com/openshift/api/servicecertsigner"
 	"github.com/openshift/api/template"
@@ -75,7 +74,6 @@ var (
 		project.Install,
 		quota.Install,
 		route.Install,
-		samples.Install,
 		security.Install,
 		servicecertsigner.Install,
 		template.Install,

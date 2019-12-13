@@ -194,7 +194,7 @@ func (in *GenericControllerManagerConfiguration) DeepCopyInto(out *GenericContro
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
-	in.Debugging.DeepCopyInto(&out.Debugging)
+	out.Debugging = in.Debugging
 	return
 }
 

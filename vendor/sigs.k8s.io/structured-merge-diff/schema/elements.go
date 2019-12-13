@@ -16,17 +16,9 @@ limitations under the License.
 
 package schema
 
-import "sync"
-
 // Schema is a list of named types.
-//
-// Schema types are indexed in a map before the first search so this type
-// should be considered immutable.
 type Schema struct {
 	Types []TypeDef `yaml:"types,omitempty"`
-
-	once sync.Once
-	m    map[string]TypeDef
 }
 
 // A TypeSpecifier references a particular type in a schema.
@@ -100,9 +92,6 @@ const (
 //
 // Maps may also represent a type which is composed of a number of different fields.
 // Each field has a name and a type.
-//
-// Fields are indexed in a map before the first search so this type
-// should be considered immutable.
 type Map struct {
 	// Each struct field appears exactly once in this list. The order in
 	// this list defines the canonical field ordering.
@@ -128,22 +117,6 @@ type Map struct {
 	// The default behavior for maps is `separable`; it's permitted to
 	// leave this unset to get the default behavior.
 	ElementRelationship ElementRelationship `yaml:"elementRelationship,omitempty"`
-
-	once sync.Once
-	m    map[string]StructField
-}
-
-// FindField is a convenience function that returns the referenced StructField,
-// if it exists, or (nil, false) if it doesn't.
-func (m *Map) FindField(name string) (StructField, bool) {
-	m.once.Do(func() {
-		m.m = make(map[string]StructField, len(m.Fields))
-		for _, field := range m.Fields {
-			m.m[field.Name] = field
-		}
-	})
-	sf, ok := m.m[name]
-	return sf, ok
 }
 
 // UnionFields are mapping between the fields that are part of the union and
@@ -231,15 +204,13 @@ type List struct {
 
 // FindNamedType is a convenience function that returns the referenced TypeDef,
 // if it exists, or (nil, false) if it doesn't.
-func (s *Schema) FindNamedType(name string) (TypeDef, bool) {
-	s.once.Do(func() {
-		s.m = make(map[string]TypeDef, len(s.Types))
-		for _, t := range s.Types {
-			s.m[t.Name] = t
+func (s Schema) FindNamedType(name string) (TypeDef, bool) {
+	for _, t := range s.Types {
+		if t.Name == name {
+			return t, true
 		}
-	})
-	t, ok := s.m[name]
-	return t, ok
+	}
+	return TypeDef{}, false
 }
 
 // Resolve is a convenience function which returns the atom referenced, whether

@@ -126,10 +126,6 @@ func RecommendedDefaultGenericControllerManagerConfiguration(obj *kubectrlmgrcon
 		obj.Controllers = []string{"*"}
 	}
 
-	if len(obj.LeaderElection.ResourceLock) == 0 {
-		obj.LeaderElection.ResourceLock = "endpointsleases"
-	}
-
 	// Use the default ClientConnectionConfiguration and LeaderElectionConfiguration options
 	componentbaseconfigv1alpha1.RecommendedDefaultClientConnectionConfiguration(&obj.ClientConnection)
 	componentbaseconfigv1alpha1.RecommendedDefaultLeaderElectionConfiguration(&obj.LeaderElection)

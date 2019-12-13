@@ -104,7 +104,7 @@ func GuessBestListPathElement(index int, item value.Value) PathElement {
 		return PathElement{Index: &index}
 	}
 
-	var keys value.FieldList
+	var keys []value.Field
 	for _, name := range AssociativeListCandidateFieldNames {
 		f, ok := item.MapValue.Get(name)
 		if !ok {
@@ -117,8 +117,7 @@ func GuessBestListPathElement(index int, item value.Value) PathElement {
 		keys = append(keys, *f)
 	}
 	if len(keys) > 0 {
-		keys.Sort()
-		return PathElement{Key: &keys}
+		return PathElement{Key: &value.Map{Items: keys}}
 	}
 	return PathElement{Index: &index}
 }

@@ -29,7 +29,6 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	types "k8s.io/apimachinery/pkg/types"
 	admission "k8s.io/kubernetes/pkg/apis/admission"
-	authenticationv1 "k8s.io/kubernetes/pkg/apis/authentication/v1"
 )
 
 func init() {
@@ -83,7 +82,8 @@ func autoConvert_v1_AdmissionRequest_To_admission_AdmissionRequest(in *v1.Admiss
 	out.Name = in.Name
 	out.Namespace = in.Namespace
 	out.Operation = admission.Operation(in.Operation)
-	if err := authenticationv1.Convert_v1_UserInfo_To_authentication_UserInfo(&in.UserInfo, &out.UserInfo, s); err != nil {
+	// TODO: Inefficient conversion - can we improve it?
+	if err := s.Convert(&in.UserInfo, &out.UserInfo, 0); err != nil {
 		return err
 	}
 	if err := runtime.Convert_runtime_RawExtension_To_runtime_Object(&in.Object, &out.Object, s); err != nil {
@@ -115,7 +115,8 @@ func autoConvert_admission_AdmissionRequest_To_v1_AdmissionRequest(in *admission
 	out.Name = in.Name
 	out.Namespace = in.Namespace
 	out.Operation = v1.Operation(in.Operation)
-	if err := authenticationv1.Convert_authentication_UserInfo_To_v1_UserInfo(&in.UserInfo, &out.UserInfo, s); err != nil {
+	// TODO: Inefficient conversion - can we improve it?
+	if err := s.Convert(&in.UserInfo, &out.UserInfo, 0); err != nil {
 		return err
 	}
 	if err := runtime.Convert_runtime_Object_To_runtime_RawExtension(&in.Object, &out.Object, s); err != nil {

@@ -30,6 +30,7 @@ import (
 // be no easy way to opt-out. Instead, if you want to use this defaulting method
 // run it in your wrapper struct of this type in its `SetDefaults_` method.
 func RecommendedDefaultNodeIPAMControllerConfiguration(obj *kubectrlmgrconfigv1alpha1.NodeIPAMControllerConfiguration) {
-	// The default mask size is not set here because we need to determine the cluster cidr family before setting the
-	// appropriate mask size.
+	if obj.NodeCIDRMaskSize == 0 {
+		obj.NodeCIDRMaskSize = 24
+	}
 }
