@@ -20,7 +20,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.1
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible
 	github.com/opencontainers/go-digest v1.0.0-rc1
-	github.com/openshift/api v3.9.1-0.20190924102528-32369d4db2ad+incompatible
+	github.com/openshift/api v3.9.1-0.20191213092759-73a708d0631c+incompatible
 	github.com/openshift/apiserver-library-go v0.0.0-20191121105954-72a8df0fc9cc
 	github.com/openshift/client-go v0.0.0-20190923180330-3b6373338c9b
 	github.com/openshift/library-go v0.0.0-20190924092619-a8c1174d4ee7
@@ -54,7 +54,7 @@ replace (
 	github.com/ghodss/yaml => github.com/ghodss/yaml v0.0.0-20170327235444-0ca9ea5df545
 	github.com/golang/glog => github.com/openshift/golang-glog v0.0.0-20190322123450-3c92600d7533
 	github.com/moby/buildkit => github.com/dmcgowan/buildkit v0.0.0-20170731200553-da2b9dc7dab9
-	github.com/openshift/api => github.com/openshift/api v0.0.0-20191209134552-1537aa86567a
+	github.com/openshift/api => github.com/openshift/api v3.9.1-0.20191213092759-73a708d0631c+incompatible
 	github.com/openshift/apiserver-library-go => github.com/openshift/apiserver-library-go v0.0.0-20191121120807-0dbf2b787e04
 	github.com/openshift/client-go => github.com/openshift/client-go v0.0.0-20191125132246-f6563a70e19a
 	github.com/openshift/library-go => github.com/openshift/library-go v0.0.0-20191209154952-998f403c47c2
