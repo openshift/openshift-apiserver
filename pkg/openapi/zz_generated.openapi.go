@@ -13496,7 +13496,6 @@ func schema_openshift_api_image_v1_ImageStream(ref common.ReferenceCallback) com
 						},
 					},
 				},
-				Required: []string{"spec"},
 			},
 		},
 		Dependencies: []string{
