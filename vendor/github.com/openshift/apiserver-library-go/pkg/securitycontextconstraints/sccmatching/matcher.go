@@ -20,7 +20,6 @@ import (
 	"github.com/openshift/api/security"
 	securityv1 "github.com/openshift/api/security/v1"
 	sccsort "github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/util/sort"
-
 	securityv1listers "github.com/openshift/client-go/security/listers/security/v1"
 	"github.com/openshift/library-go/pkg/security/uid"
 )
