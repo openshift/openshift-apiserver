@@ -24,9 +24,6 @@ import (
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 	templateapi "github.com/openshift/openshift-apiserver/pkg/template/apis/template"
 	userapi "github.com/openshift/openshift-apiserver/pkg/user/apis/user"
-
-	// required to be loaded before we register
-	_ "github.com/openshift/openshift-apiserver/pkg/api/install"
 )
 
 func init() {

@@ -5,41 +5,16 @@
 #
 rules:
   - paths:
-    - k8s.io/kubernetes
-    tag: v1.17.0-beta.2
-
-  - paths:
     - k8s.io/apiserver
-    branch: openshift-apiserver-4.3-kubernetes-1.17.0-beta.2
-
-
-  # k8s.io paths that are tracking "kubernetes-1.16.2" tag
-  - paths:
-    - k8s.io/*
-    excludes:
-    # exclude all paths we track in rule above + klog and utils as they don't follow k8s tag
-    - k8s.io/kubernetes
-    - k8s.io/apiserver
-    - k8s.io/klog
-    - k8s.io/utils
-    - k8s.io/kube-openapi
-    tag: kubernetes-1.17.0-beta.2
+    branch: openshift-apiserver-4.3-kubernetes-1.17.0
 
   # github.com/openshift/* paths that are tracking "master" branch
   - paths:
     - github.com/openshift/api
     - github.com/openshift/client-go
     - github.com/openshift/library-go
-    branch: master
-
-  - paths:
     - github.com/openshift/apiserver-library-go
-    branch: openshift-apiserver-4.3-kubernetes-1.17.0-beta.2
-
-  # apiserver team:
-  - paths:
-    - github.com/ghodss/yaml
-    tag: v1.0.0
+    branch: master
 
   # devexp team:
   - paths:
@@ -52,7 +27,3 @@ rules:
     - github.com/docker/docker
     branch: openshift-3.10-docker-b68221c
 
-  # monitoring team:
-  - paths:
-    - github.com/prometheus/client_golang
-    tag: v0.9.2
