@@ -39,7 +39,8 @@ var MissingValidationExceptions = []reflect.Type{
 
 func TestCoverage(t *testing.T) {
 	for kind, apiType := range legacyscheme.Scheme.KnownTypes(legacy.InternalGroupVersion) {
-		if strings.HasPrefix(apiType.PkgPath(), "github.com/openshift/openshift-apiserver/vendor/") {
+		if strings.HasPrefix(apiType.PkgPath(), "k8s.io/kubernetes/pkg/apis") ||
+			strings.HasPrefix(apiType.PkgPath(), "k8s.io/apimachinery/pkg/apis") {
 			continue
 		}
 		if strings.HasSuffix(kind, "List") {
@@ -63,7 +64,7 @@ func TestCoverage(t *testing.T) {
 			}
 
 			if !allowed {
-				t.Errorf("%v is not registered.  Look in pkg/api/validation/register.go.", apiType)
+				t.Errorf("%v (%s) is not registered.  Look in pkg/api/validation/register.go.", apiType, apiType.PkgPath())
 			}
 		}
 	}
