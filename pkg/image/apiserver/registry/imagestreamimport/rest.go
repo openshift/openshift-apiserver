@@ -216,14 +216,19 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		v2regConf.Registries[i].Prefix = reg.Location
 	}
 
-	// only load secrets if we need them
-	credentials := importer.NewLazyCredentialsForSecrets(func() ([]corev1.Secret, error) {
-		secrets, err := r.isV1Client.ImageStreams(namespace).Secrets(isi.Name, metav1.GetOptions{})
-		if err != nil {
-			return nil, err
-		}
-		return secrets.Items, nil
-	})
+	credentials := importer.NewUnionCredentialStore(
+		importer.NewLazyCredentialsForSecrets(func() ([]corev1.Secret, error) {
+			secrets, err := r.isV1Client.ImageStreams(namespace).Secrets(
+				isi.Name, metav1.GetOptions{},
+			)
+			if err != nil {
+				return nil, err
+			}
+			return secrets.Items, nil
+		}),
+		importer.NewNodeCredentialStore(),
+	)
+
 	importCtx := registryclient.NewContext(r.transport, r.insecureTransport).WithCredentials(credentials)
 	imports := r.importFn(importCtx, v2regConf)
 	if err := imports.Import(ctx.(gocontext.Context), isi, stream); err != nil {
