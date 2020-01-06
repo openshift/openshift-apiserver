@@ -57,13 +57,13 @@ func TestServiceResolverCache(t *testing.T) {
 	c = fakeRetriever{
 		service: &corev1.Service{
 			Spec: corev1.ServiceSpec{
-				ClusterIP: "127.0.0.1",
+				ClusterIP: "::1",
 				Ports:     []corev1.ServicePort{{Port: 80}},
 			},
 		},
 	}
 	cache = newServiceResolverCache(c.Get)
-	if v, ok := cache.resolve("FOO_SERVICE_HOST"); v != "127.0.0.1" || !ok {
+	if v, ok := cache.resolve("FOO_SERVICE_HOST"); v != "::1" || !ok {
 		t.Errorf("unexpected cache item")
 	}
 	if v, ok := cache.resolve("FOO_SERVICE_PORT"); v != "80" || !ok {
@@ -83,10 +83,10 @@ func TestServiceResolverCache(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if v, ok := fn(); v != "127.0.0.1" || !ok {
+	if v, ok := fn(); v != "::1" || !ok {
 		t.Errorf("unexpected cache item")
 	}
-	if v, ok := fn(); v != "127.0.0.1" || !ok {
+	if v, ok := fn(); v != "::1" || !ok {
 		t.Errorf("unexpected cache item")
 	}
 }
