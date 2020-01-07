@@ -238,6 +238,9 @@ type BuildStatus struct {
 
 	// LogSnippet is the last few lines of the build log.  This value is only set for builds that failed.
 	LogSnippet string
+
+	// Conditions represents the latest available observations of a build's current state.
+	Conditions []BuildCondition
 }
 
 // StageInfo contains details about a build stage.
@@ -350,6 +353,24 @@ const (
 	// BuildPhaseCancelled indicates that a running/pending build was stopped from executing.
 	BuildPhaseCancelled BuildPhase = "Cancelled"
 )
+
+type BuildConditionType string
+
+// BuildCondition describes the state of a build at a certain point.
+type BuildCondition struct {
+	// Type of build condition.
+	Type BuildConditionType
+	// Status of the condition, one of True, False, Unknown.
+	Status kapi.ConditionStatus
+	// The last time this condition was updated.
+	LastUpdateTime metav1.Time
+	// The last time the condition transitioned from one status to another.
+	LastTransitionTime metav1.Time
+	// The reason for the condition's last transition.
+	Reason string
+	// A human readable message indicating details about the transition.
+	Message string
+}
 
 // StatusReason is a brief CamelCase string that describes a temporary or
 // permanent build error condition, meant for machine parsing and tidy display
