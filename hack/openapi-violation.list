@@ -138,6 +138,8 @@ API rule violation: list_type_missing,github.com/openshift/api/config/v1,Schedul
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ServingInfo,CipherSuites
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ServingInfo,NamedCertificates
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,TLSProfileSpec,Ciphers
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,featureSetBuilder,forceOff
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,featureSetBuilder,forceOn
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,Image,DockerImageLayers
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,Image,DockerImageSignatures
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,Image,Signatures
@@ -152,6 +154,7 @@ API rule violation: list_type_missing,github.com/openshift/api/image/v1,ImageStr
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,ImageStreamStatus,Tags
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,ImageStreamTag,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,ImageStreamTagList,Items
+API rule violation: list_type_missing,github.com/openshift/api/image/v1,ImageTagList,Items
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,NamedTagEventList,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,NamedTagEventList,Items
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,RepositoryImportStatus,AdditionalTags
@@ -254,6 +257,7 @@ API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolp
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,OpenShiftControllerManagerConfig,Controllers
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,ServiceAccountControllerConfig,ManagedNames
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,AuthenticationList,Items
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,CSISnapshotControllerList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ConsoleList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSList,Items
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSSpec,Servers
@@ -882,7 +886,10 @@ API rule violation: names_match,github.com/openshift/api/config/v1,IdentityProvi
 API rule violation: names_match,github.com/openshift/api/config/v1,InfrastructureStatus,APIServerInternalURL
 API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatus,BareMetal
 API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatus,OpenStack
+API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatus,VSphere
 API rule violation: names_match,github.com/openshift/api/config/v1,RequestHeaderIdentityProvider,ClientCA
+API rule violation: names_match,github.com/openshift/api/config/v1,featureSetBuilder,forceOff
+API rule violation: names_match,github.com/openshift/api/config/v1,featureSetBuilder,forceOn
 API rule violation: names_match,github.com/openshift/api/image/v1,DockerImageReference,ID
 API rule violation: names_match,github.com/openshift/api/image/v1,DockerImageReference,Name
 API rule violation: names_match,github.com/openshift/api/image/v1,DockerImageReference,Namespace
