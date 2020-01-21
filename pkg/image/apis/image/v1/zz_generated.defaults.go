@@ -18,6 +18,8 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 	scheme.AddTypeDefaultingFunc(&v1.ImageStreamList{}, func(obj interface{}) { SetObjectDefaults_ImageStreamList(obj.(*v1.ImageStreamList)) })
 	scheme.AddTypeDefaultingFunc(&v1.ImageStreamTag{}, func(obj interface{}) { SetObjectDefaults_ImageStreamTag(obj.(*v1.ImageStreamTag)) })
 	scheme.AddTypeDefaultingFunc(&v1.ImageStreamTagList{}, func(obj interface{}) { SetObjectDefaults_ImageStreamTagList(obj.(*v1.ImageStreamTagList)) })
+	scheme.AddTypeDefaultingFunc(&v1.ImageTag{}, func(obj interface{}) { SetObjectDefaults_ImageTag(obj.(*v1.ImageTag)) })
+	scheme.AddTypeDefaultingFunc(&v1.ImageTagList{}, func(obj interface{}) { SetObjectDefaults_ImageTagList(obj.(*v1.ImageTagList)) })
 	return nil
 }
 
@@ -59,5 +61,18 @@ func SetObjectDefaults_ImageStreamTagList(in *v1.ImageStreamTagList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_ImageStreamTag(a)
+	}
+}
+
+func SetObjectDefaults_ImageTag(in *v1.ImageTag) {
+	if in.Spec != nil {
+		SetDefaults_TagReferencePolicy(&in.Spec.ReferencePolicy)
+	}
+}
+
+func SetObjectDefaults_ImageTagList(in *v1.ImageTagList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_ImageTag(a)
 	}
 }
