@@ -10,9 +10,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/kubernetes/pkg/apis/core"
 	kprinters "k8s.io/kubernetes/pkg/printers"
 
 	imagev1 "github.com/openshift/api/image/v1"
+	"github.com/openshift/library-go/pkg/image/imageutil"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 )
 
@@ -51,6 +53,20 @@ func AddImageOpenShiftHandlers(h kprinters.PrintHandler) {
 		panic(err)
 	}
 	if err := h.TableHandler(imageStreamTagColumnDefinitions, printImageStreamTag); err != nil {
+		panic(err)
+	}
+
+	imageTagColumnDefinitions := []metav1.TableColumnDefinition{
+		{Name: "Name", Type: "string", Format: "name", Description: metav1.ObjectMeta{}.SwaggerDoc()["name"]},
+		{Name: "Spec", Type: "string", Description: imagev1.ImageTag{}.SwaggerDoc()["spec"]},
+		{Name: "Status", Type: "string", Description: imagev1.ImageTag{}.SwaggerDoc()["status"]},
+		{Name: "History", Type: "number", Description: "Number of history entries"},
+		{Name: "Updated", Type: "string", Description: "Last updated at"},
+	}
+	if err := h.TableHandler(imageTagColumnDefinitions, printImageTagList); err != nil {
+		panic(err)
+	}
+	if err := h.TableHandler(imageTagColumnDefinitions, printImageTag); err != nil {
 		panic(err)
 	}
 
@@ -152,6 +168,119 @@ func printImageStreamTagList(list *imageapi.ImageStreamTagList, options kprinter
 	rows := make([]metav1.TableRow, 0, len(list.Items))
 	for i := range list.Items {
 		r, err := printImageStreamTag(&list.Items[i], options)
+		if err != nil {
+			return nil, err
+		}
+		rows = append(rows, r...)
+	}
+	return rows, nil
+}
+
+func printImageTag(ist *imageapi.ImageTag, options kprinters.GenerateOptions) ([]metav1.TableRow, error) {
+	row := metav1.TableRow{
+		Object: runtime.RawExtension{Object: ist},
+	}
+
+	var generation int64
+	var source string
+	var status string
+	var created string
+	var count int
+	var spec string
+	if ist.Spec != nil {
+		spec = "Tag"
+		if ist.Spec.Reference {
+			spec = "Ref"
+		}
+		if ist.Spec.ImportPolicy.Scheduled {
+			spec = "Scheduled"
+		}
+		if ist.Spec.Generation != nil {
+			generation = *ist.Spec.Generation
+		}
+		if ist.Spec.From != nil {
+			switch ist.Spec.From.Kind {
+			case "DockerImage":
+				source = ist.Spec.From.Name
+			case "ImageStreamImage":
+				if _, id, ok := imageutil.SplitImageStreamImage(ist.Spec.From.Name); ok {
+					source = fmt.Sprintf("image/%s", id)
+				} else {
+					status = "InvalidRefName"
+				}
+			case "ImageStreamTag":
+				if len(ist.Spec.From.Namespace) > 0 {
+					source = fmt.Sprintf("istag %s/%s", ist.Spec.From.Namespace, ist.Spec.From.Name)
+				} else {
+					source = fmt.Sprintf("istag/%s", ist.Spec.From.Name)
+				}
+				if _, _, ok := imageutil.SplitImageStreamTag(ist.Spec.From.Name); !ok {
+					// tags that reference other internal tags are "tracking tags" and should
+					// be denoted as such
+					spec = "Track"
+				}
+			default:
+				status = "InvalidRefKind"
+			}
+		} else {
+			spec = ""
+		}
+	}
+	if ist.Status != nil {
+		count = len(ist.Status.Items)
+		var last time.Time
+		if count > 0 {
+			event := ist.Status.Items[0]
+			last = event.Created.Time
+			if generation > 0 && event.Generation > 0 && event.Generation < generation {
+				status = fmt.Sprintf("Importing")
+			} else if len(event.Image) > 0 {
+				source = fmt.Sprintf("image/%s", event.Image)
+			} else if len(event.DockerImageReference) > 0 {
+				source = event.DockerImageReference
+			}
+			switch {
+			case len(source) > 0 && len(spec) == 0:
+				// default to push if no spec
+				spec = "Push"
+			case spec == "Track":
+				// TODO: tracking tags do not have a generation that matches their tag, we
+				//   can't be sure that the tag matches
+			case generation > 0 && event.Generation > 0 && event.Generation > generation:
+				// if the generation is newer than the spec tag, it was either reset or
+				// another user has pushed to this tag
+				spec = "Push"
+			}
+		}
+		for _, condition := range ist.Status.Conditions {
+			if condition.Type == imageapi.ImportSuccess && condition.Status == core.ConditionFalse {
+				status = fmt.Sprintf("ImportFailed (%s)", condition.Reason)
+			}
+			if condition.LastTransitionTime.After(last) {
+				last = condition.LastTransitionTime.Time
+			}
+		}
+		if !last.IsZero() {
+			created = fmt.Sprintf("%s ago", formatRelativeTime(last))
+		}
+	}
+	if len(status) == 0 {
+		status = source
+	}
+
+	if count > 0 {
+		row.Cells = append(row.Cells, ist.Name, spec, status, count, created)
+	} else {
+		row.Cells = append(row.Cells, ist.Name, spec, status, nil, created)
+	}
+
+	return []metav1.TableRow{row}, nil
+}
+
+func printImageTagList(list *imageapi.ImageTagList, options kprinters.GenerateOptions) ([]metav1.TableRow, error) {
+	rows := make([]metav1.TableRow, 0, len(list.Items))
+	for i := range list.Items {
+		r, err := printImageTag(&list.Items[i], options)
 		if err != nil {
 			return nil, err
 		}

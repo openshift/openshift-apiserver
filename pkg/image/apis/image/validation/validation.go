@@ -20,6 +20,7 @@ import (
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 
 	imagev1 "github.com/openshift/api/image/v1"
+	"github.com/openshift/library-go/pkg/image/imageutil"
 	imageref "github.com/openshift/library-go/pkg/image/reference"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
@@ -510,6 +511,75 @@ func ValidateImageStreamTagUpdateWithWhitelister(
 	newISTCopy.Generation = oldISTCopy.Generation
 	if !kapihelper.Semantic.Equalities.DeepEqual(&newISTCopy, &oldISTCopy) {
 		result = append(result, field.Invalid(field.NewPath("metadata"), "", "may not update fields other than metadata.annotations"))
+	}
+
+	return result
+}
+
+// ValidateImageTag validates a mutation of an image stream tag, which can happen on PUT.
+func ValidateImageTag(itag *imageapi.ImageTag) field.ErrorList {
+	return ValidateImageTagWithWhitelister(nil, itag)
+}
+
+// ValidateImageTagWithWhitelister validates a mutation of an image stream tag, which can happen on PUT. Additionally,
+// it validates each new image reference against registry whitelist.
+func ValidateImageTagWithWhitelister(
+	whitelister whitelist.RegistryWhitelister,
+	itag *imageapi.ImageTag,
+) field.ErrorList {
+	result := validation.ValidateObjectMeta(&itag.ObjectMeta, true, path.ValidatePathSegmentName, field.NewPath("metadata"))
+
+	if itag.Spec == nil {
+		result = append(result, field.Required(field.NewPath("spec"), "spec is a required field during creation"))
+	} else {
+		_, imageTag, ok := imageutil.SplitImageStreamTag(itag.Name)
+		if !ok || itag.Spec.Name != imageTag {
+			result = append(result, field.Invalid(field.NewPath("spec", "name"), itag.Spec.Name, "must match image tag name"))
+		}
+
+		insecureRepository := isRepositoryInsecure(itag)
+		result = append(result, ValidateImageStreamTagReference(whitelister, insecureRepository, *itag.Spec, field.NewPath("spec"))...)
+	}
+
+	return result
+}
+
+// ValidateImageTagUpdate ensures that only the annotations or the image reference of the IST have changed.
+func ValidateImageTagUpdate(newITag, oldITag *imageapi.ImageTag) field.ErrorList {
+	return ValidateImageTagUpdateWithWhitelister(nil, newITag, oldITag)
+}
+
+// ValidateImageTagUpdateWithWhitelister ensures that only the annotations or the image reference of the IST have
+// changed. Additionally, it validates image reference against registry whitelist if it changed.
+func ValidateImageTagUpdateWithWhitelister(
+	whitelister whitelist.RegistryWhitelister,
+	newITag, oldITag *imageapi.ImageTag,
+) field.ErrorList {
+	result := validation.ValidateObjectMetaUpdate(&newITag.ObjectMeta, &oldITag.ObjectMeta, field.NewPath("metadata"))
+
+	if whitelister != nil && oldITag.Spec != nil && oldITag.Spec.From != nil && oldITag.Spec.From.Kind == "DockerImage" {
+		whitelister = whitelister.Copy()
+		err := whitelister.WhitelistRepository(oldITag.Spec.From.Name)
+		if err != nil {
+			klog.V(4).Infof("image stream tag %s/%s: unable to add pull spec %q to whitelist: %s", oldITag.Namespace, oldITag.Name, oldITag.Spec.From.Name, err)
+		}
+	}
+
+	if newITag.Spec != nil {
+		_, imageTag, ok := imageutil.SplitImageStreamTag(newITag.Name)
+		if !ok || newITag.Spec.Name != imageTag {
+			result = append(result, field.Invalid(field.NewPath("spec", "name"), newITag.Spec.Name, "must match image tag name"))
+		}
+
+		result = append(result, ValidateImageStreamTagReference(whitelister, isRepositoryInsecure(newITag), *newITag.Spec, field.NewPath("spec"))...)
+	}
+
+	// ensure that only spec has changed
+	if !kapihelper.Semantic.Equalities.DeepEqual(&newITag.ObjectMeta, &oldITag.ObjectMeta) {
+		result = append(result, field.Invalid(field.NewPath("metadata"), "", "may not update fields other than spec"))
+	}
+	if !kapihelper.Semantic.Equalities.DeepEqual(newITag.Status, oldITag.Status) {
+		result = append(result, field.Invalid(field.NewPath("status"), "", "may not update fields other than spec"))
 	}
 
 	return result

@@ -42,6 +42,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestreamimport"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestreammapping"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestreamtag"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagetag"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
@@ -247,6 +248,7 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	imageStreamRegistry := imagestream.NewRegistry(imageStreamStorage, imageStreamStatusStorage, internalImageStreamStorage)
 	imageStreamMappingStorage := imagestreammapping.NewREST(imageRegistry, imageStreamRegistry, c.ExtraConfig.RegistryHostnameRetriever)
 	imageStreamTagStorage := imagestreamtag.NewREST(imageRegistry, imageStreamRegistry, whitelister)
+	imageTagStorage := imagetag.NewREST(imageRegistry, imageStreamRegistry, whitelister)
 	importerCache, err := imageimporter.NewImageStreamLayerCache(imageimporter.DefaultImageStreamLayerCacheSize)
 	if err != nil {
 		return nil, fmt.Errorf("error building REST storage: %v", err)
@@ -283,5 +285,6 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	v1Storage["imageStreamImages"] = imageStreamImageStorage
 	v1Storage["imageStreamMappings"] = imageStreamMappingStorage
 	v1Storage["imageStreamTags"] = imageStreamTagStorage
+	v1Storage["imageTags"] = imageTagStorage
 	return v1Storage, nil
 }

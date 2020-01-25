@@ -57,7 +57,7 @@ func buildNamespaceRolesAndBindings() (map[string][]rbacv1.Role, map[string][]rb
 			ObjectMeta: metav1.ObjectMeta{Name: OpenshiftSharedResourceViewRoleName},
 			Rules: []rbacv1.PolicyRule{
 				rbacv1helpers.NewRule(read...).Groups(templateGroup, legacyTemplateGroup).Resources("templates").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(imageGroup, legacyImageGroup).Resources("imagestreams", "imagestreamtags", "imagestreamimages").RuleOrDie(),
+				rbacv1helpers.NewRule(read...).Groups(imageGroup, legacyImageGroup).Resources("imagestreams", "imagestreamtags", "imagetags", "imagestreamimages").RuleOrDie(),
 				// so anyone can pull from openshift/* image streams
 				rbacv1helpers.NewRule("get").Groups(imageGroup, legacyImageGroup).Resources("imagestreams/layers").RuleOrDie(),
 				// so anyone can view from openshift/* configmaps. e.g. The motd configmap

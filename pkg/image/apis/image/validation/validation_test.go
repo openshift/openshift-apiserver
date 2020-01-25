@@ -1261,6 +1261,241 @@ func TestValidateISTUpdateWithWhitelister(t *testing.T) {
 	}
 }
 
+func TestValidateITUpdate(t *testing.T) {
+	old := &imageapi.ImageTag{
+		ObjectMeta: metav1.ObjectMeta{Namespace: metav1.NamespaceDefault, Name: "foo:bar", ResourceVersion: "1", Annotations: map[string]string{"one": "two"}},
+		Spec: &imageapi.TagReference{
+			From: &kapi.ObjectReference{Kind: "DockerImage", Name: "some/other:system"},
+		},
+	}
+
+	errs := ValidateImageTagUpdate(
+		&imageapi.ImageTag{
+			ObjectMeta: metav1.ObjectMeta{Namespace: metav1.NamespaceDefault, Name: "foo:bar", ResourceVersion: "1", Annotations: map[string]string{"one": "two"}},
+		},
+		old,
+	)
+	if len(errs) != 0 {
+		t.Errorf("expected success: %v", errs)
+	}
+
+	errorCases := map[string]struct {
+		A imageapi.ImageTag
+		T field.ErrorType
+		F string
+	}{
+		"changedAnnotations": {
+			A: imageapi.ImageTag{
+				ObjectMeta: metav1.ObjectMeta{Namespace: metav1.NamespaceDefault, Name: "foo:bar", ResourceVersion: "1", Annotations: map[string]string{"one": "two", "three": "four"}},
+			},
+			T: field.ErrorTypeInvalid,
+			F: "metadata",
+		},
+		"changedLabel": {
+			A: imageapi.ImageTag{
+				ObjectMeta: metav1.ObjectMeta{Namespace: metav1.NamespaceDefault, Name: "foo:bar", ResourceVersion: "1", Annotations: map[string]string{"one": "two"}, Labels: map[string]string{"a": "b"}},
+			},
+			T: field.ErrorTypeInvalid,
+			F: "metadata",
+		},
+		"mismatchedSpecName": {
+			A: imageapi.ImageTag{
+				ObjectMeta: metav1.ObjectMeta{Namespace: metav1.NamespaceDefault, Name: "foo:bar", ResourceVersion: "1", Annotations: map[string]string{"one": "two"}},
+				Spec: &imageapi.TagReference{
+					Name:            "baz",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "some/valid:image"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			T: field.ErrorTypeInvalid,
+			F: "spec.name",
+		},
+		"tagToNameRequired": {
+			A: imageapi.ImageTag{
+				ObjectMeta: metav1.ObjectMeta{Namespace: metav1.NamespaceDefault, Name: "foo:bar", ResourceVersion: "1", Annotations: map[string]string{"one": "two"}},
+				Spec: &imageapi.TagReference{
+					Name:            "bar",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: ""},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			T: field.ErrorTypeRequired,
+			F: "spec.from.name",
+		},
+		"tagToKindRequired": {
+			A: imageapi.ImageTag{
+				ObjectMeta: metav1.ObjectMeta{Namespace: metav1.NamespaceDefault, Name: "foo:bar", ResourceVersion: "1", Annotations: map[string]string{"one": "two"}},
+				Spec: &imageapi.TagReference{
+					Name:            "bar",
+					From:            &kapi.ObjectReference{Kind: "", Name: "foo/bar:biz"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			T: field.ErrorTypeRequired,
+			F: "spec.from.kind",
+		},
+	}
+	for k, v := range errorCases {
+		t.Run(k, func(t *testing.T) {
+			errs := ValidateImageTagUpdate(&v.A, old)
+			if len(errs) == 0 {
+				t.Fatalf("expected failure %s for %v", k, v.A)
+			}
+			for i := range errs {
+				if errs[i].Type != v.T {
+					t.Errorf("%s: expected errors to have type %s: %v", k, v.T, errs[i])
+				}
+				if errs[i].Field != v.F {
+					t.Errorf("%s: expected errors to have field %s: %v", k, v.F, errs[i])
+				}
+			}
+		})
+	}
+}
+
+func TestValidateITUpdateWithWhitelister(t *testing.T) {
+	for _, tc := range []struct {
+		name        string
+		whitelist   openshiftcontrolplanev1.AllowedRegistries
+		oldTagRef   *imageapi.TagReference
+		newTagRef   *imageapi.TagReference
+		registryURL string
+		expected    field.ErrorList
+	}{
+		{
+			name:      "allow whitelisted",
+			whitelist: mkAllowed(false, "docker.io"),
+			newTagRef: &imageapi.TagReference{
+				From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar:biz"},
+				ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.LocalTagReferencePolicy},
+			},
+		},
+
+		{
+			name:      "forbid not whitelisted",
+			whitelist: mkAllowed(false, "example.com:*"),
+			newTagRef: &imageapi.TagReference{
+				From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar:biz"},
+				ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.LocalTagReferencePolicy},
+			},
+			expected: field.ErrorList{
+				field.Forbidden(field.NewPath("spec", "from", "name"),
+					`registry "docker.io:443" not allowed by whitelist: "example.com:*"`),
+			},
+		},
+
+		{
+			name:      "allow old not whitelisted",
+			whitelist: mkAllowed(false, "example.com:*"),
+			oldTagRef: &imageapi.TagReference{
+				From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar:biz"},
+				ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.LocalTagReferencePolicy},
+			},
+			newTagRef: &imageapi.TagReference{
+				From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar:biz"},
+				ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.LocalTagReferencePolicy},
+			},
+		},
+
+		{
+			name:      "exact match not old references",
+			whitelist: mkAllowed(false, "example.com:*"),
+			oldTagRef: &imageapi.TagReference{
+				From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar:biz"},
+				ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.LocalTagReferencePolicy},
+			},
+			newTagRef: &imageapi.TagReference{
+				From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar:baz"},
+				ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.LocalTagReferencePolicy},
+			},
+		},
+
+		{
+			name:      "do not match insecure registries if not flagged as insecure",
+			whitelist: mkAllowed(true, "example.com"),
+			newTagRef: &imageapi.TagReference{
+				From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "example.com/foo/bar:baz"},
+				ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.LocalTagReferencePolicy},
+			},
+			expected: field.ErrorList{
+				field.Forbidden(field.NewPath("spec", "from", "name"),
+					`registry "example.com" not allowed by whitelist: "example.com:80"`),
+			},
+		},
+
+		{
+			name:      "match insecure registry if flagged",
+			whitelist: mkAllowed(false, "example.com"),
+			newTagRef: &imageapi.TagReference{
+				From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "example.com/foo/bar:baz"},
+				ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.LocalTagReferencePolicy},
+				ImportPolicy: imageapi.TagImportPolicy{
+					Insecure: true,
+				},
+			},
+		},
+
+		{
+			name:      "match integrated registry URL",
+			whitelist: mkAllowed(false, "example.com"),
+			newTagRef: &imageapi.TagReference{
+				From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "172.30.30.30:5000/foo/bar:baz"},
+				ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.LocalTagReferencePolicy},
+			},
+			registryURL: "172.30.30.30:5000",
+		},
+
+		{
+			name:      "ignore old reference of unexpected kind",
+			whitelist: mkAllowed(false, "example.com"),
+			oldTagRef: &imageapi.TagReference{
+				From:            &kapi.ObjectReference{Kind: "ImageTag", Name: "bar:biz"},
+				ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.LocalTagReferencePolicy},
+			},
+			newTagRef: &imageapi.TagReference{
+				From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "bar:biz"},
+				ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.LocalTagReferencePolicy},
+				ImportPolicy: imageapi.TagImportPolicy{
+					Insecure: true,
+				},
+			},
+			expected: field.ErrorList{
+				field.Forbidden(field.NewPath("spec", "from", "name"),
+					`registry "docker.io" not allowed by whitelist: "example.com:443"`),
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			objMeta := metav1.ObjectMeta{
+				Namespace:       metav1.NamespaceDefault,
+				Name:            "foo:bar",
+				ResourceVersion: "1",
+			}
+			if tc.oldTagRef != nil {
+				tc.oldTagRef.Name = "bar"
+			}
+			tc.newTagRef.Name = "bar"
+			istOld := imageapi.ImageTag{
+				ObjectMeta: objMeta,
+				Spec:       tc.oldTagRef,
+			}
+			istNew := imageapi.ImageTag{
+				ObjectMeta: objMeta,
+				Spec:       tc.newTagRef,
+			}
+
+			whitelister, err := whitelist.NewRegistryWhitelister(tc.whitelist, &simpleHostnameRetriever{registryURL: tc.registryURL})
+			if err != nil {
+				t.Fatal(err)
+			}
+			errs := ValidateImageTagUpdateWithWhitelister(whitelister, &istNew, &istOld)
+			if e, a := tc.expected, errs; !reflect.DeepEqual(e, a) {
+				t.Errorf("unexpected errors: %s", diff.ObjectDiff(a, e))
+			}
+		})
+	}
+}
+
 type simpleHostnameRetriever struct {
 	registryURL string
 }

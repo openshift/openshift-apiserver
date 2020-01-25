@@ -308,6 +308,16 @@ type TagEventList struct {
 	Conditions []TagEventCondition
 }
 
+// NamedTagEventList relates a tag to its image history.
+type NamedTagEventList struct {
+	// Tag is the tag for which the history is recorded
+	Tag string
+	// Standard object's metadata.
+	Items []TagEvent
+	// Conditions is an array of conditions that apply to the tag event list.
+	Conditions []TagEventCondition
+}
+
 // TagEvent is used by ImageRepositoryStatus to keep a historical record of images associated with a tag.
 type TagEvent struct {
 	// When the TagEvent was created
@@ -406,6 +416,47 @@ type ImageStreamTagList struct {
 	metav1.ListMeta
 
 	Items []ImageStreamTag
+}
+
+// +genclient
+// +genclient:onlyVerbs=get,list,create,update,delete
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// ImageTag represents a single tag within an image stream and includes the spec,
+// the status history, and the currently referenced image (if any) of the provided
+// tag. This type replaces the ImageStreamTag by providing a full view of the tag.
+// ImageTags are returned for every spec or status tag present on the image stream.
+// If no tag exists in either form a not found error will be returned by the API.
+// A create operation will succeed if no spec tag has already been defined and the
+// spec field is set. Delete will remove both spec and status elements from the
+// image stream.
+type ImageTag struct {
+	metav1.TypeMeta
+	metav1.ObjectMeta
+
+	// spec is the spec tag associated with this image stream tag, and it may be null
+	// if only pushes have occurred to this image stream.
+	Spec *TagReference
+	// status is the status tag details associated with this image stream tag, and it
+	// may be null if no push or import has been performed.
+	Status *NamedTagEventList
+	// image is the details of the most recent image stream status tag, and it may be
+	// null if import has not completed or an administrator has deleted the image
+	// object. To verify this is the most recent image, you must verify the generation
+	// of the most recent status.items entry matches the spec tag (if a spec tag is
+	// set).
+	Image *Image
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// ImageTagList is a list of ImageTag objects.
+type ImageTagList struct {
+	metav1.TypeMeta
+	metav1.ListMeta
+
+	// Items is the list of image stream tags
+	Items []ImageTag
 }
 
 // +genclient
