@@ -448,7 +448,7 @@ func checkImportFailure(status imageapi.ImageImportStatus, stream *imageapi.Imag
 		}
 	}
 
-	if !internalimageutil.HasTagCondition(stream, tag, condition) {
+	if !hasTagCondition(stream, tag, condition) {
 		setTagConditions(stream, tag, condition)
 		if tagRef, ok := stream.Spec.Tags[tag]; ok {
 			zero := int64(0)
@@ -457,6 +457,22 @@ func checkImportFailure(status imageapi.ImageImportStatus, stream *imageapi.Imag
 		}
 	}
 	return true
+}
+
+// hasTagCondition is an alternative to the public HasTagCondition in the internalimageutil package of this repo;
+// unlike that public method, it factors in changes to the message of the image stream import in case image stream
+// config changes (like which registry is used) still lead to an import InternalError. See
+// https://bugzilla.redhat.com/show_bug.cgi?id=1788700
+// So this returns true if the specified image stream tag has a condition with the same type, status, reason, and
+// message (but still does not check generation or date).
+func hasTagCondition(stream *imageapi.ImageStream, tag string, condition imageapi.TagEventCondition) bool {
+	for _, existing := range stream.Status.Tags[tag].Conditions {
+		if condition.Type == existing.Type && condition.Status == existing.Status && condition.Reason == existing.Reason &&
+			condition.Message == existing.Message {
+			return true
+		}
+	}
+	return false
 }
 
 // SetTagConditions applies the specified conditions to the status of the given tag.
