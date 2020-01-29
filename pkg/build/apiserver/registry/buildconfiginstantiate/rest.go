@@ -204,12 +204,13 @@ func (h *binaryInstantiateHandler) handle(r io.Reader) (runtime.Object, error) {
 					}
 				}
 			}
-			klog.V(2).Infof("failed to instantiate: %#v", request)
+			klog.V(2).Infof("failed to instantiate %#v with error %v", request, err)
 			return false, err
 		}
 		build = result
 		return true, nil
 	}); err != nil {
+		klog.Warningf("giving up trying to instantiate %#v due to: %v", request, err)
 		return nil, err
 	}
 	remaining := h.r.Timeout - time.Since(start)
@@ -229,25 +230,39 @@ func (h *binaryInstantiateHandler) handle(r io.Reader) (runtime.Object, error) {
 	switch {
 	// err checks, no ok check, needs to occur before ref to latest
 	case err == buildwait.ErrBuildDeleted:
-		return nil, errors.NewBadRequest(fmt.Sprintf("build %s was deleted before it started: %s", build.Name, apiserverbuildutil.NoBuildLogsMessage))
+		errLog := fmt.Sprintf("build %s was deleted before it started: %s", build.Name, apiserverbuildutil.NoBuildLogsMessage)
+		klog.Warningf(errLog)
+		return nil, errors.NewBadRequest(errLog)
 	case err != nil:
-		return nil, errors.NewBadRequest(fmt.Sprintf("unable to wait for build %s to run: %v", build.Name, err))
+		errLog := fmt.Sprintf("unable to wait for build %s to run: %v", build.Name, err)
+		klog.Warningf(errLog)
+		return nil, errors.NewBadRequest(errLog)
 	case !ok:
-		return nil, errors.NewTimeoutError(fmt.Sprintf("timed out waiting for build %s to start after %s", build.Name, h.r.Timeout), 0)
+		errLog := fmt.Sprintf("timed out waiting for build %s to start after %s", build.Name, h.r.Timeout)
+		klog.Warningf(errLog)
+		return nil, errors.NewTimeoutError(errLog, 0)
 	case latest.Status.Phase == buildv1.BuildPhaseError:
 		// don't cancel the build if it reached a terminal state on its own
 		cancel = false
-		return nil, errors.NewBadRequest(fmt.Sprintf("build %s encountered an error: %s", build.Name, apiserverbuildutil.NoBuildLogsMessage))
+		errLog := fmt.Sprintf("build %s encountered an error: %s", build.Name, apiserverbuildutil.NoBuildLogsMessage)
+		klog.Warningf(errLog)
+		return nil, errors.NewBadRequest(errLog)
 	case latest.Status.Phase == buildv1.BuildPhaseFailed:
 		// don't cancel the build if it reached a terminal state on its own
 		cancel = false
-		return nil, errors.NewBadRequest(fmt.Sprintf("build %s failed: %s: %s", build.Name, build.Status.Reason, build.Status.Message))
+		errLog := fmt.Sprintf("build %s failed: %s: %s", build.Name, build.Status.Reason, build.Status.Message)
+		klog.Warningf(errLog)
+		return nil, errors.NewBadRequest(errLog)
 	case latest.Status.Phase == buildv1.BuildPhaseCancelled:
 		// don't cancel the build if it reached a terminal state on its own
 		cancel = false
-		return nil, errors.NewBadRequest(fmt.Sprintf("build %s was cancelled: %s", build.Name, apiserverbuildutil.NoBuildLogsMessage))
+		errLog := fmt.Sprintf("build %s was cancelled: %s", build.Name, apiserverbuildutil.NoBuildLogsMessage)
+		klog.Warningf(errLog)
+		return nil, errors.NewBadRequest(errLog)
 	case latest.Status.Phase != buildv1.BuildPhaseRunning:
-		return nil, errors.NewBadRequest(fmt.Sprintf("cannot upload file to build %s with status %s", build.Name, latest.Status.Phase))
+		errLog := fmt.Sprintf("cannot upload file to build %s with status %s", build.Name, latest.Status.Phase)
+		klog.Warningf(errLog)
+		return nil, errors.NewBadRequest(errLog)
 	}
 
 	buildPodName := buildinternalhelpers.GetBuildPodName(build)
@@ -276,12 +291,14 @@ func (h *binaryInstantiateHandler) handle(r io.Reader) (runtime.Object, error) {
 
 	exec, err := remotecommand.NewSPDYExecutor(h.r.ClientConfig, "POST", req.URL())
 	if err != nil {
+		klog.Warningf("error with SPDY POST binary content to build pod %s/%s: %#v", build.Namespace, buildPodName, err)
 		return nil, err
 	}
 	err = exec.Stream(remotecommand.StreamOptions{
 		Stdin: r,
 	})
 	if err != nil {
+		klog.Warningf("error streaming binary content with build pod %s/%s: %#v", build.Namespace, buildPodName, err)
 		return nil, errors.NewInternalError(err)
 	}
 	cancel = false
