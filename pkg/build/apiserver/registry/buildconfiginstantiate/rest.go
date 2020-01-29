@@ -192,26 +192,27 @@ func (h *binaryInstantiateHandler) handle(r io.Reader) (runtime.Object, error) {
 		AsFile: h.options.AsFile,
 	}
 
-	var build *buildapi.Build
+	var build, result *buildapi.Build
+	var instErr error
 	start := time.Now()
 	if err := wait.Poll(time.Second, h.r.Timeout, func() (bool, error) {
-		result, err := h.r.Generator.InstantiateInternal(h.ctx, request)
-		if err != nil {
-			if errors.IsNotFound(err) {
-				if s, ok := err.(errors.APIStatus); ok {
+		result, instErr = h.r.Generator.InstantiateInternal(h.ctx, request)
+		if instErr != nil {
+			if errors.IsNotFound(instErr) {
+				if s, ok := instErr.(errors.APIStatus); ok {
 					if s.Status().Kind == "imagestreamtags" {
 						return false, nil
 					}
 				}
 			}
-			klog.V(2).Infof("failed to instantiate %#v with error %v", request, err)
-			return false, err
+			klog.V(2).Infof("failed to instantiate %#v with error %v", request, instErr)
+			return false, instErr
 		}
 		build = result
 		return true, nil
 	}); err != nil {
-		klog.Warningf("giving up trying to instantiate %#v due to: %v", request, err)
-		return nil, err
+		klog.Warningf("giving up trying to instantiate %#v due to: %v", request, instErr)
+		return nil, instErr
 	}
 	remaining := h.r.Timeout - time.Since(start)
 
