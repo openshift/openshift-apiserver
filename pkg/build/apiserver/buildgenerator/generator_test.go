@@ -914,10 +914,12 @@ func TestGenerateBuildFromConfig(t *testing.T) {
 	strategy := mockDockerStrategyForDockerImage(originalImage, &metav1.GetOptions{})
 	output := MockOutput()
 	resources := mockResources()
+	expectedLabel := "test-build-config-4"
 	bc := &buildv1.BuildConfig{
 		ObjectMeta: metav1.ObjectMeta{
-			UID:       "test-uid",
-			Name:      "test-build-config",
+			UID: "test-uid",
+			// Specify a name here that we cannot use as-is for a k8s ObjectMeta label
+			Name:      "test-build-config-4.3.0.ipv6-2019-11-27-0001-build",
 			Namespace: metav1.NamespaceDefault,
 			Labels:    map[string]string{"testlabel": "testvalue"},
 		},
@@ -974,10 +976,10 @@ func TestGenerateBuildFromConfig(t *testing.T) {
 	if build.Annotations[buildv1.BuildConfigAnnotation] != bc.Name {
 		t.Errorf("Build does not contain annotation from BuildConfig")
 	}
-	if build.Labels[buildv1.BuildConfigLabel] != bc.Name {
+	if build.Labels[buildv1.BuildConfigLabel] != expectedLabel {
 		t.Errorf("Build does not contain labels from BuildConfig")
 	}
-	if build.Labels[buildv1.BuildConfigLabelDeprecated] != bc.Name {
+	if build.Labels[buildv1.BuildConfigLabelDeprecated] != expectedLabel {
 		t.Errorf("Build does not contain labels from BuildConfig")
 	}
 	if build.Status.Config.Name != bc.Name || build.Status.Config.Namespace != bc.Namespace || build.Status.Config.Kind != "BuildConfig" {
