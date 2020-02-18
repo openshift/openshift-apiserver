@@ -1006,10 +1006,20 @@ func setBuildAnnotationAndLabel(bcCopy *buildv1.BuildConfig, build *buildv1.Buil
 }
 
 func labelValue(name string) string {
-	if len(name) <= validation.DNS1123LabelMaxLength {
-		return name
+	end := len(name)
+	newName := name
+	// first, try to truncate from the end to find a valid
+	// label
+	for end > 0 {
+		errStrs := validation.IsDNS1123Label(newName)
+		if len(errStrs) == 0 {
+			return newName
+		}
+		end--
+		newName = newName[:end]
 	}
-	return name[:validation.DNS1123LabelMaxLength]
+	klog.Warningf("In creating the value of the build label in the build pod, several attempts at manipulating %s to meet k8s label name requirements failed", name)
+	return name
 }
 
 // mergeMaps will merge to map[string]string instances, with
