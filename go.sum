@@ -564,6 +564,8 @@ github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d h1:t
 github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d/go.mod h1:XmfFzbwryblvZ29NebonirM7RBuNEO7+yVCOapaouAk=
 github.com/openshift/kubernetes-apiserver v0.0.0-20200217091208-bd51114464b5 h1:Z+MDNH0OVlimwK5WHyLmQjSKHkgUT6V+i/PejISNylQ=
 github.com/openshift/kubernetes-apiserver v0.0.0-20200217091208-bd51114464b5/go.mod h1:iJtsPpu1ZpEnHaNawpSV0nYTGBhhX2dUlnn7/QS7QiY=
+github.com/openshift/kubernetes-apiserver v0.0.0-20200309154654-4efd99e3711e h1:2vhIqPWpiM/wHsBsrT0Ni/hpJkC49V80PkdP5m7PldU=
+github.com/openshift/kubernetes-apiserver v0.0.0-20200309154654-4efd99e3711e/go.mod h1:iJtsPpu1ZpEnHaNawpSV0nYTGBhhX2dUlnn7/QS7QiY=
 github.com/openshift/library-go v0.0.0-20191218095328-1c12909e5923 h1:z9n4E/ubc0ow086DmSxBwjCjDAgPVYYGJJQVQaak6gU=
 github.com/openshift/library-go v0.0.0-20191218095328-1c12909e5923/go.mod h1:+EzNb8oA3fnhC613pNcAU0DJ9s3m6WaIMECIVQm2ork=
 github.com/openshift/library-go v0.0.0-20200120084036-bb27e57e2f2b h1:9UVSbNMDDkS6NoX6BTSDgfmeSlw+lxt+G0gVdes5g/Y=
