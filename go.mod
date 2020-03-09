@@ -51,7 +51,7 @@ replace (
 	k8s.io/api => k8s.io/api v0.17.3
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.17.3
 	k8s.io/apimachinery => k8s.io/apimachinery v0.17.3
-	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20200217091208-bd51114464b5
+	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20200309154654-4efd99e3711e
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.17.3
 	k8s.io/client-go => k8s.io/client-go v0.17.3
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.17.3
