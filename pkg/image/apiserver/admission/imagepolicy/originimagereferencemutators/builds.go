@@ -9,18 +9,20 @@ import (
 )
 
 type buildSpecMutator struct {
-	spec    *buildapi.CommonSpec
-	oldSpec *buildapi.CommonSpec
-	path    *field.Path
-	output  bool
+	spec                     *buildapi.CommonSpec
+	oldSpec                  *buildapi.CommonSpec
+	path                     *field.Path
+	output                   bool
+	resolveAnnotationChanged bool
 }
 
 // NewBuildMutator returns an ImageReferenceMutator that includes the output field.
-func NewBuildMutator(build *buildapi.Build) imagereferencemutators.ImageReferenceMutator {
+func NewBuildMutator(build *buildapi.Build, resolveAnnotationChanged bool) imagereferencemutators.ImageReferenceMutator {
 	return &buildSpecMutator{
-		spec:   &build.Spec.CommonSpec,
-		path:   field.NewPath("spec"),
-		output: true,
+		spec:                     &build.Spec.CommonSpec,
+		path:                     field.NewPath("spec"),
+		output:                   true,
+		resolveAnnotationChanged: resolveAnnotationChanged,
 	}
 }
 
@@ -67,7 +69,7 @@ func hasIdenticalObjectReference(ref, oldRef *kapi.ObjectReference) bool {
 func (m *buildSpecMutator) Mutate(fn imagereferencemutators.ImageReferenceMutateFunc) field.ErrorList {
 	var errs field.ErrorList
 	for i := range m.spec.Source.Images {
-		if hasIdenticalImageSourceObjectReference(m.oldSpec, m.spec.Source.Images[i].From) {
+		if !m.resolveAnnotationChanged && hasIdenticalImageSourceObjectReference(m.oldSpec, m.spec.Source.Images[i].From) {
 			continue
 		}
 		if err := fn(&m.spec.Source.Images[i].From); err != nil {
@@ -75,7 +77,7 @@ func (m *buildSpecMutator) Mutate(fn imagereferencemutators.ImageReferenceMutate
 			continue
 		}
 	}
-	if !hasIdenticalStrategyFrom(m.spec, m.oldSpec) {
+	if m.resolveAnnotationChanged || !hasIdenticalStrategyFrom(m.spec, m.oldSpec) {
 		if s := m.spec.Strategy.CustomStrategy; s != nil {
 			if err := fn(&s.From); err != nil {
 				errs = append(errs, imagereferencemutators.FieldErrorOrInternal(err, m.path.Child("strategy", "customStrategy", "from", "name")))
@@ -96,7 +98,7 @@ func (m *buildSpecMutator) Mutate(fn imagereferencemutators.ImageReferenceMutate
 	}
 	if m.output {
 		if s := m.spec.Output.To; s != nil {
-			if m.oldSpec == nil || m.oldSpec.Output.To == nil || !hasIdenticalObjectReference(s, m.oldSpec.Output.To) {
+			if m.resolveAnnotationChanged || m.oldSpec == nil || m.oldSpec.Output.To == nil || !hasIdenticalObjectReference(s, m.oldSpec.Output.To) {
 				if err := fn(s); err != nil {
 					errs = append(errs, imagereferencemutators.FieldErrorOrInternal(err, m.path.Child("output", "to")))
 				}

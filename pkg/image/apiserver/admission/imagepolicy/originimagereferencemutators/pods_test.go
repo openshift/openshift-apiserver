@@ -141,7 +141,7 @@ func Test_podSpecMutator_Mutate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := imagereferencemutators.NewPodSpecMutator(tt.fields.spec, tt.fields.oldSpec, tt.fields.path)
+			m := imagereferencemutators.NewPodSpecMutator(tt.fields.spec, tt.fields.oldSpec, tt.fields.path, false)
 			if tt.wantSpec == nil {
 				tt.wantSpec = &kapi.PodSpec{}
 			}
@@ -157,9 +157,10 @@ func Test_podSpecMutator_Mutate(t *testing.T) {
 
 func Test_podSpecV1Mutator_Mutate(t *testing.T) {
 	type fields struct {
-		spec    *kapiv1.PodSpec
-		oldSpec *kapiv1.PodSpec
-		path    *field.Path
+		spec                     *kapiv1.PodSpec
+		oldSpec                  *kapiv1.PodSpec
+		path                     *field.Path
+		resolveAnnotationChanged bool
 	}
 	type args struct {
 		fn imagereferencemutators.ImageReferenceMutateFunc
@@ -275,10 +276,48 @@ func Test_podSpecV1Mutator_Mutate(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "mutates works on update when it wasn't initially enabled",
+			fields: fields{
+				spec: &kapiv1.PodSpec{
+					InitContainers: []kapiv1.Container{
+						{Name: "1", Image: "test-1"},
+					},
+					Containers: []kapiv1.Container{
+						{Name: "2", Image: "test-2"},
+					},
+				},
+				oldSpec: &kapiv1.PodSpec{
+					InitContainers: []kapiv1.Container{
+						{Name: "1", Image: "test-1"},
+					},
+					Containers: []kapiv1.Container{
+						{Name: "2", Image: "test-2"},
+					},
+				},
+				resolveAnnotationChanged: true,
+			},
+			args: args{fn: func(ref *kapi.ObjectReference) error {
+				switch ref.Name {
+				case "test-1", "test-2":
+					ref.Name += ":sha"
+				default:
+				}
+				return nil
+			}},
+			wantSpec: &kapiv1.PodSpec{
+				InitContainers: []kapiv1.Container{
+					{Name: "1", Image: "test-1:sha"},
+				},
+				Containers: []kapiv1.Container{
+					{Name: "2", Image: "test-2:sha"},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := imagereferencemutators.NewPodSpecV1Mutator(tt.fields.spec, tt.fields.oldSpec, tt.fields.path)
+			m := imagereferencemutators.NewPodSpecV1Mutator(tt.fields.spec, tt.fields.oldSpec, tt.fields.path, tt.fields.resolveAnnotationChanged)
 			if tt.wantSpec == nil {
 				tt.wantSpec = &kapiv1.PodSpec{}
 			}
