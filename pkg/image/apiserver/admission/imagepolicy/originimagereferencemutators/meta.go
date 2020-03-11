@@ -20,15 +20,27 @@ type OriginImageMutators struct {
 // such mutator is defined. Only references that are different between obj and old will
 // be returned unless old is nil.
 func (o OriginImageMutators) GetImageReferenceMutator(obj, old runtime.Object) (imagereferencemutators.ImageReferenceMutator, error) {
+	oldAnnotations, _ := o.GetAnnotationAccessor(old)
+	annotations, _ := o.GetAnnotationAccessor(obj)
+	resolveAnnotationChanged := imagereferencemutators.ResolveAllNames(annotations) != imagereferencemutators.ResolveAllNames(oldAnnotations)
+
 	switch t := obj.(type) {
 	case *buildapi.Build:
 		if oldT, ok := old.(*buildapi.Build); ok && oldT != nil {
-			return &buildSpecMutator{spec: &t.Spec.CommonSpec, oldSpec: &oldT.Spec.CommonSpec, path: field.NewPath("spec")}, nil
+			return &buildSpecMutator{
+				spec:                     &t.Spec.CommonSpec,
+				oldSpec:                  &oldT.Spec.CommonSpec,
+				path:                     field.NewPath("spec"),
+				resolveAnnotationChanged: resolveAnnotationChanged}, nil
 		}
 		return &buildSpecMutator{spec: &t.Spec.CommonSpec, path: field.NewPath("spec")}, nil
 	case *buildapi.BuildConfig:
 		if oldT, ok := old.(*buildapi.BuildConfig); ok && oldT != nil {
-			return &buildSpecMutator{spec: &t.Spec.CommonSpec, oldSpec: &oldT.Spec.CommonSpec, path: field.NewPath("spec")}, nil
+			return &buildSpecMutator{
+				spec:                     &t.Spec.CommonSpec,
+				oldSpec:                  &oldT.Spec.CommonSpec,
+				path:                     field.NewPath("spec"),
+				resolveAnnotationChanged: resolveAnnotationChanged}, nil
 		}
 		return &buildSpecMutator{spec: &t.Spec.CommonSpec, path: field.NewPath("spec")}, nil
 	}
@@ -40,7 +52,7 @@ func (o OriginImageMutators) GetImageReferenceMutator(obj, old runtime.Object) (
 				return nil, fmt.Errorf("old and new pod spec objects were not of the same type %T != %T: %v", obj, old, err)
 			}
 		}
-		return imagereferencemutators.NewPodSpecMutator(spec, oldSpec, path), nil
+		return imagereferencemutators.NewPodSpecMutator(spec, oldSpec, path, resolveAnnotationChanged), nil
 	}
 	if spec, path, err := getPodSpecV1(obj); err == nil {
 		var oldSpec *kapiv1.PodSpec
@@ -50,7 +62,7 @@ func (o OriginImageMutators) GetImageReferenceMutator(obj, old runtime.Object) (
 				return nil, fmt.Errorf("old and new pod spec objects were not of the same type %T != %T: %v", obj, old, err)
 			}
 		}
-		return imagereferencemutators.NewPodSpecV1Mutator(spec, oldSpec, path), nil
+		return imagereferencemutators.NewPodSpecV1Mutator(spec, oldSpec, path, resolveAnnotationChanged), nil
 	}
 	return o.KubeImageMutators.GetImageReferenceMutator(obj, old)
 }
