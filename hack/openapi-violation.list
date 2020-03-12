@@ -885,6 +885,7 @@ API rule violation: names_match,github.com/openshift/api/config/v1,IdentityProvi
 API rule violation: names_match,github.com/openshift/api/config/v1,IdentityProviderConfig,HTPasswd
 API rule violation: names_match,github.com/openshift/api/config/v1,InfrastructureStatus,APIServerInternalURL
 API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatus,BareMetal
+API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatus,IBMCloud
 API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatus,OpenStack
 API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatus,VSphere
 API rule violation: names_match,github.com/openshift/api/config/v1,RequestHeaderIdentityProvider,ClientCA
