@@ -13,6 +13,7 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	apierror "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
+	metatable "k8s.io/apimachinery/pkg/api/meta/table"
 	metainternal "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -319,4 +320,32 @@ func (r *REST) List(ctx context.Context, options *metainternal.ListOptions) (run
 		forbiddenError.ErrStatus.Message = "You may not request a new project via this API."
 	}
 	return nil, forbiddenError
+}
+
+// ConvertToTable implements the TableConvertor interface for REST.
+func (r *REST) ConvertToTable(ctx context.Context, obj runtime.Object, tableOptions runtime.Object) (*metav1.Table, error) {
+	table := &metav1.Table{
+		ColumnDefinitions: []metav1.TableColumnDefinition{
+			{Name: "Status", Type: "string", Format: "name", Description: "Describes whether the user is allowed to create projectrequests"},
+		},
+	}
+
+	if m, err := meta.ListAccessor(obj); err == nil {
+		table.ResourceVersion = m.GetResourceVersion()
+		table.SelfLink = m.GetSelfLink()
+		table.Continue = m.GetContinue()
+		table.RemainingItemCount = m.GetRemainingItemCount()
+	} else {
+		if m, err := meta.CommonAccessor(obj); err == nil {
+			table.ResourceVersion = m.GetResourceVersion()
+			table.SelfLink = m.GetSelfLink()
+		}
+	}
+
+	var err error
+	table.Rows, err = metatable.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) ([]interface{}, error) {
+		status := obj.(*metav1.Status)
+		return []interface{}{status.Status}, nil
+	})
+	return table, err
 }
