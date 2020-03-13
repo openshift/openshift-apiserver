@@ -1,6 +1,7 @@
 package openshiftapiserver
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -543,7 +544,7 @@ func (c *completedConfig) startProjectAuthorizationCache(context genericapiserve
 }
 
 // EnsureOpenShiftInfraNamespace is called as part of global policy initialization to ensure infra namespace exists
-func (c *completedConfig) EnsureOpenShiftInfraNamespace(context genericapiserver.PostStartHookContext) error {
+func (c *completedConfig) EnsureOpenShiftInfraNamespace(_ genericapiserver.PostStartHookContext) error {
 	namespaceName := bootstrappolicy.DefaultOpenShiftInfraNamespace
 
 	var coreClient *corev1client.CoreV1Client
@@ -561,14 +562,14 @@ func (c *completedConfig) EnsureOpenShiftInfraNamespace(context genericapiserver
 		return err
 	}
 
-	_, err = coreClient.Namespaces().Create(&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceName}})
+	_, err = coreClient.Namespaces().Create(context.TODO(), &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceName}}, metav1.CreateOptions{})
 	if err != nil && !kapierror.IsAlreadyExists(err) {
 		utilruntime.HandleError(fmt.Errorf("error creating namespace %q: %v", namespaceName, err))
 		return err
 	}
 
 	// Ensure we have the bootstrap SA for Nodes
-	_, err = coreClient.ServiceAccounts(namespaceName).Create(&corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: bootstrappolicy.InfraNodeBootstrapServiceAccountName}})
+	_, err = coreClient.ServiceAccounts(namespaceName).Create(context.TODO(), &corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: bootstrappolicy.InfraNodeBootstrapServiceAccountName}}, metav1.CreateOptions{})
 	if err != nil && !kapierror.IsAlreadyExists(err) {
 		klog.Errorf("Error creating service account %s/%s: %v", namespaceName, bootstrappolicy.InfraNodeBootstrapServiceAccountName, err)
 	}
