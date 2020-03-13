@@ -1,6 +1,7 @@
 package deploylog
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -220,7 +221,7 @@ func TestRESTGet(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			actualPodNamespace := ""
 			actualPodName := ""
-			getPodLogsFn := func(podNamespace, podName string, logOpts *corev1.PodLogOptions) (runtime.Object, error) {
+			getPodLogsFn := func(ctx context.Context, podNamespace, podName string, logOpts *corev1.PodLogOptions) (runtime.Object, error) {
 				actualPodNamespace = podNamespace
 				actualPodName = podName
 				return nil, nil

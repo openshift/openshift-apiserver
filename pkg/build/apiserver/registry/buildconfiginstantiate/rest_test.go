@@ -35,10 +35,10 @@ func TestCreateInstantiate(t *testing.T) {
 			GetBuildConfigFunc: func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.BuildConfig, error) {
 				return MockBuildConfig(MockSource(), MockSourceStrategyForImageRepository(), MockOutput()), nil
 			},
-			UpdateBuildConfigFunc: func(ctx context.Context, buildConfig *buildv1.BuildConfig) error {
+			UpdateBuildConfigFunc: func(ctx context.Context, buildConfig *buildv1.BuildConfig, _ *metav1.UpdateOptions) error {
 				return nil
 			},
-			CreateBuildFunc: func(ctx context.Context, build *buildv1.Build) error {
+			CreateBuildFunc: func(ctx context.Context, build *buildv1.Build, _ *metav1.CreateOptions) error {
 				return nil
 			},
 			GetBuildFunc: func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.Build, error) {

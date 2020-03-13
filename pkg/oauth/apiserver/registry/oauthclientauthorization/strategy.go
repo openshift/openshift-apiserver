@@ -64,7 +64,7 @@ func (s strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorL
 	auth := obj.(*oauthapi.OAuthClientAuthorization)
 	validationErrors := validation.ValidateClientAuthorization(auth)
 
-	client, err := s.clientGetter.Get(auth.ClientName, metav1.GetOptions{})
+	client, err := s.clientGetter.Get(ctx, auth.ClientName, metav1.GetOptions{})
 	if err != nil {
 		return append(validationErrors, field.InternalError(field.NewPath("clientName"), err))
 	}
@@ -83,7 +83,7 @@ func (s strategy) ValidateUpdate(ctx context.Context, obj runtime.Object, old ru
 
 	// only do a live client check if the scopes were increased by the update
 	if containsNewScopes(clientAuth.Scopes, oldClientAuth.Scopes) {
-		client, err := s.clientGetter.Get(clientAuth.ClientName, metav1.GetOptions{})
+		client, err := s.clientGetter.Get(ctx, clientAuth.ClientName, metav1.GetOptions{})
 		if err != nil {
 			return append(validationErrors, field.InternalError(field.NewPath("clientName"), err))
 		}

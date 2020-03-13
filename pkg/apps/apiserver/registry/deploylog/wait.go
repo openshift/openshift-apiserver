@@ -32,11 +32,11 @@ func WaitForRunningDeployment(rn corev1client.ReplicationControllersGetter, obse
 	lw := &cache.ListWatch{
 		ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 			options.FieldSelector = fieldSelector
-			return rn.ReplicationControllers(observed.Namespace).List(options)
+			return rn.ReplicationControllers(observed.Namespace).List(context.TODO(), options)
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 			options.FieldSelector = fieldSelector
-			return rn.ReplicationControllers(observed.Namespace).Watch(options)
+			return rn.ReplicationControllers(observed.Namespace).Watch(context.TODO(), options)
 		},
 	}
 

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -29,30 +30,30 @@ type FakeSecretInterface struct {
 	Secrets map[string]*corev1.Secret
 }
 
-func (f *FakeSecretInterface) Create(s *corev1.Secret) (*corev1.Secret, error) {
+func (f *FakeSecretInterface) Create(_ context.Context, s *corev1.Secret, _ metav1.CreateOptions) (*corev1.Secret, error) {
 	return nil, nil
 }
 
-func (f *FakeSecretInterface) Update(*corev1.Secret) (*corev1.Secret, error) {
+func (f *FakeSecretInterface) Update(_ context.Context, s *corev1.Secret, _ metav1.UpdateOptions) (*corev1.Secret, error) {
 	return nil, nil
 }
 
-func (f *FakeSecretInterface) Delete(name string, options *metav1.DeleteOptions) error {
+func (f *FakeSecretInterface) Delete(_ context.Context, name string, options metav1.DeleteOptions) error {
 	return nil
 }
-func (f *FakeSecretInterface) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
+func (f *FakeSecretInterface) DeleteCollection(_ context.Context, options metav1.DeleteOptions, listOptions metav1.ListOptions) error {
 	return nil
 }
-func (f *FakeSecretInterface) Get(name string, options metav1.GetOptions) (*corev1.Secret, error) {
+func (f *FakeSecretInterface) Get(_ context.Context, name string, options metav1.GetOptions) (*corev1.Secret, error) {
 	return f.Secrets[name], nil
 }
-func (f *FakeSecretInterface) List(opts metav1.ListOptions) (*corev1.SecretList, error) {
+func (f *FakeSecretInterface) List(_ context.Context, opts metav1.ListOptions) (*corev1.SecretList, error) {
 	return nil, nil
 }
-func (f *FakeSecretInterface) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+func (f *FakeSecretInterface) Watch(_ context.Context, opts metav1.ListOptions) (watch.Interface, error) {
 	return nil, nil
 }
-func (f *FakeSecretInterface) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *corev1.Secret, err error) {
+func (f *FakeSecretInterface) Patch(_ context.Context, name string, pt types.PatchType, data []byte, _ metav1.PatchOptions, subresources ...string) (result *corev1.Secret, err error) {
 	return nil, nil
 }
 

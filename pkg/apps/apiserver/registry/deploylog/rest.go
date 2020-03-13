@@ -50,7 +50,7 @@ type REST struct {
 	interval  time.Duration
 
 	// for unit testing
-	getLogsFn func(podNamespace, podName string, logOpts *corev1.PodLogOptions) (runtime.Object, error)
+	getLogsFn func(ctx context.Context, podNamespace, podName string, logOpts *corev1.PodLogOptions) (runtime.Object, error)
 }
 
 // REST implements GetterWithOptions
@@ -102,7 +102,7 @@ func (r *REST) Get(ctx context.Context, name string, opts runtime.Object) (runti
 
 	// Fetch deploymentConfig and check latest version; if 0, there are no deployments
 	// for this config
-	config, err := r.dcClient.DeploymentConfigs(namespace).Get(name, metav1.GetOptions{})
+	config, err := r.dcClient.DeploymentConfigs(namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
 		return nil, apierrors.NewNotFound(apps.Resource("deploymentconfig"), name)
 	}
@@ -130,7 +130,7 @@ func (r *REST) Get(ctx context.Context, name string, opts runtime.Object) (runti
 
 	// Get desired deployment
 	targetName := appsutil.DeploymentNameForConfigVersion(config.Name, desiredVersion)
-	target, err := r.waitForExistingDeployment(namespace, targetName)
+	target, err := r.waitForExistingDeployment(ctx, namespace, targetName)
 	if err != nil {
 		return nil, err
 	}
@@ -162,26 +162,26 @@ func (r *REST) Get(ctx context.Context, name string, opts runtime.Object) (runti
 		}
 
 		if appsutil.IsCompleteDeployment(latest) {
-			podName, err = r.returnApplicationPodName(target)
+			podName, err = r.returnApplicationPodName(ctx, target)
 			if err != nil {
 				return nil, err
 			}
 		}
 	case appsv1.DeploymentStatusComplete:
-		podName, err = r.returnApplicationPodName(target)
+		podName, err = r.returnApplicationPodName(ctx, target)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	logOpts := DeploymentToPodLogOptions(deployLogOpts)
-	return r.getLogsFn(namespace, podName, logOpts)
+	return r.getLogsFn(ctx, namespace, podName, logOpts)
 }
 
-func (r *REST) getLogs(podNamespace, podName string, logOpts *corev1.PodLogOptions) (runtime.Object, error) {
+func (r *REST) getLogs(ctx context.Context, podNamespace, podName string, logOpts *corev1.PodLogOptions) (runtime.Object, error) {
 	logRequest := r.podClient.Pods(podNamespace).GetLogs(podName, logOpts)
 
-	readerCloser, err := logRequest.Stream()
+	readerCloser, err := logRequest.Stream(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -194,14 +194,14 @@ func (r *REST) getLogs(podNamespace, podName string, logOpts *corev1.PodLogOptio
 }
 
 // waitForExistingDeployment will use the timeout to wait for a deployment to appear.
-func (r *REST) waitForExistingDeployment(namespace, name string) (*corev1.ReplicationController, error) {
+func (r *REST) waitForExistingDeployment(ctx context.Context, namespace, name string) (*corev1.ReplicationController, error) {
 	var (
 		target *corev1.ReplicationController
 		err    error
 	)
 
 	condition := func() (bool, error) {
-		target, err = r.rcClient.ReplicationControllers(namespace).Get(name, metav1.GetOptions{})
+		target, err = r.rcClient.ReplicationControllers(namespace).Get(ctx, name, metav1.GetOptions{})
 		switch {
 		case apierrors.IsNotFound(err):
 			return false, nil
@@ -220,11 +220,11 @@ func (r *REST) waitForExistingDeployment(namespace, name string) (*corev1.Replic
 
 // returnApplicationPodName returns the best candidate pod for the target deployment in order to
 // view its logs.
-func (r *REST) returnApplicationPodName(target *corev1.ReplicationController) (string, error) {
+func (r *REST) returnApplicationPodName(ctx context.Context, target *corev1.ReplicationController) (string, error) {
 	selector := labels.SelectorFromValidatedSet(labels.Set(target.Spec.Selector))
 	sortBy := func(pods []*corev1.Pod) sort.Interface { return controller.ByLogging(pods) }
 
-	firstPod, _, err := GetFirstPod(r.podClient, target.Namespace, selector.String(), r.timeout, sortBy)
+	firstPod, _, err := GetFirstPod(ctx, r.podClient, target.Namespace, selector.String(), r.timeout, sortBy)
 	if err != nil {
 		return "", apierrors.NewInternalError(err)
 	}
@@ -234,15 +234,15 @@ func (r *REST) returnApplicationPodName(target *corev1.ReplicationController) (s
 // GetFirstPod returns a pod matching the namespace and label selector
 // and the number of all pods that match the label selector.
 // DO NOT EDIT: this is a copy of the same function from kubectl to avoid carrying the dependency
-func GetFirstPod(client corev1client.PodsGetter, namespace string, selector string, timeout time.Duration, sortBy func([]*corev1.Pod) sort.Interface) (*corev1.Pod, int, error) {
+func GetFirstPod(ctx context.Context, client corev1client.PodsGetter, namespace string, selector string, timeout time.Duration, sortBy func([]*corev1.Pod) sort.Interface) (*corev1.Pod, int, error) {
 	lw := &cache.ListWatch{
 		ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 			options.LabelSelector = selector
-			return client.Pods(namespace).List(options)
+			return client.Pods(namespace).List(ctx, options)
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 			options.LabelSelector = selector
-			return client.Pods(namespace).Watch(options)
+			return client.Pods(namespace).Watch(ctx, options)
 		},
 	}
 

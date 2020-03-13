@@ -75,7 +75,7 @@ type fakeMultiSubjectAccessReviewRegistry struct {
 	records map[identifier]subjectAccessReviewRecord
 }
 
-func (f *fakeMultiSubjectAccessReviewRegistry) Create(subjectAccessReview *authorizationv1.SubjectAccessReview) (*authorizationv1.SubjectAccessReview, error) {
+func (f *fakeMultiSubjectAccessReviewRegistry) Create(_ context.Context, subjectAccessReview *authorizationv1.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationv1.SubjectAccessReview, error) {
 	id := identifier{name: subjectAccessReview.Spec.ResourceAttributes.Name, namespace: subjectAccessReview.Spec.ResourceAttributes.Namespace}
 	if record, exists := f.records[id]; exists {
 		if record.request != nil {
@@ -95,14 +95,14 @@ func (f *fakeMultiSubjectAccessReviewRegistry) Create(subjectAccessReview *autho
 }
 
 func (f *fakeMultiSubjectAccessReviewRegistry) CreateContext(ctx context.Context, sar *authorizationv1.SubjectAccessReview) (result *authorizationv1.SubjectAccessReview, err error) {
-	return f.Create(sar)
+	return f.Create(ctx, sar, metav1.CreateOptions{})
 }
 
 type fakeSubjectAccessReviewRegistry struct {
 	subjectAccessReviewRecord
 }
 
-func (f *fakeSubjectAccessReviewRegistry) Create(subjectAccessReview *authorizationv1.SubjectAccessReview) (*authorizationv1.SubjectAccessReview, error) {
+func (f *fakeSubjectAccessReviewRegistry) Create(_ context.Context, subjectAccessReview *authorizationv1.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationv1.SubjectAccessReview, error) {
 	f.request = subjectAccessReview
 	f.requestNamespace = subjectAccessReview.Spec.ResourceAttributes.Namespace
 	return &authorizationv1.SubjectAccessReview{
@@ -113,7 +113,7 @@ func (f *fakeSubjectAccessReviewRegistry) Create(subjectAccessReview *authorizat
 }
 
 func (f *fakeSubjectAccessReviewRegistry) CreateContext(ctx context.Context, sar *authorizationv1.SubjectAccessReview) (result *authorizationv1.SubjectAccessReview, err error) {
-	return f.Create(sar)
+	return f.Create(ctx, sar, metav1.CreateOptions{})
 }
 
 func TestPublicDockerImageRepository(t *testing.T) {

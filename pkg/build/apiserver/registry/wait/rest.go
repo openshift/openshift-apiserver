@@ -51,7 +51,7 @@ func WaitForRunningBuild(buildClient buildtypedclient.BuildsGetter, buildNamespa
 			// make sure the build has not been deleted before we start trying to watch on it because
 			// we won't get a watch event for it if it's been deleted (because we are watching starting
 			// at resource version 0).
-			_, err := buildClient.Builds(buildNamespace).Get(buildName, metav1.GetOptions{})
+			_, err := buildClient.Builds(buildNamespace).Get(context.TODO(), buildName, metav1.GetOptions{})
 			if err != nil {
 				resultErr = err
 				if errors.IsNotFound(err) {
@@ -60,7 +60,7 @@ func WaitForRunningBuild(buildClient buildtypedclient.BuildsGetter, buildNamespa
 				return
 			}
 
-			w, err := buildClient.Builds(buildNamespace).Watch(options)
+			w, err := buildClient.Builds(buildNamespace).Watch(context.TODO(), options)
 			if err != nil {
 				resultErr = err
 				return

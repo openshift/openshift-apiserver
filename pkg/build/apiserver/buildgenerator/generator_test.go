@@ -389,7 +389,7 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 				return bc, nil
 			}
 		client.UpdateBuildConfigFunc =
-			func(ctx context.Context, buildConfig *buildv1.BuildConfig) error {
+			func(ctx context.Context, buildConfig *buildv1.BuildConfig, _ *metav1.UpdateOptions) error {
 				bc = buildConfig
 				return nil
 			}
@@ -819,7 +819,7 @@ func TestFindImageTrigger(t *testing.T) {
 
 func TestClone(t *testing.T) {
 	generator := BuildGenerator{Client: TestingClient{
-		CreateBuildFunc: func(ctx context.Context, build *buildv1.Build) error {
+		CreateBuildFunc: func(ctx context.Context, build *buildv1.Build, _ *metav1.CreateOptions) error {
 			return nil
 		},
 		GetBuildFunc: func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.Build, error) {
@@ -859,7 +859,7 @@ func TestCreateBuild(t *testing.T) {
 		},
 	}
 	generator := BuildGenerator{Client: TestingClient{
-		CreateBuildFunc: func(ctx context.Context, build *buildv1.Build) error {
+		CreateBuildFunc: func(ctx context.Context, build *buildv1.Build, _ *metav1.CreateOptions) error {
 			return nil
 		},
 		GetBuildFunc: func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.Build, error) {
@@ -898,7 +898,7 @@ func TestCreateBuildCreateError(t *testing.T) {
 		},
 	}
 	generator := BuildGenerator{Client: TestingClient{
-		CreateBuildFunc: func(ctx context.Context, build *buildv1.Build) error {
+		CreateBuildFunc: func(ctx context.Context, build *buildv1.Build, _ *metav1.CreateOptions) error {
 			return fmt.Errorf("create-error")
 		},
 	}}
@@ -1070,7 +1070,7 @@ func TestGenerateBuildWithImageTagForSourceStrategyImageRepository(t *testing.T)
 				}, nil
 			},
 
-			UpdateBuildConfigFunc: func(ctx context.Context, buildConfig *buildv1.BuildConfig) error {
+			UpdateBuildConfigFunc: func(ctx context.Context, buildConfig *buildv1.BuildConfig, _ *metav1.UpdateOptions) error {
 				return nil
 			},
 		}}
@@ -1140,7 +1140,7 @@ func TestGenerateBuildWithImageTagForDockerStrategyImageRepository(t *testing.T)
 					},
 				}, nil
 			},
-			UpdateBuildConfigFunc: func(ctx context.Context, buildConfig *buildv1.BuildConfig) error {
+			UpdateBuildConfigFunc: func(ctx context.Context, buildConfig *buildv1.BuildConfig, _ *metav1.UpdateOptions) error {
 				return nil
 			},
 		}}
@@ -1210,7 +1210,7 @@ func TestGenerateBuildWithImageTagForCustomStrategyImageRepository(t *testing.T)
 					},
 				}, nil
 			},
-			UpdateBuildConfigFunc: func(ctx context.Context, buildConfig *buildv1.BuildConfig) error {
+			UpdateBuildConfigFunc: func(ctx context.Context, buildConfig *buildv1.BuildConfig, _ *metav1.UpdateOptions) error {
 				return nil
 			},
 		}}
@@ -1712,18 +1712,18 @@ func getBuildConfigFunc(buildConfigFunc func(ctx context.Context, name string, o
 	return buildConfigFunc
 }
 
-func getUpdateBuildConfigFunc(updateBuildConfigFunc func(ctx context.Context, buildConfig *buildv1.BuildConfig) error) func(ctx context.Context, buildConfig *buildv1.BuildConfig) error {
+func getUpdateBuildConfigFunc(updateBuildConfigFunc func(ctx context.Context, buildConfig *buildv1.BuildConfig, _ *metav1.UpdateOptions) error) func(ctx context.Context, buildConfig *buildv1.BuildConfig, _ *metav1.UpdateOptions) error {
 	if updateBuildConfigFunc == nil {
-		return func(ctx context.Context, buildConfig *buildv1.BuildConfig) error {
+		return func(ctx context.Context, buildConfig *buildv1.BuildConfig, _ *metav1.UpdateOptions) error {
 			return nil
 		}
 	}
 	return updateBuildConfigFunc
 }
 
-func getCreateBuildFunc(createBuildConfigFunc func(ctx context.Context, build *buildv1.Build) error, b *buildv1.Build) func(ctx context.Context, build *buildv1.Build) error {
+func getCreateBuildFunc(createBuildConfigFunc func(ctx context.Context, build *buildv1.Build, _ *metav1.CreateOptions) error, b *buildv1.Build) func(ctx context.Context, build *buildv1.Build, _ *metav1.CreateOptions) error {
 	if createBuildConfigFunc == nil {
-		return func(ctx context.Context, build *buildv1.Build) error {
+		return func(ctx context.Context, build *buildv1.Build, _ *metav1.CreateOptions) error {
 			*b = *build
 			return nil
 		}
@@ -1806,8 +1806,8 @@ func getGetImageStreamImageFunc(getImageStreamImageFunc func(ctx context.Context
 }
 
 func mockBuildGenerator(buildConfigFunc func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.BuildConfig, error),
-	updateBuildConfigFunc func(ctx context.Context, buildConfig *buildv1.BuildConfig) error,
-	createBuildFunc func(ctx context.Context, build *buildv1.Build) error,
+	updateBuildConfigFunc func(ctx context.Context, buildConfig *buildv1.BuildConfig, _ *metav1.UpdateOptions) error,
+	createBuildFunc func(ctx context.Context, build *buildv1.Build, _ *metav1.CreateOptions) error,
 	getBuildFunc func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.Build, error),
 	getImageStreamFunc func(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStream, error),
 	getImageStreamTagFunc func(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStreamTag, error),

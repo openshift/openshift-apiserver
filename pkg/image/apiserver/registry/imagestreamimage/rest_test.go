@@ -33,12 +33,12 @@ var testDefaultRegistry = func() (string, bool) { return "defaultregistry:5000",
 type fakeSubjectAccessReviewRegistry struct {
 }
 
-func (f *fakeSubjectAccessReviewRegistry) Create(subjectAccessReview *authorizationapi.SubjectAccessReview) (*authorizationapi.SubjectAccessReview, error) {
+func (f *fakeSubjectAccessReviewRegistry) Create(_ context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationapi.SubjectAccessReview, error) {
 	return nil, nil
 }
 
 func (f *fakeSubjectAccessReviewRegistry) CreateContext(ctx context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview) (*authorizationapi.SubjectAccessReview, error) {
-	return f.Create(subjectAccessReview)
+	return f.Create(ctx, subjectAccessReview, metav1.CreateOptions{})
 }
 
 func setup(t *testing.T) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {

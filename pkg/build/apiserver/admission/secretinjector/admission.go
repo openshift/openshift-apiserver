@@ -39,14 +39,14 @@ var _ = admission.MutationInterface(&secretInjector{})
 var _ = admission.ValidationInterface(&secretInjector{})
 
 func (si *secretInjector) Admit(ctx context.Context, attr admission.Attributes, _ admission.ObjectInterfaces) (err error) {
-	return si.admit(attr, true)
+	return si.admit(ctx, attr, true)
 }
 
 func (si *secretInjector) Validate(ctx context.Context, attr admission.Attributes, _ admission.ObjectInterfaces) (err error) {
-	return si.admit(attr, false)
+	return si.admit(ctx, attr, false)
 }
 
-func (si *secretInjector) admit(attr admission.Attributes, mutationAllowed bool) (err error) {
+func (si *secretInjector) admit(ctx context.Context, attr admission.Attributes, mutationAllowed bool) (err error) {
 	bc, ok := attr.GetObject().(*buildapi.BuildConfig)
 	if !ok {
 		return nil
@@ -70,7 +70,7 @@ func (si *secretInjector) admit(attr admission.Attributes, mutationAllowed bool)
 		return nil
 	}
 
-	secrets, err := client.CoreV1().Secrets(namespace).List(metav1.ListOptions{})
+	secrets, err := client.CoreV1().Secrets(namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		klog.V(2).Infof("secretinjector: failed to list Secrets: %v", err)
 		return nil

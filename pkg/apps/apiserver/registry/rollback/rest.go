@@ -65,7 +65,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		return nil, err
 	}
 
-	from, err := r.dn.DeploymentConfigs(namespace).Get(rollback.Name, metav1.GetOptions{})
+	from, err := r.dn.DeploymentConfigs(namespace).Get(ctx, rollback.Name, metav1.GetOptions{})
 	if err != nil {
 		return nil, newInvalidError(rollback, fmt.Sprintf("cannot get deployment config %q: %v", rollback.Name, err))
 	}
@@ -86,7 +86,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 
 	// Find the target deployment and decode its config.
 	name := appsutil.DeploymentNameForConfigVersion(from.Name, revision)
-	targetDeployment, err := r.rn.ReplicationControllers(namespace).Get(name, metav1.GetOptions{})
+	targetDeployment, err := r.rn.ReplicationControllers(namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
 		return nil, newInvalidError(rollback, err.Error())
 	}

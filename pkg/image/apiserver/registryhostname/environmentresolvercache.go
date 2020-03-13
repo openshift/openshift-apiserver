@@ -1,6 +1,7 @@
 package registryhostname
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strconv"
@@ -17,7 +18,7 @@ type serviceEntry struct {
 }
 
 // ResolverCacheFunc is used for resolving names to services
-type ResolverCacheFunc func(name string, options metav1.GetOptions) (*corev1.Service, error)
+type ResolverCacheFunc func(ctx context.Context, name string, options metav1.GetOptions) (*corev1.Service, error)
 
 // ServiceResolverCache is a cache used for resolving names to services
 type ServiceResolverCache struct {
@@ -49,7 +50,7 @@ func (c *ServiceResolverCache) get(name string) (host, port string, ok bool) {
 	if entry, found := c.cache[name]; found {
 		return entry.host, entry.port, true
 	}
-	service, err := c.fill(name, metav1.GetOptions{})
+	service, err := c.fill(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		return
 	}

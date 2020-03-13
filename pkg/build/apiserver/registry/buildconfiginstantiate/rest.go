@@ -315,10 +315,10 @@ func (h *binaryInstantiateHandler) cancelBuild(build *buildapi.Build) {
 		return
 	}
 	versionedBuild.Status.Cancelled = true
-	h.r.Generator.Client.UpdateBuild(h.ctx, versionedBuild)
+	h.r.Generator.Client.UpdateBuild(h.ctx, versionedBuild, &metav1.UpdateOptions{})
 	wait.Poll(cancelPollInterval, cancelPollDuration, func() (bool, error) {
 		versionedBuild.Status.Cancelled = true
-		err := h.r.Generator.Client.UpdateBuild(h.ctx, versionedBuild)
+		err := h.r.Generator.Client.UpdateBuild(h.ctx, versionedBuild, &metav1.UpdateOptions{})
 		switch {
 		case err != nil && errors.IsConflict(err):
 			versionedBuild, err = h.r.Generator.Client.GetBuild(h.ctx, versionedBuild.Name, &metav1.GetOptions{})

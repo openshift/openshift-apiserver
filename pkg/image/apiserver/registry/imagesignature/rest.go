@@ -61,7 +61,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		return nil, apierrors.NewBadRequest(err.Error())
 	}
 
-	image, err := r.imageClient.Images().Get(imageName, metav1.GetOptions{})
+	image, err := r.imageClient.Images().Get(ctx, imageName, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 
 	image.Signatures = append(image.Signatures, *externalSignature)
 
-	image, err = r.imageClient.Images().Update(image)
+	image, err = r.imageClient.Images().Update(ctx, image, metav1.UpdateOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (r *REST) Delete(ctx context.Context, name string, validation rest.Validate
 		return nil, false, apierrors.NewBadRequest("ImageSignatures must be accessed with <imageName>@<signatureName>")
 	}
 
-	image, err := r.imageClient.Images().Get(imageName, metav1.GetOptions{})
+	image, err := r.imageClient.Images().Get(ctx, imageName, metav1.GetOptions{})
 	if err != nil {
 		return nil, false, err
 	}
@@ -111,7 +111,7 @@ func (r *REST) Delete(ctx context.Context, name string, validation rest.Validate
 	copy(image.Signatures[index:size-1], image.Signatures[index+1:size])
 	image.Signatures = image.Signatures[0 : size-1]
 
-	if _, err := r.imageClient.Images().Update(image); err != nil {
+	if _, err := r.imageClient.Images().Update(ctx, image, metav1.UpdateOptions{}); err != nil {
 		return nil, false, err
 	}
 

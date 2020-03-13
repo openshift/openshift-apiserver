@@ -43,7 +43,7 @@ type fakeSubjectAccessReviewRegistry struct {
 	requestNamespace string
 }
 
-func (f *fakeSubjectAccessReviewRegistry) Create(subjectAccessReview *authorizationapi.SubjectAccessReview) (*authorizationapi.SubjectAccessReview, error) {
+func (f *fakeSubjectAccessReviewRegistry) Create(_ context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationapi.SubjectAccessReview, error) {
 	f.request = subjectAccessReview
 	f.requestNamespace = subjectAccessReview.Spec.ResourceAttributes.Namespace
 	return &authorizationapi.SubjectAccessReview{
@@ -54,7 +54,7 @@ func (f *fakeSubjectAccessReviewRegistry) Create(subjectAccessReview *authorizat
 }
 
 func (f *fakeSubjectAccessReviewRegistry) CreateContext(ctx context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview) (*authorizationapi.SubjectAccessReview, error) {
-	return f.Create(subjectAccessReview)
+	return f.Create(ctx, subjectAccessReview, metav1.CreateOptions{})
 }
 
 func newStorage(t *testing.T) (*REST, *StatusREST, *InternalREST, *etcdtesting.EtcdTestServer) {

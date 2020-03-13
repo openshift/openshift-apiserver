@@ -88,11 +88,11 @@ func (a *buildByStrategy) Validate(ctx context.Context, attr admission.Attribute
 
 	switch obj := attr.GetObject().(type) {
 	case *buildapi.Build:
-		return a.checkBuildAuthorization(obj, attr)
+		return a.checkBuildAuthorization(ctx, obj, attr)
 	case *buildapi.BuildConfig:
-		return a.checkBuildConfigAuthorization(obj, attr)
+		return a.checkBuildConfigAuthorization(ctx, obj, attr)
 	case *buildapi.BuildRequest:
-		return a.checkBuildRequestAuthorization(obj, attr)
+		return a.checkBuildRequestAuthorization(ctx, obj, attr)
 	default:
 		return admission.NewForbidden(attr, fmt.Errorf("unrecognized request object %#v", obj))
 	}
@@ -145,7 +145,7 @@ func resourceName(objectMeta metav1.ObjectMeta) string {
 	return objectMeta.Name
 }
 
-func (a *buildByStrategy) checkBuildAuthorization(build *buildapi.Build, attr admission.Attributes) error {
+func (a *buildByStrategy) checkBuildAuthorization(ctx context.Context, build *buildapi.Build, attr admission.Attributes) error {
 	strategy := build.Spec.Strategy
 	resource, err := resourceForStrategyType(strategy)
 	if err != nil {
@@ -170,10 +170,10 @@ func (a *buildByStrategy) checkBuildAuthorization(build *buildapi.Build, attr ad
 			},
 		},
 	})
-	return a.checkAccess(strategy, sar, attr)
+	return a.checkAccess(ctx, strategy, sar, attr)
 }
 
-func (a *buildByStrategy) checkBuildConfigAuthorization(buildConfig *buildapi.BuildConfig, attr admission.Attributes) error {
+func (a *buildByStrategy) checkBuildConfigAuthorization(ctx context.Context, buildConfig *buildapi.BuildConfig, attr admission.Attributes) error {
 	strategy := buildConfig.Spec.Strategy
 	resource, err := resourceForStrategyType(strategy)
 	if err != nil {
@@ -198,15 +198,15 @@ func (a *buildByStrategy) checkBuildConfigAuthorization(buildConfig *buildapi.Bu
 			},
 		},
 	})
-	return a.checkAccess(strategy, sar, attr)
+	return a.checkAccess(ctx, strategy, sar, attr)
 }
 
-func (a *buildByStrategy) checkBuildRequestAuthorization(req *buildapi.BuildRequest, attr admission.Attributes) error {
+func (a *buildByStrategy) checkBuildRequestAuthorization(ctx context.Context, req *buildapi.BuildRequest, attr admission.Attributes) error {
 	gr := attr.GetResource().GroupResource()
 	switch gr {
 	case build.Resource("builds"),
 		legacy.Resource("builds"):
-		build, err := a.buildClient.BuildV1().Builds(attr.GetNamespace()).Get(req.Name, metav1.GetOptions{})
+		build, err := a.buildClient.BuildV1().Builds(attr.GetNamespace()).Get(ctx, req.Name, metav1.GetOptions{})
 		if err != nil {
 			return admission.NewForbidden(attr, err)
 		}
@@ -214,11 +214,11 @@ func (a *buildByStrategy) checkBuildRequestAuthorization(req *buildapi.BuildRequ
 		if err := internalExternalScheme.Convert(build, internalBuild, nil); err != nil {
 			return admission.NewForbidden(attr, err)
 		}
-		return a.checkBuildAuthorization(internalBuild, attr)
+		return a.checkBuildAuthorization(ctx, internalBuild, attr)
 
 	case build.Resource("buildconfigs"),
 		legacy.Resource("buildconfigs"):
-		buildConfig, err := a.buildClient.BuildV1().BuildConfigs(attr.GetNamespace()).Get(req.Name, metav1.GetOptions{})
+		buildConfig, err := a.buildClient.BuildV1().BuildConfigs(attr.GetNamespace()).Get(ctx, req.Name, metav1.GetOptions{})
 		if err != nil {
 			return admission.NewForbidden(attr, err)
 		}
@@ -226,14 +226,14 @@ func (a *buildByStrategy) checkBuildRequestAuthorization(req *buildapi.BuildRequ
 		if err := internalExternalScheme.Convert(buildConfig, internalBuildConfig, nil); err != nil {
 			return admission.NewForbidden(attr, err)
 		}
-		return a.checkBuildConfigAuthorization(internalBuildConfig, attr)
+		return a.checkBuildConfigAuthorization(ctx, internalBuildConfig, attr)
 	default:
 		return admission.NewForbidden(attr, fmt.Errorf("Unknown resource type %s for BuildRequest", attr.GetResource()))
 	}
 }
 
-func (a *buildByStrategy) checkAccess(strategy buildapi.BuildStrategy, subjectAccessReview *authorizationv1.SubjectAccessReview, attr admission.Attributes) error {
-	resp, err := a.sarClient.Create(subjectAccessReview)
+func (a *buildByStrategy) checkAccess(ctx context.Context, strategy buildapi.BuildStrategy, subjectAccessReview *authorizationv1.SubjectAccessReview, attr admission.Attributes) error {
+	resp, err := a.sarClient.Create(ctx, subjectAccessReview, metav1.CreateOptions{})
 	if err != nil {
 		return admission.NewForbidden(attr, err)
 	}

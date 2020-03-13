@@ -548,7 +548,7 @@ func (v *TagVerifier) Verify(old, stream *imageapi.ImageStream, user user.Info) 
 				},
 			})
 			klog.V(4).Infof("Performing SubjectAccessReview for user=%s, groups=%v to %s/%s", user.GetName(), user.GetGroups(), namespace, streamName)
-			resp, err := v.subjectAccessReviewClient.Create(subjectAccessReview)
+			resp, err := v.subjectAccessReviewClient.Create(context.TODO(), subjectAccessReview, metav1.CreateOptions{})
 			if err != nil || resp == nil || (resp != nil && !resp.Status.Allowed) {
 				message := fmt.Sprintf("%s/%s", namespace, streamName)
 				if resp != nil {

@@ -135,7 +135,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 			},
 		},
 	})
-	isCreateImage, err := r.sarClient.Create(createImageSAR)
+	isCreateImage, err := r.sarClient.Create(ctx, createImageSAR, metav1.CreateOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 			},
 		},
 	})
-	isCreateImageStreamMapping, err := r.sarClient.Create(createImageStreamMappingSAR)
+	isCreateImageStreamMapping, err := r.sarClient.Create(ctx, createImageStreamMappingSAR, metav1.CreateOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +214,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		v2regConf.Registries[i].Prefix = reg.Location
 	}
 
-	secretsList, err := r.isV1Client.ImageStreams(namespace).Secrets(isi.Name, metav1.GetOptions{})
+	secretsList, err := r.isV1Client.ImageStreams(namespace).Secrets(ctx, isi.Name, metav1.GetOptions{})
 	if err != nil {
 		return nil, kapierrors.NewInternalError(err)
 	}

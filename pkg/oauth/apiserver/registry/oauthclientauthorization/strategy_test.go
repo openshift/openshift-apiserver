@@ -1,6 +1,7 @@
 package oauthclientauthorization
 
 import (
+	"context"
 	"testing"
 
 	oauth "github.com/openshift/api/oauth/v1"
@@ -96,7 +97,7 @@ type wasCalledClientGetter struct {
 	called bool
 }
 
-func (g *wasCalledClientGetter) Get(_ string, _ metav1.GetOptions) (*oauth.OAuthClient, error) {
+func (g *wasCalledClientGetter) Get(_ context.Context, _ string, _ metav1.GetOptions) (*oauth.OAuthClient, error) {
 	g.called = true
 	return &oauth.OAuthClient{}, nil
 }

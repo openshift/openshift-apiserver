@@ -11,10 +11,10 @@ import (
 // TestingClient is an implementation of the GeneratorClient interface
 type TestingClient struct {
 	GetBuildConfigFunc      func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.BuildConfig, error)
-	UpdateBuildConfigFunc   func(ctx context.Context, buildConfig *buildv1.BuildConfig) error
+	UpdateBuildConfigFunc   func(ctx context.Context, buildConfig *buildv1.BuildConfig, options *metav1.UpdateOptions) error
 	GetBuildFunc            func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.Build, error)
-	CreateBuildFunc         func(ctx context.Context, build *buildv1.Build) error
-	UpdateBuildFunc         func(ctx context.Context, build *buildv1.Build) error
+	CreateBuildFunc         func(ctx context.Context, build *buildv1.Build, options *metav1.CreateOptions) error
+	UpdateBuildFunc         func(ctx context.Context, build *buildv1.Build, options *metav1.UpdateOptions) error
 	GetImageStreamFunc      func(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStream, error)
 	GetImageStreamImageFunc func(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStreamImage, error)
 	GetImageStreamTagFunc   func(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStreamTag, error)
@@ -26,8 +26,8 @@ func (c TestingClient) GetBuildConfig(ctx context.Context, name string, options 
 }
 
 // UpdateBuildConfig updates a named build config
-func (c TestingClient) UpdateBuildConfig(ctx context.Context, buildConfig *buildv1.BuildConfig) error {
-	return c.UpdateBuildConfigFunc(ctx, buildConfig)
+func (c TestingClient) UpdateBuildConfig(ctx context.Context, buildConfig *buildv1.BuildConfig, options *metav1.UpdateOptions) error {
+	return c.UpdateBuildConfigFunc(ctx, buildConfig, options)
 }
 
 // GetBuild retrieves a build
@@ -36,13 +36,13 @@ func (c TestingClient) GetBuild(ctx context.Context, name string, options *metav
 }
 
 // CreateBuild creates a new build
-func (c TestingClient) CreateBuild(ctx context.Context, build *buildv1.Build) error {
-	return c.CreateBuildFunc(ctx, build)
+func (c TestingClient) CreateBuild(ctx context.Context, build *buildv1.Build, options *metav1.CreateOptions) error {
+	return c.CreateBuildFunc(ctx, build, options)
 }
 
 // UpdateBuild updates a build
-func (c TestingClient) UpdateBuild(ctx context.Context, build *buildv1.Build) error {
-	return c.UpdateBuildFunc(ctx, build)
+func (c TestingClient) UpdateBuild(ctx context.Context, build *buildv1.Build, options *metav1.UpdateOptions) error {
+	return c.UpdateBuildFunc(ctx, build, options)
 }
 
 // GetImageStream retrieves a named image stream

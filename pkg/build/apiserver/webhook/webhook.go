@@ -1,6 +1,7 @@
 package webhook
 
 import (
+	"context"
 	"crypto/hmac"
 	"errors"
 	"net/http"
@@ -74,7 +75,7 @@ func CheckSecret(namespace, userSecret string, triggers []*buildv1.WebHookTrigge
 		}
 		if secretRef != nil {
 			klog.V(4).Infof("Checking user secret against secret ref %s", secretRef.Name)
-			s, err := secretsClient.Secrets(namespace).Get(secretRef.Name, metav1.GetOptions{})
+			s, err := secretsClient.Secrets(namespace).Get(context.TODO(), secretRef.Name, metav1.GetOptions{})
 			if err != nil && !kerrors.IsNotFound(err) {
 				return nil, err
 			}

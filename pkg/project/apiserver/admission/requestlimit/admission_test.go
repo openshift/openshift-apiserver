@@ -152,7 +152,7 @@ func TestMaxProjectByRequester(t *testing.T) {
 		client := fakeuserclient.NewSimpleClientset(user)
 		reqLimit.(*projectRequestLimit).userClient = client.UserV1()
 
-		maxProjects, hasLimit, err := reqLimit.(*projectRequestLimit).maxProjectsByRequester("testuser")
+		maxProjects, hasLimit, err := reqLimit.(*projectRequestLimit).maxProjectsByRequester(context.TODO(), "testuser")
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}

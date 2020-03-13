@@ -1,6 +1,7 @@
 package buildconfig
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -35,7 +36,7 @@ import (
 )
 
 type fakeInstantiator interface {
-	Instantiate(buildConfigName string, buildRequest *buildv1.BuildRequest) (*buildv1.Build, error)
+	Instantiate(buildConfigName string, buildRequest *buildv1.BuildRequest, opts metav1.CreateOptions) (*buildv1.Build, error)
 }
 
 type fakeBuildConfigInterface struct {
@@ -44,44 +45,44 @@ type fakeBuildConfigInterface struct {
 	namespace string
 }
 
-func (f *fakeBuildConfigInterface) Create(build *buildv1.BuildConfig) (*buildv1.BuildConfig, error) {
-	return f.client.Create(build)
+func (f *fakeBuildConfigInterface) Create(ctx context.Context, build *buildv1.BuildConfig, opts metav1.CreateOptions) (*buildv1.BuildConfig, error) {
+	return f.client.Create(ctx, build, opts)
 }
 
-func (f *fakeBuildConfigInterface) Update(build *buildv1.BuildConfig) (*buildv1.BuildConfig, error) {
-	return f.client.Update(build)
+func (f *fakeBuildConfigInterface) Update(ctx context.Context, build *buildv1.BuildConfig, opts metav1.UpdateOptions) (*buildv1.BuildConfig, error) {
+	return f.client.Update(ctx, build, opts)
 }
 
-func (f *fakeBuildConfigInterface) UpdateStatus(build *buildv1.BuildConfig) (*buildv1.BuildConfig, error) {
-	return f.client.UpdateStatus(build)
+func (f *fakeBuildConfigInterface) UpdateStatus(ctx context.Context, build *buildv1.BuildConfig, opts metav1.UpdateOptions) (*buildv1.BuildConfig, error) {
+	return f.client.UpdateStatus(ctx, build, opts)
 }
 
-func (f *fakeBuildConfigInterface) Delete(name string, options *metav1.DeleteOptions) error {
-	return f.client.Delete(name, options)
+func (f *fakeBuildConfigInterface) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return f.client.Delete(ctx, name, opts)
 }
 
-func (f *fakeBuildConfigInterface) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
+func (f *fakeBuildConfigInterface) DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOptions metav1.ListOptions) error {
 	panic("implement me")
 }
 
-func (f *fakeBuildConfigInterface) Get(name string, options metav1.GetOptions) (*buildv1.BuildConfig, error) {
-	return f.client.Get(name, options)
+func (f *fakeBuildConfigInterface) Get(ctx context.Context, name string, opts metav1.GetOptions) (*buildv1.BuildConfig, error) {
+	return f.client.Get(ctx, name, opts)
 }
 
-func (f *fakeBuildConfigInterface) List(opts metav1.ListOptions) (*buildv1.BuildConfigList, error) {
-	return f.client.List(opts)
+func (f *fakeBuildConfigInterface) List(ctx context.Context, opts metav1.ListOptions) (*buildv1.BuildConfigList, error) {
+	return f.client.List(ctx, opts)
 }
 
-func (f *fakeBuildConfigInterface) Watch(opts metav1.ListOptions) (watch.Interface, error) {
-	return f.client.Watch(opts)
+func (f *fakeBuildConfigInterface) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return f.client.Watch(ctx, opts)
 }
 
-func (f *fakeBuildConfigInterface) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *buildv1.BuildConfig, err error) {
-	return f.client.Patch(name, pt, data, subresources...)
+func (f *fakeBuildConfigInterface) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *buildv1.BuildConfig, err error) {
+	return f.client.Patch(ctx, name, pt, data, opts, subresources...)
 }
 
-func (f *fakeBuildConfigInterface) Instantiate(buildConfigName string, buildRequest *buildv1.BuildRequest) (*buildv1.Build, error) {
-	return f.inst.Instantiate(f.namespace, buildRequest)
+func (f *fakeBuildConfigInterface) Instantiate(ctx context.Context, buildConfigName string, buildRequest *buildv1.BuildRequest, opts metav1.CreateOptions) (*buildv1.Build, error) {
+	return f.inst.Instantiate(f.namespace, buildRequest, opts)
 }
 
 type fakeBuildConfigClient struct {
@@ -109,7 +110,7 @@ type buildConfigInstantiator struct {
 	Request *buildv1.BuildRequest
 }
 
-func (i *buildConfigInstantiator) Instantiate(namespace string, request *buildv1.BuildRequest) (*buildv1.Build, error) {
+func (i *buildConfigInstantiator) Instantiate(namespace string, request *buildv1.BuildRequest, _ metav1.CreateOptions) (*buildv1.Build, error) {
 	i.Request = request
 	if i.Build != nil {
 		return i.Build, i.Err
@@ -313,7 +314,7 @@ func TestConnectWebHook(t *testing.T) {
 
 type okBuildConfigInstantiator struct{}
 
-func (*okBuildConfigInstantiator) Instantiate(namespace string, request *buildv1.BuildRequest) (*buildv1.Build, error) {
+func (*okBuildConfigInstantiator) Instantiate(namespace string, request *buildv1.BuildRequest, _ metav1.CreateOptions) (*buildv1.Build, error) {
 	return &buildv1.Build{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: namespace,
@@ -324,7 +325,7 @@ func (*okBuildConfigInstantiator) Instantiate(namespace string, request *buildv1
 
 type errorBuildConfigInstantiator struct{}
 
-func (*errorBuildConfigInstantiator) Instantiate(namespace string, request *buildv1.BuildRequest) (*buildv1.Build, error) {
+func (*errorBuildConfigInstantiator) Instantiate(namespace string, request *buildv1.BuildRequest, _ metav1.CreateOptions) (*buildv1.Build, error) {
 	return nil, errors.New("Build error!")
 }
 

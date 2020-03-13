@@ -59,7 +59,7 @@ func (s *REST) List(ctx context.Context, options *metainternal.ListOptions) (run
 		return nil, err
 	}
 
-	roles, err := client.List(optv1)
+	roles, err := client.List(ctx, optv1)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (s *REST) Get(ctx context.Context, name string, options *metav1.GetOptions)
 		return nil, err
 	}
 
-	ret, err := client.Get(name, *options)
+	ret, err := client.Get(ctx, name, *options)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (s *REST) Delete(ctx context.Context, name string, objectFunc rest.Validate
 		return nil, false, err
 	}
 
-	if err := client.Delete(name, options); err != nil {
+	if err := client.Delete(ctx, name, *options); err != nil {
 		return nil, false, err
 	}
 
@@ -117,7 +117,7 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 		return nil, err
 	}
 
-	ret, err := client.Create(convertedObj)
+	ret, err := client.Create(ctx, convertedObj, *options)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (s *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 		return nil, false, err
 	}
 
-	old, err := client.Get(name, metav1.GetOptions{})
+	old, err := client.Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
 		return nil, false, err
 	}
@@ -155,7 +155,7 @@ func (s *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 		return nil, false, err
 	}
 
-	ret, err := client.Update(updatedRole)
+	ret, err := client.Update(ctx, updatedRole, *options)
 	if err != nil {
 		return nil, false, err
 	}

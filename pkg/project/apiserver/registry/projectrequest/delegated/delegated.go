@@ -124,7 +124,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		}
 	}
 
-	if _, err := r.projectGetter.Projects().Get(projectRequest.Name, metav1.GetOptions{}); err == nil {
+	if _, err := r.projectGetter.Projects().Get(ctx, projectRequest.Name, metav1.GetOptions{}); err == nil {
 		return nil, apierror.NewAlreadyExists(project.Resource("project"), projectRequest.Name)
 	}
 
@@ -136,7 +136,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		projectRequester = userInfo.GetName()
 	}
 
-	template, err := r.getTemplate()
+	template, err := r.getTemplate(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +194,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	}
 
 	// we split out project creation separately so that in a case of racers for the same project, only one will win and create the rest of their template objects
-	createdProject, err := r.projectGetter.Projects().Create(projectFromTemplate)
+	createdProject, err := r.projectGetter.Projects().Create(ctx, projectFromTemplate, metav1.CreateOptions{})
 	if err != nil {
 		// log errors other than AlreadyExists and Forbidden
 		if !apierror.IsAlreadyExists(err) && !apierror.IsForbidden(err) {
@@ -221,13 +221,13 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		if mappingErr != nil {
 			utilruntime.HandleError(fmt.Errorf("error creating items in requested project %q: %v", createdProject.Name, mappingErr))
 			// We have to clean up the project if any part of the project request template fails
-			if deleteErr := r.projectGetter.Projects().Delete(createdProject.Name, &metav1.DeleteOptions{}); deleteErr != nil {
+			if deleteErr := r.projectGetter.Projects().Delete(ctx, createdProject.Name, metav1.DeleteOptions{}); deleteErr != nil {
 				utilruntime.HandleError(fmt.Errorf("error cleaning up requested project %q: %v", createdProject.Name, deleteErr))
 			}
 			return nil, apierror.NewInternalError(mappingErr)
 		}
 
-		_, createErr := r.client.Resource(restMapping.Resource).Namespace(createdProject.Name).Create(toCreate, metav1.CreateOptions{})
+		_, createErr := r.client.Resource(restMapping.Resource).Namespace(createdProject.Name).Create(ctx, toCreate, metav1.CreateOptions{})
 		// if a default role binding already exists, we're probably racing the controller.  Don't die
 		if gvk := restMapping.GroupVersionKind; apierror.IsAlreadyExists(createErr) &&
 			gvk.Kind == roleBindingKind && roleBindingGroups.Has(gvk.Group) && defaultRoleBindingNames.Has(toCreate.GetName()) {
@@ -240,7 +240,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		if createErr != nil {
 			utilruntime.HandleError(fmt.Errorf("error creating items in requested project %q: %v", createdProject.Name, createErr))
 			// We have to clean up the project if any part of the project request template fails
-			if deleteErr := r.projectGetter.Projects().Delete(createdProject.Name, &metav1.DeleteOptions{}); deleteErr != nil {
+			if deleteErr := r.projectGetter.Projects().Delete(ctx, createdProject.Name, metav1.DeleteOptions{}); deleteErr != nil {
 				utilruntime.HandleError(fmt.Errorf("error cleaning up requested project %q: %v", createdProject.Name, deleteErr))
 			}
 			return nil, apierror.NewInternalError(createErr)
@@ -252,7 +252,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		r.waitForRoleBinding(createdProject.Name, lastRoleBindingName)
 	}
 
-	return r.projectGetter.Projects().Get(createdProject.Name, metav1.GetOptions{})
+	return r.projectGetter.Projects().Get(ctx, createdProject.Name, metav1.GetOptions{})
 }
 
 func (r *REST) waitForRoleBinding(namespace, name string) {
@@ -271,12 +271,12 @@ func (r *REST) waitForRoleBinding(namespace, name string) {
 	}
 }
 
-func (r *REST) getTemplate() (*templatev1.Template, error) {
+func (r *REST) getTemplate(ctx context.Context) (*templatev1.Template, error) {
 	if len(r.templateNamespace) == 0 || len(r.templateName) == 0 {
 		return DefaultTemplate(), nil
 	}
 
-	return r.templateClient.TemplateV1().Templates(r.templateNamespace).Get(r.templateName, metav1.GetOptions{})
+	return r.templateClient.TemplateV1().Templates(r.templateNamespace).Get(ctx, r.templateName, metav1.GetOptions{})
 }
 
 var _ = rest.Lister(&REST{})
@@ -298,7 +298,7 @@ func (r *REST) List(ctx context.Context, options *metainternal.ListOptions) (run
 			},
 		},
 	})
-	accessReviewResponse, err := r.sarClient.Create(accessReview)
+	accessReviewResponse, err := r.sarClient.Create(ctx, accessReview, metav1.CreateOptions{})
 	if err != nil {
 		return nil, err
 	}

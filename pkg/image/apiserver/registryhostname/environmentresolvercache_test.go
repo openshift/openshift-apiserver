@@ -1,6 +1,7 @@
 package registryhostname
 
 import (
+	"context"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -41,7 +42,7 @@ type fakeRetriever struct {
 	err     error
 }
 
-func (r fakeRetriever) Get(name string, options metav1.GetOptions) (*corev1.Service, error) {
+func (r fakeRetriever) Get(_ context.Context, name string, options metav1.GetOptions) (*corev1.Service, error) {
 	return r.service, r.err
 }
 
