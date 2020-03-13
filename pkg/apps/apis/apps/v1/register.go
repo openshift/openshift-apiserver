@@ -5,7 +5,7 @@ import (
 	corev1conversions "k8s.io/kubernetes/pkg/apis/core/v1"
 	extensionsv1beta1conversions "k8s.io/kubernetes/pkg/apis/extensions/v1beta1"
 
-	"github.com/openshift/api/apps/v1"
+	v1 "github.com/openshift/api/apps/v1"
 	"github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 )
 
@@ -15,7 +15,6 @@ var (
 		v1.Install,
 		corev1conversions.AddToScheme,
 		extensionsv1beta1conversions.AddToScheme,
-		AddConversionFuncs,
 		RegisterDefaults,
 	)
 	Install = localSchemeBuilder.AddToScheme

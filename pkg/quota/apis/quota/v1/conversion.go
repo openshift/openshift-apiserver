@@ -3,11 +3,10 @@ package v1
 import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/conversion"
-	"k8s.io/apimachinery/pkg/runtime"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 	kapiv1 "k8s.io/kubernetes/pkg/apis/core/v1"
 
-	"github.com/openshift/api/quota/v1"
+	v1 "github.com/openshift/api/quota/v1"
 	internal "github.com/openshift/openshift-apiserver/pkg/quota/apis/quota"
 )
 
@@ -41,13 +40,6 @@ func Convert_quota_ResourceQuotasStatusByNamespace_To_v1_ResourceQuotasStatusByN
 	}
 
 	return nil
-}
-
-func AddConversionFuncs(scheme *runtime.Scheme) error {
-	return scheme.AddConversionFuncs(
-		Convert_quota_ResourceQuotasStatusByNamespace_To_v1_ResourceQuotasStatusByNamespace,
-		Convert_v1_ResourceQuotasStatusByNamespace_To_quota_ResourceQuotasStatusByNamespace,
-	)
 }
 
 func ConvertV1ClusterResourceQuotaToInternalAppliedClusterResourceQuota(in *v1.ClusterResourceQuota) (*internal.AppliedClusterResourceQuota, error) {

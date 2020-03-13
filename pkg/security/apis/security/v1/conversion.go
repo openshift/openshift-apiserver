@@ -2,23 +2,10 @@ package v1
 
 import (
 	"k8s.io/apimachinery/pkg/conversion"
-	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/openshift/api/security/v1"
+	v1 "github.com/openshift/api/security/v1"
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 )
-
-func AddConversionFuncs(scheme *runtime.Scheme) error {
-	err := scheme.AddConversionFuncs(
-		Convert_v1_SecurityContextConstraints_To_security_SecurityContextConstraints,
-		Convert_security_SecurityContextConstraints_To_v1_SecurityContextConstraints,
-	)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 
 func Convert_v1_SecurityContextConstraints_To_security_SecurityContextConstraints(in *v1.SecurityContextConstraints, out *securityapi.SecurityContextConstraints, s conversion.Scope) error {
 	return autoConvert_v1_SecurityContextConstraints_To_security_SecurityContextConstraints(in, out, s)

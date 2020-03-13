@@ -4,7 +4,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	corev1conversions "k8s.io/kubernetes/pkg/apis/core/v1"
 
-	"github.com/openshift/api/build/v1"
+	v1 "github.com/openshift/api/build/v1"
 	"github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 )
 
@@ -13,7 +13,6 @@ var (
 		build.Install,
 		v1.Install,
 		corev1conversions.AddToScheme,
-		AddConversionFuncs,
 		AddFieldSelectorKeyConversions,
 		RegisterDefaults,
 	)

@@ -4,10 +4,9 @@ import (
 	"strings"
 
 	"k8s.io/apimachinery/pkg/conversion"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/openshift/api/apps/v1"
+	v1 "github.com/openshift/api/apps/v1"
 	"github.com/openshift/library-go/pkg/image/imageutil"
 	newer "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 )
@@ -105,14 +104,4 @@ func Convert_apps_RollingDeploymentStrategyParams_To_v1_RollingDeploymentStrateg
 		return err
 	}
 	return nil
-}
-
-func AddConversionFuncs(scheme *runtime.Scheme) error {
-	return scheme.AddConversionFuncs(
-		Convert_v1_DeploymentTriggerImageChangeParams_To_apps_DeploymentTriggerImageChangeParams,
-		Convert_apps_DeploymentTriggerImageChangeParams_To_v1_DeploymentTriggerImageChangeParams,
-
-		Convert_v1_RollingDeploymentStrategyParams_To_apps_RollingDeploymentStrategyParams,
-		Convert_apps_RollingDeploymentStrategyParams_To_v1_RollingDeploymentStrategyParams,
-	)
 }

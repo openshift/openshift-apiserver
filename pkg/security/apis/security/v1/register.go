@@ -13,8 +13,6 @@ var (
 		security.Install,
 		securityv1.Install,
 		corev1conversions.AddToScheme,
-
-		AddConversionFuncs,
 		AddDefaultingFuncs,
 		RegisterDefaults,
 	)

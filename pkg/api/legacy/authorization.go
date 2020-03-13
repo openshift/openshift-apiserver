@@ -27,7 +27,6 @@ func InstallInternalLegacyAuthorization(scheme *runtime.Scheme) {
 		corev1conversions.AddToScheme,
 		rbacv1conversions.AddToScheme,
 
-		authorizationv1helpers.AddConversionFuncs,
 		authorizationv1helpers.AddFieldSelectorKeyConversions,
 		authorizationv1helpers.RegisterDefaults,
 		authorizationv1helpers.RegisterConversions,
