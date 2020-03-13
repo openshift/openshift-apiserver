@@ -10,7 +10,6 @@ import (
 	gocontext "golang.org/x/net/context"
 
 	authorizationapi "k8s.io/api/authorization/v1"
-	corev1 "k8s.io/api/core/v1"
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -31,7 +30,6 @@ import (
 	operatorv1lister "github.com/openshift/client-go/operator/listers/operator/v1alpha1"
 	"github.com/openshift/library-go/pkg/authorization/authorizationutil"
 	"github.com/openshift/library-go/pkg/image/reference"
-	"github.com/openshift/library-go/pkg/image/registryclient"
 	"github.com/openshift/library-go/pkg/quota/quotautil"
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
@@ -216,15 +214,14 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		v2regConf.Registries[i].Prefix = reg.Location
 	}
 
-	// only load secrets if we need them
-	credentials := importer.NewLazyCredentialsForSecrets(func() ([]corev1.Secret, error) {
-		secrets, err := r.isV1Client.ImageStreams(namespace).Secrets(isi.Name, metav1.GetOptions{})
-		if err != nil {
-			return nil, err
-		}
-		return secrets.Items, nil
-	})
-	importCtx := registryclient.NewContext(r.transport, r.insecureTransport).WithCredentials(credentials)
+	secretsList, err := r.isV1Client.ImageStreams(namespace).Secrets(isi.Name, metav1.GetOptions{})
+	if err != nil {
+		return nil, kapierrors.NewInternalError(err)
+	}
+
+	importCtx := importer.NewStaticCredentialsContext(
+		r.transport, r.insecureTransport, secretsList.Items,
+	)
 	imports := r.importFn(importCtx, v2regConf)
 	if err := imports.Import(ctx.(gocontext.Context), isi, stream); err != nil {
 		return nil, kapierrors.NewInternalError(err)
@@ -245,7 +242,9 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	}
 	// try import IS without auth if it failed before
 	if importFailed {
-		importCtx := registryclient.NewContext(r.transport, r.insecureTransport).WithCredentials(nil)
+		importCtx := importer.NewStaticCredentialsContext(
+			r.transport, r.insecureTransport, nil,
+		)
 		imports := r.importFn(importCtx, v2regConf)
 		if err := imports.Import(ctx.(gocontext.Context), isi, stream); err != nil {
 			return nil, kapierrors.NewInternalError(err)
@@ -255,24 +254,6 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	for key, image := range isi.Status.Images {
 		if image.Status.Reason == metav1.StatusReasonUnauthorized {
 			isi.Status.Images[key].Status = imageStatus[key]
-		}
-	}
-
-	// if we encountered an error loading credentials and any images could not be retrieved with an access
-	// related error, modify the message.
-	// TODO: set a status cause
-	if err := credentials.Err(); err != nil {
-		for i, image := range isi.Status.Images {
-			switch image.Status.Reason {
-			case metav1.StatusReasonUnauthorized, metav1.StatusReasonForbidden:
-				isi.Status.Images[i].Status.Message = fmt.Sprintf("Unable to load secrets for this image: %v; (%s)", err, image.Status.Message)
-			}
-		}
-		if r := isi.Status.Repository; r != nil {
-			switch r.Status.Reason {
-			case metav1.StatusReasonUnauthorized, metav1.StatusReasonForbidden:
-				r.Status.Message = fmt.Sprintf("Unable to load secrets for this repository: %v; (%s)", err, r.Status.Message)
-			}
 		}
 	}
 

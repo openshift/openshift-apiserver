@@ -20,18 +20,25 @@ import (
 	godigest "github.com/opencontainers/go-digest"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 
-	"github.com/openshift/library-go/pkg/image/registryclient"
+	userapi "github.com/openshift/api/user/v1"
+	imageref "github.com/openshift/library-go/pkg/image/reference"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	dockerregistry "github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
 
+func init() {
+	runtime.Must(userapi.Install(legacyscheme.Scheme))
+}
+
 type mockRetrieverFunc func(registry *url.URL, repoName string, insecure bool) (distribution.Repository, error)
 
-func (r mockRetrieverFunc) Repository(ctx context.Context, registry *url.URL, repoName string, insecure bool) (distribution.Repository, error) {
-	return r(registry, repoName, insecure)
+func (r mockRetrieverFunc) Repository(ctx context.Context, ref imageref.DockerImageReference, insecure bool) (distribution.Repository, error) {
+	return r(ref.RegistryURL(), ref.RepositoryName(), insecure)
 }
 
 type mockRetriever struct {
@@ -40,7 +47,7 @@ type mockRetriever struct {
 	err      error
 }
 
-func (r *mockRetriever) Repository(ctx context.Context, registry *url.URL, repoName string, insecure bool) (distribution.Repository, error) {
+func (r *mockRetriever) Repository(ctx context.Context, ref imageref.DockerImageReference, insecure bool) (distribution.Repository, error) {
 	r.insecure = insecure
 	return r.repo, r.err
 }
@@ -218,7 +225,9 @@ func TestDockerV1Fallback(t *testing.T) {
 }
 
 func TestImportNothing(t *testing.T) {
-	ctx := registryclient.NewContext(http.DefaultTransport, http.DefaultTransport).WithCredentials(registryclient.NoCredentials)
+	ctx := NewStaticCredentialsContext(
+		http.DefaultTransport, http.DefaultTransport, nil,
+	)
 	isi := &imageapi.ImageStreamImport{}
 	i := NewImageStreamImporter(ctx, nil, 5, nil, nil)
 	if err := i.Import(nil, isi, nil); err != nil {

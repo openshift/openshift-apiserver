@@ -45,9 +45,9 @@ type Interface interface {
 
 // RepositoryRetriever fetches a Docker distribution.Repository.
 type RepositoryRetriever interface {
-	// Repository returns a properly authenticated distribution.Repository for the given registry, repository
-	// name, and insecure toleration behavior.
-	Repository(ctx gocontext.Context, registry *url.URL, repoName string, insecure bool) (distribution.Repository, error)
+	// Repository returns a properly authenticated distribution.Repository for the given
+	// docker image reference and insecure toleration behavior.
+	Repository(ctx gocontext.Context, ref imageref.DockerImageReference, insecure bool) (distribution.Repository, error)
 }
 
 // ImageStreamImport implements an import strategy for container images. It keeps a cache of images
@@ -472,7 +472,7 @@ func (isi *ImageStreamImporter) getManifestFromSource(ctx gocontext.Context, ret
 		return nil, nil, nil, fmt.Errorf("unable to parse reference %q: %v", ref.String(), err)
 	}
 
-	repo, err := retriever.Repository(ctx, imageRef.RegistryURL(), imageRef.RepositoryName(), insecure)
+	repo, err := retriever.Repository(ctx, imageRef, insecure)
 	if err != nil {
 		return nil, nil, nil, formatPingError(imageRef, insecure, err)
 	}
@@ -667,7 +667,7 @@ func (isi *ImageStreamImporter) importRepositoryFromDocker(ctx gocontext.Context
 	// if repository import is requested (MaximumTags), attempt to load the tags, sort them, and request the first N
 	if count := repository.MaximumTags; count > 0 || count == -1 {
 		// retrieve the repository
-		repo, err := retriever.Repository(ctx, repository.Registry, repository.Name, repository.Insecure)
+		repo, err := retriever.Repository(ctx, repository.Ref, repository.Insecure)
 		if err != nil {
 			klog.V(5).Infof("unable to access repository %#v: %#v", repository, err)
 			if strings.HasSuffix(err.Error(), "does not support v2 API") {
