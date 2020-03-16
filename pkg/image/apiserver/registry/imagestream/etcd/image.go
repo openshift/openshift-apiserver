@@ -1,6 +1,7 @@
 package etcd
 
 import (
+	"context"
 	"fmt"
 
 	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
@@ -27,8 +28,8 @@ type ImageLayerIndex interface {
 }
 
 type ImageListWatch interface {
-	List(metav1.ListOptions) (*imagev1.ImageList, error)
-	Watch(metav1.ListOptions) (watch.Interface, error)
+	List(context.Context, metav1.ListOptions) (*imagev1.ImageList, error)
+	Watch(context.Context, metav1.ListOptions) (watch.Interface, error)
 }
 
 type imageLayerIndex struct {
@@ -63,7 +64,7 @@ func (i imageLayerIndex) Run(stopCh <-chan struct{}) {
 func NewImageLayerIndex(lw ImageListWatch) ImageLayerIndex {
 	informer := cache.NewSharedIndexInformer(&cache.ListWatch{
 		ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-			list, err := lw.List(metav1.ListOptions{
+			list, err := lw.List(context.TODO(), metav1.ListOptions{
 				ResourceVersion: options.ResourceVersion,
 				Limit:           options.Limit,
 				Continue:        options.Continue,
@@ -85,7 +86,7 @@ func NewImageLayerIndex(lw ImageListWatch) ImageLayerIndex {
 			return out, nil
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			w, err := lw.Watch(metav1.ListOptions{
+			w, err := lw.Watch(context.TODO(), metav1.ListOptions{
 				ResourceVersion: options.ResourceVersion,
 			})
 			if err != nil {
