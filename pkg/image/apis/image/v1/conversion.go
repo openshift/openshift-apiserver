@@ -11,7 +11,7 @@ import (
 
 	"github.com/openshift/api/image/docker10"
 	"github.com/openshift/api/image/dockerpre012"
-	"github.com/openshift/api/image/v1"
+	v1 "github.com/openshift/api/image/v1"
 	"github.com/openshift/library-go/pkg/image/reference"
 	newer "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 )
@@ -257,22 +257,25 @@ func Convert_image_TagReferenceMap_to_v1_TagReferenceArray(in *map[string]newer.
 	return nil
 }
 
-func AddConversionFuncs(scheme *runtime.Scheme) error {
-	err := scheme.AddConversionFuncs(
-		Convert_v1_NamedTagEventListArray_to_api_TagEventListArray,
-		Convert_image_TagEventListArray_to_v1_NamedTagEventListArray,
-		Convert_v1_TagReferenceArray_to_api_TagReferenceMap,
-		Convert_image_TagReferenceMap_to_v1_TagReferenceArray,
-
-		Convert_image_Image_To_v1_Image,
-		Convert_v1_Image_To_image_Image,
-		Convert_v1_ImageStreamSpec_To_image_ImageStreamSpec,
-		Convert_image_ImageStreamSpec_To_v1_ImageStreamSpec,
-		Convert_v1_ImageStreamStatus_To_image_ImageStreamStatus,
-		Convert_image_ImageStreamStatus_To_v1_ImageStreamStatus,
-	)
-	if err != nil {
-		// If one of the conversion functions is malformed, detect it immediately.
+func AddConversionFuncs(s *runtime.Scheme) error {
+	if err := s.AddConversionFunc((*[]v1.NamedTagEventList)(nil), (*map[string]newer.TagEventList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_NamedTagEventListArray_to_api_TagEventListArray(a.(*[]v1.NamedTagEventList), b.(*map[string]newer.TagEventList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*map[string]newer.TagEventList)(nil), (*[]v1.NamedTagEventList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_image_TagEventListArray_to_v1_NamedTagEventListArray(a.(*map[string]newer.TagEventList), b.(*[]v1.NamedTagEventList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*[]v1.TagReference)(nil), (*map[string]newer.TagReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_TagReferenceArray_to_api_TagReferenceMap(a.(*[]v1.TagReference), b.(*map[string]newer.TagReference), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*map[string]newer.TagReference)(nil), (*[]v1.TagReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_image_TagReferenceMap_to_v1_TagReferenceArray(a.(*map[string]newer.TagReference), b.(*[]v1.TagReference), scope)
+	}); err != nil {
 		return err
 	}
 
