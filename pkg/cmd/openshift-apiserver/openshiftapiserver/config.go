@@ -128,7 +128,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 		return nil, err
 	}
 
-	authInfoResolverWrapper := webhook.NewDefaultAuthenticationInfoResolverWrapper(nil, genericConfig.LoopbackClientConfig)
+	authInfoResolverWrapper := webhook.NewDefaultAuthenticationInfoResolverWrapper(nil, genericConfig.EgressSelector, genericConfig.LoopbackClientConfig)
 	auditFlags := configflags.AuditFlags(&config.AuditConfig, configflags.ArgsWithPrefix(config.APIServerArguments, "audit-"))
 	auditOpt := genericapiserveroptions.NewAuditOptions()
 	fs := pflag.NewFlagSet("audit", pflag.ContinueOnError)
