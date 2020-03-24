@@ -199,6 +199,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.HTTPServingInfo":                                                          schema_openshift_api_config_v1_HTTPServingInfo(ref),
 		"github.com/openshift/api/config/v1.HubSource":                                                                schema_openshift_api_config_v1_HubSource(ref),
 		"github.com/openshift/api/config/v1.HubSourceStatus":                                                          schema_openshift_api_config_v1_HubSourceStatus(ref),
+		"github.com/openshift/api/config/v1.IBMCloudPlatformStatus":                                                   schema_openshift_api_config_v1_IBMCloudPlatformStatus(ref),
 		"github.com/openshift/api/config/v1.IdentityProvider":                                                         schema_openshift_api_config_v1_IdentityProvider(ref),
 		"github.com/openshift/api/config/v1.IdentityProviderConfig":                                                   schema_openshift_api_config_v1_IdentityProviderConfig(ref),
 		"github.com/openshift/api/config/v1.Image":                                                                    schema_openshift_api_config_v1_Image(ref),
@@ -5694,7 +5695,7 @@ func schema_openshift_api_build_v1_BuildStrategy(ref common.ReferenceCallback) c
 					},
 					"jenkinsPipelineStrategy": {
 						SchemaProps: spec.SchemaProps{
-							Description: "JenkinsPipelineStrategy holds the parameters to the Jenkins Pipeline build strategy.",
+							Description: "JenkinsPipelineStrategy holds the parameters to the Jenkins Pipeline build strategy. Deprecated: use OpenShift Pipelines",
 							Ref:         ref("github.com/openshift/api/build/v1.JenkinsPipelineBuildStrategy"),
 						},
 					},
@@ -6034,7 +6035,7 @@ func schema_openshift_api_build_v1_DockerBuildStrategy(ref common.ReferenceCallb
 				Properties: map[string]spec.Schema{
 					"from": {
 						SchemaProps: spec.SchemaProps{
-							Description: "from is reference to an DockerImage, ImageStreamTag, or ImageStreamImage from which the container image should be pulled the resulting image will be used in the FROM line of the Dockerfile for this build.",
+							Description: "from is a reference to an DockerImage, ImageStreamTag, or ImageStreamImage which overrides the FROM image in the Dockerfile for the build. If the Dockerfile uses multi-stage builds, this will replace the image in the last FROM directive of the file.",
 							Ref:         ref("k8s.io/api/core/v1.ObjectReference"),
 						},
 					},
@@ -6707,7 +6708,7 @@ func schema_openshift_api_build_v1_JenkinsPipelineBuildStrategy(ref common.Refer
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "JenkinsPipelineBuildStrategy holds parameters specific to a Jenkins Pipeline build.",
+				Description: "JenkinsPipelineBuildStrategy holds parameters specific to a Jenkins Pipeline build. Deprecated: use OpenShift Pipelines",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"jenkinsfilePath": {
@@ -7662,6 +7663,13 @@ func schema_openshift_api_config_v1_AuthenticationSpec(ref common.ReferenceCallb
 									},
 								},
 							},
+						},
+					},
+					"serviceAccountIssuer": {
+						SchemaProps: spec.SchemaProps{
+							Description: "serviceAccountIssuer is the identifier of the bound service account token issuer. The default is auth.openshift.io.",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 				},
@@ -9960,6 +9968,40 @@ func schema_openshift_api_config_v1_HubSourceStatus(ref common.ReferenceCallback
 	}
 }
 
+func schema_openshift_api_config_v1_IBMCloudPlatformStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "IBMCloudPlatformStatus holds the current status of the IBMCloud infrastructure provider.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"location": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Location is where the cluster has been deployed",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"resourceGroupName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ResourceGroupName is the Resource Group for new IBMCloud resources created for the cluster.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"providerType": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ProviderType indicates the type of cluster that was created",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_config_v1_IdentityProvider(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -10132,7 +10174,7 @@ func schema_openshift_api_config_v1_Image(ref common.ReferenceCallback) common.O
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Image governs policies related to imagestream imports and runtime configuration for external registries. It allows cluster admins to configure which registries OpenShift is allowed to import images from, extra CA trust bundles for external registries, and policies to blacklist/whitelist registry hostnames. When exposing OpenShift's image registry to the public, this also lets cluster admins specify the external hostname.",
+				Description: "Image governs policies related to imagestream imports and runtime configuration for external registries. It allows cluster admins to configure which registries OpenShift is allowed to import images from, extra CA trust bundles for external registries, and policies to block or allow registry hostnames. When exposing OpenShift's image registry to the public, this also lets cluster admins specify the external hostname.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -11869,12 +11911,18 @@ func schema_openshift_api_config_v1_PlatformStatus(ref common.ReferenceCallback)
 							Ref:         ref("github.com/openshift/api/config/v1.VSpherePlatformStatus"),
 						},
 					},
+					"ibmcloud": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IBMCloud contains settings specific to the IBMCloud infrastructure provider.",
+							Ref:         ref("github.com/openshift/api/config/v1.IBMCloudPlatformStatus"),
+						},
+					},
 				},
 				Required: []string{"type"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.AWSPlatformStatus", "github.com/openshift/api/config/v1.AzurePlatformStatus", "github.com/openshift/api/config/v1.BareMetalPlatformStatus", "github.com/openshift/api/config/v1.GCPPlatformStatus", "github.com/openshift/api/config/v1.OpenStackPlatformStatus", "github.com/openshift/api/config/v1.OvirtPlatformStatus", "github.com/openshift/api/config/v1.VSpherePlatformStatus"},
+			"github.com/openshift/api/config/v1.AWSPlatformStatus", "github.com/openshift/api/config/v1.AzurePlatformStatus", "github.com/openshift/api/config/v1.BareMetalPlatformStatus", "github.com/openshift/api/config/v1.GCPPlatformStatus", "github.com/openshift/api/config/v1.IBMCloudPlatformStatus", "github.com/openshift/api/config/v1.OpenStackPlatformStatus", "github.com/openshift/api/config/v1.OvirtPlatformStatus", "github.com/openshift/api/config/v1.VSpherePlatformStatus"},
 	}
 }
 
@@ -12146,7 +12194,7 @@ func schema_openshift_api_config_v1_ProxySpec(ref common.ReferenceCallback) comm
 					},
 					"trustedCA": {
 						SchemaProps: spec.SchemaProps{
-							Description: "trustedCA is a reference to a ConfigMap containing a CA certificate bundle used for client egress HTTPS connections. The certificate bundle must be from the CA that signed the proxy's certificate and be signed for everything. The trustedCA field should only be consumed by a proxy validator. The validator is responsible for reading the certificate bundle from required key \"ca-bundle.crt\" and copying it to a ConfigMap named \"trusted-ca-bundle\" in the \"openshift-config-managed\" namespace. The namespace for the ConfigMap referenced by trustedCA is \"openshift-config\". Here is an example ConfigMap (in yaml):\n\napiVersion: v1 kind: ConfigMap metadata:\n name: user-ca-bundle\n namespace: openshift-config\n data:\n   ca-bundle.crt: |\n     -----BEGIN CERTIFICATE-----\n     Custom CA certificate bundle.\n     -----END CERTIFICATE-----",
+							Description: "trustedCA is a reference to a ConfigMap containing a CA certificate bundle. The trustedCA field should only be consumed by a proxy validator. The validator is responsible for reading the certificate bundle from the required key \"ca-bundle.crt\", merging it with the system default trust bundle, and writing the merged trust bundle to a ConfigMap named \"trusted-ca-bundle\" in the \"openshift-config-managed\" namespace. Clients that expect to make proxy connections must use the trusted-ca-bundle for all HTTPS requests to the proxy, and may use the trusted-ca-bundle for non-proxy HTTPS requests as well.\n\nThe namespace for the ConfigMap referenced by trustedCA is \"openshift-config\". Here is an example ConfigMap (in yaml):\n\napiVersion: v1 kind: ConfigMap metadata:\n name: user-ca-bundle\n namespace: openshift-config\n data:\n   ca-bundle.crt: |\n     -----BEGIN CERTIFICATE-----\n     Custom CA certificate bundle.\n     -----END CERTIFICATE-----",
 							Ref:         ref("github.com/openshift/api/config/v1.ConfigMapNameReference"),
 						},
 					},
@@ -12243,7 +12291,7 @@ func schema_openshift_api_config_v1_RegistrySources(ref common.ReferenceCallback
 					},
 					"blockedRegistries": {
 						SchemaProps: spec.SchemaProps{
-							Description: "blockedRegistries are blacklisted from image pull/push. All other registries are allowed.\n\nOnly one of BlockedRegistries or AllowedRegistries may be set.",
+							Description: "blockedRegistries cannot be used for image pull and push actions. All other registries are permitted.\n\nOnly one of BlockedRegistries or AllowedRegistries may be set.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -12257,7 +12305,7 @@ func schema_openshift_api_config_v1_RegistrySources(ref common.ReferenceCallback
 					},
 					"allowedRegistries": {
 						SchemaProps: spec.SchemaProps{
-							Description: "allowedRegistries are whitelisted for image pull/push. All other registries are blocked.\n\nOnly one of BlockedRegistries or AllowedRegistries may be set.",
+							Description: "allowedRegistries are the only registries permitted for image pull and push actions. All other registries are denied.\n\nOnly one of BlockedRegistries or AllowedRegistries may be set.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -20128,14 +20176,14 @@ func schema_openshift_api_network_v1_EgressNetworkPolicyPeer(ref common.Referenc
 				Properties: map[string]spec.Schema{
 					"cidrSelector": {
 						SchemaProps: spec.SchemaProps{
-							Description: "cidrSelector is the CIDR range to allow/deny traffic to. If this is set, dnsName must be unset",
+							Description: "CIDRSelector is the CIDR range to allow/deny traffic to. If this is set, dnsName must be unset Ideally we would have liked to use the cidr openapi format for this property. But openshift-sdn only supports v4 while specifying the cidr format allows both v4 and v6 cidrs We are therefore using a regex pattern to validate instead.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"dnsName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "dnsName is the domain name to allow/deny traffic to. If this is set, cidrSelector must be unset",
+							Description: "DNSName is the domain name to allow/deny traffic to. If this is set, cidrSelector must be unset",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -23869,7 +23917,7 @@ func schema_openshift_api_operator_v1_IngressControllerSpec(ref common.Reference
 					},
 					"endpointPublishingStrategy": {
 						SchemaProps: spec.SchemaProps{
-							Description: "endpointPublishingStrategy is used to publish the ingress controller endpoints to other networks, enable load balancer integrations, etc.\n\nIf unset, the default is based on infrastructure.config.openshift.io/cluster .status.platform:\n\n  AWS:      LoadBalancerService (with External scope)\n  Azure:    LoadBalancerService (with External scope)\n  GCP:      LoadBalancerService (with External scope)\n  Libvirt:  HostNetwork\n\nAny other platform types (including None) default to HostNetwork.\n\nendpointPublishingStrategy cannot be updated.",
+							Description: "endpointPublishingStrategy is used to publish the ingress controller endpoints to other networks, enable load balancer integrations, etc.\n\nIf unset, the default is based on infrastructure.config.openshift.io/cluster .status.platform:\n\n  AWS:      LoadBalancerService (with External scope)\n  Azure:    LoadBalancerService (with External scope)\n  GCP:      LoadBalancerService (with External scope)\n  IBMCloud: LoadBalancerService (with External scope)\n  Libvirt:  HostNetwork\n\nAny other platform types (including None) default to HostNetwork.\n\nendpointPublishingStrategy cannot be updated.",
 							Ref:         ref("github.com/openshift/api/operator/v1.EndpointPublishingStrategy"),
 						},
 					},
