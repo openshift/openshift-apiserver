@@ -266,6 +266,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/console/v1.ConsoleCLIDownloadList":                                                  schema_openshift_api_console_v1_ConsoleCLIDownloadList(ref),
 		"github.com/openshift/api/console/v1.ConsoleCLIDownloadSpec":                                                  schema_openshift_api_console_v1_ConsoleCLIDownloadSpec(ref),
 		"github.com/openshift/api/console/v1.ConsoleExternalLogLink":                                                  schema_openshift_api_console_v1_ConsoleExternalLogLink(ref),
+		"github.com/openshift/api/console/v1.ConsoleExternalLogLinkList":                                              schema_openshift_api_console_v1_ConsoleExternalLogLinkList(ref),
 		"github.com/openshift/api/console/v1.ConsoleExternalLogLinkSpec":                                              schema_openshift_api_console_v1_ConsoleExternalLogLinkSpec(ref),
 		"github.com/openshift/api/console/v1.ConsoleLink":                                                             schema_openshift_api_console_v1_ConsoleLink(ref),
 		"github.com/openshift/api/console/v1.ConsoleLinkList":                                                         schema_openshift_api_console_v1_ConsoleLinkList(ref),
@@ -7659,7 +7660,7 @@ func schema_openshift_api_config_v1_Build(ref common.ReferenceCallback) common.O
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Build holds cluster-wide information on how to handle builds. The canonical name is `cluster`",
+				Description: "Build configures the behavior of OpenShift builds for the entire cluster. This includes default settings that can be overridden in BuildConfig objects, and overrides which are applied to all builds.\n\nThe canonical name is \"cluster\"",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -7864,7 +7865,7 @@ func schema_openshift_api_config_v1_BuildSpec(ref common.ReferenceCallback) comm
 				Properties: map[string]spec.Schema{
 					"additionalTrustedCA": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AdditionalTrustedCA is a reference to a ConfigMap containing additional CAs that should be trusted for image pushes and pulls during builds. The namespace for this config map is openshift-config.",
+							Description: "AdditionalTrustedCA is a reference to a ConfigMap containing additional CAs that should be trusted for image pushes and pulls during builds. The namespace for this config map is openshift-config.\n\nDEPRECATED: Additional CAs for image pull and push should be set on image.config.openshift.io/cluster instead.",
 							Ref:         ref("github.com/openshift/api/config/v1.ConfigMapNameReference"),
 						},
 					},
@@ -9051,7 +9052,7 @@ func schema_openshift_api_config_v1_ExternalIPConfig(ref common.ReferenceCallbac
 				Properties: map[string]spec.Schema{
 					"policy": {
 						SchemaProps: spec.SchemaProps{
-							Description: "policy is a set of restrictions applied to the ExternalIP field. If nil, any value is allowed for an ExternalIP. If the empty/zero policy is supplied, then ExternalIP is not allowed to be set.",
+							Description: "policy is a set of restrictions applied to the ExternalIP field. If nil or empty, then ExternalIP is not allowed to be set.",
 							Ref:         ref("github.com/openshift/api/config/v1.ExternalIPPolicy"),
 						},
 					},
@@ -9716,19 +9717,19 @@ func schema_openshift_api_config_v1_HubSource(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HubSource is used to specify the OperatorSource and its configuration",
+				Description: "HubSource is used to specify the hub source and its configuration",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "name is the name of one of the default OperatorSources",
+							Description: "name is the name of one of the default hub sources",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"disabled": {
 						SchemaProps: spec.SchemaProps{
-							Description: "disabled is used to disable a default OperatorSource on cluster",
+							Description: "disabled is used to disable a default hub source on cluster",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -9747,26 +9748,9 @@ func schema_openshift_api_config_v1_HubSourceStatus(ref common.ReferenceCallback
 				Description: "HubSourceStatus is used to reflect the current state of applying the configuration to a default source",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"name": {
+					"HubSource": {
 						SchemaProps: spec.SchemaProps{
-							Description: "name is the name of one of the default OperatorSources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"configuration": {
-						SchemaProps: spec.SchemaProps{
-							Description: "configuration is the state of the default OperatorSources configuration",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
+							Ref: ref("github.com/openshift/api/config/v1.HubSource"),
 						},
 					},
 					"status": {
@@ -9784,8 +9768,11 @@ func schema_openshift_api_config_v1_HubSourceStatus(ref common.ReferenceCallback
 						},
 					},
 				},
+				Required: []string{"HubSource"},
 			},
 		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.HubSource"},
 	}
 }
 
@@ -9961,7 +9948,7 @@ func schema_openshift_api_config_v1_Image(ref common.ReferenceCallback) common.O
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Image holds cluster-wide information about how to handle images.  The canonical name is `cluster`",
+				Description: "Image governs policies related to imagestream imports and runtime configuration for external registries. It allows cluster admins to configure which registries OpenShift is allowed to import images from, extra CA trust bundles for external registries, and policies to blacklist/whitelist registry hostnames. When exposing OpenShift's image registry to the public, this also lets cluster admins specify the external hostname.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -10087,7 +10074,7 @@ func schema_openshift_api_config_v1_ImageSpec(ref common.ReferenceCallback) comm
 				Properties: map[string]spec.Schema{
 					"allowedRegistriesForImport": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AllowedRegistriesForImport limits the container image registries that normal users may import images from. Set this list to the registries that you trust to contain valid Docker images and that you want applications to be able to import from. Users with permission to create Images or ImageStreamMappings via the API are not affected by this policy - typically only administrators or system integrations will have those permissions.",
+							Description: "allowedRegistriesForImport limits the container image registries that normal users may import images from. Set this list to the registries that you trust to contain valid Docker images and that you want applications to be able to import from. Users with permission to create Images or ImageStreamMappings via the API are not affected by this policy - typically only administrators or system integrations will have those permissions.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -10114,13 +10101,13 @@ func schema_openshift_api_config_v1_ImageSpec(ref common.ReferenceCallback) comm
 					},
 					"additionalTrustedCA": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AdditionalTrustedCA is a reference to a ConfigMap containing additional CAs that should be trusted during imagestream import, pod image pull, and imageregistry pullthrough. The namespace for this config map is openshift-config.",
+							Description: "additionalTrustedCA is a reference to a ConfigMap containing additional CAs that should be trusted during imagestream import, pod image pull, build image pull, and imageregistry pullthrough. The namespace for this config map is openshift-config.",
 							Ref:         ref("github.com/openshift/api/config/v1.ConfigMapNameReference"),
 						},
 					},
 					"registrySources": {
 						SchemaProps: spec.SchemaProps{
-							Description: "RegistrySources contains configuration that determines how the container runtime should treat individual registries when accessing images for builds+pods. (e.g. whether or not to allow insecure access).  It does not contain configuration for the internal cluster registry.",
+							Description: "registrySources contains configuration that determines how the container runtime should treat individual registries when accessing images for builds+pods. (e.g. whether or not to allow insecure access).  It does not contain configuration for the internal cluster registry.",
 							Ref:         ref("github.com/openshift/api/config/v1.RegistrySources"),
 						},
 					},
@@ -10140,7 +10127,7 @@ func schema_openshift_api_config_v1_ImageStatus(ref common.ReferenceCallback) co
 				Properties: map[string]spec.Schema{
 					"internalRegistryHostname": {
 						SchemaProps: spec.SchemaProps{
-							Description: "this value is set by the image registry operator which controls the internal registry hostname InternalRegistryHostname sets the hostname for the default internal image registry. The value must be in \"hostname[:port]\" format. For backward compatibility, users can still use OPENSHIFT_DEFAULT_REGISTRY environment variable but this setting overrides the environment variable.",
+							Description: "internalRegistryHostname sets the hostname for the default internal image registry. The value must be in \"hostname[:port]\" format. This value is set by the image registry operator which controls the internal registry hostname. For backward compatibility, users can still use OPENSHIFT_DEFAULT_REGISTRY environment variable but this setting overrides the environment variable.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -10343,7 +10330,7 @@ func schema_openshift_api_config_v1_Ingress(ref common.ReferenceCallback) common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Ingress holds cluster-wide information about Ingress.  The canonical name is `cluster`",
+				Description: "Ingress holds cluster-wide information about ingress, including the default ingress domain used for routes. The canonical name is `cluster`.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -10442,7 +10429,7 @@ func schema_openshift_api_config_v1_IngressSpec(ref common.ReferenceCallback) co
 				Properties: map[string]spec.Schema{
 					"domain": {
 						SchemaProps: spec.SchemaProps{
-							Description: "domain is used to generate a default host name for a route when the route's host name is empty.  The generated host name will follow this pattern: \"<route-name>.<route-namespace>.<domain>\".",
+							Description: "domain is used to generate a default host name for a route when the route's host name is empty. The generated host name will follow this pattern: \"<route-name>.<route-namespace>.<domain>\".\n\nIt is also used as the default wildcard domain suffix for ingress. The default ingresscontroller domain will follow this pattern: \"*.<domain>\".\n\nOnce set, changing domain is not currently supported.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -10766,7 +10753,7 @@ func schema_openshift_api_config_v1_Network(ref common.ReferenceCallback) common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Network holds cluster-wide information about Network.  The canonical name is `cluster`",
+				Description: "Network holds cluster-wide information about Network. The canonical name is `cluster`. It is used to configure the desired network configuration, such as: IP address pools for services/pod IPs, network plugin, etc. Please view network.spec for an explanation on what applies when configuring this resource.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -10791,7 +10778,7 @@ func schema_openshift_api_config_v1_Network(ref common.ReferenceCallback) common
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Description: "spec holds user settable values for configuration.",
+							Description: "spec holds user settable values for configuration. As a general rule, this SHOULD NOT be read directly. Instead, you should consume the NetworkStatus, as it indicates the currently deployed configuration. Currently, most spec fields are immutable after installation. Please view the individual ones for further details on each.",
 							Ref:         ref("github.com/openshift/api/config/v1.NetworkSpec"),
 						},
 					},
@@ -10861,12 +10848,12 @@ func schema_openshift_api_config_v1_NetworkSpec(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "NetworkSpec is the desired network configuration. As a general rule, this SHOULD NOT be read directly. Instead, you should consume the NetworkStatus, as it indicates the currently deployed configuration. Currently, changing ClusterNetwork, ServiceNetwork, or NetworkType after installation is not supported.",
+				Description: "NetworkSpec is the desired network configuration. As a general rule, this SHOULD NOT be read directly. Instead, you should consume the NetworkStatus, as it indicates the currently deployed configuration. Currently, most spec fields are immutable after installation. Please view the individual ones for further details on each.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"clusterNetwork": {
 						SchemaProps: spec.SchemaProps{
-							Description: "IP address pool to use for pod IPs.",
+							Description: "IP address pool to use for pod IPs. This field is immutable after installation.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -10879,7 +10866,7 @@ func schema_openshift_api_config_v1_NetworkSpec(ref common.ReferenceCallback) co
 					},
 					"serviceNetwork": {
 						SchemaProps: spec.SchemaProps{
-							Description: "IP address pool for services. Currently, we only support a single entry here.",
+							Description: "IP address pool for services. Currently, we only support a single entry here. This field is immutable after installation.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -10893,14 +10880,14 @@ func schema_openshift_api_config_v1_NetworkSpec(ref common.ReferenceCallback) co
 					},
 					"networkType": {
 						SchemaProps: spec.SchemaProps{
-							Description: "NetworkType is the plugin that is to be deployed (e.g. OpenShiftSDN). This should match a value that the cluster-network-operator understands, or else no networking will be installed. Currently supported values are: - OpenShiftSDN",
+							Description: "NetworkType is the plugin that is to be deployed (e.g. OpenShiftSDN). This should match a value that the cluster-network-operator understands, or else no networking will be installed. Currently supported values are: - OpenShiftSDN This field is immutable after installation.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"externalIP": {
 						SchemaProps: spec.SchemaProps{
-							Description: "externalIP defines configuration for controllers that affect Service.ExternalIP",
+							Description: "externalIP defines configuration for controllers that affect Service.ExternalIP. If nil, then ExternalIP is not allowed to be set.",
 							Ref:         ref("github.com/openshift/api/config/v1.ExternalIPConfig"),
 						},
 					},
@@ -11432,7 +11419,7 @@ func schema_openshift_api_config_v1_OperatorHub(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OperatorHub is the Schema for the operatorhubs API",
+				Description: "OperatorHub is the Schema for the operatorhubs API. It can be used to change the state of the default hub sources for OperatorHub on the cluster from enabled to disabled and vice versa.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -11527,9 +11514,16 @@ func schema_openshift_api_config_v1_OperatorHubSpec(ref common.ReferenceCallback
 				Description: "OperatorHubSpec defines the desired state of OperatorHub",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"hubSources": {
+					"disableAllDefaultSources": {
 						SchemaProps: spec.SchemaProps{
-							Description: "hubSources is the list of default OperatorSources and their configuration",
+							Description: "disableAllDefaultSources allows you to disable all the default hub sources. If this is true, a specific entry in sources can be used to enable a default source. If this is false, a specific entry in sources can be used to disable or enable a default source.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"sources": {
+						SchemaProps: spec.SchemaProps{
+							Description: "sources is the list of default hub sources and their configuration. If the list is empty, it implies that the default hub sources are enabled on the cluster unless disableAllDefaultSources is true. If disableAllDefaultSources is true and sources is not empty, the configuration present in sources will take precedence. The list of default hub sources and their current state will always be reflected in the status block.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -11552,12 +11546,12 @@ func schema_openshift_api_config_v1_OperatorHubStatus(ref common.ReferenceCallba
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OperatorHubStatus defines the observed state of OperatorHub",
+				Description: "OperatorHubStatus defines the observed state of OperatorHub. The current state of the default hub sources will always be reflected here.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"hubSourcesStatus": {
+					"sources": {
 						SchemaProps: spec.SchemaProps{
-							Description: "hubSourcesStatus encapsulates the result applying the configuration",
+							Description: "sources encapsulates the result of applying the configuration for each hub source",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -11900,7 +11894,7 @@ func schema_openshift_api_config_v1_ProxySpec(ref common.ReferenceCallback) comm
 					},
 					"trustedCA": {
 						SchemaProps: spec.SchemaProps{
-							Description: "trustedCA is a reference to a ConfigMap containing a CA certificate bundle used for client egress HTTPS connections. The certificate bundle must be from the CA that signed the proxy's certificate and be signed for everything. trustedCA should only be consumed by a proxy validator. The validator is responsible for reading ConfigMapNameReference, validating the certificate and copying \"ca-bundle.crt\" from data to a ConfigMap in the namespace of an operator configured for proxy. The namespace for this ConfigMap is \"openshift-config\". Here is an example ConfigMap (in yaml):\n\napiVersion: v1 kind: ConfigMap metadata:\n name: trusted-ca-bundle\n namespace: openshift-config\n data:\n   ca-bundle.crt: |\n     -----BEGIN CERTIFICATE-----\n     Custom CA certificate bundle.\n     -----END CERTIFICATE-----",
+							Description: "trustedCA is a reference to a ConfigMap containing a CA certificate bundle used for client egress HTTPS connections. The certificate bundle must be from the CA that signed the proxy's certificate and be signed for everything. The trustedCA field should only be consumed by a proxy validator. The validator is responsible for reading the certificate bundle from required key \"ca-bundle.crt\" and copying it to a ConfigMap named \"trusted-ca-bundle\" in the \"openshift-config-managed\" namespace. The namespace for the ConfigMap referenced by trustedCA is \"openshift-config\". Here is an example ConfigMap (in yaml):\n\napiVersion: v1 kind: ConfigMap metadata:\n name: user-ca-bundle\n namespace: openshift-config\n data:\n   ca-bundle.crt: |\n     -----BEGIN CERTIFICATE-----\n     Custom CA certificate bundle.\n     -----END CERTIFICATE-----",
 							Ref:         ref("github.com/openshift/api/config/v1.ConfigMapNameReference"),
 						},
 					},
@@ -11955,14 +11949,14 @@ func schema_openshift_api_config_v1_RegistryLocation(ref common.ReferenceCallbac
 				Properties: map[string]spec.Schema{
 					"domainName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "DomainName specifies a domain name for the registry In case the registry use non-standard (80 or 443) port, the port should be included in the domain name as well.",
+							Description: "domainName specifies a domain name for the registry In case the registry use non-standard (80 or 443) port, the port should be included in the domain name as well.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"insecure": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Insecure indicates whether the registry is secure (https) or insecure (http) By default (if not specified) the registry is assumed as secure.",
+							Description: "insecure indicates whether the registry is secure (https) or insecure (http) By default (if not specified) the registry is assumed as secure.",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -11983,7 +11977,7 @@ func schema_openshift_api_config_v1_RegistrySources(ref common.ReferenceCallback
 				Properties: map[string]spec.Schema{
 					"insecureRegistries": {
 						SchemaProps: spec.SchemaProps{
-							Description: "InsecureRegistries are registries which do not have a valid TLS certificates or only support HTTP connections.",
+							Description: "insecureRegistries are registries which do not have a valid TLS certificates or only support HTTP connections.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -11997,7 +11991,7 @@ func schema_openshift_api_config_v1_RegistrySources(ref common.ReferenceCallback
 					},
 					"blockedRegistries": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BlockedRegistries are blacklisted from image pull/push. All other registries are allowed.\n\nOnly one of BlockedRegistries or AllowedRegistries may be set.",
+							Description: "blockedRegistries are blacklisted from image pull/push. All other registries are allowed.\n\nOnly one of BlockedRegistries or AllowedRegistries may be set.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -12011,7 +12005,7 @@ func schema_openshift_api_config_v1_RegistrySources(ref common.ReferenceCallback
 					},
 					"allowedRegistries": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AllowedRegistries are whitelisted for image pull/push. All other registries are blocked.\n\nOnly one of BlockedRegistries or AllowedRegistries may be set.",
+							Description: "allowedRegistries are whitelisted for image pull/push. All other registries are blocked.\n\nOnly one of BlockedRegistries or AllowedRegistries may be set.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -12181,7 +12175,7 @@ func schema_openshift_api_config_v1_Scheduler(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Scheduler holds cluster-wide information about Scheduler.  The canonical name is `cluster`",
+				Description: "Scheduler holds cluster-wide config information to run the Kubernetes Scheduler and influence its placement decisions. The canonical name for this config is `cluster`.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -12864,6 +12858,53 @@ func schema_openshift_api_console_v1_ConsoleExternalLogLink(ref common.Reference
 		},
 		Dependencies: []string{
 			"github.com/openshift/api/console/v1.ConsoleExternalLogLinkSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_openshift_api_console_v1_ConsoleExternalLogLinkList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/openshift/api/console/v1.ConsoleExternalLogLink"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"metadata", "items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/console/v1.ConsoleExternalLogLink", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
 	}
 }
 
@@ -23609,7 +23650,7 @@ func schema_openshift_api_operator_v1_IngressControllerSpec(ref common.Reference
 					},
 					"endpointPublishingStrategy": {
 						SchemaProps: spec.SchemaProps{
-							Description: "endpointPublishingStrategy is used to publish the ingress controller endpoints to other networks, enable load balancer integrations, etc.\n\nIf unset, the default is based on infrastructure.config.openshift.io/cluster .status.platform:\n\n  AWS:      LoadBalancerService\n  Azure:    LoadBalancerService\n  GCP:      LoadBalancerService\n  Libvirt:  HostNetwork\n\nAny other platform types (including None) default to HostNetwork.\n\nendpointPublishingStrategy cannot be updated.",
+							Description: "endpointPublishingStrategy is used to publish the ingress controller endpoints to other networks, enable load balancer integrations, etc.\n\nIf unset, the default is based on infrastructure.config.openshift.io/cluster .status.platform:\n\n  AWS:      LoadBalancerService (with External scope)\n  Azure:    LoadBalancerService (with External scope)\n  GCP:      LoadBalancerService (with External scope)\n  Libvirt:  HostNetwork\n\nAny other platform types (including None) default to HostNetwork.\n\nendpointPublishingStrategy cannot be updated.",
 							Ref:         ref("github.com/openshift/api/operator/v1.EndpointPublishingStrategy"),
 						},
 					},
@@ -24478,6 +24519,13 @@ func schema_openshift_api_operator_v1_KuryrConfig(ref common.ReferenceCallback) 
 							Format:      "int64",
 						},
 					},
+					"openStackServiceNetwork": {
+						SchemaProps: spec.SchemaProps{
+							Description: "openStackServiceNetwork contains the CIDR of network from which to allocate IPs for OpenStack Octavia's Amphora VMs. Please note that with Amphora driver Octavia uses two IPs from that network for each loadbalancer - one given by OpenShift and second for VRRP connections. As the first one is managed by OpenShift's and second by Neutron's IPAMs, those need to come from different pools. Therefore `openStackServiceNetwork` needs to be at least twice the size of `serviceNetwork`, and whole `serviceNetwork` must be overlapping with `openStackServiceNetwork`. cluster-network-operator will then make sure VRRP IPs are taken from the ranges inside `openStackServiceNetwork` that are not overlapping with `serviceNetwork`, effectivly preventing conflicts. If not set cluster-network-operator will use `serviceNetwork` expanded by decrementing the prefix size by 1.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 				},
 			},
 		},
@@ -24493,12 +24541,13 @@ func schema_openshift_api_operator_v1_LoadBalancerStrategy(ref common.ReferenceC
 				Properties: map[string]spec.Schema{
 					"scope": {
 						SchemaProps: spec.SchemaProps{
-							Description: "scope indicates the scope at which the load balancer is exposed. Possible values are \"External\" and \"Internal\".  The default is \"External\".",
+							Description: "scope indicates the scope at which the load balancer is exposed. Possible values are \"External\" and \"Internal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 				},
+				Required: []string{"scope"},
 			},
 		},
 	}

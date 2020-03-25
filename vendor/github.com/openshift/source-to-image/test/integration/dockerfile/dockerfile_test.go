@@ -11,8 +11,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/docker/docker/builder/dockerfile/parser"
+	"github.com/moby/buildkit/frontend/dockerfile/parser"
+
 	"github.com/openshift/source-to-image/pkg/api"
+	"github.com/openshift/source-to-image/pkg/build"
 	"github.com/openshift/source-to-image/pkg/build/strategies"
 	"github.com/openshift/source-to-image/pkg/scm/git"
 )
@@ -152,9 +154,9 @@ func TestDockerfileBuildLabels(t *testing.T) {
 		AssembleUser: "",
 		ImageWorkDir: "",
 		Source:       git.MustParse("https://github.com/sclorg/nodejs-ex"),
-		ScriptsURL:   "",
+		ScriptsURL:   "image:///scripts",
 		Injections:   api.VolumeList{},
-		Destination:  "",
+		Destination:  "/destination",
 
 		Environment: api.EnvironmentList{},
 		Labels: map[string]string{"label1": "value1",
@@ -164,6 +166,8 @@ func TestDockerfileBuildLabels(t *testing.T) {
 		AsDockerfile: filepath.Join(tempdir, "Dockerfile"),
 	}
 	expected := []string{
+		"\"io.openshift.s2i.scripts-url\"=\"image:///scripts\"",
+		"\"io.openshift.s2i.destination\"=\"/destination\"",
 		"\"io.openshift.s2i.build.commit.date\"",
 		"\"io.openshift.s2i.build.commit.id\"",
 		"\"io.openshift.s2i.build.commit.ref\"",
@@ -1033,7 +1037,7 @@ func TestDockerfileLocalSource(t *testing.T) {
 
 func runDockerfileTest(t *testing.T, config *api.Config, expected []string, notExpected []string, expectedFiles []string, expectFailure bool) {
 
-	b, _, err := strategies.GetStrategy(nil, config)
+	b, _, err := strategies.Strategy(nil, config, build.Overrides{})
 	if err != nil {
 		t.Fatalf("Cannot create a new builder.")
 	}
