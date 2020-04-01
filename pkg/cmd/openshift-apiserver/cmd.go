@@ -123,6 +123,15 @@ func (o *OpenShiftAPIServer) RunAPIServer(stopCh <-chan struct{}) error {
 	configFileLocation := path.Dir(absoluteConfigFile)
 
 	config := obj.(*openshiftcontrolplanev1.OpenShiftAPIServerConfig)
+	// If authentication-kubeconfig or authorization-kubeconfig flag are not
+	// specified fallback to the kubeconfig file provided with the
+	// configuration.
+	if o.Authentication.RemoteKubeConfigFile == "" {
+		o.Authentication.RemoteKubeConfigFile = config.KubeClientConfig.KubeConfig
+	}
+	if o.Authorization.RemoteKubeConfigFile == "" {
+		o.Authorization.RemoteKubeConfigFile = config.KubeClientConfig.KubeConfig
+	}
 	if err := helpers.ResolvePaths(getOpenShiftAPIServerConfigFileReferences(config), configFileLocation); err != nil {
 		return err
 	}
