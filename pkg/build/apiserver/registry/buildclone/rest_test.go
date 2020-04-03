@@ -16,10 +16,10 @@ import (
 
 func TestCreateClone(t *testing.T) {
 	rest := CloneREST{&buildgenerator.BuildGenerator{Client: buildgenerator.TestingClient{
-		CreateBuildFunc: func(ctx context.Context, build *buildv1.Build, _ *metav1.CreateOptions) error {
+		CreateBuildFunc: func(ctx context.Context, build *buildv1.Build, _ metav1.CreateOptions) error {
 			return nil
 		},
-		GetBuildFunc: func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.Build, error) {
+		GetBuildFunc: func(ctx context.Context, name string, _ metav1.GetOptions) (*buildv1.Build, error) {
 			return &buildv1.Build{}, nil
 		},
 	}}}
