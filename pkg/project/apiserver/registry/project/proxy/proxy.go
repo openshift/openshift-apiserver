@@ -201,6 +201,10 @@ func (s *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 var _ = rest.GracefulDeleter(&REST{})
 
 // Delete deletes a Project specified by its name
-func (s *REST) Delete(ctx context.Context, name string, objectFunc rest.ValidateObjectFunc, _ *metav1.DeleteOptions) (runtime.Object, bool, error) {
-	return &metav1.Status{Status: metav1.StatusSuccess}, false, s.client.Delete(ctx, name, metav1.DeleteOptions{})
+func (s *REST) Delete(ctx context.Context, name string, objectFunc rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
+	var opts metav1.DeleteOptions
+	if options != nil {
+		opts = *options
+	}
+	return &metav1.Status{Status: metav1.StatusSuccess}, false, s.client.Delete(ctx, name, opts)
 }
