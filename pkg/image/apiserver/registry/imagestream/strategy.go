@@ -84,7 +84,7 @@ func collapseEmptyStatusTags(stream *imageapi.ImageStream) {
 func (s Strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 	stream := obj.(*imageapi.ImageStream)
 	stream.Status = imageapi.ImageStreamStatus{
-		DockerImageRepository: s.dockerImageRepository(stream, false),
+		DockerImageRepository: s.dockerImageRepository(ctx, stream, false),
 		Tags:                  make(map[string]imageapi.TagEventList),
 	}
 	stream.Generation = 1
@@ -103,7 +103,7 @@ func (s Strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorL
 	if err := s.validateTagsAndLimits(ctx, nil, stream); err != nil {
 		errs = append(errs, field.InternalError(field.NewPath(""), err))
 	}
-	errs = append(errs, validation.ValidateImageStreamWithWhitelister(s.registryWhitelister, stream)...)
+	errs = append(errs, validation.ValidateImageStreamWithWhitelister(ctx, s.registryWhitelister, stream)...)
 	return errs
 }
 
@@ -113,8 +113,8 @@ func (s Strategy) validateTagsAndLimits(ctx context.Context, oldStream, newStrea
 		return kerrors.NewForbidden(schema.GroupResource{Resource: "imagestreams"}, newStream.Name, fmt.Errorf("no user context available"))
 	}
 
-	errs := s.tagVerifier.Verify(oldStream, newStream, user)
-	errs = append(errs, s.tagsChanged(oldStream, newStream)...)
+	errs := s.tagVerifier.Verify(ctx, oldStream, newStream, user)
+	errs = append(errs, s.tagsChanged(ctx, oldStream, newStream)...)
 	if len(errs) > 0 {
 		return kerrors.NewInvalid(schema.GroupKind{Kind: "imagestreams"}, newStream.Name, errs)
 	}
@@ -139,8 +139,8 @@ func (Strategy) AllowUnconditionalUpdate() bool {
 // If stream.DockerImageRepository is set, that value is returned. Otherwise,
 // if a default registry exists, the value returned is of the form
 // <default registry>/<namespace>/<stream name>.
-func (s Strategy) dockerImageRepository(stream *imageapi.ImageStream, allowNamespaceDefaulting bool) string {
-	registry, ok := s.registryHostnameRetriever.InternalRegistryHostname()
+func (s Strategy) dockerImageRepository(ctx context.Context, stream *imageapi.ImageStream, allowNamespaceDefaulting bool) string {
+	registry, ok := s.registryHostnameRetriever.InternalRegistryHostname(ctx)
 	if !ok {
 		return stream.Spec.DockerImageRepository
 	}
@@ -203,8 +203,8 @@ func parseFromReference(stream *imageapi.ImageStream, from *kapi.ObjectReference
 
 // tagsChanged updates stream.Status.Tags based on the old and new image stream.
 // if the old stream is nil, all tags are considered additions.
-func (s Strategy) tagsChanged(old, stream *imageapi.ImageStream) field.ErrorList {
-	internalRegistry, hasInternalRegistry := s.registryHostnameRetriever.InternalRegistryHostname()
+func (s Strategy) tagsChanged(ctx context.Context, old, stream *imageapi.ImageStream) field.ErrorList {
+	internalRegistry, hasInternalRegistry := s.registryHostnameRetriever.InternalRegistryHostname(ctx)
 
 	var errs field.ErrorList
 
@@ -496,7 +496,7 @@ type TagVerifier struct {
 	subjectAccessReviewClient authorizationclient.SubjectAccessReviewInterface
 }
 
-func (v *TagVerifier) Verify(old, stream *imageapi.ImageStream, user user.Info) field.ErrorList {
+func (v *TagVerifier) Verify(ctx context.Context, old, stream *imageapi.ImageStream, user user.Info) field.ErrorList {
 	var errors field.ErrorList
 	oldTags := map[string]imageapi.TagReference{}
 	if old != nil && old.Spec.Tags != nil {
@@ -548,7 +548,7 @@ func (v *TagVerifier) Verify(old, stream *imageapi.ImageStream, user user.Info) 
 				},
 			})
 			klog.V(4).Infof("Performing SubjectAccessReview for user=%s, groups=%v to %s/%s", user.GetName(), user.GetGroups(), namespace, streamName)
-			resp, err := v.subjectAccessReviewClient.Create(context.TODO(), subjectAccessReview, metav1.CreateOptions{})
+			resp, err := v.subjectAccessReviewClient.Create(ctx, subjectAccessReview, metav1.CreateOptions{})
 			if err != nil || resp == nil || (resp != nil && !resp.Status.Allowed) {
 				message := fmt.Sprintf("%s/%s", namespace, streamName)
 				if resp != nil {
@@ -572,7 +572,7 @@ func (v *TagVerifier) Verify(old, stream *imageapi.ImageStream, user user.Info) 
 func (Strategy) Canonicalize(obj runtime.Object) {
 }
 
-func (s Strategy) prepareForUpdate(obj, old runtime.Object, resetStatus bool) {
+func (s Strategy) prepareForUpdate(ctx context.Context, obj, old runtime.Object, resetStatus bool) {
 	oldStream := old.(*imageapi.ImageStream)
 	stream := obj.(*imageapi.ImageStream)
 
@@ -581,7 +581,7 @@ func (s Strategy) prepareForUpdate(obj, old runtime.Object, resetStatus bool) {
 	if resetStatus {
 		stream.Status = oldStream.Status
 	}
-	stream.Status.DockerImageRepository = s.dockerImageRepository(stream, true)
+	stream.Status.DockerImageRepository = s.dockerImageRepository(ctx, stream, true)
 
 	// ensure that users cannot change spec tag generation to any value except 0
 	updateSpecTagGenerationsForUpdate(stream, oldStream)
@@ -599,7 +599,7 @@ func (s Strategy) prepareForUpdate(obj, old runtime.Object, resetStatus bool) {
 }
 
 func (s Strategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
-	s.prepareForUpdate(obj, old, true)
+	s.prepareForUpdate(ctx, obj, old, true)
 }
 
 // ValidateUpdate is the default update validation for an end user.
@@ -610,7 +610,7 @@ func (s Strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 	if err := s.validateTagsAndLimits(ctx, oldStream, stream); err != nil {
 		errs = append(errs, field.InternalError(field.NewPath(""), err))
 	}
-	errs = append(errs, validation.ValidateImageStreamUpdateWithWhitelister(s.registryWhitelister, stream, oldStream)...)
+	errs = append(errs, validation.ValidateImageStreamUpdateWithWhitelister(ctx, s.registryWhitelister, stream, oldStream)...)
 	return errs
 }
 
@@ -619,12 +619,12 @@ func (s Strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 func (s Strategy) Decorate(obj runtime.Object) error {
 	switch t := obj.(type) {
 	case *imageapi.ImageStream:
-		t.Status.DockerImageRepository = s.dockerImageRepository(t, true)
+		t.Status.DockerImageRepository = s.dockerImageRepository(context.TODO(), t, true)
 		t.Status.PublicDockerImageRepository = s.publicDockerImageRepository(t)
 	case *imageapi.ImageStreamList:
 		for i := range t.Items {
 			is := &t.Items[i]
-			is.Status.DockerImageRepository = s.dockerImageRepository(is, true)
+			is.Status.DockerImageRepository = s.dockerImageRepository(context.TODO(), is, true)
 			is.Status.PublicDockerImageRepository = s.publicDockerImageRepository(is)
 		}
 	default:
@@ -671,7 +671,7 @@ func (s StatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Obj
 	}
 
 	// TODO: merge valid fields after update
-	errs = append(errs, validation.ValidateImageStreamStatusUpdateWithWhitelister(s.registryWhitelister, newIS, old.(*imageapi.ImageStream))...)
+	errs = append(errs, validation.ValidateImageStreamStatusUpdateWithWhitelister(ctx, s.registryWhitelister, newIS, old.(*imageapi.ImageStream))...)
 	return errs
 }
 
@@ -694,7 +694,7 @@ func (InternalStrategy) Canonicalize(obj runtime.Object) {
 func (s InternalStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 	stream := obj.(*imageapi.ImageStream)
 
-	stream.Status.DockerImageRepository = s.dockerImageRepository(stream, false)
+	stream.Status.DockerImageRepository = s.dockerImageRepository(ctx, stream, false)
 	stream.Generation = 1
 	for tag, ref := range stream.Spec.Tags {
 		ref.Generation = &stream.Generation
@@ -703,5 +703,5 @@ func (s InternalStrategy) PrepareForCreate(ctx context.Context, obj runtime.Obje
 }
 
 func (s InternalStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
-	s.prepareForUpdate(obj, old, false)
+	s.prepareForUpdate(ctx, obj, old, false)
 }

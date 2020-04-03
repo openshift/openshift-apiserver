@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strings"
 
+	"golang.org/x/net/context"
 	"k8s.io/klog"
 
 	kerrutil "k8s.io/apimachinery/pkg/util/errors"
@@ -33,11 +34,11 @@ const (
 // RegistryWhitelister decides whether given image pull specs are allowed by system's image policy.
 type RegistryWhitelister interface {
 	// AdmitHostname returns error if the given host is not allowed by the whitelist.
-	AdmitHostname(host string, transport WhitelistTransport) error
+	AdmitHostname(ctx context.Context, host string, transport WhitelistTransport) error
 	// AdmitPullSpec returns error if the given pull spec is not allowed by the whitelist.
-	AdmitPullSpec(pullSpec string, transport WhitelistTransport) error
+	AdmitPullSpec(ctx context.Context, pullSpec string, transport WhitelistTransport) error
 	// AdmitDockerImageReference returns error if the given reference is not allowed by the whitelist.
-	AdmitDockerImageReference(ref imageapi.DockerImageReference, transport WhitelistTransport) error
+	AdmitDockerImageReference(ctx context.Context, ref imageapi.DockerImageReference, transport WhitelistTransport) error
 	// WhitelistRegistry extends internal whitelist for additional registry domain name. Accepted values are:
 	//  <host>, <host>:<port>
 	// where each component can contain wildcards like '*' or '??' to match wide range of registries. If the
@@ -56,7 +57,7 @@ type RegistryWhitelister interface {
 // RegistryHostnameRetriever represents an interface for retrieving the hostname
 // of internal and external registry.
 type RegistryHostnameRetriever interface {
-	InternalRegistryHostname() (string, bool)
+	InternalRegistryHostname(context.Context) (string, bool)
 	ExternalRegistryHostname() (string, bool)
 }
 
@@ -106,26 +107,26 @@ func NewRegistryWhitelister(
 
 // WhitelistAllRegistries returns a whitelister that will allow any given registry host name.
 // TODO: make a new implementation of RegistryWhitelister instead that will not bother with pull specs
-func WhitelistAllRegistries() RegistryWhitelister {
+func WhitelistAllRegistries(ctx context.Context) RegistryWhitelister {
 	return &registryWhitelister{
 		whitelist:    []allowedHostPortGlobs{{host: "*", port: "*"}},
 		repositories: sets.NewString(),
 	}
 }
 
-func (rw *registryWhitelister) AdmitHostname(hostname string, transport WhitelistTransport) error {
-	return rw.AdmitDockerImageReference(imageapi.DockerImageReference{Registry: hostname}, transport)
+func (rw *registryWhitelister) AdmitHostname(ctx context.Context, hostname string, transport WhitelistTransport) error {
+	return rw.AdmitDockerImageReference(ctx, imageapi.DockerImageReference{Registry: hostname}, transport)
 }
 
-func (rw *registryWhitelister) AdmitPullSpec(pullSpec string, transport WhitelistTransport) error {
+func (rw *registryWhitelister) AdmitPullSpec(ctx context.Context, pullSpec string, transport WhitelistTransport) error {
 	ref, err := reference.Parse(pullSpec)
 	if err != nil {
 		return err
 	}
-	return rw.AdmitDockerImageReference(ref, transport)
+	return rw.AdmitDockerImageReference(ctx, ref, transport)
 }
 
-func (rw *registryWhitelister) AdmitDockerImageReference(ref imageapi.DockerImageReference, transport WhitelistTransport) error {
+func (rw *registryWhitelister) AdmitDockerImageReference(ctx context.Context, ref imageapi.DockerImageReference, transport WhitelistTransport) error {
 	const showMax = 5
 	if rw.repositories.Len() > 0 {
 		if rw.repositories.Has(canonicalRepository(ref)) {
@@ -134,7 +135,7 @@ func (rw *registryWhitelister) AdmitDockerImageReference(ref imageapi.DockerImag
 	}
 
 	if rw.registryHostRetriever != nil {
-		if localRegistry, ok := rw.registryHostRetriever.InternalRegistryHostname(); ok {
+		if localRegistry, ok := rw.registryHostRetriever.InternalRegistryHostname(ctx); ok {
 			rw.WhitelistRegistry(localRegistry, WhitelistTransportSecure)
 		}
 	}

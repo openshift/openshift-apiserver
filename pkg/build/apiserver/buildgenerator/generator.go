@@ -109,14 +109,14 @@ func (c Client) GetImageStreamTag(ctx context.Context, name string, options meta
 
 // fetchServiceAccountSecrets retrieves the Secrets used for pushing and pulling
 // images from private container image registries.
-func fetchServiceAccountSecrets(secrets corev1client.SecretsGetter, serviceAccounts corev1client.ServiceAccountsGetter, namespace, serviceAccount string) ([]corev1.Secret, error) {
+func fetchServiceAccountSecrets(ctx context.Context, secrets corev1client.SecretsGetter, serviceAccounts corev1client.ServiceAccountsGetter, namespace, serviceAccount string) ([]corev1.Secret, error) {
 	var result []corev1.Secret
-	sa, err := serviceAccounts.ServiceAccounts(namespace).Get(context.TODO(), serviceAccount, metav1.GetOptions{})
+	sa, err := serviceAccounts.ServiceAccounts(namespace).Get(ctx, serviceAccount, metav1.GetOptions{})
 	if err != nil {
 		return result, fmt.Errorf("error getting push/pull secrets for service account %s/%s: %v", namespace, serviceAccount, err)
 	}
 	for _, ref := range sa.Secrets {
-		secret, err := secrets.Secrets(namespace).Get(context.TODO(), ref.Name, metav1.GetOptions{})
+		secret, err := secrets.Secrets(namespace).Get(ctx, ref.Name, metav1.GetOptions{})
 		if err != nil {
 			continue
 		}
@@ -556,7 +556,7 @@ func (g *BuildGenerator) generateBuildFromConfig(ctx context.Context, bc *buildv
 
 	var builderSecrets []corev1.Secret
 	var err error
-	if builderSecrets, err = fetchServiceAccountSecrets(g.Secrets, g.ServiceAccounts, bcCopy.Namespace, serviceAccount); err != nil {
+	if builderSecrets, err = fetchServiceAccountSecrets(ctx, g.Secrets, g.ServiceAccounts, bcCopy.Namespace, serviceAccount); err != nil {
 		return nil, err
 	}
 

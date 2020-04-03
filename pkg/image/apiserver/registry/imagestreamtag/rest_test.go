@@ -34,7 +34,7 @@ import (
 	_ "github.com/openshift/openshift-apiserver/pkg/api/install"
 )
 
-var testDefaultRegistry = func() (string, bool) { return "defaultregistry:5000", true }
+var testDefaultRegistry = func(_ context.Context) (string, bool) { return "defaultregistry:5000", true }
 
 type fakeSubjectAccessReviewRegistry struct {
 }

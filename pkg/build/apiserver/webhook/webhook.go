@@ -64,7 +64,7 @@ func NewWarning(message string) *kerrors.StatusError {
 
 // CheckSecret tests the user provided secret against the secrets for the webhook triggers, if a match is found
 // then the corresponding webhook trigger is returned.
-func CheckSecret(namespace, userSecret string, triggers []*buildv1.WebHookTrigger, secretsClient kubernetes.SecretsGetter) (*buildv1.WebHookTrigger, error) {
+func CheckSecret(ctx context.Context, namespace, userSecret string, triggers []*buildv1.WebHookTrigger, secretsClient kubernetes.SecretsGetter) (*buildv1.WebHookTrigger, error) {
 	for i := range triggers {
 		secretRef := triggers[i].SecretReference
 		secret := triggers[i].Secret
@@ -75,7 +75,7 @@ func CheckSecret(namespace, userSecret string, triggers []*buildv1.WebHookTrigge
 		}
 		if secretRef != nil {
 			klog.V(4).Infof("Checking user secret against secret ref %s", secretRef.Name)
-			s, err := secretsClient.Secrets(namespace).Get(context.TODO(), secretRef.Name, metav1.GetOptions{})
+			s, err := secretsClient.Secrets(namespace).Get(ctx, secretRef.Name, metav1.GetOptions{})
 			if err != nil && !kerrors.IsNotFound(err) {
 				return nil, err
 			}

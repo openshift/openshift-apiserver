@@ -11,6 +11,8 @@ import (
 )
 
 func TestServiceResolverCacheEmpty(t *testing.T) {
+	ctx := context.TODO()
+
 	fakeClient := fake.NewSimpleClientset(&corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "foo",
@@ -21,17 +23,17 @@ func TestServiceResolverCacheEmpty(t *testing.T) {
 		},
 	})
 	cache := newServiceResolverCache(fakeClient.CoreV1().Services("default").Get)
-	if v, ok := cache.resolve("FOO_SERVICE_HOST"); v != "" || !ok {
+	if v, ok := cache.resolve(ctx, "FOO_SERVICE_HOST"); v != "" || !ok {
 		t.Errorf("unexpected cache item")
 	}
 	if len(fakeClient.Actions()) != 1 {
 		t.Errorf("unexpected client actions: %#v", fakeClient.Actions())
 	}
-	cache.resolve("FOO_SERVICE_HOST")
+	cache.resolve(ctx, "FOO_SERVICE_HOST")
 	if len(fakeClient.Actions()) != 1 {
 		t.Errorf("unexpected cache miss: %#v", fakeClient.Actions())
 	}
-	cache.resolve("FOO_SERVICE_PORT")
+	cache.resolve(ctx, "FOO_SERVICE_PORT")
 	if len(fakeClient.Actions()) != 1 {
 		t.Errorf("unexpected cache miss: %#v", fakeClient.Actions())
 	}
@@ -47,11 +49,13 @@ func (r fakeRetriever) Get(_ context.Context, name string, options metav1.GetOpt
 }
 
 func TestServiceResolverCache(t *testing.T) {
+	ctx := context.TODO()
+
 	c := fakeRetriever{
 		err: errors.NewNotFound(corev1.Resource("Service"), "bar"),
 	}
 	cache := newServiceResolverCache(c.Get)
-	if v, ok := cache.resolve("FOO_SERVICE_HOST"); v != "" || ok {
+	if v, ok := cache.resolve(ctx, "FOO_SERVICE_HOST"); v != "" || ok {
 		t.Errorf("unexpected cache item")
 	}
 
@@ -64,10 +68,10 @@ func TestServiceResolverCache(t *testing.T) {
 		},
 	}
 	cache = newServiceResolverCache(c.Get)
-	if v, ok := cache.resolve("FOO_SERVICE_HOST"); v != "::1" || !ok {
+	if v, ok := cache.resolve(ctx, "FOO_SERVICE_HOST"); v != "::1" || !ok {
 		t.Errorf("unexpected cache item")
 	}
-	if v, ok := cache.resolve("FOO_SERVICE_PORT"); v != "80" || !ok {
+	if v, ok := cache.resolve(ctx, "FOO_SERVICE_PORT"); v != "80" || !ok {
 		t.Errorf("unexpected cache item")
 	}
 	if _, err := cache.Defer("${UNKNOWN}"); err == nil {
@@ -77,17 +81,17 @@ func TestServiceResolverCache(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if v, ok := fn(); v != "test" || !ok {
+	if v, ok := fn(ctx); v != "test" || !ok {
 		t.Errorf("unexpected cache item")
 	}
 	fn, err = cache.Defer("${FOO_SERVICE_HOST}")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if v, ok := fn(); v != "::1" || !ok {
+	if v, ok := fn(ctx); v != "::1" || !ok {
 		t.Errorf("unexpected cache item")
 	}
-	if v, ok := fn(); v != "::1" || !ok {
+	if v, ok := fn(ctx); v != "::1" || !ok {
 		t.Errorf("unexpected cache item")
 	}
 }

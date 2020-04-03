@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"reflect"
@@ -843,7 +844,7 @@ func TestValidateImageStreamWithWhitelister(t *testing.T) {
 				},
 			}
 
-			errs := ValidateImageStreamWithWhitelister(mkWhitelister(t, test.whitelist), &stream)
+			errs := ValidateImageStreamWithWhitelister(context.TODO(), mkWhitelister(t, test.whitelist), &stream)
 			if e, a := test.expected, errs; !reflect.DeepEqual(e, a) {
 				t.Errorf("unexpected errors: %s", diff.ObjectDiff(e, a))
 			}
@@ -1032,7 +1033,7 @@ func TestValidateImageStreamUpdateWithWhitelister(t *testing.T) {
 					Tags: tc.newStatusTags,
 				},
 			}
-			errs := ValidateImageStreamUpdateWithWhitelister(whitelister, &newStream, &oldStream)
+			errs := ValidateImageStreamUpdateWithWhitelister(context.TODO(), whitelister, &newStream, &oldStream)
 			if e, a := tc.expected, errs; !reflect.DeepEqual(e, a) {
 				t.Errorf("unexpected errors: %s", diff.ObjectDiff(a, e))
 			}
@@ -1253,7 +1254,7 @@ func TestValidateISTUpdateWithWhitelister(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			errs := ValidateImageStreamTagUpdateWithWhitelister(whitelister, &istNew, &istOld)
+			errs := ValidateImageStreamTagUpdateWithWhitelister(context.TODO(), whitelister, &istNew, &istOld)
 			if e, a := tc.expected, errs; !reflect.DeepEqual(e, a) {
 				t.Errorf("unexpected errors: %s", diff.ObjectDiff(a, e))
 			}
@@ -1488,7 +1489,7 @@ func TestValidateITUpdateWithWhitelister(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			errs := ValidateImageTagUpdateWithWhitelister(whitelister, &istNew, &istOld)
+			errs := ValidateImageTagUpdateWithWhitelister(context.TODO(), whitelister, &istNew, &istOld)
 			if e, a := tc.expected, errs; !reflect.DeepEqual(e, a) {
 				t.Errorf("unexpected errors: %s", diff.ObjectDiff(a, e))
 			}
@@ -1500,7 +1501,7 @@ type simpleHostnameRetriever struct {
 	registryURL string
 }
 
-func (r *simpleHostnameRetriever) InternalRegistryHostname() (string, bool) {
+func (r *simpleHostnameRetriever) InternalRegistryHostname(_ context.Context) (string, bool) {
 	return r.registryURL, len(r.registryURL) > 0
 }
 
@@ -1538,7 +1539,7 @@ func TestValidateRegistryAllowedForImport(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			errs := ValidateRegistryAllowedForImport(whitelister, nil, fieldName, host, port)
+			errs := ValidateRegistryAllowedForImport(context.TODO(), whitelister, nil, fieldName, host, port)
 			if e, a := tc.expected, errs; !reflect.DeepEqual(e, a) {
 				t.Errorf("unexpected errors: %s", diff.ObjectDiff(e, a))
 			}
@@ -1750,7 +1751,7 @@ func mkAllowed(insecure bool, regs ...string) openshiftcontrolplanev1.AllowedReg
 func mkWhitelister(t *testing.T, wl openshiftcontrolplanev1.AllowedRegistries) whitelist.RegistryWhitelister {
 	var whitelister whitelist.RegistryWhitelister
 	if wl == nil {
-		whitelister = whitelist.WhitelistAllRegistries()
+		whitelister = whitelist.WhitelistAllRegistries(context.TODO())
 	} else {
 		rw, err := whitelist.NewRegistryWhitelister(wl, nil)
 		if err != nil {

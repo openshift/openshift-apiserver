@@ -1,19 +1,21 @@
 package fake
 
 import (
+	"context"
+
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
 )
 
 type RegistryWhitelister struct{}
 
-func (rw *RegistryWhitelister) AdmitHostname(host string, transport whitelist.WhitelistTransport) error {
+func (rw *RegistryWhitelister) AdmitHostname(_ context.Context, host string, transport whitelist.WhitelistTransport) error {
 	return nil
 }
-func (rw *RegistryWhitelister) AdmitPullSpec(pullSpec string, transport whitelist.WhitelistTransport) error {
+func (rw *RegistryWhitelister) AdmitPullSpec(_ context.Context, pullSpec string, transport whitelist.WhitelistTransport) error {
 	return nil
 }
-func (rw *RegistryWhitelister) AdmitDockerImageReference(ref imageapi.DockerImageReference, transport whitelist.WhitelistTransport) error {
+func (rw *RegistryWhitelister) AdmitDockerImageReference(_ context.Context, ref imageapi.DockerImageReference, transport whitelist.WhitelistTransport) error {
 	return nil
 }
 func (rw *RegistryWhitelister) WhitelistRegistry(hostPortGlob string, transport whitelist.WhitelistTransport) error {

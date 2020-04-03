@@ -32,8 +32,8 @@ const (
 )
 
 var (
-	testDefaultRegistry = func() (string, bool) { return "test", true }
-	noDefaultRegistry   = func() (string, bool) { return "", false }
+	testDefaultRegistry = func(_ context.Context) (string, bool) { return "test", true }
+	noDefaultRegistry   = func(_ context.Context) (string, bool) { return "", false }
 )
 
 type fakeSubjectAccessReviewRegistry struct {

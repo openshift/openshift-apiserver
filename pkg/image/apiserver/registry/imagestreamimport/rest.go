@@ -155,7 +155,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	}
 
 	if !isCreateImage.Status.Allowed && !isCreateImageStreamMapping.Status.Allowed {
-		if errs := r.strategy.ValidateAllowedRegistries(isi); len(errs) != 0 {
+		if errs := r.strategy.ValidateAllowedRegistries(ctx, isi); len(errs) != 0 {
 			return nil, kapierrors.NewInvalid(image.Kind("ImageStreamImport"), isi.Name, errs)
 		}
 	}

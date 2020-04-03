@@ -41,7 +41,7 @@ import (
 
 const testDefaultRegistryURL = "defaultregistry:5000"
 
-var testDefaultRegistry = func() (string, bool) { return testDefaultRegistryURL, true }
+var testDefaultRegistry = func(_ context.Context) (string, bool) { return testDefaultRegistryURL, true }
 
 type fakeSubjectAccessReviewRegistry struct {
 }

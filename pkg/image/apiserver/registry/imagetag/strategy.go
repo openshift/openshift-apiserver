@@ -54,7 +54,7 @@ func (s Strategy) GenerateName(base string) string {
 func (s Strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	itag := obj.(*imageapi.ImageTag)
 
-	return validation.ValidateImageTagWithWhitelister(s.registryWhitelister, itag)
+	return validation.ValidateImageTagWithWhitelister(ctx, s.registryWhitelister, itag)
 }
 
 func (s Strategy) AllowCreateOnUpdate() bool {
@@ -83,7 +83,7 @@ func (s Strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 	newITag := obj.(*imageapi.ImageTag)
 	oldITag := old.(*imageapi.ImageTag)
 
-	return validation.ValidateImageTagUpdateWithWhitelister(s.registryWhitelister, newITag, oldITag)
+	return validation.ValidateImageTagUpdateWithWhitelister(ctx, s.registryWhitelister, newITag, oldITag)
 }
 
 // MatchImageTag returns a generic matcher for a given label and field selector.

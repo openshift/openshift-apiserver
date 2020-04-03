@@ -60,7 +60,7 @@ type fakeDefaultRegistry struct {
 	registry string
 }
 
-func (f *fakeDefaultRegistry) DefaultRegistry() (string, bool) {
+func (f *fakeDefaultRegistry) DefaultRegistry(_ context.Context) (string, bool) {
 	return f.registry, len(f.registry) > 0
 }
 
@@ -221,7 +221,7 @@ func TestDockerImageRepository(t *testing.T) {
 	for testName, test := range tests {
 		fakeRegistry := &fakeDefaultRegistry{test.defaultRegistry}
 		strategy := NewStrategy(registryhostname.TestingRegistryHostnameRetriever(fakeRegistry.DefaultRegistry, "", ""), &fakeSubjectAccessReviewRegistry{}, &admfake.ImageStreamLimitVerifier{}, nil, nil)
-		value := strategy.dockerImageRepository(test.stream, true)
+		value := strategy.dockerImageRepository(context.TODO(), test.stream, true)
 		if e, a := test.expected, value; e != a {
 			t.Errorf("%s: expected %q, got %q", testName, e, a)
 		}
@@ -473,7 +473,7 @@ func TestTagVerifier(t *testing.T) {
 		}
 
 		tagVerifier := &TagVerifier{sar}
-		errs := tagVerifier.Verify(old, stream, &fakeUser{})
+		errs := tagVerifier.Verify(context.TODO(), old, stream, &fakeUser{})
 
 		for id, record := range test.sars {
 			if e, a := id.namespace, record.requestNamespace; e != a {
@@ -1268,7 +1268,7 @@ func TestTagsChanged(t *testing.T) {
 			registryHostnameRetriever: registryhostname.TestingRegistryHostnameRetriever(fakeRegistry.DefaultRegistry, "", ""),
 			imageStreamGetter:         &fakeImageStreamGetter{test.otherStream},
 		}
-		err := s.tagsChanged(previousStream, stream)
+		err := s.tagsChanged(context.TODO(), previousStream, stream)
 		if len(err) > 0 {
 			t.Errorf("%s: unable to process tags: %v", testName, err)
 			continue

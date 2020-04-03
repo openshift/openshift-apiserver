@@ -1,6 +1,7 @@
 package registryhostname
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -12,7 +13,7 @@ import (
 // RegistryHostnameRetriever represents an interface for retrieving the hostname
 // of internal and external registry.
 type RegistryHostnameRetriever interface {
-	InternalRegistryHostname() (string, bool)
+	InternalRegistryHostname(context.Context) (string, bool)
 	ExternalRegistryHostname() (string, bool)
 }
 
@@ -21,7 +22,7 @@ type RegistryHostnameRetriever interface {
 // The first argument is a function that lazy-loads the value of
 // OPENSHIFT_DEFAULT_REGISTRY environment variable which should be deprecated in
 // future.
-func TestingRegistryHostnameRetriever(deprecatedDefaultRegistryEnvFn func() (string, bool), external, internal string) RegistryHostnameRetriever {
+func TestingRegistryHostnameRetriever(deprecatedDefaultRegistryEnvFn func(context.Context) (string, bool), external, internal string) RegistryHostnameRetriever {
 	return &defaultRegistryHostnameRetriever{
 		deprecatedDefaultFn: deprecatedDefaultRegistryEnvFn,
 		externalHostname:    external,
@@ -61,7 +62,7 @@ func env(key string, defaultValue string) string {
 type defaultRegistryHostnameRetriever struct {
 	// deprecatedDefaultFn points to a function that will lazy-load the value of
 	// OPENSHIFT_DEFAULT_REGISTRY.
-	deprecatedDefaultFn func() (string, bool)
+	deprecatedDefaultFn func(context.Context) (string, bool)
 	internalHostname    string
 	externalHostname    string
 }
@@ -70,12 +71,12 @@ type defaultRegistryHostnameRetriever struct {
 // the internal Docker Registry hostname. If the master configuration properly
 // InternalRegistryHostname is set, it will prefer that over the lazy-loaded
 // environment variable 'OPENSHIFT_DEFAULT_REGISTRY'.
-func (r *defaultRegistryHostnameRetriever) InternalRegistryHostname() (string, bool) {
+func (r *defaultRegistryHostnameRetriever) InternalRegistryHostname(ctx context.Context) (string, bool) {
 	if len(r.internalHostname) > 0 {
 		return r.internalHostname, true
 	}
 	if r.deprecatedDefaultFn != nil {
-		return r.deprecatedDefaultFn()
+		return r.deprecatedDefaultFn(ctx)
 	}
 	return "", false
 }

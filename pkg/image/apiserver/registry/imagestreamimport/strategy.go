@@ -37,12 +37,12 @@ func (s *strategy) GenerateName(string) string {
 func (s *strategy) Canonicalize(runtime.Object) {
 }
 
-func (s *strategy) ValidateAllowedRegistries(isi *imageapi.ImageStreamImport) field.ErrorList {
+func (s *strategy) ValidateAllowedRegistries(ctx context.Context, isi *imageapi.ImageStreamImport) field.ErrorList {
 	errs := field.ErrorList{}
 	validate := func(path *field.Path, name string, insecure bool) field.ErrorList {
 		ref, _ := reference.Parse(name)
 		registryHost, registryPort := ref.RegistryHostPort(insecure)
-		return validation.ValidateRegistryAllowedForImport(s.registryWhitelister, path.Child("from", "name"), ref.Name, registryHost, registryPort)
+		return validation.ValidateRegistryAllowedForImport(ctx, s.registryWhitelister, path.Child("from", "name"), ref.Name, registryHost, registryPort)
 	}
 	if spec := isi.Spec.Repository; spec != nil && spec.From.Kind == "DockerImage" {
 		errs = append(errs, validate(field.NewPath("spec").Child("repository"), spec.From.Name, spec.ImportPolicy.Insecure)...)

@@ -40,7 +40,7 @@ func (s Strategy) NamespaceScoped() bool {
 func (s Strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 	ism := obj.(*imageapi.ImageStreamMapping)
 	if len(ism.Image.DockerImageReference) == 0 {
-		internalRegistry, ok := s.registryHostRetriever.InternalRegistryHostname()
+		internalRegistry, ok := s.registryHostRetriever.InternalRegistryHostname(ctx)
 		if ok {
 			ism.Image.DockerImageReference = imageapi.DockerImageReference{
 				Registry:  internalRegistry,

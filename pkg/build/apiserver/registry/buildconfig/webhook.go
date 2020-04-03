@@ -142,7 +142,7 @@ func (w *WebHookHandler) ProcessWebHook(writer http.ResponseWriter, req *http.Re
 	}
 
 	klog.V(4).Infof("checking secret for %q webhook trigger of buildconfig %s/%s", hookType, config.Namespace, config.Name)
-	trigger, err := webhook.CheckSecret(config.Namespace, secret, triggers, w.secretsClient)
+	trigger, err := webhook.CheckSecret(ctx, config.Namespace, secret, triggers, w.secretsClient)
 	if err != nil {
 		return errors.NewUnauthorized(fmt.Sprintf("the webhook %q for %q did not accept your secret", hookType, name))
 	}

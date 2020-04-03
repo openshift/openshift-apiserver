@@ -153,7 +153,7 @@ func (r *REST) Get(ctx context.Context, name string, opts runtime.Object) (runti
 			return nil, apierrors.NewBadRequest(fmt.Sprintf("failed to run deployer pod %s: %v", podName, err))
 		}
 
-		latest, err := WaitForRunningDeployment(r.rcClient, target, r.timeout)
+		latest, err := WaitForRunningDeployment(ctx, r.rcClient, target, r.timeout)
 		if err == wait.ErrWaitTimeout {
 			return nil, apierrors.NewServerTimeout(kapi.Resource("ReplicationController"), "get", 2)
 		}
