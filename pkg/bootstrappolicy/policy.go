@@ -609,19 +609,6 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 		},
 		{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: RegistryRoleName,
-			},
-			Rules: []rbacv1.PolicyRule{
-				rbacv1helpers.NewRule("list").Groups(kapiGroup).Resources("limitranges", "resourcequotas", "imagestreams").RuleOrDie(),
-
-				rbacv1helpers.NewRule("get", "delete").Groups(imageGroup, legacyImageGroup).Resources("images", "imagestreamtags", "imagetags").RuleOrDie(),
-				rbacv1helpers.NewRule("get").Groups(imageGroup, legacyImageGroup).Resources("imagestreamimages", "imagestreams/secrets").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "update").Groups(imageGroup, legacyImageGroup).Resources("images", "imagestreams").RuleOrDie(),
-				rbacv1helpers.NewRule("create").Groups(imageGroup, legacyImageGroup).Resources("imagestreammappings").RuleOrDie(),
-			},
-		},
-		{
-			ObjectMeta: metav1.ObjectMeta{
 				Name: NodeAdminRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
