@@ -9,7 +9,6 @@ items:
     name: sudoer
   rules:
   - apiGroups:
-    - ""
     - user.openshift.io
     resourceNames:
     - system:admin
@@ -19,7 +18,6 @@ items:
     verbs:
     - impersonate
   - apiGroups:
-    - ""
     - user.openshift.io
     resourceNames:
     - system:masters
@@ -250,7 +248,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - authorization.openshift.io
     resources:
     - clusterrolebindings
@@ -263,7 +260,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/details
@@ -272,7 +268,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - images
@@ -282,14 +277,12 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/layers
     verbs:
     - get
   - apiGroups:
-    - ""
     - oauth.openshift.io
     resources:
     - oauthclientauthorizations
@@ -298,7 +291,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - project.openshift.io
     resources:
     - projects
@@ -306,7 +298,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - project.openshift.io
     resources:
     - projectrequests
@@ -315,7 +306,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - quota.openshift.io
     resources:
     - clusterresourcequotas
@@ -325,7 +315,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - network.openshift.io
     resources:
     - clusternetworks
@@ -337,7 +326,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - security.openshift.io
     resources:
     - securitycontextconstraints
@@ -354,7 +342,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - template.openshift.io
     resources:
     - brokertemplateinstances
@@ -364,7 +351,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - user.openshift.io
     resources:
     - groups
@@ -376,7 +362,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - authorization.openshift.io
     resources:
     - localresourceaccessreviews
@@ -403,7 +388,6 @@ items:
     verbs:
     - create
   - apiGroups:
-    - ""
     - security.openshift.io
     resources:
     - podsecuritypolicyreviews
@@ -452,7 +436,6 @@ items:
     name: system:build-strategy-docker
   rules:
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/docker
@@ -468,7 +451,6 @@ items:
     name: system:build-strategy-custom
   rules:
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/custom
@@ -483,7 +465,6 @@ items:
     name: system:build-strategy-source
   rules:
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/source
@@ -498,7 +479,6 @@ items:
     name: system:build-strategy-jenkinspipeline
   rules:
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/jenkinspipeline
@@ -566,7 +546,6 @@ items:
     name: system:openshift:aggregate-to-admin
   rules:
   - apiGroups:
-    - ""
     - authorization.openshift.io
     resources:
     - rolebindings
@@ -581,7 +560,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - authorization.openshift.io
     resources:
     - localresourceaccessreviews
@@ -590,7 +568,6 @@ items:
     verbs:
     - create
   - apiGroups:
-    - ""
     - security.openshift.io
     resources:
     - podsecuritypolicyreviews
@@ -599,7 +576,6 @@ items:
     verbs:
     - create
   - apiGroups:
-    - ""
     - authorization.openshift.io
     resources:
     - rolebindingrestrictions
@@ -608,7 +584,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildconfigs
@@ -624,7 +599,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/log
@@ -633,7 +607,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildconfigs/instantiate
@@ -642,7 +615,6 @@ items:
     verbs:
     - create
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/details
@@ -657,7 +629,6 @@ items:
     - edit
     - view
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs
@@ -672,7 +643,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigrollbacks
@@ -681,7 +651,6 @@ items:
     verbs:
     - create
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs/log
@@ -691,7 +660,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimages
@@ -710,7 +678,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/status
@@ -719,7 +686,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/layers
@@ -727,14 +693,12 @@ items:
     - get
     - update
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimports
     verbs:
     - create
   - apiGroups:
-    - ""
     - project.openshift.io
     resources:
     - projects
@@ -744,7 +708,6 @@ items:
     - patch
     - update
   - apiGroups:
-    - ""
     - quota.openshift.io
     resources:
     - appliedclusterresourcequotas
@@ -753,7 +716,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - route.openshift.io
     resources:
     - routes
@@ -767,14 +729,12 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - route.openshift.io
     resources:
     - routes/custom-host
     verbs:
     - create
   - apiGroups:
-    - ""
     - route.openshift.io
     resources:
     - routes/status
@@ -783,14 +743,12 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - route.openshift.io
     resources:
     - routes/status
     verbs:
     - update
   - apiGroups:
-    - ""
     - template.openshift.io
     resources:
     - processedtemplates
@@ -821,7 +779,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildlogs
@@ -843,7 +800,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - authorization.openshift.io
     resources:
     - resourceaccessreviews
@@ -861,7 +817,6 @@ items:
     name: system:openshift:aggregate-to-edit
   rules:
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildconfigs
@@ -877,7 +832,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/log
@@ -886,7 +840,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildconfigs/instantiate
@@ -895,7 +848,6 @@ items:
     verbs:
     - create
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/details
@@ -909,7 +861,6 @@ items:
     - edit
     - view
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs
@@ -924,7 +875,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigrollbacks
@@ -933,7 +883,6 @@ items:
     verbs:
     - create
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs/log
@@ -943,7 +892,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimages
@@ -962,7 +910,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/status
@@ -971,7 +918,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/layers
@@ -979,21 +925,18 @@ items:
     - get
     - update
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimports
     verbs:
     - create
   - apiGroups:
-    - ""
     - project.openshift.io
     resources:
     - projects
     verbs:
     - get
   - apiGroups:
-    - ""
     - quota.openshift.io
     resources:
     - appliedclusterresourcequotas
@@ -1002,7 +945,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - route.openshift.io
     resources:
     - routes
@@ -1016,14 +958,12 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - route.openshift.io
     resources:
     - routes/custom-host
     verbs:
     - create
   - apiGroups:
-    - ""
     - route.openshift.io
     resources:
     - routes/status
@@ -1032,7 +972,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - template.openshift.io
     resources:
     - processedtemplates
@@ -1063,7 +1002,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildlogs
@@ -1095,7 +1033,6 @@ items:
     name: system:openshift:aggregate-to-view
   rules:
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildconfigs
@@ -1106,7 +1043,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/log
@@ -1121,7 +1057,6 @@ items:
     verbs:
     - view
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs
@@ -1131,7 +1066,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs/log
@@ -1141,7 +1075,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimages
@@ -1154,7 +1087,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/status
@@ -1163,14 +1095,12 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - project.openshift.io
     resources:
     - projects
     verbs:
     - get
   - apiGroups:
-    - ""
     - quota.openshift.io
     resources:
     - appliedclusterresourcequotas
@@ -1179,7 +1109,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - route.openshift.io
     resources:
     - routes
@@ -1188,7 +1117,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - route.openshift.io
     resources:
     - routes/status
@@ -1197,7 +1125,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - template.openshift.io
     resources:
     - processedtemplates
@@ -1209,7 +1136,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildlogs
@@ -1235,7 +1161,6 @@ items:
     name: basic-user
   rules:
   - apiGroups:
-    - ""
     - user.openshift.io
     resourceNames:
     - "~"
@@ -1244,14 +1169,12 @@ items:
     verbs:
     - get
   - apiGroups:
-    - ""
     - project.openshift.io
     resources:
     - projectrequests
     verbs:
     - list
   - apiGroups:
-    - ""
     - authorization.openshift.io
     resources:
     - clusterroles
@@ -1274,7 +1197,6 @@ items:
     - get
     - list
   - apiGroups:
-    - ""
     - project.openshift.io
     resources:
     - projects
@@ -1282,7 +1204,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - authorization.openshift.io
     resources:
     - selfsubjectrulesreviews
@@ -1303,7 +1224,6 @@ items:
     name: self-access-reviewer
   rules:
   - apiGroups:
-    - ""
     - authorization.openshift.io
     resources:
     - selfsubjectrulesreviews
@@ -1325,7 +1245,6 @@ items:
     name: self-provisioner
   rules:
   - apiGroups:
-    - ""
     - project.openshift.io
     resources:
     - projectrequests
@@ -1375,7 +1294,6 @@ items:
     name: system:image-auditor
   rules:
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - images
@@ -1395,7 +1313,6 @@ items:
     name: system:image-puller
   rules:
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/layers
@@ -1412,7 +1329,6 @@ items:
     name: system:image-pusher
   rules:
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/layers
@@ -1433,7 +1349,6 @@ items:
     name: system:image-builder
   rules:
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/layers
@@ -1441,21 +1356,18 @@ items:
     - get
     - update
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams
     verbs:
     - create
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/details
     verbs:
     - update
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds
@@ -1484,7 +1396,6 @@ items:
     verbs:
     - list
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildconfigs
@@ -1493,7 +1404,6 @@ items:
     - get
     - list
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs
@@ -1525,14 +1435,12 @@ items:
     - get
     - list
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - images
     verbs:
     - delete
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - images
@@ -1542,7 +1450,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/status
@@ -1557,7 +1464,6 @@ items:
     name: system:image-signer
   rules:
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - images
@@ -1565,7 +1471,6 @@ items:
     verbs:
     - get
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagesignatures
@@ -1627,7 +1532,6 @@ items:
     - create
     - list
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamtags
@@ -1662,7 +1566,6 @@ items:
     name: system:oauth-token-deleter
   rules:
   - apiGroups:
-    - ""
     - oauth.openshift.io
     resources:
     - oauthaccesstokens
@@ -1704,7 +1607,6 @@ items:
     verbs:
     - create
   - apiGroups:
-    - ""
     - route.openshift.io
     resources:
     - routes
@@ -1712,7 +1614,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - route.openshift.io
     resources:
     - routes/status
@@ -1735,7 +1636,6 @@ items:
     verbs:
     - list
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - images
@@ -1745,7 +1645,6 @@ items:
     - delete
     - get
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimages
@@ -1753,7 +1652,6 @@ items:
     verbs:
     - get
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - images
@@ -1762,7 +1660,6 @@ items:
     - get
     - update
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreammappings
@@ -1839,7 +1736,6 @@ items:
     name: system:sdn-reader
   rules:
   - apiGroups:
-    - ""
     - network.openshift.io
     resources:
     - egressnetworkpolicies
@@ -1875,7 +1771,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - network.openshift.io
     resources:
     - clusternetworks
@@ -1898,7 +1793,6 @@ items:
     name: system:sdn-manager
   rules:
   - apiGroups:
-    - ""
     - network.openshift.io
     resources:
     - hostsubnets
@@ -1910,7 +1804,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - network.openshift.io
     resources:
     - clusternetworks
@@ -1934,7 +1827,6 @@ items:
     name: system:webhook
   rules:
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildconfigs/webhooks
@@ -1995,7 +1887,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimages
@@ -2014,14 +1905,12 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimports
     verbs:
     - create
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/layers
@@ -2029,7 +1918,6 @@ items:
     - get
     - update
   - apiGroups:
-    - ""
     - authorization.openshift.io
     resources:
     - rolebindings
@@ -2058,7 +1946,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - authorization.openshift.io
     resources:
     - localresourceaccessreviews
@@ -2079,7 +1966,6 @@ items:
     verbs:
     - get
   - apiGroups:
-    - ""
     - project.openshift.io
     resources:
     - projects
@@ -2087,7 +1973,6 @@ items:
     - delete
     - get
   - apiGroups:
-    - ""
     - authorization.openshift.io
     resources:
     - resourceaccessreviews
@@ -2119,7 +2004,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimages
@@ -2138,14 +2022,12 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimports
     verbs:
     - create
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/layers
@@ -2159,7 +2041,6 @@ items:
     verbs:
     - get
   - apiGroups:
-    - ""
     - project.openshift.io
     resources:
     - projects
@@ -2176,7 +2057,6 @@ items:
     name: registry-viewer
   rules:
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimages
@@ -2189,7 +2069,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/layers
@@ -2202,7 +2081,6 @@ items:
     verbs:
     - get
   - apiGroups:
-    - ""
     - project.openshift.io
     resources:
     - projects
@@ -2232,7 +2110,6 @@ items:
     name: system:openshift:controller:build-controller
   rules:
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds
@@ -2244,21 +2121,18 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/finalizers
     verbs:
     - update
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildconfigs
     verbs:
     - get
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/custom
@@ -2269,7 +2143,6 @@ items:
     verbs:
     - create
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams
@@ -2314,7 +2187,6 @@ items:
     - get
     - list
   - apiGroups:
-    - ""
     - security.openshift.io
     resources:
     - podsecuritypolicysubjectreviews
@@ -2344,7 +2216,6 @@ items:
     name: system:openshift:controller:build-config-change-controller
   rules:
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildconfigs
@@ -2353,14 +2224,12 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildconfigs/instantiate
     verbs:
     - create
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds
@@ -2451,21 +2320,18 @@ items:
     - get
     - update
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs/status
     verbs:
     - update
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs/finalizers
     verbs:
     - update
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs
@@ -2629,7 +2495,6 @@ items:
     name: system:openshift:controller:image-trigger-controller
   rules:
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams
@@ -2666,7 +2531,6 @@ items:
     - get
     - update
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs
@@ -2674,14 +2538,12 @@ items:
     - get
     - update
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - buildconfigs/instantiate
     verbs:
     - create
   - apiGroups:
-    - ""
     - build.openshift.io
     resources:
     - builds/custom
@@ -2743,7 +2605,6 @@ items:
     name: system:openshift:controller:image-import-controller
   rules:
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams
@@ -2754,7 +2615,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - images
@@ -2767,7 +2627,6 @@ items:
     - update
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimports
@@ -2804,7 +2663,6 @@ items:
     - get
     - list
   - apiGroups:
-    - ""
     - quota.openshift.io
     resources:
     - clusterresourcequotas/status
@@ -2843,7 +2701,6 @@ items:
     - patch
     - update
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs
@@ -2861,7 +2718,6 @@ items:
     - get
     - update
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs/scale
@@ -3084,7 +2940,6 @@ items:
     name: system:openshift:controller:horizontal-pod-autoscaler
   rules:
   - apiGroups:
-    - ""
     - apps.openshift.io
     resources:
     - deploymentconfigs/scale
@@ -3156,12 +3011,6 @@ items:
     resources:
     - configmaps
     - services
-    verbs:
-    - get
-  - apiGroups:
-    - ""
-    resources:
-    - routes
     verbs:
     - get
   - apiGroups:

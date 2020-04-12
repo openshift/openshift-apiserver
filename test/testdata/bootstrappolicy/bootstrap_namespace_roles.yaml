@@ -10,7 +10,6 @@ items:
     namespace: openshift
   rules:
   - apiGroups:
-    - ""
     - template.openshift.io
     resources:
     - templates
@@ -19,7 +18,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreamimages
@@ -31,7 +29,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - ""
     - image.openshift.io
     resources:
     - imagestreams/layers
