@@ -70,7 +70,7 @@ func (s *InstantiateREST) Create(ctx context.Context, obj runtime.Object, create
 			},
 		)
 	}
-	return s.generator.InstantiateInternal(ctx, request)
+	return s.generator.InstantiateInternal(ctx, request, *options)
 }
 
 func (s *InstantiateREST) ProducesObject(verb string) interface{} {
@@ -196,7 +196,7 @@ func (h *binaryInstantiateHandler) handle(r io.Reader) (runtime.Object, error) {
 	var instErr error
 	start := time.Now()
 	if err := wait.Poll(time.Second, h.r.Timeout, func() (bool, error) {
-		result, instErr = h.r.Generator.InstantiateInternal(h.ctx, request)
+		result, instErr = h.r.Generator.InstantiateInternal(h.ctx, request, metav1.CreateOptions{})
 		if instErr != nil {
 			if errors.IsNotFound(instErr) {
 				if s, ok := instErr.(errors.APIStatus); ok {

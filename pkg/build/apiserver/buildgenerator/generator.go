@@ -198,12 +198,12 @@ func updateBuildArgs(oldArgs *[]corev1.EnvVar, newArgs []corev1.EnvVar) []corev1
 }
 
 // DEPRECATED: Use only by apiserver
-func (g *BuildGenerator) InstantiateInternal(ctx context.Context, request *buildapi.BuildRequest) (*buildapi.Build, error) {
+func (g *BuildGenerator) InstantiateInternal(ctx context.Context, request *buildapi.BuildRequest, opts metav1.CreateOptions) (*buildapi.Build, error) {
 	versionedRequest := &buildv1.BuildRequest{}
 	if err := legacyscheme.Scheme.Convert(request, versionedRequest, nil); err != nil {
 		return nil, fmt.Errorf("failed to convert internal BuildRequest to external: %v", err)
 	}
-	build, err := g.Instantiate(ctx, versionedRequest)
+	build, err := g.Instantiate(ctx, versionedRequest, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -215,11 +215,11 @@ func (g *BuildGenerator) InstantiateInternal(ctx context.Context, request *build
 }
 
 // Instantiate returns a new Build object based on a BuildRequest object
-func (g *BuildGenerator) Instantiate(ctx context.Context, request *buildv1.BuildRequest) (*buildv1.Build, error) {
+func (g *BuildGenerator) Instantiate(ctx context.Context, request *buildv1.BuildRequest, opts metav1.CreateOptions) (*buildv1.Build, error) {
 	var build *buildv1.Build
 	var err error
 	for i := 0; i < conflictRetries; i++ {
-		build, err = g.instantiate(ctx, request)
+		build, err = g.instantiate(ctx, request, opts)
 		if errors.IsConflict(err) {
 			klog.V(2).Infof("instantiate returned conflict, try %d/%d", i+1, conflictRetries)
 			continue
@@ -234,7 +234,7 @@ func (g *BuildGenerator) Instantiate(ctx context.Context, request *buildv1.Build
 	return build, err
 }
 
-func (g *BuildGenerator) instantiate(ctx context.Context, request *buildv1.BuildRequest) (*buildv1.Build, error) {
+func (g *BuildGenerator) instantiate(ctx context.Context, request *buildv1.BuildRequest, opts metav1.CreateOptions) (*buildv1.Build, error) {
 	klog.V(4).Infof("Generating Build from %s", describeBuildRequest(request))
 	bc, err := g.Client.GetBuildConfig(ctx, request.Name, metav1.GetOptions{})
 	if err != nil {
@@ -323,7 +323,7 @@ func (g *BuildGenerator) instantiate(ctx context.Context, request *buildv1.Build
 	// create the corresponding build, however doing things in that order
 	// allows for a race condition in which two builds get kicked off.  Doing
 	// it in this order ensures that we catch the race while updating the BC.
-	return g.createBuild(ctx, newBuild)
+	return g.createBuild(ctx, newBuild, opts)
 }
 
 // checkLastVersion will return an error if the BuildConfig's LastVersion doesn't match the passed in lastVersion
@@ -463,7 +463,7 @@ func (g *BuildGenerator) clone(ctx context.Context, request *buildv1.BuildReques
 		}
 	}
 
-	return g.createBuild(ctx, newBuild)
+	return g.createBuild(ctx, newBuild, metav1.CreateOptions{})
 }
 
 // GeneratorFatalError represents a fatal error while generating a build.
@@ -479,12 +479,12 @@ func (e *generatorFatalError) Error() string {
 }
 
 // createBuild is responsible for validating build object and saving it and returning newly created object
-func (g *BuildGenerator) createBuild(ctx context.Context, build *buildv1.Build) (*buildv1.Build, error) {
+func (g *BuildGenerator) createBuild(ctx context.Context, build *buildv1.Build, opts metav1.CreateOptions) (*buildv1.Build, error) {
 	if !rest.ValidNamespace(ctx, &build.ObjectMeta) {
 		return nil, errors.NewConflict(buildv1.Resource("build"), build.Namespace, fmt.Errorf("Build.Namespace does not match the provided context"))
 	}
 	rest.FillObjectMetaSystemFields(&build.ObjectMeta)
-	err := g.Client.CreateBuild(ctx, build, metav1.CreateOptions{})
+	err := g.Client.CreateBuild(ctx, build, opts)
 	if err != nil {
 		return nil, err
 	}

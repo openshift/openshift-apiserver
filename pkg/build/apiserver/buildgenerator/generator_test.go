@@ -56,7 +56,7 @@ const (
 
 func TestInstantiate(t *testing.T) {
 	generator := mockBuildGenerator(nil, nil, nil, nil, nil, nil, nil)
-	_, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{})
+	_, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{}, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
@@ -64,7 +64,7 @@ func TestInstantiate(t *testing.T) {
 
 func TestInstantiateBinary(t *testing.T) {
 	generator := mockBuildGenerator(nil, nil, nil, nil, nil, nil, nil)
-	build, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{Binary: &buildv1.BinaryBuildSource{}})
+	build, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{Binary: &buildv1.BinaryBuildSource{}}, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
@@ -108,7 +108,7 @@ func TestInstantiateRetry(t *testing.T) {
 			},
 		}}
 
-	_, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{})
+	_, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{}, metav1.CreateOptions{})
 	if err == nil || !strings.Contains(err.Error(), "update-error") {
 		t.Errorf("Expected update-error, got different %v", err)
 	}
@@ -159,7 +159,7 @@ func TestInstantiateDeletingError(t *testing.T) {
 			return build, nil
 		},
 	}}
-	_, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{})
+	_, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{}, metav1.CreateOptions{})
 	if err == nil || !strings.Contains(err.Error(), "BuildConfig is paused") {
 		t.Errorf("Expected error, got different %v", err)
 	}
@@ -208,7 +208,7 @@ func TestInstantiateBinaryRemoved(t *testing.T) {
 		return build, nil
 	}
 
-	build, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{})
+	build, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{}, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
@@ -240,7 +240,7 @@ func TestInstantiateGetBuildConfigError(t *testing.T) {
 		},
 	}}
 
-	_, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{})
+	_, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{}, metav1.CreateOptions{})
 	if err == nil || !strings.Contains(err.Error(), "get-error") {
 		t.Errorf("Expected get-error, got different %v", err)
 	}
@@ -260,7 +260,7 @@ func TestInstantiateGenerateBuildError(t *testing.T) {
 			},
 		}}
 
-	_, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{})
+	_, err := generator.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{}, metav1.CreateOptions{})
 	if err == nil || !strings.Contains(err.Error(), "get-error") {
 		t.Errorf("Expected get-error, got different %v", err)
 	}
@@ -437,7 +437,7 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 			},
 			From: tc.reqFrom,
 		}
-		_, err := generator.Instantiate(apirequest.NewDefaultContext(), req)
+		_, err := generator.Instantiate(apirequest.NewDefaultContext(), req, metav1.CreateOptions{})
 		if err != nil && !tc.errorExpected {
 			t.Errorf("%s: unexpected error %v", tc.name, err)
 			continue
@@ -545,7 +545,7 @@ func TestInstantiateWithBuildRequestEnvs(t *testing.T) {
 		client := generator.Client.(TestingClient)
 		client.GetBuildConfigFunc = tc.bcfunc
 		generator.Client = client
-		build, err := generator.Instantiate(apirequest.NewDefaultContext(), &tc.req)
+		build, err := generator.Instantiate(apirequest.NewDefaultContext(), &tc.req, metav1.CreateOptions{})
 		if err != nil {
 			t.Errorf("unexpected error %v", err)
 		} else {
@@ -600,21 +600,21 @@ func TestInstantiateWithLastVersion(t *testing.T) {
 	g.Client = c
 
 	// Version not specified
-	_, err := g.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{})
+	_, err := g.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{}, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
 
 	// Version specified and it matches
 	lastVersion := int64(1)
-	_, err = g.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{LastVersion: &lastVersion})
+	_, err = g.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{LastVersion: &lastVersion}, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
 
 	// Version specified, but doesn't match
 	lastVersion = 0
-	_, err = g.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{LastVersion: &lastVersion})
+	_, err = g.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{LastVersion: &lastVersion}, metav1.CreateOptions{})
 	if err == nil {
 		t.Errorf("Expected an error and did not get one")
 	}
@@ -628,7 +628,7 @@ func TestInstantiateWithMissingImageStream(t *testing.T) {
 	}
 	g.Client = c
 
-	_, err := g.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{})
+	_, err := g.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{}, metav1.CreateOptions{})
 	se, ok := err.(*errors.StatusError)
 
 	if !ok {
@@ -671,7 +671,7 @@ func TestInstantiateWithLabelsAndAnnotations(t *testing.T) {
 		},
 	}
 
-	build, err := g.Instantiate(apirequest.NewDefaultContext(), req)
+	build, err := g.Instantiate(apirequest.NewDefaultContext(), req, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
@@ -867,7 +867,7 @@ func TestCreateBuild(t *testing.T) {
 		},
 	}}
 
-	build, err := generator.createBuild(apirequest.NewDefaultContext(), build)
+	build, err := generator.createBuild(apirequest.NewDefaultContext(), build, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("Unexpected error %v", err)
 	}
@@ -884,7 +884,7 @@ func TestCreateBuildNamespaceError(t *testing.T) {
 	}
 	generator := mockBuildGenerator(nil, nil, nil, nil, nil, nil, nil)
 
-	_, err := generator.createBuild(apirequest.NewContext(), build)
+	_, err := generator.createBuild(apirequest.NewContext(), build, metav1.CreateOptions{})
 	if err == nil || !strings.Contains(err.Error(), "Build.Namespace") {
 		t.Errorf("Expected namespace error, got different %v", err)
 	}
@@ -903,7 +903,7 @@ func TestCreateBuildCreateError(t *testing.T) {
 		},
 	}}
 
-	_, err := generator.createBuild(apirequest.NewDefaultContext(), build)
+	_, err := generator.createBuild(apirequest.NewDefaultContext(), build, metav1.CreateOptions{})
 	if err == nil || !strings.Contains(err.Error(), "create-error") {
 		t.Errorf("Expected create-error, got different %v", err)
 	}
@@ -1880,7 +1880,7 @@ func TestInstantiateBuildTriggerCauseConfigChange(t *testing.T) {
 		),
 	}
 	generator := mockBuildGenerator(nil, nil, nil, nil, nil, nil, nil)
-	buildObject, err := generator.Instantiate(apirequest.NewDefaultContext(), buildRequest)
+	buildObject, err := generator.Instantiate(apirequest.NewDefaultContext(), buildRequest, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %v", err)
 	}
@@ -1915,7 +1915,7 @@ func TestInstantiateBuildTriggerCauseImageChange(t *testing.T) {
 	}
 
 	generator := mockBuildGenerator(nil, nil, nil, nil, nil, nil, nil)
-	buildObject, err := generator.Instantiate(apirequest.NewDefaultContext(), buildRequest)
+	buildObject, err := generator.Instantiate(apirequest.NewDefaultContext(), buildRequest, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %v", err)
 	}
@@ -1963,7 +1963,7 @@ func TestInstantiateBuildTriggerCauseGenericWebHook(t *testing.T) {
 	}
 
 	generator := mockBuildGenerator(nil, nil, nil, nil, nil, nil, nil)
-	buildObject, err := generator.Instantiate(apirequest.NewDefaultContext(), buildRequest)
+	buildObject, err := generator.Instantiate(apirequest.NewDefaultContext(), buildRequest, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %v", err)
 	}
@@ -2008,7 +2008,7 @@ func TestInstantiateBuildTriggerCauseGitHubWebHook(t *testing.T) {
 	}
 
 	generator := mockBuildGenerator(nil, nil, nil, nil, nil, nil, nil)
-	buildObject, err := generator.Instantiate(apirequest.NewDefaultContext(), buildRequest)
+	buildObject, err := generator.Instantiate(apirequest.NewDefaultContext(), buildRequest, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %v", err)
 	}
@@ -2055,7 +2055,7 @@ func TestInstantiateBuildTriggerCauseGitLabWebHook(t *testing.T) {
 	}
 
 	generator := mockBuildGenerator(nil, nil, nil, nil, nil, nil, nil)
-	buildObject, err := generator.Instantiate(apirequest.NewDefaultContext(), buildRequest)
+	buildObject, err := generator.Instantiate(apirequest.NewDefaultContext(), buildRequest, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %v", err)
 	}
@@ -2102,7 +2102,7 @@ func TestInstantiateBuildTriggerCauseBitbucketWebHook(t *testing.T) {
 	}
 
 	generator := mockBuildGenerator(nil, nil, nil, nil, nil, nil, nil)
-	buildObject, err := generator.Instantiate(apirequest.NewDefaultContext(), buildRequest)
+	buildObject, err := generator.Instantiate(apirequest.NewDefaultContext(), buildRequest, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %v", err)
 	}
@@ -2144,7 +2144,7 @@ func TestOverrideDockerStrategyNoCacheOption(t *testing.T) {
 	}
 
 	g := mockBuildGenerator(buildConfigFunc, nil, nil, nil, nil, nil, nil)
-	build, err := g.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{})
+	build, err := g.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{}, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Unexpected error encountered:  %v", err)
 	}
@@ -2184,7 +2184,7 @@ func TestOverrideSourceStrategyIncrementalOption(t *testing.T) {
 	}
 
 	g := mockBuildGenerator(buildConfigFunc, nil, nil, nil, nil, nil, nil)
-	build, err := g.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{})
+	build, err := g.Instantiate(apirequest.NewDefaultContext(), &buildv1.BuildRequest{}, metav1.CreateOptions{})
 	if err != nil {
 		t.Errorf("Unexpected error encountered:  %v", err)
 	}
