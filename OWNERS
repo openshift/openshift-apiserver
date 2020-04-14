@@ -6,3 +6,4 @@ approvers:
   - deads2k
   - mfojtik
   - sttts
+component: openshift-apiserver
