@@ -3,8 +3,9 @@ package validation
 import (
 	"fmt"
 	"reflect"
+	"runtime"
 
-	"k8s.io/apimachinery/pkg/runtime"
+	kruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -13,11 +14,11 @@ type WrappingValidator struct {
 	validateUpdate *reflect.Value
 }
 
-func (v *WrappingValidator) Validate(obj runtime.Object) field.ErrorList {
+func (v *WrappingValidator) Validate(obj kruntime.Object) field.ErrorList {
 	return callValidate(reflect.ValueOf(obj), *v.validate)
 }
 
-func (v *WrappingValidator) ValidateUpdate(obj, old runtime.Object) field.ErrorList {
+func (v *WrappingValidator) ValidateUpdate(obj, old kruntime.Object) field.ErrorList {
 	if v.validateUpdate == nil {
 		// if there is no update validation, fail.
 		return field.ErrorList{field.Forbidden(field.NewPath("obj"), fmt.Sprintf("%v", obj))}
@@ -30,7 +31,8 @@ func NewValidationWrapper(validateFunction interface{}, validateUpdateFunction i
 	validateFunctionValue := reflect.ValueOf(validateFunction)
 	validateType := validateFunctionValue.Type()
 	if err := verifyValidateFunctionSignature(validateType); err != nil {
-		return nil, err
+		validateFunctionName := runtime.FuncForPC(validateFunctionValue.Pointer()).Name()
+		return nil, fmt.Errorf("%s: %v", validateFunctionName, err)
 	}
 
 	var validateUpdateFunctionValue *reflect.Value
@@ -38,7 +40,8 @@ func NewValidationWrapper(validateFunction interface{}, validateUpdateFunction i
 		functionValue := reflect.ValueOf(validateUpdateFunction)
 		validateUpdateType := functionValue.Type()
 		if err := verifyValidateUpdateFunctionSignature(validateUpdateType); err != nil {
-			return nil, err
+			validateUpdateName := runtime.FuncForPC(functionValue.Pointer()).Name()
+			return nil, fmt.Errorf(validateUpdateName, err)
 		}
 
 		validateUpdateFunctionValue = &functionValue
