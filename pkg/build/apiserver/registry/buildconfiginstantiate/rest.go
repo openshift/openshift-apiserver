@@ -62,7 +62,7 @@ func (s *InstantiateREST) Create(ctx context.Context, obj runtime.Object, create
 	}
 
 	request := obj.(*buildapi.BuildRequest)
-	if request.TriggeredBy == nil {
+	if len(request.TriggeredBy) == 0 {
 		buildTriggerCauses := []buildapi.BuildTriggerCause{}
 		request.TriggeredBy = append(buildTriggerCauses,
 			buildapi.BuildTriggerCause{
