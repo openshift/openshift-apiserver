@@ -543,6 +543,8 @@ github.com/openshift/kubernetes-apiserver v0.0.0-20191119111452-e7aff81895e5 h1:
 github.com/openshift/kubernetes-apiserver v0.0.0-20191119111452-e7aff81895e5/go.mod h1:nAMi+dsXDQ24G2QNSbzrtABrae/ykdz64bR7Fl1M7HY=
 github.com/openshift/kubernetes-apiserver v0.0.0-20200217093435-d6f6bec668c0 h1:tya6c1GcmdsZo8xKEi0gTxIARTN3q61EPHMGAsgeuBA=
 github.com/openshift/kubernetes-apiserver v0.0.0-20200217093435-d6f6bec668c0/go.mod h1:iJtsPpu1ZpEnHaNawpSV0nYTGBhhX2dUlnn7/QS7QiY=
+github.com/openshift/kubernetes-apiserver v0.0.0-20200414111737-95536ff33058 h1:9H0MTy71Gzf87GzlSu9CRfUXXL/hg0YBMoy/o8znaf8=
+github.com/openshift/kubernetes-apiserver v0.0.0-20200414111737-95536ff33058/go.mod h1:iJtsPpu1ZpEnHaNawpSV0nYTGBhhX2dUlnn7/QS7QiY=
 github.com/openshift/library-go v0.0.0-20191209154952-998f403c47c2 h1:Pa8bo3zKZd/d9aeXtinD7D1pNio4t1jgsEGRN9QN4VI=
 github.com/openshift/library-go v0.0.0-20191209154952-998f403c47c2/go.mod h1:NBttNjZpWwup/nthuLbPAPSYC8Qyo+BBK5bCtFoyYjo=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d h1:fLITXDjxMSvUDjnXs/zljIWktbST9+Om8XbrmmM7T4I=
