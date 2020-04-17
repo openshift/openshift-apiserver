@@ -87,7 +87,6 @@ const (
 	ImageSignerRoleName       = "system:image-signer"
 	DeployerRoleName          = "system:deployer"
 	RouterRoleName            = "system:router"
-	RegistryRoleName          = "system:registry"
 	MasterRoleName            = "system:master"
 	SDNReaderRoleName         = "system:sdn-reader"
 	SDNManagerRoleName        = "system:sdn-manager"

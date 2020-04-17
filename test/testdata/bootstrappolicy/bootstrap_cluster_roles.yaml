@@ -1724,56 +1724,6 @@ items:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
-    name: system:registry
-  rules:
-  - apiGroups:
-    - ""
-    resources:
-    - imagestreams
-    - limitranges
-    - resourcequotas
-    verbs:
-    - list
-  - apiGroups:
-    - ""
-    - image.openshift.io
-    resources:
-    - images
-    - imagestreamtags
-    - imagetags
-    verbs:
-    - delete
-    - get
-  - apiGroups:
-    - ""
-    - image.openshift.io
-    resources:
-    - imagestreamimages
-    - imagestreams/secrets
-    verbs:
-    - get
-  - apiGroups:
-    - ""
-    - image.openshift.io
-    resources:
-    - images
-    - imagestreams
-    verbs:
-    - get
-    - update
-  - apiGroups:
-    - ""
-    - image.openshift.io
-    resources:
-    - imagestreammappings
-    verbs:
-    - create
-- apiVersion: rbac.authorization.k8s.io/v1
-  kind: ClusterRole
-  metadata:
-    annotations:
-      rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:node-admin
   rules:
   - apiGroups:
