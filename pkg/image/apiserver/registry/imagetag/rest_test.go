@@ -36,12 +36,12 @@ import (
 	_ "github.com/openshift/openshift-apiserver/pkg/api/install"
 )
 
-var testDefaultRegistry = func() (string, bool) { return "defaultregistry:5000", true }
+var testDefaultRegistry = func(_ context.Context) (string, bool) { return "defaultregistry:5000", true }
 
 type fakeSubjectAccessReviewRegistry struct {
 }
 
-func (f *fakeSubjectAccessReviewRegistry) Create(subjectAccessReview *authorizationapi.SubjectAccessReview) (*authorizationapi.SubjectAccessReview, error) {
+func (f *fakeSubjectAccessReviewRegistry) Create(_ context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationapi.SubjectAccessReview, error) {
 	return nil, nil
 }
 

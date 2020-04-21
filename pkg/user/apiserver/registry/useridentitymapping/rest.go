@@ -137,7 +137,7 @@ func (s *REST) createOrUpdate(ctx context.Context, obj runtime.Object, forceCrea
 	}
 
 	// GetIdentities new user
-	newUser, err := s.userClient.Get(mapping.User.Name, metav1.GetOptions{})
+	newUser, err := s.userClient.Get(ctx, mapping.User.Name, metav1.GetOptions{})
 	if kerrs.IsNotFound(err) {
 		errs := field.ErrorList{field.Invalid(field.NewPath("user", "name"), mapping.User.Name, "referenced user does not exist")}
 		// TODO update to openshift/api
@@ -149,14 +149,14 @@ func (s *REST) createOrUpdate(ctx context.Context, obj runtime.Object, forceCrea
 
 	// UpdateUser the new user to point at the identity. If this fails, UpdateUser is re-entrant
 	if addIdentityToUser(identity, newUser) {
-		if _, err := s.userClient.Update(newUser); err != nil {
+		if _, err := s.userClient.Update(ctx, newUser, metav1.UpdateOptions{}); err != nil {
 			return nil, false, err
 		}
 	}
 
 	// UpdateUser the identity to point at the new user. If this fails. UpdateUser is re-entrant
 	if setIdentityUser(identity, newUser) {
-		if updatedIdentity, err := s.identityClient.Update(identity); err != nil {
+		if updatedIdentity, err := s.identityClient.Update(ctx, identity, metav1.UpdateOptions{}); err != nil {
 			return nil, false, err
 		} else {
 			identity = updatedIdentity
@@ -169,7 +169,7 @@ func (s *REST) createOrUpdate(ctx context.Context, obj runtime.Object, forceCrea
 	// UpdateUser the old user to no longer point at the identity.
 	// If this fails, log the error, but continue, because UpdateUser is no longer re-entrant
 	if oldUser != nil && removeIdentityFromUser(identity, oldUser) {
-		if _, err := s.userClient.Update(oldUser); err != nil {
+		if _, err := s.userClient.Update(ctx, oldUser, metav1.UpdateOptions{}); err != nil {
 			utilruntime.HandleError(fmt.Errorf("error removing identity reference %s from user %s: %v", identity.Name, oldUser.Name, err))
 		}
 	}
@@ -189,7 +189,7 @@ func (s *REST) Delete(ctx context.Context, name string, validation rest.Validate
 	// Disassociate the identity with the user first
 	// If this fails, Delete is re-entrant
 	if removeIdentityFromUser(identity, user) {
-		if _, err := s.userClient.Update(user); err != nil {
+		if _, err := s.userClient.Update(ctx, user, metav1.UpdateOptions{}); err != nil {
 			return nil, false, err
 		}
 	}
@@ -198,7 +198,7 @@ func (s *REST) Delete(ctx context.Context, name string, validation rest.Validate
 	// If this fails, log the error, but continue, because Delete is no longer re-entrant
 	// At this point, the mapping for the identity no longer exists
 	if unsetIdentityUser(identity) {
-		if _, err := s.identityClient.Update(identity); err != nil {
+		if _, err := s.identityClient.Update(ctx, identity, metav1.UpdateOptions{}); err != nil {
 			utilruntime.HandleError(fmt.Errorf("error removing user reference %s from identity %s: %v", user.Name, identity.Name, err))
 		}
 	}
@@ -219,7 +219,7 @@ func (s *REST) getRelatedObjects(ctx context.Context, name string, options *meta
 	mappingErr = kerrs.NewNotFound(userapi.Resource("useridentitymapping"), name)
 
 	// GetIdentities identity
-	identity, identityErr = s.identityClient.Get(name, *options)
+	identity, identityErr = s.identityClient.Get(ctx, name, *options)
 	if identityErr != nil {
 		return
 	}
@@ -228,7 +228,7 @@ func (s *REST) getRelatedObjects(ctx context.Context, name string, options *meta
 	}
 
 	// GetIdentities user
-	user, userErr = s.userClient.Get(identity.User.Name, *options)
+	user, userErr = s.userClient.Get(ctx, identity.User.Name, *options)
 	if userErr != nil {
 		return
 	}

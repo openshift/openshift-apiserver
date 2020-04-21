@@ -1,6 +1,7 @@
 package route
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
@@ -30,7 +31,7 @@ type testSAR struct {
 	sar   *authorizationapi.SubjectAccessReview
 }
 
-func (t *testSAR) Create(subjectAccessReview *authorizationapi.SubjectAccessReview) (*authorizationapi.SubjectAccessReview, error) {
+func (t *testSAR) Create(_ context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationapi.SubjectAccessReview, error) {
 	t.sar = subjectAccessReview
 	return &authorizationapi.SubjectAccessReview{
 		Status: authorizationapi.SubjectAccessReviewStatus{

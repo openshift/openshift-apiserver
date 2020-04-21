@@ -1,6 +1,7 @@
 package registryhostname
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strconv"
@@ -17,7 +18,7 @@ type serviceEntry struct {
 }
 
 // ResolverCacheFunc is used for resolving names to services
-type ResolverCacheFunc func(name string, options metav1.GetOptions) (*corev1.Service, error)
+type ResolverCacheFunc func(ctx context.Context, name string, options metav1.GetOptions) (*corev1.Service, error)
 
 // ServiceResolverCache is a cache used for resolving names to services
 type ServiceResolverCache struct {
@@ -34,7 +35,7 @@ func newServiceResolverCache(fill ResolverCacheFunc) *ServiceResolverCache {
 	}
 }
 
-func (c *ServiceResolverCache) get(name string) (host, port string, ok bool) {
+func (c *ServiceResolverCache) get(ctx context.Context, name string) (host, port string, ok bool) {
 	// check
 	c.lock.RLock()
 	entry, found := c.cache[name]
@@ -49,7 +50,7 @@ func (c *ServiceResolverCache) get(name string) (host, port string, ok bool) {
 	if entry, found := c.cache[name]; found {
 		return entry.host, entry.port, true
 	}
-	service, err := c.fill(name, metav1.GetOptions{})
+	service, err := c.fill(ctx, name, metav1.GetOptions{})
 	if err != nil {
 		return
 	}
@@ -85,12 +86,12 @@ func recognizeVariable(name string) (service string, host bool, ok bool) {
 	return
 }
 
-func (c *ServiceResolverCache) resolve(name string) (string, bool) {
+func (c *ServiceResolverCache) resolve(ctx context.Context, name string) (string, bool) {
 	service, isHost, ok := recognizeVariable(name)
 	if !ok {
 		return "", false
 	}
-	host, port, ok := c.get(service)
+	host, port, ok := c.get(ctx, service)
 	if !ok {
 		return "", false
 	}
@@ -103,7 +104,7 @@ func (c *ServiceResolverCache) resolve(name string) (string, bool) {
 // Defer takes a string (with optional variables) and an expansion function and returns
 // a function that can be called to get the value. This method will optimize the
 // expansion away in the event that no expansion is necessary.
-func (c *ServiceResolverCache) Defer(env string) (func() (string, bool), error) {
+func (c *ServiceResolverCache) Defer(env string) (func(context.Context) (string, bool), error) {
 	hasExpansion := false
 	invalid := []string{}
 	os.Expand(env, func(name string) string {
@@ -117,13 +118,13 @@ func (c *ServiceResolverCache) Defer(env string) (func() (string, bool), error) 
 		return nil, fmt.Errorf("invalid variable name(s): %s", strings.Join(invalid, ", "))
 	}
 	if !hasExpansion {
-		return func() (string, bool) { return env, true }, nil
+		return func(_ context.Context) (string, bool) { return env, true }, nil
 	}
 
 	// only load the value once
 	lock := sync.Mutex{}
 	loaded := false
-	return func() (string, bool) {
+	return func(ctx context.Context) (string, bool) {
 		lock.Lock()
 		defer lock.Unlock()
 		if loaded {
@@ -131,7 +132,7 @@ func (c *ServiceResolverCache) Defer(env string) (func() (string, bool), error) 
 		}
 		resolved := true
 		expand := os.Expand(env, func(s string) string {
-			s, ok := c.resolve(s)
+			s, ok := c.resolve(ctx, s)
 			resolved = resolved && ok
 			return s
 		})

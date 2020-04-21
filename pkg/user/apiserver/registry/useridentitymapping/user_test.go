@@ -1,6 +1,8 @@
 package useridentitymapping
 
 import (
+	"context"
+
 	kerrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -27,7 +29,7 @@ type UserRegistry struct {
 	Actions *[]Action
 }
 
-func (r *UserRegistry) Get(name string, options metav1.GetOptions) (*userapi.User, error) {
+func (r *UserRegistry) Get(_ context.Context, name string, options metav1.GetOptions) (*userapi.User, error) {
 	*r.Actions = append(*r.Actions, Action{"GetUser", name})
 	if user, ok := r.GetUsers[name]; ok {
 		return user, nil
@@ -38,7 +40,7 @@ func (r *UserRegistry) Get(name string, options metav1.GetOptions) (*userapi.Use
 	return nil, kerrs.NewNotFound(userapi.Resource("user"), name)
 }
 
-func (r *UserRegistry) Create(u *userapi.User) (*userapi.User, error) {
+func (r *UserRegistry) Create(_ context.Context, u *userapi.User, _ metav1.CreateOptions) (*userapi.User, error) {
 	*r.Actions = append(*r.Actions, Action{"CreateUser", u})
 	if r.CreateUser == nil && r.CreateErr == nil {
 		return u, nil
@@ -46,7 +48,7 @@ func (r *UserRegistry) Create(u *userapi.User) (*userapi.User, error) {
 	return r.CreateUser, r.CreateErr
 }
 
-func (r *UserRegistry) Update(u *userapi.User) (*userapi.User, error) {
+func (r *UserRegistry) Update(_ context.Context, u *userapi.User, _ metav1.UpdateOptions) (*userapi.User, error) {
 	*r.Actions = append(*r.Actions, Action{"UpdateUser", u})
 	err, _ := r.UpdateErr[u.Name]
 	if r.UpdateUser == nil && err == nil {
@@ -55,7 +57,7 @@ func (r *UserRegistry) Update(u *userapi.User) (*userapi.User, error) {
 	return r.UpdateUser, err
 }
 
-func (r *UserRegistry) List(options metav1.ListOptions) (*userapi.UserList, error) {
+func (r *UserRegistry) List(_ context.Context, options metav1.ListOptions) (*userapi.UserList, error) {
 	*r.Actions = append(*r.Actions, Action{"ListUsers", options})
 	if r.ListUsers == nil && r.ListErr == nil {
 		return &userapi.UserList{}, nil

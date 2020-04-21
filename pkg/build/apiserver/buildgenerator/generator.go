@@ -45,14 +45,14 @@ type BuildGenerator struct {
 
 // GeneratorClient is the API client used by the generator
 type GeneratorClient interface {
-	GetBuildConfig(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.BuildConfig, error)
-	UpdateBuildConfig(ctx context.Context, buildConfig *buildv1.BuildConfig) error
-	GetBuild(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.Build, error)
-	CreateBuild(ctx context.Context, build *buildv1.Build) error
-	UpdateBuild(ctx context.Context, build *buildv1.Build) error
-	GetImageStream(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStream, error)
-	GetImageStreamImage(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStreamImage, error)
-	GetImageStreamTag(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStreamTag, error)
+	GetBuildConfig(ctx context.Context, name string, options metav1.GetOptions) (*buildv1.BuildConfig, error)
+	UpdateBuildConfig(ctx context.Context, buildConfig *buildv1.BuildConfig, options metav1.UpdateOptions) error
+	GetBuild(ctx context.Context, name string, options metav1.GetOptions) (*buildv1.Build, error)
+	CreateBuild(ctx context.Context, build *buildv1.Build, options metav1.CreateOptions) error
+	UpdateBuild(ctx context.Context, build *buildv1.Build, options metav1.UpdateOptions) error
+	GetImageStream(ctx context.Context, name string, options metav1.GetOptions) (*imagev1.ImageStream, error)
+	GetImageStreamImage(ctx context.Context, name string, options metav1.GetOptions) (*imagev1.ImageStreamImage, error)
+	GetImageStreamTag(ctx context.Context, name string, options metav1.GetOptions) (*imagev1.ImageStreamTag, error)
 }
 
 // Client is an implementation of the GeneratorClient interface
@@ -65,58 +65,58 @@ type Client struct {
 }
 
 // GetBuildConfig retrieves a named build config
-func (c Client) GetBuildConfig(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.BuildConfig, error) {
-	return c.BuildConfigs.BuildConfigs(apirequest.NamespaceValue(ctx)).Get(name, *options)
+func (c Client) GetBuildConfig(ctx context.Context, name string, options metav1.GetOptions) (*buildv1.BuildConfig, error) {
+	return c.BuildConfigs.BuildConfigs(apirequest.NamespaceValue(ctx)).Get(ctx, name, options)
 }
 
 // UpdateBuildConfig updates a named build config
-func (c Client) UpdateBuildConfig(ctx context.Context, buildConfig *buildv1.BuildConfig) error {
-	_, err := c.BuildConfigs.BuildConfigs(apirequest.NamespaceValue(ctx)).Update(buildConfig)
+func (c Client) UpdateBuildConfig(ctx context.Context, buildConfig *buildv1.BuildConfig, options metav1.UpdateOptions) error {
+	_, err := c.BuildConfigs.BuildConfigs(apirequest.NamespaceValue(ctx)).Update(ctx, buildConfig, options)
 	return err
 }
 
 // GetBuild retrieves a build
-func (c Client) GetBuild(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.Build, error) {
-	return c.Builds.Builds(apirequest.NamespaceValue(ctx)).Get(name, *options)
+func (c Client) GetBuild(ctx context.Context, name string, options metav1.GetOptions) (*buildv1.Build, error) {
+	return c.Builds.Builds(apirequest.NamespaceValue(ctx)).Get(ctx, name, options)
 }
 
 // CreateBuild creates a new build
-func (c Client) CreateBuild(ctx context.Context, build *buildv1.Build) error {
-	_, err := c.Builds.Builds(apirequest.NamespaceValue(ctx)).Create(build)
+func (c Client) CreateBuild(ctx context.Context, build *buildv1.Build, options metav1.CreateOptions) error {
+	_, err := c.Builds.Builds(apirequest.NamespaceValue(ctx)).Create(ctx, build, options)
 	return err
 }
 
 // UpdateBuild updates a build
-func (c Client) UpdateBuild(ctx context.Context, build *buildv1.Build) error {
-	_, err := c.Builds.Builds(apirequest.NamespaceValue(ctx)).Update(build)
+func (c Client) UpdateBuild(ctx context.Context, build *buildv1.Build, options metav1.UpdateOptions) error {
+	_, err := c.Builds.Builds(apirequest.NamespaceValue(ctx)).Update(ctx, build, options)
 	return err
 }
 
 // GetImageStream retrieves a named image stream
-func (c Client) GetImageStream(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStream, error) {
-	return c.ImageStreams.ImageStreams(apirequest.NamespaceValue(ctx)).Get(name, *options)
+func (c Client) GetImageStream(ctx context.Context, name string, options metav1.GetOptions) (*imagev1.ImageStream, error) {
+	return c.ImageStreams.ImageStreams(apirequest.NamespaceValue(ctx)).Get(ctx, name, options)
 }
 
 // GetImageStreamImage retrieves an image stream image
-func (c Client) GetImageStreamImage(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStreamImage, error) {
-	return c.ImageStreamImages.ImageStreamImages(apirequest.NamespaceValue(ctx)).Get(name, *options)
+func (c Client) GetImageStreamImage(ctx context.Context, name string, options metav1.GetOptions) (*imagev1.ImageStreamImage, error) {
+	return c.ImageStreamImages.ImageStreamImages(apirequest.NamespaceValue(ctx)).Get(ctx, name, options)
 }
 
 // GetImageStreamTag retrieves and image stream tag
-func (c Client) GetImageStreamTag(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStreamTag, error) {
-	return c.ImageStreamTags.ImageStreamTags(apirequest.NamespaceValue(ctx)).Get(name, *options)
+func (c Client) GetImageStreamTag(ctx context.Context, name string, options metav1.GetOptions) (*imagev1.ImageStreamTag, error) {
+	return c.ImageStreamTags.ImageStreamTags(apirequest.NamespaceValue(ctx)).Get(ctx, name, options)
 }
 
 // fetchServiceAccountSecrets retrieves the Secrets used for pushing and pulling
 // images from private container image registries.
-func fetchServiceAccountSecrets(secrets corev1client.SecretsGetter, serviceAccounts corev1client.ServiceAccountsGetter, namespace, serviceAccount string) ([]corev1.Secret, error) {
+func fetchServiceAccountSecrets(ctx context.Context, secrets corev1client.SecretsGetter, serviceAccounts corev1client.ServiceAccountsGetter, namespace, serviceAccount string) ([]corev1.Secret, error) {
 	var result []corev1.Secret
-	sa, err := serviceAccounts.ServiceAccounts(namespace).Get(serviceAccount, metav1.GetOptions{})
+	sa, err := serviceAccounts.ServiceAccounts(namespace).Get(ctx, serviceAccount, metav1.GetOptions{})
 	if err != nil {
 		return result, fmt.Errorf("error getting push/pull secrets for service account %s/%s: %v", namespace, serviceAccount, err)
 	}
 	for _, ref := range sa.Secrets {
-		secret, err := secrets.Secrets(namespace).Get(ref.Name, metav1.GetOptions{})
+		secret, err := secrets.Secrets(namespace).Get(ctx, ref.Name, metav1.GetOptions{})
 		if err != nil {
 			continue
 		}
@@ -198,12 +198,12 @@ func updateBuildArgs(oldArgs *[]corev1.EnvVar, newArgs []corev1.EnvVar) []corev1
 }
 
 // DEPRECATED: Use only by apiserver
-func (g *BuildGenerator) InstantiateInternal(ctx context.Context, request *buildapi.BuildRequest) (*buildapi.Build, error) {
+func (g *BuildGenerator) InstantiateInternal(ctx context.Context, request *buildapi.BuildRequest, opts metav1.CreateOptions) (*buildapi.Build, error) {
 	versionedRequest := &buildv1.BuildRequest{}
 	if err := legacyscheme.Scheme.Convert(request, versionedRequest, nil); err != nil {
 		return nil, fmt.Errorf("failed to convert internal BuildRequest to external: %v", err)
 	}
-	build, err := g.Instantiate(ctx, versionedRequest)
+	build, err := g.Instantiate(ctx, versionedRequest, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -215,11 +215,11 @@ func (g *BuildGenerator) InstantiateInternal(ctx context.Context, request *build
 }
 
 // Instantiate returns a new Build object based on a BuildRequest object
-func (g *BuildGenerator) Instantiate(ctx context.Context, request *buildv1.BuildRequest) (*buildv1.Build, error) {
+func (g *BuildGenerator) Instantiate(ctx context.Context, request *buildv1.BuildRequest, opts metav1.CreateOptions) (*buildv1.Build, error) {
 	var build *buildv1.Build
 	var err error
 	for i := 0; i < conflictRetries; i++ {
-		build, err = g.instantiate(ctx, request)
+		build, err = g.instantiate(ctx, request, opts)
 		if errors.IsConflict(err) {
 			klog.V(2).Infof("instantiate returned conflict, try %d/%d", i+1, conflictRetries)
 			continue
@@ -234,9 +234,9 @@ func (g *BuildGenerator) Instantiate(ctx context.Context, request *buildv1.Build
 	return build, err
 }
 
-func (g *BuildGenerator) instantiate(ctx context.Context, request *buildv1.BuildRequest) (*buildv1.Build, error) {
+func (g *BuildGenerator) instantiate(ctx context.Context, request *buildv1.BuildRequest, opts metav1.CreateOptions) (*buildv1.Build, error) {
 	klog.V(4).Infof("Generating Build from %s", describeBuildRequest(request))
-	bc, err := g.Client.GetBuildConfig(ctx, request.Name, &metav1.GetOptions{})
+	bc, err := g.Client.GetBuildConfig(ctx, request.Name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -313,7 +313,7 @@ func (g *BuildGenerator) instantiate(ctx context.Context, request *buildv1.Build
 
 	// need to update the BuildConfig because LastVersion and possibly
 	// LastTriggeredImageID changed
-	if err := g.Client.UpdateBuildConfig(ctx, bc); err != nil {
+	if err := g.Client.UpdateBuildConfig(ctx, bc, metav1.UpdateOptions{}); err != nil {
 		klog.V(2).Infof("Failed to update BuildConfig %s/%s so no Build will be created", bc.Namespace, bc.Name)
 		return nil, err
 	}
@@ -323,7 +323,7 @@ func (g *BuildGenerator) instantiate(ctx context.Context, request *buildv1.Build
 	// create the corresponding build, however doing things in that order
 	// allows for a race condition in which two builds get kicked off.  Doing
 	// it in this order ensures that we catch the race while updating the BC.
-	return g.createBuild(ctx, newBuild)
+	return g.createBuild(ctx, newBuild, opts)
 }
 
 // checkLastVersion will return an error if the BuildConfig's LastVersion doesn't match the passed in lastVersion
@@ -417,14 +417,14 @@ func (g *BuildGenerator) Clone(ctx context.Context, request *buildv1.BuildReques
 
 func (g *BuildGenerator) clone(ctx context.Context, request *buildv1.BuildRequest) (*buildv1.Build, error) {
 	klog.V(4).Infof("Generating build from build %s/%s", request.Namespace, request.Name)
-	build, err := g.Client.GetBuild(ctx, request.Name, &metav1.GetOptions{})
+	build, err := g.Client.GetBuild(ctx, request.Name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
 
 	var buildConfig *buildv1.BuildConfig
 	if build.Status.Config != nil {
-		buildConfig, err = g.Client.GetBuildConfig(ctx, build.Status.Config.Name, &metav1.GetOptions{})
+		buildConfig, err = g.Client.GetBuildConfig(ctx, build.Status.Config.Name, metav1.GetOptions{})
 		if err != nil && !errors.IsNotFound(err) {
 			return nil, err
 		}
@@ -457,13 +457,13 @@ func (g *BuildGenerator) clone(ctx context.Context, request *buildv1.BuildReques
 
 	// need to update the BuildConfig because LastVersion changed
 	if buildConfig != nil {
-		if err := g.Client.UpdateBuildConfig(ctx, buildConfig); err != nil {
+		if err := g.Client.UpdateBuildConfig(ctx, buildConfig, metav1.UpdateOptions{}); err != nil {
 			klog.V(4).Infof("Failed to update BuildConfig %s/%s so no Build will be created", buildConfig.Namespace, buildConfig.Name)
 			return nil, err
 		}
 	}
 
-	return g.createBuild(ctx, newBuild)
+	return g.createBuild(ctx, newBuild, metav1.CreateOptions{})
 }
 
 // GeneratorFatalError represents a fatal error while generating a build.
@@ -479,16 +479,16 @@ func (e *generatorFatalError) Error() string {
 }
 
 // createBuild is responsible for validating build object and saving it and returning newly created object
-func (g *BuildGenerator) createBuild(ctx context.Context, build *buildv1.Build) (*buildv1.Build, error) {
+func (g *BuildGenerator) createBuild(ctx context.Context, build *buildv1.Build, opts metav1.CreateOptions) (*buildv1.Build, error) {
 	if !rest.ValidNamespace(ctx, &build.ObjectMeta) {
 		return nil, errors.NewConflict(buildv1.Resource("build"), build.Namespace, fmt.Errorf("Build.Namespace does not match the provided context"))
 	}
 	rest.FillObjectMetaSystemFields(&build.ObjectMeta)
-	err := g.Client.CreateBuild(ctx, build)
+	err := g.Client.CreateBuild(ctx, build, opts)
 	if err != nil {
 		return nil, err
 	}
-	return g.Client.GetBuild(ctx, build.Name, &metav1.GetOptions{})
+	return g.Client.GetBuild(ctx, build.Name, metav1.GetOptions{})
 }
 
 // generateBuildFromConfig generates a build definition based on the current imageid
@@ -556,7 +556,7 @@ func (g *BuildGenerator) generateBuildFromConfig(ctx context.Context, bc *buildv
 
 	var builderSecrets []corev1.Secret
 	var err error
-	if builderSecrets, err = fetchServiceAccountSecrets(g.Secrets, g.ServiceAccounts, bcCopy.Namespace, serviceAccount); err != nil {
+	if builderSecrets, err = fetchServiceAccountSecrets(ctx, g.Secrets, g.ServiceAccounts, bcCopy.Namespace, serviceAccount); err != nil {
 		return nil, err
 	}
 
@@ -690,7 +690,7 @@ func (g *BuildGenerator) resolveImageStreamReference(ctx context.Context, from c
 			klog.V(2).Info(err)
 			return "", err
 		}
-		stream, err := g.Client.GetImageStream(apirequest.WithNamespace(ctx, namespace), name, &metav1.GetOptions{})
+		stream, err := g.Client.GetImageStream(apirequest.WithNamespace(ctx, namespace), name, metav1.GetOptions{})
 		if err != nil {
 			err = resolveError(from.Kind, namespace, from.Name, err)
 			klog.V(2).Info(err)
@@ -712,7 +712,7 @@ func (g *BuildGenerator) resolveImageStreamReference(ctx context.Context, from c
 			klog.V(2).Info(err)
 			return "", err
 		}
-		stream, err := g.Client.GetImageStream(apirequest.WithNamespace(ctx, namespace), name, &metav1.GetOptions{})
+		stream, err := g.Client.GetImageStream(apirequest.WithNamespace(ctx, namespace), name, metav1.GetOptions{})
 		if err != nil {
 			err = resolveError(from.Kind, namespace, from.Name, err)
 			klog.V(2).Info(err)
@@ -744,7 +744,7 @@ func (g *BuildGenerator) resolveImageStreamDockerRepository(ctx context.Context,
 	klog.V(4).Infof("Resolving ImageStreamReference %s of Kind %s in namespace %s", from.Name, from.Kind, namespace)
 	switch from.Kind {
 	case "ImageStreamImage":
-		imageStreamImage, err := g.Client.GetImageStreamImage(apirequest.WithNamespace(ctx, namespace), from.Name, &metav1.GetOptions{})
+		imageStreamImage, err := g.Client.GetImageStreamImage(apirequest.WithNamespace(ctx, namespace), from.Name, metav1.GetOptions{})
 		if err != nil {
 			err = resolveError(from.Kind, namespace, from.Name, err)
 			klog.V(2).Info(err)
@@ -755,7 +755,7 @@ func (g *BuildGenerator) resolveImageStreamDockerRepository(ctx context.Context,
 		return image.DockerImageReference, nil
 	case "ImageStreamTag":
 		name := strings.Split(from.Name, ":")[0]
-		is, err := g.Client.GetImageStream(apirequest.WithNamespace(ctx, namespace), name, &metav1.GetOptions{})
+		is, err := g.Client.GetImageStream(apirequest.WithNamespace(ctx, namespace), name, metav1.GetOptions{})
 		if err != nil {
 			err = resolveError("ImageStream", namespace, from.Name, err)
 			klog.V(2).Info(err)

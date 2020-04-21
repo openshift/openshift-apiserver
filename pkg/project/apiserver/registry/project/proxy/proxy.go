@@ -125,7 +125,7 @@ func (s *REST) Get(ctx context.Context, name string, options *metav1.GetOptions)
 	if options != nil {
 		opts = *options
 	}
-	namespace, err := s.client.Get(name, opts)
+	namespace, err := s.client.Get(ctx, name, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, creationValidatio
 	if err != nil {
 		return nil, err
 	}
-	namespace, err := s.client.Create(projectExternal)
+	namespace, err := s.client.Create(ctx, projectExternal, *options)
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func (s *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 	if err != nil {
 		return nil, false, err
 	}
-	namespace, err := s.client.Update(projectExternal)
+	namespace, err := s.client.Update(ctx, projectExternal, *options)
 	if err != nil {
 		return nil, false, err
 	}
@@ -202,5 +202,9 @@ var _ = rest.GracefulDeleter(&REST{})
 
 // Delete deletes a Project specified by its name
 func (s *REST) Delete(ctx context.Context, name string, objectFunc rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
-	return &metav1.Status{Status: metav1.StatusSuccess}, false, s.client.Delete(name, nil)
+	var opts metav1.DeleteOptions
+	if options != nil {
+		opts = *options
+	}
+	return &metav1.Status{Status: metav1.StatusSuccess}, false, s.client.Delete(ctx, name, opts)
 }

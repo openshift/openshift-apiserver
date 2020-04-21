@@ -27,16 +27,16 @@ var (
 // WaitForRunningDeployment waits until the specified deployment is no longer New or Pending. Returns true if
 // the deployment became running, complete, or failed within timeout, false if it did not, and an error if any
 // other error state occurred. The last observed deployment state is returned.
-func WaitForRunningDeployment(rn corev1client.ReplicationControllersGetter, observed *corev1.ReplicationController, timeout time.Duration) (*corev1.ReplicationController, error) {
+func WaitForRunningDeployment(ctx context.Context, rn corev1client.ReplicationControllersGetter, observed *corev1.ReplicationController, timeout time.Duration) (*corev1.ReplicationController, error) {
 	fieldSelector := fields.OneTermEqualSelector("metadata.name", observed.Name).String()
 	lw := &cache.ListWatch{
 		ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 			options.FieldSelector = fieldSelector
-			return rn.ReplicationControllers(observed.Namespace).List(options)
+			return rn.ReplicationControllers(observed.Namespace).List(ctx, options)
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 			options.FieldSelector = fieldSelector
-			return rn.ReplicationControllers(observed.Namespace).Watch(options)
+			return rn.ReplicationControllers(observed.Namespace).Watch(ctx, options)
 		},
 	}
 
@@ -63,7 +63,7 @@ func WaitForRunningDeployment(rn corev1client.ReplicationControllersGetter, obse
 		return false, nil
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 	event, err := watchtools.UntilWithSync(ctx, lw, &corev1.ReplicationController{}, preconditionFunc, func(e watch.Event) (bool, error) {
 		switch e.Type {

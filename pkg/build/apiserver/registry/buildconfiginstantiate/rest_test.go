@@ -32,25 +32,25 @@ func TestCreateInstantiate(t *testing.T) {
 		Secrets:         fake.NewSimpleClientset(fakeSecrets...).CoreV1(),
 		ServiceAccounts: MockBuilderServiceAccount(MockBuilderSecrets()),
 		Client: buildgenerator.TestingClient{
-			GetBuildConfigFunc: func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.BuildConfig, error) {
+			GetBuildConfigFunc: func(ctx context.Context, name string, options metav1.GetOptions) (*buildv1.BuildConfig, error) {
 				return MockBuildConfig(MockSource(), MockSourceStrategyForImageRepository(), MockOutput()), nil
 			},
-			UpdateBuildConfigFunc: func(ctx context.Context, buildConfig *buildv1.BuildConfig) error {
+			UpdateBuildConfigFunc: func(ctx context.Context, buildConfig *buildv1.BuildConfig, _ metav1.UpdateOptions) error {
 				return nil
 			},
-			CreateBuildFunc: func(ctx context.Context, build *buildv1.Build) error {
+			CreateBuildFunc: func(ctx context.Context, build *buildv1.Build, _ metav1.CreateOptions) error {
 				return nil
 			},
-			GetBuildFunc: func(ctx context.Context, name string, options *metav1.GetOptions) (*buildv1.Build, error) {
+			GetBuildFunc: func(ctx context.Context, name string, options metav1.GetOptions) (*buildv1.Build, error) {
 				return &buildv1.Build{}, nil
 			},
-			GetImageStreamFunc: func(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStream, error) {
+			GetImageStreamFunc: func(ctx context.Context, name string, options metav1.GetOptions) (*imagev1.ImageStream, error) {
 				return imageStream, nil
 			},
-			GetImageStreamTagFunc: func(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStreamTag, error) {
+			GetImageStreamTagFunc: func(ctx context.Context, name string, options metav1.GetOptions) (*imagev1.ImageStreamTag, error) {
 				return &imagev1.ImageStreamTag{Image: *image}, nil
 			},
-			GetImageStreamImageFunc: func(ctx context.Context, name string, options *metav1.GetOptions) (*imagev1.ImageStreamImage, error) {
+			GetImageStreamImageFunc: func(ctx context.Context, name string, options metav1.GetOptions) (*imagev1.ImageStreamImage, error) {
 				return &imagev1.ImageStreamImage{Image: *image}, nil
 			},
 		}}}

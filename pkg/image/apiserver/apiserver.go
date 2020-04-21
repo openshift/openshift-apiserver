@@ -1,6 +1,7 @@
 package apiserver
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -225,7 +226,7 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 			return nil, fmt.Errorf("error building registry whitelister: %v", err)
 		}
 	} else {
-		whitelister = whitelist.WhitelistAllRegistries()
+		whitelister = whitelist.WhitelistAllRegistries(context.TODO())
 	}
 
 	imageLayerIndex := imagestreametcd.NewImageLayerIndex(imageV1Client.ImageV1().Images())

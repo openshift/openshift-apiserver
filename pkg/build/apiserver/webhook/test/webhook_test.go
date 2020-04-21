@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -29,30 +30,30 @@ type FakeSecretInterface struct {
 	Secrets map[string]*corev1.Secret
 }
 
-func (f *FakeSecretInterface) Create(s *corev1.Secret) (*corev1.Secret, error) {
+func (f *FakeSecretInterface) Create(_ context.Context, s *corev1.Secret, _ metav1.CreateOptions) (*corev1.Secret, error) {
 	return nil, nil
 }
 
-func (f *FakeSecretInterface) Update(*corev1.Secret) (*corev1.Secret, error) {
+func (f *FakeSecretInterface) Update(_ context.Context, s *corev1.Secret, _ metav1.UpdateOptions) (*corev1.Secret, error) {
 	return nil, nil
 }
 
-func (f *FakeSecretInterface) Delete(name string, options *metav1.DeleteOptions) error {
+func (f *FakeSecretInterface) Delete(_ context.Context, name string, options metav1.DeleteOptions) error {
 	return nil
 }
-func (f *FakeSecretInterface) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
+func (f *FakeSecretInterface) DeleteCollection(_ context.Context, options metav1.DeleteOptions, listOptions metav1.ListOptions) error {
 	return nil
 }
-func (f *FakeSecretInterface) Get(name string, options metav1.GetOptions) (*corev1.Secret, error) {
+func (f *FakeSecretInterface) Get(_ context.Context, name string, options metav1.GetOptions) (*corev1.Secret, error) {
 	return f.Secrets[name], nil
 }
-func (f *FakeSecretInterface) List(opts metav1.ListOptions) (*corev1.SecretList, error) {
+func (f *FakeSecretInterface) List(_ context.Context, opts metav1.ListOptions) (*corev1.SecretList, error) {
 	return nil, nil
 }
-func (f *FakeSecretInterface) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+func (f *FakeSecretInterface) Watch(_ context.Context, opts metav1.ListOptions) (watch.Interface, error) {
 	return nil, nil
 }
-func (f *FakeSecretInterface) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *corev1.Secret, err error) {
+func (f *FakeSecretInterface) Patch(_ context.Context, name string, pt types.PatchType, data []byte, _ metav1.PatchOptions, subresources ...string) (result *corev1.Secret, err error) {
 	return nil, nil
 }
 
@@ -265,7 +266,7 @@ func TestValidateWrongWebHookSecretError(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
-	_, err = webhook.CheckSecret("", "wrongsecret", triggers, nil)
+	_, err = webhook.CheckSecret(context.TODO(), "", "wrongsecret", triggers, nil)
 	if err != webhook.ErrSecretMismatch {
 		t.Errorf("Expected error %s, got %s", webhook.ErrSecretMismatch, err)
 	}
@@ -279,7 +280,7 @@ func TestValidateMatchGenericWebHookSecret(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
-	trigger, err := webhook.CheckSecret("", secret, triggers, nil)
+	trigger, err := webhook.CheckSecret(context.TODO(), "", secret, triggers, nil)
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
@@ -300,7 +301,7 @@ func TestValidateMatchGitHubWebHookSecret(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
-	trigger, err := webhook.CheckSecret("", secret, triggers, nil)
+	trigger, err := webhook.CheckSecret(context.TODO(), "", secret, triggers, nil)
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
@@ -322,7 +323,7 @@ func TestValidateMatchGitLabWebHookSecret(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
-	trigger, err := webhook.CheckSecret("", secret, triggers, nil)
+	trigger, err := webhook.CheckSecret(context.TODO(), "", secret, triggers, nil)
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
@@ -344,7 +345,7 @@ func TestValidateMatchBitbucketWebHookSecret(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
-	trigger, err := webhook.CheckSecret("", secret, triggers, nil)
+	trigger, err := webhook.CheckSecret(context.TODO(), "", secret, triggers, nil)
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
@@ -366,7 +367,7 @@ func TestValidateEnvVarsGenericWebHook(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
-	trigger, err := webhook.CheckSecret("", secret, triggers, nil)
+	trigger, err := webhook.CheckSecret(context.TODO(), "", secret, triggers, nil)
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
@@ -387,7 +388,7 @@ func TestCheckSecret(t *testing.T) {
 	t2 := &buildv1.WebHookTrigger{
 		Secret: "secret2",
 	}
-	m, err := webhook.CheckSecret("", "secret1", []*buildv1.WebHookTrigger{t1, t2}, nil)
+	m, err := webhook.CheckSecret(context.TODO(), "", "secret1", []*buildv1.WebHookTrigger{t1, t2}, nil)
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
@@ -398,7 +399,7 @@ func TestCheckSecret(t *testing.T) {
 		t.Errorf("Expected to match trigger %v, matched trigger %v", *m, *t1)
 	}
 
-	m, err = webhook.CheckSecret("", "secret2", []*buildv1.WebHookTrigger{t1, t2}, nil)
+	m, err = webhook.CheckSecret(context.TODO(), "", "secret2", []*buildv1.WebHookTrigger{t1, t2}, nil)
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
@@ -409,7 +410,7 @@ func TestCheckSecret(t *testing.T) {
 		t.Errorf("Expected to match trigger %v, matched trigger %v", *m, *t1)
 	}
 
-	m, err = webhook.CheckSecret("", "secret3", []*buildv1.WebHookTrigger{t1, t2}, nil)
+	m, err = webhook.CheckSecret(context.TODO(), "", "secret3", []*buildv1.WebHookTrigger{t1, t2}, nil)
 	if err != webhook.ErrSecretMismatch {
 		t.Errorf("Expected error %v, got %v", webhook.ErrSecretMismatch, err)
 	}
@@ -461,7 +462,7 @@ func TestCheckSecretRef(t *testing.T) {
 			Name: "invalidSecret",
 		},
 	}
-	m, err := webhook.CheckSecret("", "secretvalue1", []*buildv1.WebHookTrigger{t1, t2}, secretsClient)
+	m, err := webhook.CheckSecret(context.TODO(), "", "secretvalue1", []*buildv1.WebHookTrigger{t1, t2}, secretsClient)
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
@@ -472,7 +473,7 @@ func TestCheckSecretRef(t *testing.T) {
 		t.Errorf("Expected to match trigger %v, matched trigger %v", *m, *t1)
 	}
 
-	m, err = webhook.CheckSecret("", "secretvalue2", []*buildv1.WebHookTrigger{t1, t2}, secretsClient)
+	m, err = webhook.CheckSecret(context.TODO(), "", "secretvalue2", []*buildv1.WebHookTrigger{t1, t2}, secretsClient)
 	if err != nil {
 		t.Errorf("Expected error to be nil, got %s", err)
 	}
@@ -483,7 +484,7 @@ func TestCheckSecretRef(t *testing.T) {
 		t.Errorf("Expected to match trigger %v, matched trigger %v", *m, *t1)
 	}
 
-	m, err = webhook.CheckSecret("", "othersecretvalue", []*buildv1.WebHookTrigger{t1, t2}, secretsClient)
+	m, err = webhook.CheckSecret(context.TODO(), "", "othersecretvalue", []*buildv1.WebHookTrigger{t1, t2}, secretsClient)
 	if err != webhook.ErrSecretMismatch {
 		t.Errorf("Expected error %v, got %v", webhook.ErrSecretMismatch, err)
 	}
@@ -491,7 +492,7 @@ func TestCheckSecretRef(t *testing.T) {
 		t.Errorf("Expected not to match a trigger, but matched %v", *m)
 	}
 
-	m, err = webhook.CheckSecret("", "secretvalue1", []*buildv1.WebHookTrigger{t3}, secretsClient)
+	m, err = webhook.CheckSecret(context.TODO(), "", "secretvalue1", []*buildv1.WebHookTrigger{t3}, secretsClient)
 	if err != webhook.ErrSecretMismatch {
 		t.Errorf("Expected error %v, got %v", webhook.ErrSecretMismatch, err)
 	}

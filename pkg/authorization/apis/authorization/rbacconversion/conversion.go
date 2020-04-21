@@ -22,17 +22,45 @@ var (
 // reconcileProtectAnnotation is the name of an annotation which prevents reconciliation if set to "true"
 const reconcileProtectAnnotation = "openshift.io/reconcile-protect"
 
-func addConversionFuncs(scheme *runtime.Scheme) error {
-	if err := scheme.AddConversionFuncs(
-		Convert_authorization_ClusterRole_To_rbac_ClusterRole,
-		Convert_authorization_Role_To_rbac_Role,
-		Convert_authorization_ClusterRoleBinding_To_rbac_ClusterRoleBinding,
-		Convert_authorization_RoleBinding_To_rbac_RoleBinding,
-		Convert_rbac_ClusterRole_To_authorization_ClusterRole,
-		Convert_rbac_Role_To_authorization_Role,
-		Convert_rbac_ClusterRoleBinding_To_authorization_ClusterRoleBinding,
-		Convert_rbac_RoleBinding_To_authorization_RoleBinding,
-	); err != nil { // If one of the conversion functions is malformed, detect it immediately.
+func addConversionFuncs(s *runtime.Scheme) error {
+	if err := s.AddGeneratedConversionFunc((*authorizationapi.ClusterRole)(nil), (*rbac.ClusterRole)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_ClusterRole_To_rbac_ClusterRole(a.(*authorizationapi.ClusterRole), b.(*rbac.ClusterRole), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*authorizationapi.Role)(nil), (*rbac.Role)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_Role_To_rbac_Role(a.(*authorizationapi.Role), b.(*rbac.Role), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*authorizationapi.ClusterRoleBinding)(nil), (*rbac.ClusterRoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_ClusterRoleBinding_To_rbac_ClusterRoleBinding(a.(*authorizationapi.ClusterRoleBinding), b.(*rbac.ClusterRoleBinding), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*authorizationapi.RoleBinding)(nil), (*rbac.RoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_RoleBinding_To_rbac_RoleBinding(a.(*authorizationapi.RoleBinding), b.(*rbac.RoleBinding), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*rbac.ClusterRole)(nil), (*authorizationapi.ClusterRole)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_rbac_ClusterRole_To_authorization_ClusterRole(a.(*rbac.ClusterRole), b.(*authorizationapi.ClusterRole), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*rbac.Role)(nil), (*authorizationapi.Role)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_rbac_Role_To_authorization_Role(a.(*rbac.Role), b.(*authorizationapi.Role), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*rbac.ClusterRoleBinding)(nil), (*authorizationapi.ClusterRoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_rbac_ClusterRoleBinding_To_authorization_ClusterRoleBinding(a.(*rbac.ClusterRoleBinding), b.(*authorizationapi.ClusterRoleBinding), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*rbac.RoleBinding)(nil), (*authorizationapi.RoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_rbac_RoleBinding_To_authorization_RoleBinding(a.(*rbac.RoleBinding), b.(*authorizationapi.RoleBinding), scope)
+	}); err != nil {
 		return err
 	}
 	return nil

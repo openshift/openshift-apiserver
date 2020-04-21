@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	authorizationapi "k8s.io/api/authorization/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
@@ -24,7 +25,7 @@ const HostGeneratedAnnotationKey = "openshift.io/host.generated"
 
 // Registry is an interface for performing subject access reviews
 type SubjectAccessReviewInterface interface {
-	Create(sar *authorizationapi.SubjectAccessReview) (result *authorizationapi.SubjectAccessReview, err error)
+	Create(ctx context.Context, sar *authorizationapi.SubjectAccessReview, opts metav1.CreateOptions) (result *authorizationapi.SubjectAccessReview, err error)
 }
 
 var _ SubjectAccessReviewInterface = authorizationclient.SubjectAccessReviewInterface(nil)
@@ -82,6 +83,7 @@ func (s routeStrategy) allocateHost(ctx context.Context, route *routeapi.Route) 
 			return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), fmt.Errorf("unable to verify host field can be set"))}
 		}
 		res, err := s.sarClient.Create(
+			ctx,
 			authorizationutil.AddUserToSAR(
 				user,
 				&authorizationapi.SubjectAccessReview{
@@ -96,6 +98,7 @@ func (s routeStrategy) allocateHost(ctx context.Context, route *routeapi.Route) 
 					},
 				},
 			),
+			metav1.CreateOptions{},
 		)
 		if err != nil {
 			return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), err)}
@@ -193,6 +196,7 @@ func (s routeStrategy) validateHostUpdate(ctx context.Context, route, older *rou
 		return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), fmt.Errorf("unable to verify host field can be changed"))}
 	}
 	res, err := s.sarClient.Create(
+		ctx,
 		authorizationutil.AddUserToSAR(
 			user,
 			&authorizationapi.SubjectAccessReview{
@@ -207,6 +211,7 @@ func (s routeStrategy) validateHostUpdate(ctx context.Context, route, older *rou
 				},
 			},
 		),
+		metav1.CreateOptions{},
 	)
 	if err != nil {
 		return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), err)}
@@ -218,6 +223,7 @@ func (s routeStrategy) validateHostUpdate(ctx context.Context, route, older *rou
 
 		// if tls is being updated without host being updated, we check if 'create' permission exists on custom-host subresource
 		res, err := s.sarClient.Create(
+			ctx,
 			authorizationutil.AddUserToSAR(
 				user,
 				&authorizationapi.SubjectAccessReview{
@@ -232,6 +238,7 @@ func (s routeStrategy) validateHostUpdate(ctx context.Context, route, older *rou
 					},
 				},
 			),
+			metav1.CreateOptions{},
 		)
 		if err != nil {
 			return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), err)}

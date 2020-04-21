@@ -15,7 +15,7 @@ import (
 
 	"github.com/docker/distribution/manifest/schema1"
 	"github.com/docker/distribution/manifest/schema2"
-	"github.com/fsouza/go-dockerclient"
+	docker "github.com/fsouza/go-dockerclient"
 	"k8s.io/klog"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,47 +33,55 @@ import (
 // type into an api type.  Localize the crazy here.
 // TODO this scheme needs to be configurable or we're going to end up with weird problems.
 func init() {
-	err := legacyscheme.Scheme.AddConversionFuncs(
-		// Convert docker client object to internal object
-		func(in *docker.Image, out *imageapi.DockerImage, s conversion.Scope) error {
-			if err := s.Convert(&in.Config, &out.Config, conversion.AllowDifferentFieldTypeNames); err != nil {
-				return err
-			}
-			if err := s.Convert(&in.ContainerConfig, &out.ContainerConfig, conversion.AllowDifferentFieldTypeNames); err != nil {
-				return err
-			}
-			out.ID = in.ID
-			out.Parent = in.Parent
-			out.Comment = in.Comment
-			out.Created = metav1.NewTime(in.Created)
-			out.Container = in.Container
-			out.DockerVersion = in.DockerVersion
-			out.Author = in.Author
-			out.Architecture = in.Architecture
-			out.Size = in.Size
-			return nil
-		},
-		func(in *imageapi.DockerImage, out *docker.Image, s conversion.Scope) error {
-			if err := s.Convert(&in.Config, &out.Config, conversion.AllowDifferentFieldTypeNames); err != nil {
-				return err
-			}
-			if err := s.Convert(&in.ContainerConfig, &out.ContainerConfig, conversion.AllowDifferentFieldTypeNames); err != nil {
-				return err
-			}
-			out.ID = in.ID
-			out.Parent = in.Parent
-			out.Comment = in.Comment
-			out.Created = in.Created.Time
-			out.Container = in.Container
-			out.DockerVersion = in.DockerVersion
-			out.Author = in.Author
-			out.Architecture = in.Architecture
-			out.Size = in.Size
-			return nil
-		},
-	)
-	if err != nil {
-		// If one of the conversion functions is malformed, detect it immediately.
+	dockerToInternal := func(in *docker.Image, out *imageapi.DockerImage, s conversion.Scope) error {
+		if err := s.Convert(&in.Config, &out.Config, conversion.AllowDifferentFieldTypeNames); err != nil {
+			return err
+		}
+		if err := s.Convert(&in.ContainerConfig, &out.ContainerConfig, conversion.AllowDifferentFieldTypeNames); err != nil {
+			return err
+		}
+		out.ID = in.ID
+		out.Parent = in.Parent
+		out.Comment = in.Comment
+		out.Created = metav1.NewTime(in.Created)
+		out.Container = in.Container
+		out.DockerVersion = in.DockerVersion
+		out.Author = in.Author
+		out.Architecture = in.Architecture
+		out.Size = in.Size
+		return nil
+	}
+	// Convert docker client object to internal object
+	internalToDocker := func(in *imageapi.DockerImage, out *docker.Image, s conversion.Scope) error {
+		if err := s.Convert(&in.Config, &out.Config, conversion.AllowDifferentFieldTypeNames); err != nil {
+			return err
+		}
+		if err := s.Convert(&in.ContainerConfig, &out.ContainerConfig, conversion.AllowDifferentFieldTypeNames); err != nil {
+			return err
+		}
+		out.ID = in.ID
+		out.Parent = in.Parent
+		out.Comment = in.Comment
+		out.Created = in.Created.Time
+		out.Container = in.Container
+		out.DockerVersion = in.DockerVersion
+		out.Author = in.Author
+		out.Architecture = in.Architecture
+		out.Size = in.Size
+		return nil
+	}
+
+	if err := legacyscheme.Scheme.AddConversionFunc((*docker.Image)(nil), (*imageapi.DockerImage)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return dockerToInternal(a.(*docker.Image), b.(*imageapi.DockerImage), scope)
+	}); err != nil {
+		// If the conversion function is malformed, detect it immediately.
+		panic(err)
+	}
+
+	if err := legacyscheme.Scheme.AddConversionFunc((*imageapi.DockerImage)(nil), (*docker.Image)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return internalToDocker(a.(*imageapi.DockerImage), b.(*docker.Image), scope)
+	}); err != nil {
+		// If the conversion function is malformed, detect it immediately.
 		panic(err)
 	}
 }

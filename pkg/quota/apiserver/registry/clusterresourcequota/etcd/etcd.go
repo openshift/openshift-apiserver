@@ -93,3 +93,7 @@ func (r *StatusREST) Get(ctx context.Context, name string, options *metav1.GetOp
 func (r *StatusREST) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
 	return nil, false, errors.NewInternalError(fmt.Errorf("unsupported"))
 }
+
+func (r *REST) ConvertToTable(ctx context.Context, object runtime.Object, tableOptions runtime.Object) (*metav1.Table, error) {
+	return nil, errors.NewInternalError(fmt.Errorf("unsupported"))
+}

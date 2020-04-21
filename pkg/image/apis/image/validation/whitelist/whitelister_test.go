@@ -1,6 +1,7 @@
 package whitelist
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -280,6 +281,8 @@ func TestRegistryWhitelister(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			ctx := context.TODO()
+
 			rw, err := NewRegistryWhitelister(tc.whitelist, nil)
 			if err != nil {
 				t.Fatal(err)
@@ -287,21 +290,21 @@ func TestRegistryWhitelister(t *testing.T) {
 
 			for hn, expErr := range tc.hostnames {
 				t.Run("hostname "+hn, func(t *testing.T) {
-					err := rw.AdmitHostname(hn, tc.transport)
+					err := rw.AdmitHostname(ctx, hn, tc.transport)
 					assertExpectedError(t, err, expErr)
 				})
 			}
 
 			for dif, expErr := range tc.difs {
 				t.Run("dockerImageReference "+dif.String(), func(t *testing.T) {
-					err := rw.AdmitDockerImageReference(dif, tc.transport)
+					err := rw.AdmitDockerImageReference(ctx, dif, tc.transport)
 					assertExpectedError(t, err, expErr)
 				})
 			}
 
 			for ps, expErr := range tc.pullSpecs {
 				t.Run("pull spec "+ps, func(t *testing.T) {
-					err := rw.AdmitPullSpec(ps, tc.transport)
+					err := rw.AdmitPullSpec(ctx, ps, tc.transport)
 					assertExpectedError(t, err, expErr)
 				})
 
@@ -311,6 +314,8 @@ func TestRegistryWhitelister(t *testing.T) {
 }
 
 func TestWhitelistRegistry(t *testing.T) {
+	ctx := context.TODO()
+
 	rwClean, err := NewRegistryWhitelister(openshiftcontrolplanev1.AllowedRegistries{}, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -321,7 +326,7 @@ func TestWhitelistRegistry(t *testing.T) {
 		t.Fatal(err)
 	}
 	exp := fmt.Errorf(`registry "sub.foo.com" not allowed by whitelist: "foo.com:443", "foo.com:80"`)
-	if err := rw.AdmitHostname("sub.foo.com", WhitelistTransportAny); err == nil || err.Error() != exp.Error() {
+	if err := rw.AdmitHostname(ctx, "sub.foo.com", WhitelistTransportAny); err == nil || err.Error() != exp.Error() {
 		t.Fatalf("got unexpected error: %s", diff.ObjectGoPrintDiff(err, exp))
 	}
 
@@ -330,7 +335,7 @@ func TestWhitelistRegistry(t *testing.T) {
 		t.Fatal(err)
 	}
 	exp = fmt.Errorf(`registry "sub.foo.com" not allowed by whitelist: "foo.com:80"`)
-	if err := rw.AdmitHostname("sub.foo.com", WhitelistTransportAny); err == nil || err.Error() != exp.Error() {
+	if err := rw.AdmitHostname(ctx, "sub.foo.com", WhitelistTransportAny); err == nil || err.Error() != exp.Error() {
 		t.Fatalf("got unexpected error: %s", diff.ObjectGoPrintDiff(err, exp))
 	}
 	// add duplicate
@@ -338,7 +343,7 @@ func TestWhitelistRegistry(t *testing.T) {
 		t.Fatal(err)
 	}
 	exp = fmt.Errorf(`registry "sub.foo.com" not allowed by whitelist: "foo.com:80"`)
-	if err := rw.AdmitHostname("sub.foo.com", WhitelistTransportAny); err == nil || err.Error() != exp.Error() {
+	if err := rw.AdmitHostname(ctx, "sub.foo.com", WhitelistTransportAny); err == nil || err.Error() != exp.Error() {
 		t.Fatalf("got unexpected error: %s", diff.ObjectGoPrintDiff(err, exp))
 	}
 	// add duplicate with different port
@@ -346,7 +351,7 @@ func TestWhitelistRegistry(t *testing.T) {
 		t.Fatal(err)
 	}
 	exp = fmt.Errorf(`registry "sub.foo.com" not allowed by whitelist: "foo.com:443", "foo.com:80"`)
-	if err := rw.AdmitHostname("sub.foo.com", WhitelistTransportAny); err == nil || err.Error() != exp.Error() {
+	if err := rw.AdmitHostname(ctx, "sub.foo.com", WhitelistTransportAny); err == nil || err.Error() != exp.Error() {
 		t.Fatalf("got unexpected error: %s", diff.ObjectGoPrintDiff(err, exp))
 	}
 }
@@ -439,7 +444,7 @@ func TestWhitelistRepository(t *testing.T) {
 					t.Error(err)
 				}
 			}
-			err = wl.AdmitPullSpec(tc.check, WhitelistTransportSecure)
+			err = wl.AdmitPullSpec(context.TODO(), tc.check, WhitelistTransportSecure)
 			assertExpectedError(t, err, tc.err)
 		})
 	}

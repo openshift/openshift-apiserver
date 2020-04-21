@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -63,7 +64,7 @@ func (p *ProjectCache) GetNamespace(name string) (*corev1.Namespace, error) {
 		namespace = namespaceObj.(*corev1.Namespace)
 	} else {
 		// Our watch maybe latent, so we make a best effort to get the object, and only fail if not found
-		namespace, err = p.Client.Get(name, metav1.GetOptions{})
+		namespace, err = p.Client.Get(context.TODO(), name, metav1.GetOptions{})
 		// the namespace does not exist, so prevent create and update in that namespace
 		if err != nil {
 			return nil, fmt.Errorf("namespace %s does not exist", name)

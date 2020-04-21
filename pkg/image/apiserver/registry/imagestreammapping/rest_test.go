@@ -41,12 +41,12 @@ import (
 
 const testDefaultRegistryURL = "defaultregistry:5000"
 
-var testDefaultRegistry = func() (string, bool) { return testDefaultRegistryURL, true }
+var testDefaultRegistry = func(_ context.Context) (string, bool) { return testDefaultRegistryURL, true }
 
 type fakeSubjectAccessReviewRegistry struct {
 }
 
-func (f *fakeSubjectAccessReviewRegistry) Create(subjectAccessReview *authorizationapi.SubjectAccessReview) (*authorizationapi.SubjectAccessReview, error) {
+func (f *fakeSubjectAccessReviewRegistry) Create(_ context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationapi.SubjectAccessReview, error) {
 	return nil, nil
 }
 

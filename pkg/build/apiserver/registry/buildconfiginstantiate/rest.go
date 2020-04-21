@@ -70,7 +70,7 @@ func (s *InstantiateREST) Create(ctx context.Context, obj runtime.Object, create
 			},
 		)
 	}
-	return s.generator.InstantiateInternal(ctx, request)
+	return s.generator.InstantiateInternal(ctx, request, *options)
 }
 
 func (s *InstantiateREST) ProducesObject(verb string) interface{} {
@@ -196,7 +196,7 @@ func (h *binaryInstantiateHandler) handle(r io.Reader) (runtime.Object, error) {
 	var instErr error
 	start := time.Now()
 	if err := wait.Poll(time.Second, h.r.Timeout, func() (bool, error) {
-		result, instErr = h.r.Generator.InstantiateInternal(h.ctx, request)
+		result, instErr = h.r.Generator.InstantiateInternal(h.ctx, request, metav1.CreateOptions{})
 		if instErr != nil {
 			if errors.IsNotFound(instErr) {
 				if s, ok := instErr.(errors.APIStatus); ok {
@@ -315,13 +315,13 @@ func (h *binaryInstantiateHandler) cancelBuild(build *buildapi.Build) {
 		return
 	}
 	versionedBuild.Status.Cancelled = true
-	h.r.Generator.Client.UpdateBuild(h.ctx, versionedBuild)
+	h.r.Generator.Client.UpdateBuild(h.ctx, versionedBuild, metav1.UpdateOptions{})
 	wait.Poll(cancelPollInterval, cancelPollDuration, func() (bool, error) {
 		versionedBuild.Status.Cancelled = true
-		err := h.r.Generator.Client.UpdateBuild(h.ctx, versionedBuild)
+		err := h.r.Generator.Client.UpdateBuild(h.ctx, versionedBuild, metav1.UpdateOptions{})
 		switch {
 		case err != nil && errors.IsConflict(err):
-			versionedBuild, err = h.r.Generator.Client.GetBuild(h.ctx, versionedBuild.Name, &metav1.GetOptions{})
+			versionedBuild, err = h.r.Generator.Client.GetBuild(h.ctx, versionedBuild.Name, metav1.GetOptions{})
 			return false, err
 		default:
 			return true, err

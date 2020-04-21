@@ -17,7 +17,6 @@ import (
 type NoWatchStorage interface {
 	rest.Getter
 	rest.Lister
-	rest.TableConvertor
 	rest.CreaterUpdater
 	rest.GracefulDeleter
 	rest.Scoper

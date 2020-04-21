@@ -129,7 +129,7 @@ func (w *WebHookHandler) ProcessWebHook(writer http.ResponseWriter, req *http.Re
 		return errors.NewNotFound(build.Resource("buildconfighook"), hookType)
 	}
 
-	config, err := w.buildConfigClient.BuildConfigs(apirequest.NamespaceValue(ctx)).Get(name, metav1.GetOptions{})
+	config, err := w.buildConfigClient.BuildConfigs(apirequest.NamespaceValue(ctx)).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
 		// clients should not be able to find information about build configs in
 		// the system unless the config exists and the secret matches
@@ -142,7 +142,7 @@ func (w *WebHookHandler) ProcessWebHook(writer http.ResponseWriter, req *http.Re
 	}
 
 	klog.V(4).Infof("checking secret for %q webhook trigger of buildconfig %s/%s", hookType, config.Namespace, config.Name)
-	trigger, err := webhook.CheckSecret(config.Namespace, secret, triggers, w.secretsClient)
+	trigger, err := webhook.CheckSecret(ctx, config.Namespace, secret, triggers, w.secretsClient)
 	if err != nil {
 		return errors.NewUnauthorized(fmt.Sprintf("the webhook %q for %q did not accept your secret", hookType, name))
 	}
@@ -172,7 +172,7 @@ func (w *WebHookHandler) ProcessWebHook(writer http.ResponseWriter, req *http.Re
 		DockerStrategyOptions: dockerStrategyOptions,
 	}
 
-	newBuild, err := w.instantiator.BuildConfigs(config.Namespace).Instantiate(config.Namespace, request)
+	newBuild, err := w.instantiator.BuildConfigs(config.Namespace).Instantiate(ctx, config.Namespace, request, metav1.CreateOptions{})
 	if err != nil {
 		return errors.NewInternalError(fmt.Errorf("could not generate a build: %v", err))
 	}

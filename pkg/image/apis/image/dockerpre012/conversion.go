@@ -47,9 +47,17 @@ func Convert_api_DockerImage_to_dockerpre012_ImagePre_012(in *newer.DockerImage,
 	return nil
 }
 
-func addConversionFuncs(scheme *runtime.Scheme) error {
-	return scheme.AddConversionFuncs(
-		Convert_dockerpre012_ImagePre_012_to_api_DockerImage,
-		Convert_api_DockerImage_to_dockerpre012_ImagePre_012,
-	)
+func addConversionFuncs(s *runtime.Scheme) error {
+	if err := s.AddConversionFunc((*dockerpre012.ImagePre012)(nil), (*newer.DockerImage)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_dockerpre012_ImagePre_012_to_api_DockerImage(a.(*dockerpre012.ImagePre012), b.(*newer.DockerImage), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*newer.DockerImage)(nil), (*dockerpre012.ImagePre012)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_api_DockerImage_to_dockerpre012_ImagePre_012(a.(*newer.DockerImage), b.(*dockerpre012.ImagePre012), scope)
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }

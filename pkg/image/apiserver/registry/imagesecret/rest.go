@@ -51,7 +51,7 @@ func (r *REST) Get(ctx context.Context, _ string, options runtime.Object) (runti
 	if !ok {
 		ns = metav1.NamespaceAll
 	}
-	secrets, err := r.secrets.Secrets(ns).List(opts)
+	secrets, err := r.secrets.Secrets(ns).List(ctx, opts)
 	if err != nil {
 		return nil, err
 	}

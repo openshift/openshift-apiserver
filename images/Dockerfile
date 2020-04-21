@@ -1,9 +1,9 @@
-FROM registry.svc.ci.openshift.org/openshift/release:golang-1.12 AS builder
+FROM registry.svc.ci.openshift.org/openshift/release:golang-1.13 AS builder
 WORKDIR /go/src/github.com/openshift/openshift-apiserver
 COPY . .
 RUN make build --warn-undefined-variables
 
-FROM registry.svc.ci.openshift.org/openshift/origin-v4.0:base
+FROM registry.svc.ci.openshift.org/openshift/origin-v4.5:base
 COPY --from=builder /go/src/github.com/openshift/openshift-apiserver/openshift-apiserver /usr/bin/
 ENTRYPOINT ["/usr/bin/openshift-apiserver"]
 LABEL io.k8s.display-name="OpenShift API Server Command" \

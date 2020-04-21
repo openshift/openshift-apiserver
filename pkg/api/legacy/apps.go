@@ -27,7 +27,6 @@ func InstallInternalLegacyApps(scheme *runtime.Scheme) {
 		corev1conversions.AddToScheme,
 		extensionsv1beta1conversions.AddToScheme,
 
-		appsv1helpers.AddConversionFuncs,
 		appsv1helpers.RegisterDefaults,
 		appsv1helpers.RegisterConversions,
 	)

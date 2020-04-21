@@ -240,7 +240,7 @@ func TestPodSpecNodeSelectorUpdateDisallowed(t *testing.T) {
 		},
 	}
 
-	if errs := validation.ValidatePodUpdate(oldPod, oldPod); len(errs) != 0 {
+	if errs := validation.ValidatePodUpdate(oldPod, oldPod, validation.PodValidationOptions{}); len(errs) != 0 {
 		t.Fatal("expected no errors")
 	}
 
@@ -248,7 +248,7 @@ func TestPodSpecNodeSelectorUpdateDisallowed(t *testing.T) {
 	// use a new map so it doesn't change oldPod's map too
 	newPod.Spec.NodeSelector = map[string]string{"foo": "other"}
 
-	errs := validation.ValidatePodUpdate(&newPod, oldPod)
+	errs := validation.ValidatePodUpdate(&newPod, oldPod, validation.PodValidationOptions{})
 	if len(errs) == 0 {
 		t.Fatal("expected at least 1 error")
 	}

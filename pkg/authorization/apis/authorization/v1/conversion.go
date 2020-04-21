@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"github.com/openshift/api/authorization/v1"
+	v1 "github.com/openshift/api/authorization/v1"
 	newer "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 	"k8s.io/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -166,33 +166,6 @@ func Convert_authorization_ClusterRoleBinding_To_v1_ClusterRoleBinding(in *newer
 	}
 
 	out.UserNames, out.GroupNames = newer.StringSubjectsFor(in.Namespace, in.Subjects)
-
-	return nil
-}
-
-func AddConversionFuncs(scheme *runtime.Scheme) error {
-	err := scheme.AddConversionFuncs(
-		Convert_v1_SubjectAccessReview_To_authorization_SubjectAccessReview,
-		Convert_authorization_SubjectAccessReview_To_v1_SubjectAccessReview,
-		Convert_v1_LocalSubjectAccessReview_To_authorization_LocalSubjectAccessReview,
-		Convert_authorization_LocalSubjectAccessReview_To_v1_LocalSubjectAccessReview,
-		Convert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview,
-		Convert_authorization_ResourceAccessReview_To_v1_ResourceAccessReview,
-		Convert_v1_LocalResourceAccessReview_To_authorization_LocalResourceAccessReview,
-		Convert_authorization_LocalResourceAccessReview_To_v1_LocalResourceAccessReview,
-		Convert_v1_ResourceAccessReviewResponse_To_authorization_ResourceAccessReviewResponse,
-		Convert_authorization_ResourceAccessReviewResponse_To_v1_ResourceAccessReviewResponse,
-		Convert_v1_PolicyRule_To_authorization_PolicyRule,
-		Convert_authorization_PolicyRule_To_v1_PolicyRule,
-		Convert_v1_RoleBinding_To_authorization_RoleBinding,
-		Convert_authorization_RoleBinding_To_v1_RoleBinding,
-		Convert_v1_ClusterRoleBinding_To_authorization_ClusterRoleBinding,
-		Convert_authorization_ClusterRoleBinding_To_v1_ClusterRoleBinding,
-	)
-	if err != nil {
-		// If one of the conversion functions is malformed, detect it immediately.
-		return err
-	}
 
 	return nil
 }

@@ -22,7 +22,6 @@ func InstallInternalLegacySecurity(scheme *runtime.Scheme) {
 		core.AddToScheme,
 		corev1conversions.AddToScheme,
 
-		securityv1helpers.AddConversionFuncs,
 		securityv1helpers.AddDefaultingFuncs,
 		securityv1helpers.RegisterDefaults,
 		securityv1helpers.RegisterConversions,

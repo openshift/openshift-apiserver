@@ -107,7 +107,7 @@ func (o *projectRequestLimit) Validate(ctx context.Context, a admission.Attribut
 	if err != nil {
 		return err
 	}
-	maxProjects, hasLimit, err := o.maxProjectsByRequester(userName)
+	maxProjects, hasLimit, err := o.maxProjectsByRequester(ctx, userName)
 	if err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func (o *projectRequestLimit) Validate(ctx context.Context, a admission.Attribut
 
 // maxProjectsByRequester returns the maximum number of projects allowed for a given user, whether a limit exists, and an error
 // if an error occurred. If a limit doesn't exist, the maximum number should be ignored.
-func (o *projectRequestLimit) maxProjectsByRequester(userName string) (int, bool, error) {
+func (o *projectRequestLimit) maxProjectsByRequester(ctx context.Context, userName string) (int, bool, error) {
 	// service accounts have a different ruleset, check them
 	if _, _, err := serviceaccount.SplitUsername(userName); err == nil {
 		if o.config.MaxProjectsForServiceAccounts == nil {
@@ -143,7 +143,7 @@ func (o *projectRequestLimit) maxProjectsByRequester(userName string) (int, bool
 		return 0, false, nil
 	}
 
-	user, err := o.userClient.Users().Get(userName, metav1.GetOptions{})
+	user, err := o.userClient.Users().Get(ctx, userName, metav1.GetOptions{})
 	if err != nil {
 		return 0, false, err
 	}

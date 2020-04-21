@@ -1,6 +1,7 @@
 package deploylog
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -26,7 +27,7 @@ func TestWaitForRunningDeploymentSuccess(t *testing.T) {
 
 	go func() {
 		defer close(stopChan)
-		rc, err := WaitForRunningDeployment(kubeclient.CoreV1(), fakeController, 10*time.Second)
+		rc, err := WaitForRunningDeployment(context.TODO(), kubeclient.CoreV1(), fakeController, 10*time.Second)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

@@ -22,7 +22,6 @@ func InstallInternalLegacyBuild(scheme *runtime.Scheme) {
 		core.AddToScheme,
 
 		addLegacyBuildFieldSelectorKeyConversions,
-		buildv1helpers.AddConversionFuncs,
 		buildv1helpers.RegisterDefaults,
 		buildv1helpers.RegisterConversions,
 	)

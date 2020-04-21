@@ -74,12 +74,12 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		// We need to process the deployment config before we can determine if it is possible to trigger
 		// a deployment.
 		if req.Latest {
-			if err := processTriggers(config, s.is, req.Force, req.ExcludeTriggers); err != nil {
+			if err := processTriggers(ctx, config, s.is, req.Force, req.ExcludeTriggers); err != nil {
 				return err
 			}
 		}
 
-		canTrigger, causes, err := canTrigger(config, s.rn, req.Force)
+		canTrigger, causes, err := canTrigger(ctx, config, s.rn, req.Force)
 		if err != nil {
 			return err
 		}
@@ -134,7 +134,7 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 // processTriggers will go over all deployment triggers that require processing and update
 // the deployment config accordingly. This contains the work that the image change controller
 // had been doing up to the point we got the /instantiate endpoint.
-func processTriggers(config *appsapi.DeploymentConfig, is imagev1typedclient.ImageStreamsGetter, force bool, exclude []appsapi.DeploymentTriggerType) error {
+func processTriggers(ctx context.Context, config *appsapi.DeploymentConfig, is imagev1typedclient.ImageStreamsGetter, force bool, exclude []appsapi.DeploymentTriggerType) error {
 	errs := []error{}
 
 	// Process any image change triggers.
@@ -157,7 +157,7 @@ func processTriggers(config *appsapi.DeploymentConfig, is imagev1typedclient.Ima
 
 		// Tag references are already validated
 		name, tag, _ := imageutil.SplitImageStreamTag(params.From.Name)
-		stream, err := is.ImageStreams(params.From.Namespace).Get(name, metav1.GetOptions{})
+		stream, err := is.ImageStreams(params.From.Namespace).Get(ctx, name, metav1.GetOptions{})
 		if err != nil {
 			if !errors.IsNotFound(err) {
 				errs = append(errs, err)
@@ -222,12 +222,13 @@ func containsTriggerType(types []appsapi.DeploymentTriggerType, triggerType apps
 
 // canTrigger determines if we can trigger a new deployment for config based on the various deployment triggers.
 func canTrigger(
+	ctx context.Context,
 	config *appsapi.DeploymentConfig,
 	rn corev1client.ReplicationControllersGetter,
 	force bool,
 ) (bool, []appsapi.DeploymentCause, error) {
 
-	decoded, err := decodeFromLatestDeployment(config, rn)
+	decoded, err := decodeFromLatestDeployment(ctx, config, rn)
 	if err != nil {
 		return false, nil, err
 	}
@@ -307,7 +308,7 @@ func canTrigger(
 // decodeFromLatestDeployment will try to return the decoded version of the current deploymentconfig
 // found in the annotations of its latest deployment. If there is no previous deploymentconfig (ie.
 // latestVersion == 0), the returned deploymentconfig will be the same.
-func decodeFromLatestDeployment(config *appsapi.DeploymentConfig, rn corev1client.ReplicationControllersGetter) (*appsapi.DeploymentConfig, error) {
+func decodeFromLatestDeployment(ctx context.Context, config *appsapi.DeploymentConfig, rn corev1client.ReplicationControllersGetter) (*appsapi.DeploymentConfig, error) {
 	if config.Status.LatestVersion == 0 {
 		return config, nil
 	}
@@ -316,7 +317,7 @@ func decodeFromLatestDeployment(config *appsapi.DeploymentConfig, rn corev1clien
 		return nil, err
 	}
 	latestDeploymentName := appsutil.LatestDeploymentNameForConfig(externalConfig)
-	deployment, err := rn.ReplicationControllers(config.Namespace).Get(latestDeploymentName, metav1.GetOptions{})
+	deployment, err := rn.ReplicationControllers(config.Namespace).Get(ctx, latestDeploymentName, metav1.GetOptions{})
 	if err != nil {
 		// If there's no deployment for the latest config, we have no basis of
 		// comparison. It's the responsibility of the deployment config controller

@@ -1,6 +1,7 @@
 package instantiate
 
 import (
+	"context"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -82,7 +83,7 @@ func TestProcess_changeForNonAutomaticTag(t *testing.T) {
 		image := config.Spec.Template.Spec.Containers[0].Image
 
 		// Force equals to false; we shouldn't update the config anyway
-		err := processTriggers(config, fake.ImageV1(), test.force, test.excludes)
+		err := processTriggers(context.TODO(), config, fake.ImageV1(), test.force, test.excludes)
 		if err == nil && test.expectedErr {
 			t.Errorf("%s: expected an error", test.name)
 			continue
@@ -116,14 +117,14 @@ func TestProcess_changeForUnregisteredTag(t *testing.T) {
 	image := config.Spec.Template.Spec.Containers[0].Image
 
 	// verify no-op; should be the same for force=true and force=false
-	if err := processTriggers(config, fake.ImageV1(), false, nil); err != nil {
+	if err := processTriggers(context.TODO(), config, fake.ImageV1(), false, nil); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if image != config.Spec.Template.Spec.Containers[0].Image {
 		t.Fatalf("unexpected image update: %#v", config.Spec.Template.Spec.Containers[0].Image)
 	}
 
-	if err := processTriggers(config, fake.ImageV1(), true, nil); err != nil {
+	if err := processTriggers(context.TODO(), config, fake.ImageV1(), true, nil); err != nil {
 		t.Fatalf("unexpected error when forced: %v", err)
 	}
 	if image != config.Spec.Template.Spec.Containers[0].Image {
@@ -264,7 +265,7 @@ func TestProcess_matchScenarios(t *testing.T) {
 		}
 		image := config.Spec.Template.Spec.Containers[0].Image
 
-		err := processTriggers(config, fake.ImageV1(), false, nil)
+		err := processTriggers(context.TODO(), config, fake.ImageV1(), false, nil)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 			continue
@@ -708,7 +709,7 @@ func TestCanTrigger(t *testing.T) {
 
 		test.config = RoundTripConfig(t, test.config)
 
-		got, gotCauses, err := canTrigger(test.config, client.CoreV1(), test.force)
+		got, gotCauses, err := canTrigger(context.TODO(), test.config, client.CoreV1(), test.force)
 		if err != nil && !test.expectedErr {
 			t.Errorf("unexpected error: %v", err)
 			continue

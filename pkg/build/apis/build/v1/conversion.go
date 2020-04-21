@@ -4,7 +4,7 @@ import (
 	"k8s.io/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/openshift/api/build/v1"
+	v1 "github.com/openshift/api/build/v1"
 	"github.com/openshift/library-go/pkg/image/imageutil"
 	newer "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 	buildinternalhelpers "github.com/openshift/openshift-apiserver/pkg/build/apis/build/internal_helpers"
@@ -148,29 +148,6 @@ func Convert_build_BuildStrategy_To_v1_BuildStrategy(in *newer.BuildStrategy, ou
 		out.Type = ""
 	}
 	return nil
-}
-
-func AddConversionFuncs(scheme *runtime.Scheme) error {
-	return scheme.AddConversionFuncs(
-		Convert_v1_BuildConfig_To_build_BuildConfig,
-		Convert_build_BuildConfig_To_v1_BuildConfig,
-		Convert_v1_SourceBuildStrategy_To_build_SourceBuildStrategy,
-		Convert_build_SourceBuildStrategy_To_v1_SourceBuildStrategy,
-		Convert_v1_DockerBuildStrategy_To_build_DockerBuildStrategy,
-		Convert_build_DockerBuildStrategy_To_v1_DockerBuildStrategy,
-		Convert_v1_CustomBuildStrategy_To_build_CustomBuildStrategy,
-		Convert_build_CustomBuildStrategy_To_v1_CustomBuildStrategy,
-		Convert_v1_BuildOutput_To_build_BuildOutput,
-		Convert_build_BuildOutput_To_v1_BuildOutput,
-		Convert_v1_BuildTriggerPolicy_To_build_BuildTriggerPolicy,
-		Convert_build_BuildTriggerPolicy_To_v1_BuildTriggerPolicy,
-		Convert_v1_SourceRevision_To_build_SourceRevision,
-		Convert_build_SourceRevision_To_v1_SourceRevision,
-		Convert_v1_BuildSource_To_build_BuildSource,
-		Convert_build_BuildSource_To_v1_BuildSource,
-		Convert_v1_BuildStrategy_To_build_BuildStrategy,
-		Convert_build_BuildStrategy_To_v1_BuildStrategy,
-	)
 }
 
 func AddFieldSelectorKeyConversions(scheme *runtime.Scheme) error {

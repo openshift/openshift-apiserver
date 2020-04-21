@@ -54,7 +54,7 @@ func (s Strategy) GenerateName(base string) string {
 func (s Strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	istag := obj.(*imageapi.ImageStreamTag)
 
-	return validation.ValidateImageStreamTagWithWhitelister(s.registryWhitelister, istag)
+	return validation.ValidateImageStreamTagWithWhitelister(ctx, s.registryWhitelister, istag)
 }
 
 func (s Strategy) AllowCreateOnUpdate() bool {
@@ -87,7 +87,7 @@ func (s Strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 	newIST := obj.(*imageapi.ImageStreamTag)
 	oldIST := old.(*imageapi.ImageStreamTag)
 
-	return validation.ValidateImageStreamTagUpdateWithWhitelister(s.registryWhitelister, newIST, oldIST)
+	return validation.ValidateImageStreamTagUpdateWithWhitelister(ctx, s.registryWhitelister, newIST, oldIST)
 }
 
 // MatchImageStreamTag returns a generic matcher for a given label and field selector.

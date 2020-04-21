@@ -142,7 +142,7 @@ func TestWaitForBuild(t *testing.T) {
 			PodClient:   newPodClient().CoreV1(),
 			Timeout:     defaultTimeout,
 		}
-		getSimplePodLogsFn := func(podNamespace, podName string, logOpts *kapi.PodLogOptions) (runtime.Object, error) {
+		getSimplePodLogsFn := func(_ context.Context, podNamespace, podName string, logOpts *kapi.PodLogOptions) (runtime.Object, error) {
 			return nil, nil
 		}
 		storage.getSimpleLogsFn = getSimplePodLogsFn
@@ -191,7 +191,7 @@ func resourceLocationHelper(buildPhase buildv1.BuildPhase, podPhase string, ctx 
 	actualPodNamespace := ""
 	actualPodName := ""
 	actualContainer := ""
-	getSimplePodLogsFn := func(podNamespace, podName string, logOpts *kapi.PodLogOptions) (runtime.Object, error) {
+	getSimplePodLogsFn := func(_ context.Context, podNamespace, podName string, logOpts *kapi.PodLogOptions) (runtime.Object, error) {
 		actualPodNamespace = podNamespace
 		actualPodName = podName
 		actualContainer = logOpts.Container
@@ -261,7 +261,7 @@ func TestPreviousBuildLogs(t *testing.T) {
 	actualPodNamespace := ""
 	actualPodName := ""
 	actualContainer := ""
-	getSimplePodLogsFn := func(podNamespace, podName string, logOpts *kapi.PodLogOptions) (runtime.Object, error) {
+	getSimplePodLogsFn := func(_ context.Context, podNamespace, podName string, logOpts *kapi.PodLogOptions) (runtime.Object, error) {
 		actualPodNamespace = podNamespace
 		actualPodName = podName
 		actualContainer = logOpts.Container

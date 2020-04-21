@@ -2,6 +2,7 @@ package validation
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net"
 	"regexp"
@@ -176,12 +177,15 @@ func ValidateImageSignatureUpdate(newImageSignature, oldImageSignature *imageapi
 
 // ValidateImageStream tests required fields for an ImageStream.
 func ValidateImageStream(stream *imageapi.ImageStream) field.ErrorList {
-	return ValidateImageStreamWithWhitelister(nil, stream)
+	// "normal" object validators aren't supposed to be querying the API server so passing
+	// context is not expected, but we are special. Don't try to wire it up.
+	return ValidateImageStreamWithWhitelister(context.TODO(), nil, stream)
 }
 
 // ValidateImageStreamWithWhitelister tests required fields for an ImageStream. Additionally, it validates
 // each new image reference against registry whitelist.
 func ValidateImageStreamWithWhitelister(
+	ctx context.Context,
 	whitelister whitelist.RegistryWhitelister,
 	stream *imageapi.ImageStream,
 ) field.ErrorList {
@@ -212,14 +216,14 @@ func ValidateImageStreamWithWhitelister(
 			}
 		}
 		if isValid && whitelister != nil {
-			if err := whitelister.AdmitDockerImageReference(ref, getWhitelistTransportForFlag(insecureRepository, true)); err != nil {
+			if err := whitelister.AdmitDockerImageReference(ctx, ref, getWhitelistTransportForFlag(insecureRepository, true)); err != nil {
 				result = append(result, field.Forbidden(dockerImageRepositoryPath, err.Error()))
 			}
 		}
 	}
 	for tag, tagRef := range stream.Spec.Tags {
 		path := field.NewPath("spec", "tags").Key(tag)
-		result = append(result, ValidateImageStreamTagReference(whitelister, insecureRepository, tagRef, path)...)
+		result = append(result, ValidateImageStreamTagReference(ctx, whitelister, insecureRepository, tagRef, path)...)
 	}
 	for tag, history := range stream.Status.Tags {
 		for i, tagEvent := range history.Items {
@@ -238,7 +242,7 @@ func ValidateImageStreamWithWhitelister(
 					insecure = tr.ImportPolicy.Insecure
 				}
 				transport := getWhitelistTransportForFlag(insecure || insecureRepository, true)
-				if err := whitelister.AdmitDockerImageReference(ref, transport); err != nil {
+				if err := whitelister.AdmitDockerImageReference(ctx, ref, transport); err != nil {
 					result = append(result, field.Forbidden(field.NewPath("status", "tags").Key(tag).Child("items").Index(i).Child("dockerImageReference"), err.Error()))
 				}
 			}
@@ -250,6 +254,7 @@ func ValidateImageStreamWithWhitelister(
 
 // ValidateImageStreamTagReference ensures that a given tag reference is valid.
 func ValidateImageStreamTagReference(
+	ctx context.Context,
 	whitelister whitelist.RegistryWhitelister,
 	insecureRepository bool,
 	tagRef imageapi.TagReference,
@@ -267,7 +272,8 @@ func ValidateImageStreamTagReference(
 				errs = append(errs, field.Invalid(fldPath.Child("from", "name"), tagRef.From.Name, err.Error()))
 			} else if whitelister != nil {
 				transport := getWhitelistTransportForFlag(tagRef.ImportPolicy.Insecure || insecureRepository, true)
-				if err := whitelister.AdmitDockerImageReference(ref, transport); err != nil {
+
+				if err := whitelister.AdmitDockerImageReference(ctx, ref, transport); err != nil {
 					errs = append(errs, field.Forbidden(fldPath.Child("from", "name"), err.Error()))
 				}
 			}
@@ -290,12 +296,15 @@ func ValidateImageStreamTagReference(
 
 // ValidateImageStreamUpdate tests required fields for an ImageStream update.
 func ValidateImageStreamUpdate(newStream, oldStream *imageapi.ImageStream) field.ErrorList {
-	return ValidateImageStreamUpdateWithWhitelister(nil, newStream, oldStream)
+	// "normal" object validators aren't supposed to be querying the API server so passing
+	// context is not expected, but we are special. Don't try to wire it up.
+	return ValidateImageStreamUpdateWithWhitelister(context.TODO(), nil, newStream, oldStream)
 }
 
 // ValidateImageStreamUpdateWithWhitelister tests required fields for an ImageStream update. Additionally, it
 // validates each new image reference against registry whitelist.
 func ValidateImageStreamUpdateWithWhitelister(
+	ctx context.Context,
 	whitelister whitelist.RegistryWhitelister,
 	newStream, oldStream *imageapi.ImageStream,
 ) field.ErrorList {
@@ -322,7 +331,7 @@ func ValidateImageStreamUpdateWithWhitelister(
 		}
 	}
 
-	result = append(result, ValidateImageStreamWithWhitelister(whitelister, newStream)...)
+	result = append(result, ValidateImageStreamWithWhitelister(ctx, whitelister, newStream)...)
 
 	return result
 }
@@ -330,6 +339,7 @@ func ValidateImageStreamUpdateWithWhitelister(
 // ValidateImageStreamStatusUpdateWithWhitelister tests required fields for an ImageStream status update.
 // Additionally, it validates each new image reference against registry whitelist.
 func ValidateImageStreamStatusUpdateWithWhitelister(
+	ctx context.Context,
 	whitelister whitelist.RegistryWhitelister,
 	newStream, oldStream *imageapi.ImageStream,
 ) field.ErrorList {
@@ -366,7 +376,7 @@ func ValidateImageStreamStatusUpdateWithWhitelister(
 			}
 		}
 		transport := getWhitelistTransportForFlag(insecure, true)
-		if err := whitelister.AdmitDockerImageReference(ref, transport); err != nil {
+		if err := whitelister.AdmitDockerImageReference(ctx, ref, transport); err != nil {
 			// TODO: should we whitelist references imported based on whitelisted/old spec?
 			// report error for each tag/history item having this reference
 			for _, rf := range rfs {
@@ -451,12 +461,15 @@ func ValidateImageStreamMapping(mapping *imageapi.ImageStreamMapping) field.Erro
 
 // ValidateImageStreamTag validates a mutation of an image stream tag, which can happen on PUT.
 func ValidateImageStreamTag(ist *imageapi.ImageStreamTag) field.ErrorList {
-	return ValidateImageStreamTagWithWhitelister(nil, ist)
+	// "normal" object validators aren't supposed to be querying the API server so passing
+	// context is not expected, but we are special. Don't try to wire it up.
+	return ValidateImageStreamTagWithWhitelister(context.TODO(), nil, ist)
 }
 
 // ValidateImageStreamTag validates a mutation of an image stream tag, which can happen on PUT. Additionally,
 // it validates each new image reference against registry whitelist.
 func ValidateImageStreamTagWithWhitelister(
+	ctx context.Context,
 	whitelister whitelist.RegistryWhitelister,
 	ist *imageapi.ImageStreamTag,
 ) field.ErrorList {
@@ -465,7 +478,7 @@ func ValidateImageStreamTagWithWhitelister(
 	if ist.Tag != nil {
 		// TODO: verify that istag inherits imagestream's annotations
 		insecureRepository := isRepositoryInsecure(ist)
-		result = append(result, ValidateImageStreamTagReference(whitelister, insecureRepository, *ist.Tag, field.NewPath("tag"))...)
+		result = append(result, ValidateImageStreamTagReference(ctx, whitelister, insecureRepository, *ist.Tag, field.NewPath("tag"))...)
 		if ist.Tag.Annotations != nil && !kapihelper.Semantic.DeepEqual(ist.Tag.Annotations, ist.ObjectMeta.Annotations) {
 			result = append(result, field.Invalid(field.NewPath("tag", "annotations"), "<map>", "tag annotations must not be provided or must be equal to the object meta annotations"))
 		}
@@ -476,12 +489,15 @@ func ValidateImageStreamTagWithWhitelister(
 
 // ValidateImageStreamTagUpdate ensures that only the annotations or the image reference of the IST have changed.
 func ValidateImageStreamTagUpdate(newIST, oldIST *imageapi.ImageStreamTag) field.ErrorList {
-	return ValidateImageStreamTagUpdateWithWhitelister(nil, newIST, oldIST)
+	// "normal" object validators aren't supposed to be querying the API server so passing
+	// context is not expected, but we are special. Don't try to wire it through.
+	return ValidateImageStreamTagUpdateWithWhitelister(context.TODO(), nil, newIST, oldIST)
 }
 
 // ValidateImageStreamTagUpdate ensures that only the annotations or the image reference of the IST have
 // changed. Additionally, it validates image reference against registry whitelist if it changed.
 func ValidateImageStreamTagUpdateWithWhitelister(
+	ctx context.Context,
 	whitelister whitelist.RegistryWhitelister,
 	newIST, oldIST *imageapi.ImageStreamTag,
 ) field.ErrorList {
@@ -496,7 +512,7 @@ func ValidateImageStreamTagUpdateWithWhitelister(
 	}
 
 	if newIST.Tag != nil {
-		result = append(result, ValidateImageStreamTagReference(whitelister, isRepositoryInsecure(newIST), *newIST.Tag, field.NewPath("tag"))...)
+		result = append(result, ValidateImageStreamTagReference(ctx, whitelister, isRepositoryInsecure(newIST), *newIST.Tag, field.NewPath("tag"))...)
 		if newIST.Tag.Annotations != nil && !kapihelper.Semantic.DeepEqual(newIST.Tag.Annotations, newIST.ObjectMeta.Annotations) {
 			result = append(result, field.Invalid(field.NewPath("tag", "annotations"), "<map>", "tag annotations must not be provided or must be equal to the object meta annotations"))
 		}
@@ -517,13 +533,14 @@ func ValidateImageStreamTagUpdateWithWhitelister(
 }
 
 // ValidateImageTag validates a mutation of an image stream tag, which can happen on PUT.
-func ValidateImageTag(itag *imageapi.ImageTag) field.ErrorList {
-	return ValidateImageTagWithWhitelister(nil, itag)
+func ValidateImageTag(ctx context.Context, itag *imageapi.ImageTag) field.ErrorList {
+	return ValidateImageTagWithWhitelister(ctx, nil, itag)
 }
 
 // ValidateImageTagWithWhitelister validates a mutation of an image stream tag, which can happen on PUT. Additionally,
 // it validates each new image reference against registry whitelist.
 func ValidateImageTagWithWhitelister(
+	ctx context.Context,
 	whitelister whitelist.RegistryWhitelister,
 	itag *imageapi.ImageTag,
 ) field.ErrorList {
@@ -538,7 +555,7 @@ func ValidateImageTagWithWhitelister(
 		}
 
 		insecureRepository := isRepositoryInsecure(itag)
-		result = append(result, ValidateImageStreamTagReference(whitelister, insecureRepository, *itag.Spec, field.NewPath("spec"))...)
+		result = append(result, ValidateImageStreamTagReference(ctx, whitelister, insecureRepository, *itag.Spec, field.NewPath("spec"))...)
 	}
 
 	return result
@@ -546,12 +563,15 @@ func ValidateImageTagWithWhitelister(
 
 // ValidateImageTagUpdate ensures that only the annotations or the image reference of the IST have changed.
 func ValidateImageTagUpdate(newITag, oldITag *imageapi.ImageTag) field.ErrorList {
-	return ValidateImageTagUpdateWithWhitelister(nil, newITag, oldITag)
+	// "normal" object validators aren't supposed to be querying the API server so passing
+	// context is not expected, but we are special. Don't try to wire it up.
+	return ValidateImageTagUpdateWithWhitelister(context.TODO(), nil, newITag, oldITag)
 }
 
 // ValidateImageTagUpdateWithWhitelister ensures that only the annotations or the image reference of the IST have
 // changed. Additionally, it validates image reference against registry whitelist if it changed.
 func ValidateImageTagUpdateWithWhitelister(
+	ctx context.Context,
 	whitelister whitelist.RegistryWhitelister,
 	newITag, oldITag *imageapi.ImageTag,
 ) field.ErrorList {
@@ -571,7 +591,7 @@ func ValidateImageTagUpdateWithWhitelister(
 			result = append(result, field.Invalid(field.NewPath("spec", "name"), newITag.Spec.Name, "must match image tag name"))
 		}
 
-		result = append(result, ValidateImageStreamTagReference(whitelister, isRepositoryInsecure(newITag), *newITag.Spec, field.NewPath("spec"))...)
+		result = append(result, ValidateImageStreamTagReference(ctx, whitelister, isRepositoryInsecure(newITag), *newITag.Spec, field.NewPath("spec"))...)
 	}
 
 	// ensure that only spec has changed
@@ -585,9 +605,15 @@ func ValidateImageTagUpdateWithWhitelister(
 	return result
 }
 
-func ValidateRegistryAllowedForImport(whitelister whitelist.RegistryWhitelister, path *field.Path, name, registryHost, registryPort string) field.ErrorList {
+func ValidateRegistryAllowedForImport(
+	ctx context.Context,
+	whitelister whitelist.RegistryWhitelister,
+	path *field.Path,
+	name, registryHost,
+	registryPort string,
+) field.ErrorList {
 	hostname := net.JoinHostPort(registryHost, registryPort)
-	err := whitelister.AdmitHostname(hostname, whitelist.WhitelistTransportSecure)
+	err := whitelister.AdmitHostname(ctx, hostname, whitelist.WhitelistTransportSecure)
 	if err != nil {
 		return field.ErrorList{field.Forbidden(path, fmt.Sprintf("importing images from registry %q is forbidden: %v", hostname, err))}
 	}

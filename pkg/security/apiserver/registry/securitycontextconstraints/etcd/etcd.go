@@ -81,3 +81,7 @@ func (r *REST) DeleteCollection(ctx context.Context, validation rest.ValidateObj
 func (r *REST) Watch(ctx context.Context, options *metainternalversion.ListOptions) (watch.Interface, error) {
 	return nil, errors.NewInternalError(fmt.Errorf("unsupported"))
 }
+
+func (r *REST) ConvertToTable(ctx context.Context, object runtime.Object, tableOptions runtime.Object) (*metav1.Table, error) {
+	return nil, errors.NewInternalError(fmt.Errorf("unsupported"))
+}
