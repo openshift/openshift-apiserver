@@ -23,12 +23,12 @@ require (
 	github.com/openshift/client-go v0.0.0-20200326155132-2a6cd50aedd0
 	github.com/openshift/library-go v0.0.0-20200402123743-4015ba624cae
 	github.com/openshift/source-to-image v1.3.1-0.20200213141744-eed2850f2187
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
-	go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738
-	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
+	go.etcd.io/etcd v0.5.0-alpha.5.0.20200401174654-e694b7bb0875
+	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
 	k8s.io/api v0.18.0
 	k8s.io/apiextensions-apiserver v0.18.0
 	k8s.io/apimachinery v0.18.0
@@ -38,14 +38,15 @@ require (
 	k8s.io/component-base v0.18.0
 	k8s.io/klog v1.0.0
 	k8s.io/kube-aggregator v0.18.0
-	k8s.io/kube-openapi v0.0.0-20200121204235-bf4fb3bd569c
+	k8s.io/kube-openapi v0.0.0-20200403204345-e1beb1bd0f35
 	k8s.io/kubectl v0.18.0
-	k8s.io/kubernetes v1.18.0
+	k8s.io/kubernetes v1.19.0-alpha.2.0.20200422115352-fc9d1741022a
 )
 
 replace (
 	github.com/docker/distribution => github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d
 	github.com/docker/docker => github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d
+	github.com/googleapis/gnostic => github.com/googleapis/gnostic v0.4.1-0.20200130232022-81b31a2e6e4e
 	github.com/moby/buildkit => github.com/dmcgowan/buildkit v0.0.0-20170731200553-da2b9dc7dab9
 	k8s.io/api => k8s.io/api v0.18.0
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.18.0
@@ -66,7 +67,7 @@ replace (
 	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.18.0
 	k8s.io/kubectl => k8s.io/kubectl v0.18.0
 	k8s.io/kubelet => k8s.io/kubelet v0.18.0
-	k8s.io/kubernetes => k8s.io/kubernetes v1.18.0
+	k8s.io/kubernetes => k8s.io/kubernetes v1.19.0-alpha.2.0.20200422115352-fc9d1741022a
 	k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.18.0
 	k8s.io/metrics => k8s.io/metrics v0.18.0
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.18.0
