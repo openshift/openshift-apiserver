@@ -15,11 +15,11 @@ const (
 var (
 	GroupVersion = schema.GroupVersion{Group: GroupName, Version: "v1"}
 
-	schemeBuilder = runtime.NewSchemeBuilder(
+	localSchemeBuilder = runtime.NewSchemeBuilder(
 		addKnownTypes,
 		requestlimit.Install,
 	)
-	Install = schemeBuilder.AddToScheme
+	Install = localSchemeBuilder.AddToScheme
 )
 
 // Adds the list of known types to api.Scheme.
