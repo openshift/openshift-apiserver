@@ -3,7 +3,7 @@ package template
 import (
 	"testing"
 
-	"k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -15,6 +15,7 @@ import (
 
 	templatev1 "github.com/openshift/api/template/v1"
 	"github.com/openshift/openshift-apiserver/pkg/template/apis/template"
+	v1 "github.com/openshift/openshift-apiserver/pkg/template/apis/template/v1"
 )
 
 func TestNewRESTDefaultsName(t *testing.T) {
@@ -60,11 +61,10 @@ func TestNewRESTTemplateLabels(t *testing.T) {
 	storage := NewREST()
 
 	testScheme := runtime.NewScheme()
-	utilruntime.Must(v1.AddToScheme(testScheme))
-	utilruntime.Must(templatev1.Install(testScheme))
-	utilruntime.Must(template.Install(testScheme))
+	utilruntime.Must(corev1.AddToScheme(testScheme))
+	utilruntime.Must(v1.Install(testScheme))
 	testCodecFactory := serializer.NewCodecFactory(testScheme)
-	testCodec := testCodecFactory.LegacyCodec(templatev1.GroupVersion, v1.SchemeGroupVersion)
+	testCodec := testCodecFactory.LegacyCodec(templatev1.GroupVersion, corev1.SchemeGroupVersion)
 	// because of encoding changes, we to round-trip ourselves
 	templateToCreate := &templatev1.Template{
 		ObjectMeta: metav1.ObjectMeta{
@@ -73,18 +73,18 @@ func TestNewRESTTemplateLabels(t *testing.T) {
 		ObjectLabels: testLabels,
 	}
 	templateToCreate.Objects = append(templateToCreate.Objects, runtime.RawExtension{
-		Raw: []byte(runtime.EncodeOrDie(testCodec, &v1.Service{
+		Raw: []byte(runtime.EncodeOrDie(testCodec, &corev1.Service{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "test-service",
 			},
-			Spec: v1.ServiceSpec{
-				Ports: []v1.ServicePort{
+			Spec: corev1.ServiceSpec{
+				Ports: []corev1.ServicePort{
 					{
 						Port:     80,
-						Protocol: v1.ProtocolTCP,
+						Protocol: corev1.ProtocolTCP,
 					},
 				},
-				SessionAffinity: v1.ServiceAffinityNone,
+				SessionAffinity: corev1.ServiceAffinityNone,
 			},
 		})),
 	})
@@ -140,11 +140,10 @@ func TestNewRESTTemplateLabelsList(t *testing.T) {
 	storage := NewREST()
 
 	testScheme := runtime.NewScheme()
-	utilruntime.Must(v1.AddToScheme(testScheme))
-	utilruntime.Must(templatev1.Install(testScheme))
-	utilruntime.Must(template.Install(testScheme))
+	utilruntime.Must(corev1.AddToScheme(testScheme))
+	utilruntime.Must(v1.Install(testScheme))
 	testCodecFactory := serializer.NewCodecFactory(testScheme)
-	testCodec := testCodecFactory.LegacyCodec(templatev1.GroupVersion, v1.SchemeGroupVersion)
+	testCodec := testCodecFactory.LegacyCodec(templatev1.GroupVersion, corev1.SchemeGroupVersion)
 	// because of encoding changes, we to round-trip ourselves
 	templateToCreate := &templatev1.Template{
 		ObjectMeta: metav1.ObjectMeta{
@@ -153,18 +152,18 @@ func TestNewRESTTemplateLabelsList(t *testing.T) {
 		ObjectLabels: testLabels,
 	}
 	templateToCreate.Objects = append(templateToCreate.Objects, runtime.RawExtension{
-		Raw: []byte(runtime.EncodeOrDie(testCodec, &v1.Service{
+		Raw: []byte(runtime.EncodeOrDie(testCodec, &corev1.Service{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "test-service",
 			},
-			Spec: v1.ServiceSpec{
-				Ports: []v1.ServicePort{
+			Spec: corev1.ServiceSpec{
+				Ports: []corev1.ServicePort{
 					{
 						Port:     80,
-						Protocol: v1.ProtocolTCP,
+						Protocol: corev1.ProtocolTCP,
 					},
 				},
-				SessionAffinity: v1.ServiceAffinityNone,
+				SessionAffinity: corev1.ServiceAffinityNone,
 			},
 		})),
 	})
