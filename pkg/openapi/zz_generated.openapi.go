@@ -134,7 +134,9 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.APIServerServingCerts":                                                    schema_openshift_api_config_v1_APIServerServingCerts(ref),
 		"github.com/openshift/api/config/v1.APIServerSpec":                                                            schema_openshift_api_config_v1_APIServerSpec(ref),
 		"github.com/openshift/api/config/v1.APIServerStatus":                                                          schema_openshift_api_config_v1_APIServerStatus(ref),
+		"github.com/openshift/api/config/v1.AWSPlatformSpec":                                                          schema_openshift_api_config_v1_AWSPlatformSpec(ref),
 		"github.com/openshift/api/config/v1.AWSPlatformStatus":                                                        schema_openshift_api_config_v1_AWSPlatformStatus(ref),
+		"github.com/openshift/api/config/v1.AWSServiceEndpoint":                                                       schema_openshift_api_config_v1_AWSServiceEndpoint(ref),
 		"github.com/openshift/api/config/v1.AdmissionConfig":                                                          schema_openshift_api_config_v1_AdmissionConfig(ref),
 		"github.com/openshift/api/config/v1.AdmissionPluginConfig":                                                    schema_openshift_api_config_v1_AdmissionPluginConfig(ref),
 		"github.com/openshift/api/config/v1.AuditConfig":                                                              schema_openshift_api_config_v1_AuditConfig(ref),
@@ -142,7 +144,9 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.AuthenticationList":                                                       schema_openshift_api_config_v1_AuthenticationList(ref),
 		"github.com/openshift/api/config/v1.AuthenticationSpec":                                                       schema_openshift_api_config_v1_AuthenticationSpec(ref),
 		"github.com/openshift/api/config/v1.AuthenticationStatus":                                                     schema_openshift_api_config_v1_AuthenticationStatus(ref),
+		"github.com/openshift/api/config/v1.AzurePlatformSpec":                                                        schema_openshift_api_config_v1_AzurePlatformSpec(ref),
 		"github.com/openshift/api/config/v1.AzurePlatformStatus":                                                      schema_openshift_api_config_v1_AzurePlatformStatus(ref),
+		"github.com/openshift/api/config/v1.BareMetalPlatformSpec":                                                    schema_openshift_api_config_v1_BareMetalPlatformSpec(ref),
 		"github.com/openshift/api/config/v1.BareMetalPlatformStatus":                                                  schema_openshift_api_config_v1_BareMetalPlatformStatus(ref),
 		"github.com/openshift/api/config/v1.BasicAuthIdentityProvider":                                                schema_openshift_api_config_v1_BasicAuthIdentityProvider(ref),
 		"github.com/openshift/api/config/v1.Build":                                                                    schema_openshift_api_config_v1_Build(ref),
@@ -189,6 +193,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.FeatureGateSelection":                                                     schema_openshift_api_config_v1_FeatureGateSelection(ref),
 		"github.com/openshift/api/config/v1.FeatureGateSpec":                                                          schema_openshift_api_config_v1_FeatureGateSpec(ref),
 		"github.com/openshift/api/config/v1.FeatureGateStatus":                                                        schema_openshift_api_config_v1_FeatureGateStatus(ref),
+		"github.com/openshift/api/config/v1.GCPPlatformSpec":                                                          schema_openshift_api_config_v1_GCPPlatformSpec(ref),
 		"github.com/openshift/api/config/v1.GCPPlatformStatus":                                                        schema_openshift_api_config_v1_GCPPlatformStatus(ref),
 		"github.com/openshift/api/config/v1.GenericAPIServerConfig":                                                   schema_openshift_api_config_v1_GenericAPIServerConfig(ref),
 		"github.com/openshift/api/config/v1.GenericControllerConfig":                                                  schema_openshift_api_config_v1_GenericControllerConfig(ref),
@@ -199,6 +204,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.HTTPServingInfo":                                                          schema_openshift_api_config_v1_HTTPServingInfo(ref),
 		"github.com/openshift/api/config/v1.HubSource":                                                                schema_openshift_api_config_v1_HubSource(ref),
 		"github.com/openshift/api/config/v1.HubSourceStatus":                                                          schema_openshift_api_config_v1_HubSourceStatus(ref),
+		"github.com/openshift/api/config/v1.IBMCloudPlatformSpec":                                                     schema_openshift_api_config_v1_IBMCloudPlatformSpec(ref),
 		"github.com/openshift/api/config/v1.IBMCloudPlatformStatus":                                                   schema_openshift_api_config_v1_IBMCloudPlatformStatus(ref),
 		"github.com/openshift/api/config/v1.IdentityProvider":                                                         schema_openshift_api_config_v1_IdentityProvider(ref),
 		"github.com/openshift/api/config/v1.IdentityProviderConfig":                                                   schema_openshift_api_config_v1_IdentityProviderConfig(ref),
@@ -237,13 +243,16 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.OldTLSProfile":                                                            schema_openshift_api_config_v1_OldTLSProfile(ref),
 		"github.com/openshift/api/config/v1.OpenIDClaims":                                                             schema_openshift_api_config_v1_OpenIDClaims(ref),
 		"github.com/openshift/api/config/v1.OpenIDIdentityProvider":                                                   schema_openshift_api_config_v1_OpenIDIdentityProvider(ref),
+		"github.com/openshift/api/config/v1.OpenStackPlatformSpec":                                                    schema_openshift_api_config_v1_OpenStackPlatformSpec(ref),
 		"github.com/openshift/api/config/v1.OpenStackPlatformStatus":                                                  schema_openshift_api_config_v1_OpenStackPlatformStatus(ref),
 		"github.com/openshift/api/config/v1.OperandVersion":                                                           schema_openshift_api_config_v1_OperandVersion(ref),
 		"github.com/openshift/api/config/v1.OperatorHub":                                                              schema_openshift_api_config_v1_OperatorHub(ref),
 		"github.com/openshift/api/config/v1.OperatorHubList":                                                          schema_openshift_api_config_v1_OperatorHubList(ref),
 		"github.com/openshift/api/config/v1.OperatorHubSpec":                                                          schema_openshift_api_config_v1_OperatorHubSpec(ref),
 		"github.com/openshift/api/config/v1.OperatorHubStatus":                                                        schema_openshift_api_config_v1_OperatorHubStatus(ref),
+		"github.com/openshift/api/config/v1.OvirtPlatformSpec":                                                        schema_openshift_api_config_v1_OvirtPlatformSpec(ref),
 		"github.com/openshift/api/config/v1.OvirtPlatformStatus":                                                      schema_openshift_api_config_v1_OvirtPlatformStatus(ref),
+		"github.com/openshift/api/config/v1.PlatformSpec":                                                             schema_openshift_api_config_v1_PlatformSpec(ref),
 		"github.com/openshift/api/config/v1.PlatformStatus":                                                           schema_openshift_api_config_v1_PlatformStatus(ref),
 		"github.com/openshift/api/config/v1.Project":                                                                  schema_openshift_api_config_v1_Project(ref),
 		"github.com/openshift/api/config/v1.ProjectList":                                                              schema_openshift_api_config_v1_ProjectList(ref),
@@ -271,6 +280,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.TokenConfig":                                                              schema_openshift_api_config_v1_TokenConfig(ref),
 		"github.com/openshift/api/config/v1.Update":                                                                   schema_openshift_api_config_v1_Update(ref),
 		"github.com/openshift/api/config/v1.UpdateHistory":                                                            schema_openshift_api_config_v1_UpdateHistory(ref),
+		"github.com/openshift/api/config/v1.VSpherePlatformSpec":                                                      schema_openshift_api_config_v1_VSpherePlatformSpec(ref),
 		"github.com/openshift/api/config/v1.VSpherePlatformStatus":                                                    schema_openshift_api_config_v1_VSpherePlatformStatus(ref),
 		"github.com/openshift/api/config/v1.WebhookTokenAuthenticator":                                                schema_openshift_api_config_v1_WebhookTokenAuthenticator(ref),
 		"github.com/openshift/api/config/v1.featureSetBuilder":                                                        schema_openshift_api_config_v1_featureSetBuilder(ref),
@@ -451,6 +461,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/openshiftcontrolplane/v1.ServiceAccountControllerConfig":                            schema_openshift_api_openshiftcontrolplane_v1_ServiceAccountControllerConfig(ref),
 		"github.com/openshift/api/openshiftcontrolplane/v1.ServiceServingCert":                                        schema_openshift_api_openshiftcontrolplane_v1_ServiceServingCert(ref),
 		"github.com/openshift/api/openshiftcontrolplane/v1.SourceStrategyDefaultsConfig":                              schema_openshift_api_openshiftcontrolplane_v1_SourceStrategyDefaultsConfig(ref),
+		"github.com/openshift/api/operator/v1.AccessLogging":                                                          schema_openshift_api_operator_v1_AccessLogging(ref),
 		"github.com/openshift/api/operator/v1.AdditionalNetworkDefinition":                                            schema_openshift_api_operator_v1_AdditionalNetworkDefinition(ref),
 		"github.com/openshift/api/operator/v1.Authentication":                                                         schema_openshift_api_operator_v1_Authentication(ref),
 		"github.com/openshift/api/operator/v1.AuthenticationList":                                                     schema_openshift_api_operator_v1_AuthenticationList(ref),
@@ -472,6 +483,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.ConsoleProviders":                                                       schema_openshift_api_operator_v1_ConsoleProviders(ref),
 		"github.com/openshift/api/operator/v1.ConsoleSpec":                                                            schema_openshift_api_operator_v1_ConsoleSpec(ref),
 		"github.com/openshift/api/operator/v1.ConsoleStatus":                                                          schema_openshift_api_operator_v1_ConsoleStatus(ref),
+		"github.com/openshift/api/operator/v1.ContainerLoggingDestinationParameters":                                  schema_openshift_api_operator_v1_ContainerLoggingDestinationParameters(ref),
 		"github.com/openshift/api/operator/v1.DNS":                                                                    schema_openshift_api_operator_v1_DNS(ref),
 		"github.com/openshift/api/operator/v1.DNSList":                                                                schema_openshift_api_operator_v1_DNSList(ref),
 		"github.com/openshift/api/operator/v1.DNSSpec":                                                                schema_openshift_api_operator_v1_DNSSpec(ref),
@@ -489,6 +501,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.IPAMConfig":                                                             schema_openshift_api_operator_v1_IPAMConfig(ref),
 		"github.com/openshift/api/operator/v1.IngressController":                                                      schema_openshift_api_operator_v1_IngressController(ref),
 		"github.com/openshift/api/operator/v1.IngressControllerList":                                                  schema_openshift_api_operator_v1_IngressControllerList(ref),
+		"github.com/openshift/api/operator/v1.IngressControllerLogging":                                               schema_openshift_api_operator_v1_IngressControllerLogging(ref),
 		"github.com/openshift/api/operator/v1.IngressControllerSpec":                                                  schema_openshift_api_operator_v1_IngressControllerSpec(ref),
 		"github.com/openshift/api/operator/v1.IngressControllerStatus":                                                schema_openshift_api_operator_v1_IngressControllerStatus(ref),
 		"github.com/openshift/api/operator/v1.KubeAPIServer":                                                          schema_openshift_api_operator_v1_KubeAPIServer(ref),
@@ -509,6 +522,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.KubeStorageVersionMigratorStatus":                                       schema_openshift_api_operator_v1_KubeStorageVersionMigratorStatus(ref),
 		"github.com/openshift/api/operator/v1.KuryrConfig":                                                            schema_openshift_api_operator_v1_KuryrConfig(ref),
 		"github.com/openshift/api/operator/v1.LoadBalancerStrategy":                                                   schema_openshift_api_operator_v1_LoadBalancerStrategy(ref),
+		"github.com/openshift/api/operator/v1.LoggingDestination":                                                     schema_openshift_api_operator_v1_LoggingDestination(ref),
 		"github.com/openshift/api/operator/v1.MyOperatorResource":                                                     schema_openshift_api_operator_v1_MyOperatorResource(ref),
 		"github.com/openshift/api/operator/v1.MyOperatorResourceSpec":                                                 schema_openshift_api_operator_v1_MyOperatorResourceSpec(ref),
 		"github.com/openshift/api/operator/v1.MyOperatorResourceStatus":                                               schema_openshift_api_operator_v1_MyOperatorResourceStatus(ref),
@@ -557,6 +571,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.StaticPodOperatorSpec":                                                  schema_openshift_api_operator_v1_StaticPodOperatorSpec(ref),
 		"github.com/openshift/api/operator/v1.StaticPodOperatorStatus":                                                schema_openshift_api_operator_v1_StaticPodOperatorStatus(ref),
 		"github.com/openshift/api/operator/v1.StatuspageProvider":                                                     schema_openshift_api_operator_v1_StatuspageProvider(ref),
+		"github.com/openshift/api/operator/v1.SyslogLoggingDestinationParameters":                                     schema_openshift_api_operator_v1_SyslogLoggingDestinationParameters(ref),
 		"github.com/openshift/api/operator/v1alpha1.DelegatedAuthentication":                                          schema_openshift_api_operator_v1alpha1_DelegatedAuthentication(ref),
 		"github.com/openshift/api/operator/v1alpha1.DelegatedAuthorization":                                           schema_openshift_api_operator_v1alpha1_DelegatedAuthorization(ref),
 		"github.com/openshift/api/operator/v1alpha1.GenerationHistory":                                                schema_openshift_api_operator_v1alpha1_GenerationHistory(ref),
@@ -5317,7 +5332,6 @@ func schema_openshift_api_build_v1_BuildRequest(ref common.ReferenceCallback) co
 						},
 					},
 				},
-				Required: []string{"triggeredBy"},
 			},
 		},
 		Dependencies: []string{
@@ -5505,7 +5519,7 @@ func schema_openshift_api_build_v1_BuildSpec(ref common.ReferenceCallback) commo
 						},
 					},
 				},
-				Required: []string{"strategy", "triggeredBy"},
+				Required: []string{"strategy"},
 			},
 		},
 		Dependencies: []string{
@@ -7364,6 +7378,34 @@ func schema_openshift_api_config_v1_APIServerStatus(ref common.ReferenceCallback
 	}
 }
 
+func schema_openshift_api_config_v1_AWSPlatformSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "AWSPlatformSpec holds the desired state of the Amazon Web Services infrastructure provider. This only includes fields that can be modified in the cluster.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"serviceEndpoints": {
+						SchemaProps: spec.SchemaProps{
+							Description: "serviceEndpoints list contains custom endpoints which will override default service endpoint of AWS Services. There must be only one ServiceEndpoint for a service.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/openshift/api/config/v1.AWSServiceEndpoint"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.AWSServiceEndpoint"},
+	}
+}
+
 func schema_openshift_api_config_v1_AWSPlatformStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -7378,8 +7420,51 @@ func schema_openshift_api_config_v1_AWSPlatformStatus(ref common.ReferenceCallba
 							Format:      "",
 						},
 					},
+					"serviceEndpoints": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ServiceEndpoints list contains custom endpoints which will override default service endpoint of AWS Services. There must be only one ServiceEndpoint for a service.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/openshift/api/config/v1.AWSServiceEndpoint"),
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"region"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.AWSServiceEndpoint"},
+	}
+}
+
+func schema_openshift_api_config_v1_AWSServiceEndpoint(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "AWSServiceEndpoint store the configuration of a custom url to override existing defaults of AWS Services.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "name is the name of the AWS service. The list of all the service names can be found at https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html This must be provided and cannot be empty.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"url": {
+						SchemaProps: spec.SchemaProps{
+							Description: "url is fully qualified URI with scheme https, that overrides the default generated endpoint for a client. This must be provided and cannot be empty.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name", "url"},
 			},
 		},
 	}
@@ -7681,7 +7766,7 @@ func schema_openshift_api_config_v1_AuthenticationSpec(ref common.ReferenceCallb
 					},
 					"serviceAccountIssuer": {
 						SchemaProps: spec.SchemaProps{
-							Description: "serviceAccountIssuer is the identifier of the bound service account token issuer. The default is auth.openshift.io.",
+							Description: "serviceAccountIssuer is the identifier of the bound service account token issuer. The default is https://kubernetes.default.svc",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7715,6 +7800,17 @@ func schema_openshift_api_config_v1_AuthenticationStatus(ref common.ReferenceCal
 	}
 }
 
+func schema_openshift_api_config_v1_AzurePlatformSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "AzurePlatformSpec holds the desired state of the Azure infrastructure provider. This only includes fields that can be modified in the cluster.",
+				Type:        []string{"object"},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_config_v1_AzurePlatformStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -7738,6 +7834,17 @@ func schema_openshift_api_config_v1_AzurePlatformStatus(ref common.ReferenceCall
 					},
 				},
 				Required: []string{"resourceGroupName"},
+			},
+		},
+	}
+}
+
+func schema_openshift_api_config_v1_BareMetalPlatformSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BareMetalPlatformSpec holds the desired state of the BareMetal infrastructure provider. This only includes fields that can be modified in the cluster.",
+				Type:        []string{"object"},
 			},
 		},
 	}
@@ -9531,6 +9638,17 @@ func schema_openshift_api_config_v1_FeatureGateStatus(ref common.ReferenceCallba
 	}
 }
 
+func schema_openshift_api_config_v1_GCPPlatformSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GCPPlatformSpec holds the desired state of the Google Cloud Platform infrastructure provider. This only includes fields that can be modified in the cluster.",
+				Type:        []string{"object"},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_config_v1_GCPPlatformStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -9977,6 +10095,17 @@ func schema_openshift_api_config_v1_HubSourceStatus(ref common.ReferenceCallback
 						},
 					},
 				},
+			},
+		},
+	}
+}
+
+func schema_openshift_api_config_v1_IBMCloudPlatformSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "IBMCloudPlatformSpec holds the desired state of the IBMCloud infrastructure provider. This only includes fields that can be modified in the cluster.",
+				Type:        []string{"object"},
 			},
 		},
 	}
@@ -10493,15 +10622,21 @@ func schema_openshift_api_config_v1_InfrastructureSpec(ref common.ReferenceCallb
 				Properties: map[string]spec.Schema{
 					"cloudConfig": {
 						SchemaProps: spec.SchemaProps{
-							Description: "cloudConfig is a reference to a ConfigMap containing the cloud provider configuration file. This configuration file is used to configure the Kubernetes cloud provider integration when using the built-in cloud provider integration or the external cloud controller manager. The namespace for this config map is openshift-config.",
+							Description: "cloudConfig is a reference to a ConfigMap containing the cloud provider configuration file. This configuration file is used to configure the Kubernetes cloud provider integration when using the built-in cloud provider integration or the external cloud controller manager. The namespace for this config map is openshift-config.\n\ncloudConfig should only be consumed by the kube_cloud_config controller. The controller is responsible for using the user configuration in the spec for various platforms and combining that with the user provided ConfigMap in this field to create a stitched kube cloud config. The controller generates a ConfigMap `kube-cloud-config` in `openshift-config-managed` namespace with the kube cloud config is stored in `cloud.conf` key. All the clients are expected to use the generated ConfigMap only.",
 							Ref:         ref("github.com/openshift/api/config/v1.ConfigMapFileReference"),
+						},
+					},
+					"platformSpec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "platformSpec holds desired information specific to the underlying infrastructure provider.",
+							Ref:         ref("github.com/openshift/api/config/v1.PlatformSpec"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.ConfigMapFileReference"},
+			"github.com/openshift/api/config/v1.ConfigMapFileReference", "github.com/openshift/api/config/v1.PlatformSpec"},
 	}
 }
 
@@ -11612,6 +11747,17 @@ func schema_openshift_api_config_v1_OpenIDIdentityProvider(ref common.ReferenceC
 	}
 }
 
+func schema_openshift_api_config_v1_OpenStackPlatformSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "OpenStackPlatformSpec holds the desired state of the OpenStack infrastructure provider. This only includes fields that can be modified in the cluster.",
+				Type:        []string{"object"},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_config_v1_OpenStackPlatformStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -11835,6 +11981,17 @@ func schema_openshift_api_config_v1_OperatorHubStatus(ref common.ReferenceCallba
 	}
 }
 
+func schema_openshift_api_config_v1_OvirtPlatformSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "OvirtPlatformSpec holds the desired state of the oVirt infrastructure provider. This only includes fields that can be modified in the cluster.",
+				Type:        []string{"object"},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_config_v1_OvirtPlatformStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -11869,6 +12026,77 @@ func schema_openshift_api_config_v1_OvirtPlatformStatus(ref common.ReferenceCall
 	}
 }
 
+func schema_openshift_api_config_v1_PlatformSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PlatformSpec holds the desired state specific to the underlying infrastructure provider of the current cluster. Since these are used at spec-level for the underlying cluster, it is supposed that only one of the spec structs is set.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "type is the underlying infrastructure provider for the cluster. This value controls whether infrastructure automation such as service load balancers, dynamic volume provisioning, machine creation and deletion, and other integrations are enabled. If None, no infrastructure automation is enabled. Allowed values are \"AWS\", \"Azure\", \"BareMetal\", \"GCP\", \"Libvirt\", \"OpenStack\", \"VSphere\", \"oVirt\", and \"None\". Individual components may not support all platforms, and must handle unrecognized platforms as None if they do not support that platform.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"aws": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AWS contains settings specific to the Amazon Web Services infrastructure provider.",
+							Ref:         ref("github.com/openshift/api/config/v1.AWSPlatformSpec"),
+						},
+					},
+					"azure": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Azure contains settings specific to the Azure infrastructure provider.",
+							Ref:         ref("github.com/openshift/api/config/v1.AzurePlatformSpec"),
+						},
+					},
+					"gcp": {
+						SchemaProps: spec.SchemaProps{
+							Description: "GCP contains settings specific to the Google Cloud Platform infrastructure provider.",
+							Ref:         ref("github.com/openshift/api/config/v1.GCPPlatformSpec"),
+						},
+					},
+					"baremetal": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BareMetal contains settings specific to the BareMetal platform.",
+							Ref:         ref("github.com/openshift/api/config/v1.BareMetalPlatformSpec"),
+						},
+					},
+					"openstack": {
+						SchemaProps: spec.SchemaProps{
+							Description: "OpenStack contains settings specific to the OpenStack infrastructure provider.",
+							Ref:         ref("github.com/openshift/api/config/v1.OpenStackPlatformSpec"),
+						},
+					},
+					"ovirt": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Ovirt contains settings specific to the oVirt infrastructure provider.",
+							Ref:         ref("github.com/openshift/api/config/v1.OvirtPlatformSpec"),
+						},
+					},
+					"vsphere": {
+						SchemaProps: spec.SchemaProps{
+							Description: "VSphere contains settings specific to the VSphere infrastructure provider.",
+							Ref:         ref("github.com/openshift/api/config/v1.VSpherePlatformSpec"),
+						},
+					},
+					"ibmcloud": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IBMCloud contains settings specific to the IBMCloud infrastructure provider.",
+							Ref:         ref("github.com/openshift/api/config/v1.IBMCloudPlatformSpec"),
+						},
+					},
+				},
+				Required: []string{"type"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.AWSPlatformSpec", "github.com/openshift/api/config/v1.AzurePlatformSpec", "github.com/openshift/api/config/v1.BareMetalPlatformSpec", "github.com/openshift/api/config/v1.GCPPlatformSpec", "github.com/openshift/api/config/v1.IBMCloudPlatformSpec", "github.com/openshift/api/config/v1.OpenStackPlatformSpec", "github.com/openshift/api/config/v1.OvirtPlatformSpec", "github.com/openshift/api/config/v1.VSpherePlatformSpec"},
+	}
+}
+
 func schema_openshift_api_config_v1_PlatformStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -11878,7 +12106,7 @@ func schema_openshift_api_config_v1_PlatformStatus(ref common.ReferenceCallback)
 				Properties: map[string]spec.Schema{
 					"type": {
 						SchemaProps: spec.SchemaProps{
-							Description: "type is the underlying infrastructure provider for the cluster. This value controls whether infrastructure automation such as service load balancers, dynamic volume provisioning, machine creation and deletion, and other integrations are enabled. If None, no infrastructure automation is enabled. Allowed values are \"AWS\", \"Azure\", \"BareMetal\", \"GCP\", \"Libvirt\", \"OpenStack\", \"VSphere\", \"oVirt\", and \"None\". Individual components may not support all platforms, and must handle unrecognized platforms as None if they do not support that platform.",
+							Description: "type is the underlying infrastructure provider for the cluster. This value controls whether infrastructure automation such as service load balancers, dynamic volume provisioning, machine creation and deletion, and other integrations are enabled. If None, no infrastructure automation is enabled. Allowed values are \"AWS\", \"Azure\", \"BareMetal\", \"GCP\", \"Libvirt\", \"OpenStack\", \"VSphere\", \"oVirt\", and \"None\". Individual components may not support all platforms, and must handle unrecognized platforms as None if they do not support that platform.\n\nThis value will be synced with to the `status.platform` and `status.platformStatus.type`. Currently this value cannot be changed once set.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -13044,6 +13272,17 @@ func schema_openshift_api_config_v1_UpdateHistory(ref common.ReferenceCallback) 
 		},
 		Dependencies: []string{
 			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_openshift_api_config_v1_VSpherePlatformSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VSpherePlatformSpec holds the desired state of the vSphere infrastructure provider. This only includes fields that can be modified in the cluster.",
+				Type:        []string{"object"},
+			},
+		},
 	}
 }
 
@@ -22372,6 +22611,35 @@ func schema_openshift_api_openshiftcontrolplane_v1_SourceStrategyDefaultsConfig(
 	}
 }
 
+func schema_openshift_api_operator_v1_AccessLogging(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "AccessLogging describes how client requests should be logged.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"destination": {
+						SchemaProps: spec.SchemaProps{
+							Description: "destination is where access logs go.",
+							Ref:         ref("github.com/openshift/api/operator/v1.LoggingDestination"),
+						},
+					},
+					"httpLogFormat": {
+						SchemaProps: spec.SchemaProps{
+							Description: "httpLogFormat specifies the format of the log message for an HTTP request.\n\nIf this field is empty, log messages use the implementation's default HTTP log format.  For HAProxy's default HTTP log format, see the HAProxy documentation: http://cbonte.github.io/haproxy-dconv/2.0/configuration.html#8.2.3",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"destination"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/operator/v1.LoggingDestination"},
+	}
+}
+
 func schema_openshift_api_operator_v1_AdditionalNetworkDefinition(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -23385,6 +23653,17 @@ func schema_openshift_api_operator_v1_ConsoleStatus(ref common.ReferenceCallback
 	}
 }
 
+func schema_openshift_api_operator_v1_ContainerLoggingDestinationParameters(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ContainerLoggingDestinationParameters describes parameters for the Container logging destination type.",
+				Type:        []string{"object"},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_operator_v1_DNS(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -24154,6 +24433,27 @@ func schema_openshift_api_operator_v1_IngressControllerList(ref common.Reference
 	}
 }
 
+func schema_openshift_api_operator_v1_IngressControllerLogging(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "IngressControllerLogging describes what should be logged where.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"access": {
+						SchemaProps: spec.SchemaProps{
+							Description: "access describes how the client requests should be logged.\n\nIf this field is empty, access logging is disabled.",
+							Ref:         ref("github.com/openshift/api/operator/v1.AccessLogging"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/operator/v1.AccessLogging"},
+	}
+}
+
 func schema_openshift_api_operator_v1_IngressControllerSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -24217,11 +24517,17 @@ func schema_openshift_api_operator_v1_IngressControllerSpec(ref common.Reference
 							Ref:         ref("github.com/openshift/api/operator/v1.RouteAdmissionPolicy"),
 						},
 					},
+					"logging": {
+						SchemaProps: spec.SchemaProps{
+							Description: "logging defines parameters for what should be logged where.  If this field is empty, operational logs are enabled but access logs are disabled.",
+							Ref:         ref("github.com/openshift/api/operator/v1.IngressControllerLogging"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.TLSSecurityProfile", "github.com/openshift/api/operator/v1.EndpointPublishingStrategy", "github.com/openshift/api/operator/v1.NodePlacement", "github.com/openshift/api/operator/v1.RouteAdmissionPolicy", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
+			"github.com/openshift/api/config/v1.TLSSecurityProfile", "github.com/openshift/api/operator/v1.EndpointPublishingStrategy", "github.com/openshift/api/operator/v1.IngressControllerLogging", "github.com/openshift/api/operator/v1.NodePlacement", "github.com/openshift/api/operator/v1.RouteAdmissionPolicy", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
 	}
 }
 
@@ -25336,6 +25642,54 @@ func schema_openshift_api_operator_v1_LoadBalancerStrategy(ref common.ReferenceC
 				Required: []string{"scope"},
 			},
 		},
+	}
+}
+
+func schema_openshift_api_operator_v1_LoggingDestination(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LoggingDestination describes a destination for log messages.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "type is the type of destination for logs.  It must be one of the following:\n\n* Container\n\nThe ingress operator configures the sidecar container named \"logs\" on the ingress controller pod and configures the ingress controller to write logs to the sidecar.  The logs are then available as container logs.  The expectation is that the administrator configures a custom logging solution that reads logs from this sidecar.  Note that using container logs means that logs may be dropped if the rate of logs exceeds the container runtime's or the custom logging solution's capacity.\n\n* Syslog\n\nLogs are sent to a syslog endpoint.  The administrator must specify an endpoint that can receive syslog messages.  The expectation is that the administrator has configured a custom syslog instance.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"syslog": {
+						SchemaProps: spec.SchemaProps{
+							Description: "syslog holds parameters for a syslog endpoint.  Present only if type is Syslog.",
+							Ref:         ref("github.com/openshift/api/operator/v1.SyslogLoggingDestinationParameters"),
+						},
+					},
+					"container": {
+						SchemaProps: spec.SchemaProps{
+							Description: "container holds parameters for the Container logging destination. Present only if type is Container.",
+							Ref:         ref("github.com/openshift/api/operator/v1.ContainerLoggingDestinationParameters"),
+						},
+					},
+				},
+				Required: []string{"type"},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-unions": []interface{}{
+						map[string]interface{}{
+							"discriminator": "type",
+							"fields-to-discriminateBy": map[string]interface{}{
+								"container": "Container",
+								"syslog":    "Syslog",
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/operator/v1.ContainerLoggingDestinationParameters", "github.com/openshift/api/operator/v1.SyslogLoggingDestinationParameters"},
 	}
 }
 
@@ -27569,6 +27923,41 @@ func schema_openshift_api_operator_v1_StatuspageProvider(ref common.ReferenceCal
 					},
 				},
 				Required: []string{"pageID"},
+			},
+		},
+	}
+}
+
+func schema_openshift_api_operator_v1_SyslogLoggingDestinationParameters(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SyslogLoggingDestinationParameters describes parameters for the Syslog logging destination type.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"address": {
+						SchemaProps: spec.SchemaProps{
+							Description: "address is the IP address of the syslog endpoint that receives log messages.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "port is the UDP port number of the syslog endpoint that receives log messages.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"facility": {
+						SchemaProps: spec.SchemaProps{
+							Description: "facility specifies the syslog facility of log messages.\n\nIf this field is empty, the facility is \"local1\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"address", "port"},
 			},
 		},
 	}
