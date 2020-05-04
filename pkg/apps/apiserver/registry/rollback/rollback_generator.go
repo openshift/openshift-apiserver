@@ -1,10 +1,6 @@
 package rollback
 
 import (
-	"fmt"
-
-	"k8s.io/kubernetes/pkg/api/legacyscheme"
-
 	appsapi "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 )
 
@@ -30,17 +26,11 @@ func NewRollbackGenerator() RollbackGenerator {
 type rollbackGenerator struct{}
 
 func (g *rollbackGenerator) GenerateRollback(from, to *appsapi.DeploymentConfig, spec *appsapi.DeploymentConfigRollbackSpec) (*appsapi.DeploymentConfig, error) {
-	rollback := &appsapi.DeploymentConfig{}
-
-	if err := legacyscheme.Scheme.Convert(&from, &rollback, nil); err != nil {
-		return nil, fmt.Errorf("couldn't clone 'from' DeploymentConfig: %v", err)
-	}
+	rollback := from.DeepCopy()
 
 	// construct the candidate deploymentConfig based on the rollback spec
 	if spec.IncludeTemplate {
-		if err := legacyscheme.Scheme.Convert(&to.Spec.Template, &rollback.Spec.Template, nil); err != nil {
-			return nil, fmt.Errorf("couldn't copy template to rollback:: %v", err)
-		}
+		rollback.Spec.Template = to.Spec.Template.DeepCopy()
 	}
 
 	if spec.IncludeReplicationMeta {
@@ -52,15 +42,14 @@ func (g *rollbackGenerator) GenerateRollback(from, to *appsapi.DeploymentConfig,
 	}
 
 	if spec.IncludeTriggers {
-		if err := legacyscheme.Scheme.Convert(&to.Spec.Triggers, &rollback.Spec.Triggers, nil); err != nil {
-			return nil, fmt.Errorf("couldn't copy triggers to rollback:: %v", err)
+		rollback.Spec.Triggers = []appsapi.DeploymentTriggerPolicy{}
+		for _, curr := range to.Spec.Triggers {
+			rollback.Spec.Triggers = append(rollback.Spec.Triggers, *curr.DeepCopy())
 		}
 	}
 
 	if spec.IncludeStrategy {
-		if err := legacyscheme.Scheme.Convert(&to.Spec.Strategy, &rollback.Spec.Strategy, nil); err != nil {
-			return nil, fmt.Errorf("couldn't copy strategy to rollback:: %v", err)
-		}
+		rollback.Spec.Strategy = *to.Spec.Strategy.DeepCopy()
 	}
 
 	// Disable any image change triggers.
