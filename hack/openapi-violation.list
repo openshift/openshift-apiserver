@@ -66,6 +66,8 @@ API rule violation: list_type_missing,github.com/openshift/api/config/v1,APIServ
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,APIServerNamedServingCert,Names
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,APIServerServingCerts,NamedCertificates
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,APIServerSpec,AdditionalCORSAllowedOrigins
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,AWSPlatformSpec,ServiceEndpoints
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,AWSPlatformStatus,ServiceEndpoints
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AdmissionConfig,DisabledAdmissionPlugins
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AdmissionConfig,EnabledAdmissionPlugins
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AuthenticationList,Items
@@ -887,6 +889,10 @@ API rule violation: names_match,github.com/openshift/api/config/v1,IdentityProvi
 API rule violation: names_match,github.com/openshift/api/config/v1,IdentityProviderConfig,GitLab
 API rule violation: names_match,github.com/openshift/api/config/v1,IdentityProviderConfig,HTPasswd
 API rule violation: names_match,github.com/openshift/api/config/v1,InfrastructureStatus,APIServerInternalURL
+API rule violation: names_match,github.com/openshift/api/config/v1,PlatformSpec,BareMetal
+API rule violation: names_match,github.com/openshift/api/config/v1,PlatformSpec,IBMCloud
+API rule violation: names_match,github.com/openshift/api/config/v1,PlatformSpec,OpenStack
+API rule violation: names_match,github.com/openshift/api/config/v1,PlatformSpec,VSphere
 API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatus,BareMetal
 API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatus,IBMCloud
 API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatus,OpenStack
