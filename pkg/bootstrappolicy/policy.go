@@ -118,6 +118,9 @@ var (
 
 	// openShiftDescription is a common, optional annotation that stores the description for a resource.
 	openShiftDescription = "openshift.io/description"
+
+	// openshiftManagedRBACAnnotation is added to only RBAC resources created by openshift-apiserver.
+	openShiftManagedRBACAnnotation = "openshiftapiserver.rbac.authorization.openshift.io/managed"
 )
 
 func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
@@ -856,6 +859,11 @@ func addDefaultMetadata(obj runtime.Object) {
 	for k, v := range bootstrappolicy.Annotation {
 		annotations[k] = v
 	}
+
+	// Setting the annotation to "true" would let github.com/openshift/cluster-openshift-apiserver-operator
+	// to manage this resource.
+	annotations[openShiftManagedRBACAnnotation] = "true"
+
 	metadata.SetAnnotations(annotations)
 }
 
