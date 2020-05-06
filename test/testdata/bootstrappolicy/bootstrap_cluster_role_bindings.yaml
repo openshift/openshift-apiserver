@@ -4,6 +4,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:masters
@@ -19,6 +20,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:node-admins
@@ -37,6 +39,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: cluster-admins
@@ -55,6 +58,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: cluster-readers
@@ -70,6 +74,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: basic-users
@@ -85,6 +90,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: self-access-reviewers
@@ -103,6 +109,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: self-provisioners
@@ -118,6 +125,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:oauth-token-deleters
@@ -136,6 +144,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: cluster-status-binding
@@ -151,6 +160,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:node-proxiers
@@ -166,6 +176,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:sdn-readers
@@ -181,6 +192,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:webhooks
@@ -199,6 +211,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:discovery
@@ -214,6 +227,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:build-strategy-docker-binding
@@ -229,6 +243,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:build-strategy-source-binding
@@ -244,6 +259,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:build-strategy-jenkinspipeline-binding
@@ -259,6 +275,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:node-bootstrapper
@@ -274,6 +291,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:scope-impersonation
@@ -292,6 +310,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:build-controller
@@ -307,6 +326,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:build-config-change-controller
@@ -322,6 +342,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:deployer-controller
@@ -337,6 +358,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:deploymentconfig-controller
@@ -352,6 +374,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:template-instance-controller
@@ -367,6 +390,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:template-instance-controller:admin
@@ -382,6 +406,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:template-instance-finalizer-controller
@@ -397,6 +422,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:template-instance-finalizer-controller:admin
@@ -412,6 +438,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:origin-namespace-controller
@@ -427,6 +454,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:serviceaccount-controller
@@ -442,6 +470,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:serviceaccount-pull-secrets-controller
@@ -457,6 +486,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:image-trigger-controller
@@ -472,6 +502,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:service-serving-cert-controller
@@ -487,6 +518,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:image-import-controller
@@ -502,6 +534,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:cluster-quota-reconciliation-controller
@@ -517,6 +550,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:unidling-controller
@@ -532,6 +566,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:service-ingress-ip-controller
@@ -547,6 +582,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:ingress-to-route-controller
@@ -562,6 +598,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:pv-recycler-controller
@@ -577,6 +614,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:resourcequota-controller
@@ -592,6 +630,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:horizontal-pod-autoscaler
@@ -607,6 +646,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:controller:horizontal-pod-autoscaler
@@ -622,6 +662,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:template-service-broker
@@ -637,6 +678,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:image-puller
@@ -652,6 +694,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:image-builder
@@ -667,6 +710,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:deployer
@@ -682,6 +726,7 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:openshift:controller:default-rolebindings-controller

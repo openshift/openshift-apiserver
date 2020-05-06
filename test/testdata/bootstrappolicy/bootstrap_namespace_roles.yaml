@@ -4,6 +4,7 @@ items:
   kind: Role
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: shared-resource-viewer
@@ -47,6 +48,7 @@ items:
   kind: Role
   metadata:
     annotations:
+      openshiftapiserver.rbac.authorization.openshift.io/managed: "true"
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:node-config-reader
