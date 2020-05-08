@@ -17,7 +17,6 @@ import (
 	authorizationclient "k8s.io/client-go/kubernetes/typed/authorization/v1"
 	"k8s.io/client-go/rest"
 	kapihelper "k8s.io/kubernetes/pkg/apis/core/helper"
-	rbacregistry "k8s.io/kubernetes/pkg/registry/rbac"
 
 	"github.com/openshift/api/build"
 	buildclient "github.com/openshift/client-go/build/clientset/versioned"
@@ -82,7 +81,7 @@ func (a *buildByStrategy) Validate(ctx context.Context, attr admission.Attribute
 	// if this is an update, see if we are only updating the ownerRef.  Garbage collection does this
 	// and we should allow it in general, since you had the power to update and the power to delete.
 	// The worst that happens is that you delete something, but you aren't controlling the privileged object itself
-	if attr.GetOldObject() != nil && rbacregistry.IsOnlyMutatingGCFields(attr.GetObject(), attr.GetOldObject(), kapihelper.Semantic) {
+	if attr.GetOldObject() != nil && isOnlyMutatingGCFields(attr.GetObject(), attr.GetOldObject(), kapihelper.Semantic) {
 		return nil
 	}
 
