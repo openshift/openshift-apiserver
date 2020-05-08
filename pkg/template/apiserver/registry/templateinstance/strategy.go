@@ -15,7 +15,6 @@ import (
 	authorizationclient "k8s.io/client-go/kubernetes/typed/authorization/v1"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	kapihelper "k8s.io/kubernetes/pkg/apis/core/helper"
-	rbacregistry "k8s.io/kubernetes/pkg/registry/rbac"
 
 	"github.com/openshift/library-go/pkg/authorization/authorizationutil"
 	templateapi "github.com/openshift/openshift-apiserver/pkg/template/apis/template"
@@ -133,7 +132,7 @@ func (s *templateInstanceStrategy) ValidateUpdate(ctx context.Context, obj, old 
 }
 
 func (s *templateInstanceStrategy) validateImpersonationUpdate(templateInstance, oldTemplateInstance *templateapi.TemplateInstance, userinfo user.Info) field.ErrorList {
-	if rbacregistry.IsOnlyMutatingGCFields(templateInstance, oldTemplateInstance, kapihelper.Semantic) {
+	if isOnlyMutatingGCFields(templateInstance, oldTemplateInstance, kapihelper.Semantic) {
 		return nil
 	}
 
