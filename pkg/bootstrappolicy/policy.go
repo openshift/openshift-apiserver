@@ -1,6 +1,8 @@
 package bootstrappolicy
 
 import (
+	"fmt"
+
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -736,12 +738,30 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				rbacv1helpers.NewRule("get", "put", "update", "delete").URLs(serviceBrokerRoot + "/*").RuleOrDie(),
 			},
 		},
+		clusterRoleForSCC("anyuid"),
+		clusterRoleForSCC("hostaccess"),
+		clusterRoleForSCC("hostmount"),
+		clusterRoleForSCC("hostnetwork"),
+		clusterRoleForSCC("nonroot"),
+		clusterRoleForSCC("privileged"),
+		clusterRoleForSCC("restricted"),
 	}
 	for i := range clusterRoles {
 		clusterRole := &clusterRoles[i]
 		addDefaultMetadata(clusterRole)
 	}
 	return clusterRoles
+}
+
+func clusterRoleForSCC(sccName string) rbacv1.ClusterRole {
+	return rbacv1.ClusterRole{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: fmt.Sprintf("system:openshift:scc:%s", sccName),
+		},
+		Rules: []rbacv1.PolicyRule{
+			rbacv1helpers.NewRule("use").Groups(securityGroup).Resources("securitycontextconstraints").Names(sccName).RuleOrDie(),
+		},
+	}
 }
 
 func GetBootstrapClusterRoles() []rbacv1.ClusterRole {
