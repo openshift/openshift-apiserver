@@ -585,6 +585,8 @@ github.com/openshift/api v0.0.0-20200327145400-6efe1ee417e1 h1:3K/nqFY7qkqBuuSai
 github.com/openshift/api v0.0.0-20200327145400-6efe1ee417e1/go.mod h1:RKMJ5CBnljLfnej+BJ/xnOWc3kZDvJUaIAEq2oKSPtE=
 github.com/openshift/api v0.0.0-20200424083944-0422dc17083e h1:VDcwVyMEVbLyekLmtob1TEf8GfP454Afc2hO3FkgBps=
 github.com/openshift/api v0.0.0-20200424083944-0422dc17083e/go.mod h1:VnbEzX8SAaRj7Yfl836NykdQIlbEjfL6/CD+AaJQg5Q=
+github.com/openshift/api v0.0.0-20200521162313-4090b8d67ad8 h1:hmeRDYagWib4YM2xFGv7AQ4r/+1wCl27pOii9kHmPT4=
+github.com/openshift/api v0.0.0-20200521162313-4090b8d67ad8/go.mod h1:TkhafijfTiRi1Q3120/ZSE4oIWKQ4DGRh3byPywv4Mw=
 github.com/openshift/apiserver-library-go v0.0.0-20200403094534-263ee09c7716 h1:Bgs6/Ldm/3OVAdubsCVc+PImrMEKNvatJ63/Ll4NxBg=
 github.com/openshift/apiserver-library-go v0.0.0-20200403094534-263ee09c7716/go.mod h1:5DBN8IjgHwCZbLCfD8VO0/kq//bu+jYfRIDy7ilOZh4=
 github.com/openshift/build-machinery-go v0.0.0-20200211121458-5e3d6e570160 h1:V4E6yt4XWiBEPKnJbs/E8pgUq9AjZqzQfsL3eeT84Qs=
@@ -604,6 +606,8 @@ github.com/openshift/library-go v0.0.0-20200402123743-4015ba624cae h1:QE9zls9gSM
 github.com/openshift/library-go v0.0.0-20200402123743-4015ba624cae/go.mod h1:CfydoH0B+RYs22uQZQ36A1mz5m5zhucpMGh8t5s71v4=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d h1:fLITXDjxMSvUDjnXs/zljIWktbST9+Om8XbrmmM7T4I=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d/go.mod h1:LJM49W8fBVSj+rvcopJZu9mgH5Tx6HwLHySIYeGeu4k=
+github.com/openshift/source-to-image v0.0.0-20200213141744-eed2850f2187 h1:WuKQPKSuKEV+r2ez9bXmJWm9LqO5LnJN5Z4zLVJ/ptQ=
+github.com/openshift/source-to-image v0.0.0-20200213141744-eed2850f2187/go.mod h1:HEWMBvkkwGoJo+CMxnfYJW6O52zc052D83XBUo1zFRw=
 github.com/openshift/source-to-image v1.3.1-0.20200213141744-eed2850f2187 h1:1eVKqhy+oDaHjQ8QJBbmgMRmlXxMi7+D8uXlfVNn4cY=
 github.com/openshift/source-to-image v1.3.1-0.20200213141744-eed2850f2187/go.mod h1:HEWMBvkkwGoJo+CMxnfYJW6O52zc052D83XBUo1zFRw=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=

@@ -17,24 +17,24 @@ require (
 	github.com/hashicorp/golang-lru v0.5.1
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
 	github.com/opencontainers/go-digest v1.0.0-rc1
-	github.com/openshift/api v0.0.0-20200424083944-0422dc17083e
+	github.com/openshift/api v0.0.0-20200521162313-4090b8d67ad8
 	github.com/openshift/apiserver-library-go v0.0.0-20200403094534-263ee09c7716
 	github.com/openshift/build-machinery-go v0.0.0-20200424080330-082bf86082cc
 	github.com/openshift/client-go v0.0.0-20200326155132-2a6cd50aedd0
 	github.com/openshift/library-go v0.0.0-20200402123743-4015ba624cae
-	github.com/openshift/source-to-image v1.3.1-0.20200213141744-eed2850f2187
+	github.com/openshift/source-to-image v0.0.0-20200213141744-eed2850f2187
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
-	k8s.io/api v0.18.2
+	k8s.io/api v0.18.3
 	k8s.io/apiextensions-apiserver v0.18.0
-	k8s.io/apimachinery v0.18.2
+	k8s.io/apimachinery v0.18.3
 	k8s.io/apiserver v0.18.0
 	k8s.io/client-go v0.18.0
-	k8s.io/code-generator v0.18.2
+	k8s.io/code-generator v0.18.3
 	k8s.io/component-base v0.18.0
 	k8s.io/klog v1.0.0
 	k8s.io/kube-aggregator v0.18.0
