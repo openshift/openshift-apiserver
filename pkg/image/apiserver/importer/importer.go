@@ -35,7 +35,9 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
 )
 
-// Add a dockerregistry.Client to the passed context with this key to support v1 container image registry importing
+// ContextKeyV1RegistryClient is used to support v1 container image registry import. Add a
+// dockerregistry.Client to the passed context with this key to support v1 container image
+// registry importing
 const ContextKeyV1RegistryClient = "v1-registry-client"
 
 // Interface loads images into an image stream import request.
@@ -50,7 +52,7 @@ type RepositoryRetriever interface {
 	Repository(ctx gocontext.Context, ref imageref.DockerImageReference, insecure bool) (distribution.Repository, error)
 }
 
-// ImageStreamImport implements an import strategy for container images. It keeps a cache of images
+// ImageStreamImporter implements an import strategy for container images. It keeps a cache of images
 // per distinct auth context to reduce duplicate loads. This type is not thread safe.
 type ImageStreamImporter struct {
 	maximumTagsPerRepo int
@@ -65,9 +67,15 @@ type ImageStreamImporter struct {
 	digestToLayerSizeCache *ImageStreamLayerCache
 }
 
-// NewImageStreamImport creates an importer that will load images from a remote container image registry into an
-// ImageStreamImport object. Limiter may be nil.
-func NewImageStreamImporter(retriever RepositoryRetriever, regConf *sysregistriesv2.V2RegistriesConf, maximumTagsPerRepo int, limiter flowcontrol.RateLimiter, cache *ImageStreamLayerCache) *ImageStreamImporter {
+// NewImageStreamImporter creates an importer that will load images from a remote container image
+// registry into an ImageStreamImport object. Limiter may be nil.
+func NewImageStreamImporter(
+	retriever RepositoryRetriever,
+	regConf *sysregistriesv2.V2RegistriesConf,
+	maximumTagsPerRepo int,
+	limiter flowcontrol.RateLimiter,
+	cache *ImageStreamLayerCache,
+) *ImageStreamImporter {
 	if limiter == nil {
 		limiter = flowcontrol.NewFakeAlwaysRateLimiter()
 	}
@@ -87,32 +95,32 @@ func NewImageStreamImporter(retriever RepositoryRetriever, regConf *sysregistrie
 }
 
 // Import tries to complete the provided isi object with images loaded from remote registries.
-func (i *ImageStreamImporter) Import(ctx gocontext.Context, isi *imageapi.ImageStreamImport, stream *imageapi.ImageStream) error {
+func (imp *ImageStreamImporter) Import(ctx gocontext.Context, isi *imageapi.ImageStreamImport, stream *imageapi.ImageStream) error {
 	// Initialize layer size cache if not given.
-	if i.digestToLayerSizeCache == nil {
+	if imp.digestToLayerSizeCache == nil {
 		cache, err := NewImageStreamLayerCache(DefaultImageStreamLayerCacheSize)
 		if err != nil {
 			return err
 		}
-		i.digestToLayerSizeCache = &cache
+		imp.digestToLayerSizeCache = &cache
 	}
 	// Initialize the image cache entry for a context.
-	if _, ok := i.digestToRepositoryCache[ctx]; !ok {
-		i.digestToRepositoryCache[ctx] = make(map[manifestKey]*imageapi.Image)
+	if _, ok := imp.digestToRepositoryCache[ctx]; !ok {
+		imp.digestToRepositoryCache[ctx] = make(map[manifestKey]*imageapi.Image)
 	}
 
-	i.importImages(ctx, i.retriever, isi, stream, i.limiter)
-	i.importFromRepository(ctx, i.retriever, isi, i.maximumTagsPerRepo, i.limiter)
+	imp.importImages(ctx, imp.retriever, isi, stream, imp.limiter)
+	imp.importFromRepository(ctx, imp.retriever, isi, imp.maximumTagsPerRepo, imp.limiter)
 	return nil
 }
 
 // importImages updates the passed ImageStreamImport object and sets Status for each image based on whether the import
 // succeeded or failed. Cache is updated with any loaded images. Limiter is optional and controls how fast images are updated.
-func (i *ImageStreamImporter) importImages(ctx gocontext.Context, retriever RepositoryRetriever, isi *imageapi.ImageStreamImport, stream *imageapi.ImageStream, limiter flowcontrol.RateLimiter) {
+func (imp *ImageStreamImporter) importImages(ctx gocontext.Context, retriever RepositoryRetriever, isi *imageapi.ImageStreamImport, stream *imageapi.ImageStream, limiter flowcontrol.RateLimiter) {
 	tags := make(map[manifestKey][]int)
 	ids := make(map[manifestKey][]int)
 	repositories := make(map[repositoryKey]*importRepository)
-	cache := i.digestToRepositoryCache[ctx]
+	cache := imp.digestToRepositoryCache[ctx]
 
 	isi.Status.Images = make([]imageapi.ImageImportStatus, len(isi.Spec.Images))
 	for i := range isi.Spec.Images {
@@ -190,7 +198,7 @@ func (i *ImageStreamImporter) importImages(ctx gocontext.Context, retriever Repo
 
 	// for each repository we found, import all tags and digests
 	for key, repo := range repositories {
-		i.importRepositoryFromDocker(ctx, retriever, repo, limiter)
+		imp.importRepositoryFromDocker(ctx, retriever, repo, limiter)
 		for _, tag := range repo.Tags {
 			j := manifestKey{repositoryKey: key, preferArch: tag.PreferArch, preferOS: tag.PreferOS}
 			j.value = tag.Name
@@ -238,11 +246,11 @@ func (i *ImageStreamImporter) importImages(ctx gocontext.Context, retriever Repo
 // importFromRepository imports the repository named on the ImageStreamImport, if any, importing up to maximumTags, and reporting
 // status on each image that is attempted to be imported. If the repository cannot be found or tags cannot be retrieved, the repository
 // status field is set.
-func (i *ImageStreamImporter) importFromRepository(ctx gocontext.Context, retriever RepositoryRetriever, isi *imageapi.ImageStreamImport, maximumTags int, limiter flowcontrol.RateLimiter) {
+func (imp *ImageStreamImporter) importFromRepository(ctx gocontext.Context, retriever RepositoryRetriever, isi *imageapi.ImageStreamImport, maximumTags int, limiter flowcontrol.RateLimiter) {
 	if isi.Spec.Repository == nil {
 		return
 	}
-	cache := i.digestToRepositoryCache[ctx]
+	cache := imp.digestToRepositoryCache[ctx]
 	isi.Status.Repository = &imageapi.RepositoryImportStatus{}
 	status := isi.Status.Repository
 
@@ -279,7 +287,7 @@ func (i *ImageStreamImporter) importFromRepository(ctx gocontext.Context, retrie
 		Insecure:    spec.ImportPolicy.Insecure,
 		MaximumTags: maximumTags,
 	}
-	i.importRepositoryFromDocker(ctx, retriever, repo, limiter)
+	imp.importRepositoryFromDocker(ctx, retriever, repo, limiter)
 
 	if repo.Err != nil {
 		status.Status = imageImportStatus(repo.Err, "", "repository")
@@ -376,7 +384,7 @@ func formatRepositoryError(ref reference.Named, err error) error {
 
 // calculateImageSize gets and updates size of each image layer. If manifest v2 is converted to v1,
 // then it loses information about layers size. We have to get this information from server again.
-func (isi *ImageStreamImporter) calculateImageSize(ctx gocontext.Context, bs distribution.BlobStore, image *imageapi.Image) error {
+func (imp *ImageStreamImporter) calculateImageSize(ctx gocontext.Context, bs distribution.BlobStore, image *imageapi.Image) error {
 	blobSet := sets.NewString()
 	size := int64(0)
 	for i := range image.DockerImageLayers {
@@ -387,7 +395,7 @@ func (isi *ImageStreamImporter) calculateImageSize(ctx gocontext.Context, bs dis
 		}
 		blobSet.Insert(layer.Name)
 
-		if layerSize, ok := isi.digestToLayerSizeCache.Get(layer.Name); ok {
+		if layerSize, ok := imp.digestToLayerSizeCache.Get(layer.Name); ok {
 			layerSize := layerSize.(int64)
 			layer.LayerSize = layerSize
 			size += layerSize
@@ -399,7 +407,7 @@ func (isi *ImageStreamImporter) calculateImageSize(ctx gocontext.Context, bs dis
 			return err
 		}
 
-		isi.digestToLayerSizeCache.Add(layer.Name, desc.Size)
+		imp.digestToLayerSizeCache.Add(layer.Name, desc.Size)
 		layer.LayerSize = desc.Size
 		size += desc.Size
 	}
@@ -423,18 +431,18 @@ func isSubrepo(repo, ancestor string) bool {
 	return false
 }
 
-func (isi *ImageStreamImporter) findRegistryConfiguration(ref reference.Named) *sysregistriesv2.Registry {
-	if isi.regConf == nil || len(isi.regConf.Registries) == 0 {
+func (imp *ImageStreamImporter) findRegistryConfiguration(ref reference.Named) *sysregistriesv2.Registry {
+	if imp.regConf == nil || len(imp.regConf.Registries) == 0 {
 		return nil
 	}
 
 	repoName := ref.Name()
 
 	var bestMatch *sysregistriesv2.Registry
-	for i := range isi.regConf.Registries {
+	for i := range imp.regConf.Registries {
 		// XXX We cannot use `i, reg := range` here and `&reg` later.
 		// Otherwise the value will be changed on the next loop iteration.
-		reg := isi.regConf.Registries[i]
+		reg := imp.regConf.Registries[i]
 
 		if bestMatch == nil || len(reg.Prefix) > len(bestMatch.Prefix) {
 			if isSubrepo(repoName, reg.Prefix) {
@@ -448,8 +456,8 @@ func (isi *ImageStreamImporter) findRegistryConfiguration(ref reference.Named) *
 // getPullSources returns a list of possible sources for ref. In case of
 // errors, the returned list still can be used and contains at least one
 // element.
-func (isi *ImageStreamImporter) getPullSources(ref reference.Named) ([]sysregistriesv2.PullSource, error) {
-	reg := isi.findRegistryConfiguration(ref)
+func (imp *ImageStreamImporter) getPullSources(ref reference.Named) ([]sysregistriesv2.PullSource, error) {
+	reg := imp.findRegistryConfiguration(ref)
 	if reg == nil {
 		return []sysregistriesv2.PullSource{{Reference: ref}}, nil
 	}
@@ -466,7 +474,7 @@ func (isi *ImageStreamImporter) getPullSources(ref reference.Named) ([]sysregist
 // ref. Also it returns the manifest service and the blob store so that
 // additional resources (an image configuration for schema 2 manifests or
 // another manifest for manifest lists) can be pulled.
-func (isi *ImageStreamImporter) getManifestFromSource(ctx gocontext.Context, retriever RepositoryRetriever, ref reference.Named, insecure bool) (distribution.Manifest, distribution.ManifestService, distribution.BlobStore, error) {
+func (imp *ImageStreamImporter) getManifestFromSource(ctx gocontext.Context, retriever RepositoryRetriever, ref reference.Named, insecure bool) (distribution.Manifest, distribution.ManifestService, distribution.BlobStore, error) {
 	imageRef, err := imageref.Parse(ref.String())
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("unable to parse reference %q: %v", ref.String(), err)
@@ -502,10 +510,10 @@ func (isi *ImageStreamImporter) getManifestFromSource(ctx gocontext.Context, ret
 
 // getManifestFromSource pulls a manifest from the source respecting
 // V2RegistriesConf.
-func (isi *ImageStreamImporter) getManifest(ctx gocontext.Context, retriever RepositoryRetriever, ref reference.Named, insecure bool) (distribution.Manifest, distribution.ManifestService, distribution.BlobStore, error) {
+func (imp *ImageStreamImporter) getManifest(ctx gocontext.Context, retriever RepositoryRetriever, ref reference.Named, insecure bool) (distribution.Manifest, distribution.ManifestService, distribution.BlobStore, error) {
 	var errs []error
 
-	pullSources, err := isi.getPullSources(ref)
+	pullSources, err := imp.getPullSources(ref)
 	if err != nil {
 		errs = append(errs, err)
 	}
@@ -521,7 +529,7 @@ func (isi *ImageStreamImporter) getManifest(ctx gocontext.Context, retriever Rep
 	for _, pullSource := range pullSources {
 		klog.V(5).Infof("importing %s: trying to fetch manifest from %s...", ref, pullSource.Reference)
 
-		manifest, ms, bs, err := isi.getManifestFromSource(ctx, retriever, pullSource.Reference, insecure)
+		manifest, ms, bs, err := imp.getManifestFromSource(ctx, retriever, pullSource.Reference, insecure)
 		if err != nil {
 			klog.V(5).Infof("importing %s: failed to get manifest from %s: %s", ref, pullSource.Reference, err)
 			errs = append(errs, err)
@@ -588,7 +596,7 @@ func manifestFromManifestList(ctx gocontext.Context, manifestList *manifestlist.
 	return manifest, manifestDigest, err
 }
 
-func (isi *ImageStreamImporter) importManifest(ctx gocontext.Context, manifest distribution.Manifest, ref reference.Named, d godigest.Digest, s distribution.ManifestService, b distribution.BlobStore, preferArch, preferOS string) (image *imageapi.Image, err error) {
+func (imp *ImageStreamImporter) importManifest(ctx gocontext.Context, manifest distribution.Manifest, ref reference.Named, d godigest.Digest, s distribution.ManifestService, b distribution.BlobStore, preferArch, preferOS string) (image *imageapi.Image, err error) {
 	if manifestList, ok := manifest.(*manifestlist.DeserializedManifestList); ok {
 		manifest, d, err = manifestFromManifestList(ctx, manifestList, ref, s, preferArch, preferOS)
 		if err != nil {
@@ -618,7 +626,7 @@ func (isi *ImageStreamImporter) importManifest(ctx gocontext.Context, manifest d
 	}
 
 	if image.DockerImageMetadata.Size == 0 {
-		if err := isi.calculateImageSize(ctx, b, image); err != nil {
+		if err := imp.calculateImageSize(ctx, b, image); err != nil {
 			return image, err
 		}
 	}
@@ -627,7 +635,7 @@ func (isi *ImageStreamImporter) importManifest(ctx gocontext.Context, manifest d
 
 // importRepositoryFromDocker loads the tags and images requested in the passed importRepository, obeying the
 // optional rate limiter.  Errors are set onto the individual tags and digest objects.
-func (isi *ImageStreamImporter) importRepositoryFromDocker(ctx gocontext.Context, retriever RepositoryRetriever, repository *importRepository, limiter flowcontrol.RateLimiter) {
+func (imp *ImageStreamImporter) importRepositoryFromDocker(ctx gocontext.Context, retriever RepositoryRetriever, repository *importRepository, limiter flowcontrol.RateLimiter) {
 	klog.V(5).Infof("importing remote Docker repository registry=%s repository=%s insecure=%t", repository.Registry, repository.Name, repository.Insecure)
 
 	// load digests
@@ -655,14 +663,14 @@ func (isi *ImageStreamImporter) importRepositoryFromDocker(ctx gocontext.Context
 
 		limiter.Accept()
 
-		manifest, ms, bs, err := isi.getManifest(ctx, retriever, dockerRef, repository.Insecure)
+		manifest, ms, bs, err := imp.getManifest(ctx, retriever, dockerRef, repository.Insecure)
 		if err != nil {
 			klog.V(5).Infof("unable to get manifest by digest %s for image %s: %v", d, ref.Exact(), err)
 			importDigest.Err = err
 			continue
 		}
 
-		importDigest.Image, importDigest.Err = isi.importManifest(ctx, manifest, dockerRef, d, ms, bs, "", "")
+		importDigest.Image, importDigest.Err = imp.importManifest(ctx, manifest, dockerRef, d, ms, bs, "", "")
 	}
 
 	// if repository import is requested (MaximumTags), attempt to load the tags, sort them, and request the first N
@@ -731,14 +739,14 @@ func (isi *ImageStreamImporter) importRepositoryFromDocker(ctx gocontext.Context
 
 		limiter.Accept()
 
-		manifest, ms, bs, err := isi.getManifest(ctx, retriever, dockerRef, repository.Insecure)
+		manifest, ms, bs, err := imp.getManifest(ctx, retriever, dockerRef, repository.Insecure)
 		if err != nil {
 			klog.V(5).Infof("unable to get manifest by tag %q for image %s: %#v", importTag.Name, ref.Exact(), err)
 			importTag.Err = err
 			continue
 		}
 
-		importTag.Image, importTag.Err = isi.importManifest(ctx, manifest, dockerRef, "", ms, bs, importTag.PreferArch, importTag.PreferOS)
+		importTag.Image, importTag.Err = imp.importManifest(ctx, manifest, dockerRef, "", ms, bs, importTag.PreferArch, importTag.PreferOS)
 	}
 }
 
