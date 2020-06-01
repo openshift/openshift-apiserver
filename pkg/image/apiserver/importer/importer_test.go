@@ -1,6 +1,7 @@
 package importer
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,8 +13,6 @@ import (
 	"time"
 
 	"github.com/containers/image/pkg/sysregistriesv2"
-	"golang.org/x/net/context"
-
 	"github.com/docker/distribution"
 	"github.com/docker/distribution/manifest/manifestlist"
 	"github.com/docker/distribution/manifest/schema1"

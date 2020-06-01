@@ -1,13 +1,13 @@
 package importer_test
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	gocontext "golang.org/x/net/context"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
@@ -110,7 +110,7 @@ func TestImageStreamImportDockerHub(t *testing.T) {
 
 	err := retryWhenUnreachable(t, func() error {
 		i := importer.NewImageStreamImporter(importCtx, nil, 3, nil, nil)
-		if err := i.Import(gocontext.Background(), imports, &imageapi.ImageStream{}); err != nil {
+		if err := i.Import(context.Background(), imports, &imageapi.ImageStream{}); err != nil {
 			return err
 		}
 
@@ -166,7 +166,7 @@ func TestImageStreamImportQuayIO(t *testing.T) {
 
 	err := retryWhenUnreachable(t, func() error {
 		i := importer.NewImageStreamImporter(importCtx, nil, 3, nil, nil)
-		if err := i.Import(gocontext.Background(), imports, &imageapi.ImageStream{}); err != nil {
+		if err := i.Import(context.Background(), imports, &imageapi.ImageStream{}); err != nil {
 			return err
 		}
 
@@ -219,7 +219,7 @@ func TestImageStreamImportRedHatRegistry(t *testing.T) {
 	}
 
 	i := importer.NewImageStreamImporter(importCtx, nil, 3, nil, nil)
-	if err := i.Import(gocontext.Background(), imports, &imageapi.ImageStream{}); err != nil {
+	if err := i.Import(context.Background(), imports, &imageapi.ImageStream{}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -242,7 +242,7 @@ func TestImageStreamImportRedHatRegistry(t *testing.T) {
 			},
 		},
 	}
-	context := gocontext.WithValue(gocontext.Background(), importer.ContextKeyV1RegistryClient, dockerregistry.NewClient(20*time.Second, false))
+	context := context.WithValue(context.Background(), importer.ContextKeyV1RegistryClient, dockerregistry.NewClient(20*time.Second, false))
 	importCtx = importer.NewStaticCredentialsContext(rt, nil, nil)
 	err := retryWhenUnreachable(t, func() error {
 		i = importer.NewImageStreamImporter(importCtx, nil, 3, nil, nil)

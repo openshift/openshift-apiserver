@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/containers/image/pkg/sysregistriesv2"
-	gocontext "golang.org/x/net/context"
 
 	authorizationapi "k8s.io/api/authorization/v1"
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -223,7 +222,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		r.transport, r.insecureTransport, secretsList.Items,
 	)
 	imports := r.importFn(importCtx, v2regConf)
-	if err := imports.Import(ctx.(gocontext.Context), isi, stream); err != nil {
+	if err := imports.Import(ctx, isi, stream); err != nil {
 		return nil, kapierrors.NewInternalError(err)
 	}
 
@@ -246,7 +245,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 			r.transport, r.insecureTransport, nil,
 		)
 		imports := r.importFn(importCtx, v2regConf)
-		if err := imports.Import(ctx.(gocontext.Context), isi, stream); err != nil {
+		if err := imports.Import(ctx, isi, stream); err != nil {
 			return nil, kapierrors.NewInternalError(err)
 		}
 	}

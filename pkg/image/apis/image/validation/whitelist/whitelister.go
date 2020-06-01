@@ -1,12 +1,12 @@
 package whitelist
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"reflect"
 	"strings"
 
-	"golang.org/x/net/context"
 	"k8s.io/klog"
 
 	kerrutil "k8s.io/apimachinery/pkg/util/errors"

@@ -1,9 +1,8 @@
 package imagestreamimage
 
 import (
+	"context"
 	"testing"
-
-	"golang.org/x/net/context"
 
 	etcd "go.etcd.io/etcd/clientv3"
 	authorizationapi "k8s.io/api/authorization/v1"
