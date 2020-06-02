@@ -821,6 +821,19 @@ items:
     - update
     - watch
   - apiGroups:
+    - snapshot.storage.k8s.io
+    resources:
+    - volumesnapshots
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - get
+    - list
+    - patch
+    - update
+    - watch
+  - apiGroups:
     - ""
     - build.openshift.io
     resources:
@@ -1063,6 +1076,19 @@ items:
     - update
     - watch
   - apiGroups:
+    - snapshot.storage.k8s.io
+    resources:
+    - volumesnapshots
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - get
+    - list
+    - patch
+    - update
+    - watch
+  - apiGroups:
     - ""
     - build.openshift.io
     resources:
@@ -1209,6 +1235,14 @@ items:
     - list
     - watch
   - apiGroups:
+    - snapshot.storage.k8s.io
+    resources:
+    - volumesnapshots
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
     - ""
     - build.openshift.io
     resources:
@@ -1270,6 +1304,13 @@ items:
     - storage.k8s.io
     resources:
     - storageclasses
+    verbs:
+    - get
+    - list
+  - apiGroups:
+    - snapshot.storage.k8s.io
+    resources:
+    - volumesnapshotclasses
     verbs:
     - get
     - list

@@ -60,6 +60,7 @@ var (
 	schedulingGroup            = "scheduling.k8s.io"
 	kAuthzGroup                = kauthorizationapi.GroupName
 	kAuthnGroup                = kauthenticationapi.GroupName
+	snapshotGroup              = "snapshot.storage.k8s.io"
 
 	deployGroup         = oapps.GroupName
 	authzGroup          = authorization.GroupName
@@ -342,6 +343,8 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 
 				rbacv1helpers.NewRule(readWrite...).Groups(extensionsGroup, networkingGroup).Resources("networkpolicies").RuleOrDie(),
 
+				rbacv1helpers.NewRule(readWrite...).Groups(snapshotGroup).Resources("volumesnapshots").RuleOrDie(),
+
 				// backwards compatibility
 				rbacv1helpers.NewRule(readWrite...).Groups(buildGroup, legacyBuildGroup).Resources("buildlogs").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(kapiGroup).Resources("resourcequotausages").RuleOrDie(),
@@ -384,6 +387,8 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 
 				rbacv1helpers.NewRule(readWrite...).Groups(extensionsGroup, networkingGroup).Resources("networkpolicies").RuleOrDie(),
 
+				rbacv1helpers.NewRule(readWrite...).Groups(snapshotGroup).Resources("volumesnapshots").RuleOrDie(),
+
 				// backwards compatibility
 				rbacv1helpers.NewRule(readWrite...).Groups(buildGroup, legacyBuildGroup).Resources("buildlogs").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(kapiGroup).Resources("resourcequotausages").RuleOrDie(),
@@ -417,6 +422,8 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 
 				rbacv1helpers.NewRule(read...).Groups(templateGroup, legacyTemplateGroup).Resources("templates", "templateconfigs", "processedtemplates", "templateinstances").RuleOrDie(),
 
+				rbacv1helpers.NewRule(read...).Groups(snapshotGroup).Resources("volumesnapshots").RuleOrDie(),
+
 				// backwards compatibility
 				rbacv1helpers.NewRule(read...).Groups(buildGroup, legacyBuildGroup).Resources("buildlogs").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(kapiGroup).Resources("resourcequotausages").RuleOrDie(),
@@ -435,6 +442,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				rbacv1helpers.NewRule("get", "list").Groups(authzGroup, legacyAuthzGroup).Resources("clusterroles").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(rbacGroup).Resources("clusterroles").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list").Groups(storageGroup).Resources("storageclasses").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list").Groups(snapshotGroup).Resources("volumesnapshotclasses").RuleOrDie(),
 				rbacv1helpers.NewRule("list", "watch").Groups(projectGroup, legacyProjectGroup).Resources("projects").RuleOrDie(),
 				rbacv1helpers.NewRule("create").Groups(authzGroup, legacyAuthzGroup).Resources("selfsubjectrulesreviews").RuleOrDie(),
 				rbacv1helpers.NewRule("create").Groups(kAuthzGroup).Resources("selfsubjectaccessreviews").RuleOrDie(),
