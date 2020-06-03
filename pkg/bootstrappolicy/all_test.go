@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/diff"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -16,7 +16,9 @@ const osClusterRoleAggregationPrefix = "system:openshift:"
 // this map must be manually kept up to date as we make changes to aggregation
 // we hard code this data with no constants because we cannot change the underlying values
 var expectedAggregationMap = map[string]sets.String{
+	"basic-user":     sets.NewString("system:openshift:aggregate-to-basic-user"),
 	"cluster-reader": sets.NewString("registry-viewer", "system:openshift:aggregate-to-view", "system:openshift:aggregate-to-cluster-reader"),
+	"storage-admin":  sets.NewString("system:openshift:aggregate-to-storage-admin"),
 }
 
 func TestPolicyAggregation(t *testing.T) {
