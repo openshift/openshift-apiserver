@@ -228,6 +228,16 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 			return nil, apierror.NewInternalError(mappingErr)
 		}
 
+		if restMapping.Scope == nil || restMapping.Scope.Name() != meta.RESTScopeNameNamespace {
+			scopeErr := fmt.Errorf("%s specified in project template is not namespace scoped", toCreate.GroupVersionKind())
+			utilruntime.HandleError(fmt.Errorf("error creating items in requested project %q: %v", createdProject.Name, scopeErr))
+			// We have to clean up the project if any part of the project request template fails
+			if deleteErr := r.projectGetter.Projects().Delete(ctx, createdProject.Name, metav1.DeleteOptions{}); deleteErr != nil {
+				utilruntime.HandleError(fmt.Errorf("error cleaning up requested project %q: %v", createdProject.Name, deleteErr))
+			}
+			return nil, apierror.NewInternalError(scopeErr)
+		}
+
 		_, createErr := r.client.Resource(restMapping.Resource).Namespace(createdProject.Name).Create(ctx, toCreate, metav1.CreateOptions{})
 		// if a default role binding already exists, we're probably racing the controller.  Don't die
 		if gvk := restMapping.GroupVersionKind; apierror.IsAlreadyExists(createErr) &&
