@@ -375,7 +375,7 @@ func init() {
 		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraNamespaceSecurityAllocationControllerServiceAccountName},
 		Rules: []rbacv1.PolicyRule{
 			rbacv1helpers.NewRule("get", "create", "update").Groups(securityGroup).Resources("rangeallocations").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "list", "watch", "update").Groups(kapiGroup).Resources("namespaces").RuleOrDie(),
+			rbacv1helpers.NewRule("get", "list", "watch", "update", "patch").Groups(kapiGroup).Resources("namespaces").RuleOrDie(),
 			eventsRule(),
 		},
 	})
