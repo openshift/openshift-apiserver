@@ -543,9 +543,9 @@ func (isi *ImageStreamImporter) getManifest(ctx gocontext.Context, retriever Rep
 	return nil, nil, nil, utilerrors.NewAggregate(errs)
 }
 
-func manifestFromManifestList(ctx gocontext.Context, manifestList *manifestlist.DeserializedManifestList, ref reference.Named, s distribution.ManifestService, preferArch, preferOS string) (distribution.Manifest, error) {
+func manifestFromManifestList(ctx gocontext.Context, manifestList *manifestlist.DeserializedManifestList, ref reference.Named, s distribution.ManifestService, preferArch, preferOS string) (distribution.Manifest, godigest.Digest, error) {
 	if len(manifestList.Manifests) == 0 {
-		return nil, fmt.Errorf("no manifests in manifest list")
+		return nil, "", fmt.Errorf("no manifests in manifest list")
 	}
 
 	if preferArch == "" {
@@ -582,14 +582,15 @@ func manifestFromManifestList(ctx gocontext.Context, manifestList *manifestlist.
 	manifest, err := s.Get(ctx, manifestDigest)
 	if err != nil {
 		klog.V(5).Infof("unable to get %s/%s manifest by digest %q for image %s: %#v", preferOS, preferArch, manifestDigest, ref.String(), err)
-		return nil, err
+		return nil, "", err
 	}
-	return manifest, err
+
+	return manifest, manifestDigest, err
 }
 
 func (isi *ImageStreamImporter) importManifest(ctx gocontext.Context, manifest distribution.Manifest, ref reference.Named, d godigest.Digest, s distribution.ManifestService, b distribution.BlobStore, preferArch, preferOS string) (image *imageapi.Image, err error) {
 	if manifestList, ok := manifest.(*manifestlist.DeserializedManifestList); ok {
-		manifest, err = manifestFromManifestList(ctx, manifestList, ref, s, preferArch, preferOS)
+		manifest, d, err = manifestFromManifestList(ctx, manifestList, ref, s, preferArch, preferOS)
 		if err != nil {
 			return nil, formatRepositoryError(ref, err)
 		}
