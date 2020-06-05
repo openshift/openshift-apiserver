@@ -14,6 +14,7 @@ var (
 		v1.Install,
 		corev1conversions.AddToScheme,
 		AddFieldSelectorKeyConversions,
+		AddCustomConversionFuncs,
 		RegisterDefaults,
 	)
 	Install = localSchemeBuilder.AddToScheme
