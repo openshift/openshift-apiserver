@@ -10,7 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	kinternal "k8s.io/kubernetes/pkg/apis/core"
 
-	"github.com/openshift/api/build/v1"
+	v1 "github.com/openshift/api/build/v1"
 	"github.com/openshift/openshift-apiserver/pkg/api/apihelpers/apitesting"
 	internal "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 )
@@ -37,8 +37,13 @@ func TestFieldSelectorConversions(t *testing.T) {
 
 func TestBinaryBuildRequestOptions(t *testing.T) {
 	r := &internal.BinaryBuildRequestOptions{
-		AsFile: "Dockerfile",
-		Commit: "abcdef",
+		AsFile:         "Dockerfile",
+		Commit:         "abcdef",
+		Message:        "hello world!",
+		AuthorName:     "Jane Doe",
+		AuthorEmail:    "jdoe@email.net",
+		CommitterName:  "Bob Roberts",
+		CommitterEmail: "bobbobs@email.net",
 	}
 	versioned, err := scheme.ConvertToVersion(r, v1.GroupVersion)
 	if err != nil {
@@ -52,8 +57,26 @@ func TestBinaryBuildRequestOptions(t *testing.T) {
 	if err := scheme.Convert(&params, decoded, nil); err != nil {
 		t.Fatal(err)
 	}
-	if decoded.Commit != "abcdef" || decoded.AsFile != "Dockerfile" {
-		t.Errorf("unexpected decoded object: %#v", decoded)
+	if decoded.AsFile != r.AsFile {
+		t.Errorf("expected AsFile to be %q, got %q", r.AsFile, decoded.AsFile)
+	}
+	if decoded.Commit != r.Commit {
+		t.Errorf("expected Commit to be %q, got %q", r.Commit, decoded.Commit)
+	}
+	if decoded.Message != r.Message {
+		t.Errorf("expected Message to be %q, got %q", r.Message, decoded.Message)
+	}
+	if decoded.AuthorName != r.AuthorName {
+		t.Errorf("expected AuthorName to be %q, got %q", r.AuthorName, decoded.AuthorName)
+	}
+	if decoded.AuthorEmail != r.AuthorEmail {
+		t.Errorf("expected AuthorEmail to be %q, got %q", r.AuthorEmail, decoded.AuthorEmail)
+	}
+	if decoded.CommitterName != r.CommitterName {
+		t.Errorf("expected CommitterName to be %q, got %q", r.CommitterName, decoded.CommitterName)
+	}
+	if decoded.CommitterEmail != r.CommitterEmail {
+		t.Errorf("expected CommitterEmail to be %q, got %q", r.CommitterEmail, decoded.CommitterEmail)
 	}
 }
 

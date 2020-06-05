@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"math/rand"
+	"net/url"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/google/gofuzz"
+	fuzz "github.com/google/gofuzz"
 
 	"k8s.io/apimachinery/pkg/api/apitesting"
 	"k8s.io/apimachinery/pkg/api/apitesting/fuzzer"
@@ -22,7 +24,7 @@ import (
 	kapitesting "k8s.io/kubernetes/pkg/api/testing"
 	"k8s.io/kubernetes/pkg/apis/apps"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
-	"k8s.io/kubernetes/pkg/apis/core/v1"
+	corev1 "k8s.io/kubernetes/pkg/apis/core/v1"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 	extensionsv1beta1 "k8s.io/kubernetes/pkg/apis/extensions/v1beta1"
 
@@ -155,7 +157,7 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 				case *build.BuildConfig:
 					codec = apitesting.TestCodec(legacyscheme.Codecs, buildv1.SchemeGroupVersion)
 				default:
-					codec = apitesting.TestCodec(legacyscheme.Codecs, v1.SchemeGroupVersion)
+					codec = apitesting.TestCodec(legacyscheme.Codecs, corev1.SchemeGroupVersion)
 				}
 
 				b, err := runtime.Encode(codec, obj)
@@ -529,7 +531,7 @@ func TestSpecificKind(t *testing.T) {
 	legacyscheme.Scheme.Log(t)
 	defer legacyscheme.Scheme.Log(nil)
 
-	gvk := authorizationapi.SchemeGroupVersion.WithKind("ClusterRole")
+	gvk := buildv1.SchemeGroupVersion.WithKind("BinaryBuildRequestOptions")
 	// TODO: make upstream CodecFactory customizable
 	codecs := serializer.NewCodecFactory(legacyscheme.Scheme)
 	for i := 0; i < fuzzIters; i++ {
@@ -558,6 +560,31 @@ func TestRoundTripDockerImage(t *testing.T) {
 	for gvk := range dockerImageTypes {
 		roundtrip.RoundTripSpecificKindWithoutProtobuf(t, gvk, legacyscheme.Scheme, legacyscheme.Codecs, fuzzer, nil)
 		roundtrip.RoundTripSpecificKindWithoutProtobuf(t, gvk, legacyscheme.Scheme, legacyscheme.Codecs, fuzzer, nil)
+	}
+}
+
+func TestBinaryBuildRequestOptionsFuzz(t *testing.T) {
+	seed := rand.Int63()
+	fuzzer := originFuzzer(t, seed)
+	r := &buildv1.BinaryBuildRequestOptions{}
+	fuzzer.Fuzz(r)
+	urlOut := &url.Values{}
+	err := legacyscheme.Scheme.Convert(r, urlOut, nil)
+	if err != nil {
+		t.Errorf("failed to convert buildv1.BinaryBuildRequestOptions to url.Values: %v", err)
+	}
+	decoded := &buildv1.BinaryBuildRequestOptions{}
+	err = legacyscheme.Scheme.Convert(urlOut, decoded, nil)
+	if err != nil {
+		t.Errorf("failed to convert url.Values to buildv1.BinaryBuildRequestOptions: %v", err)
+	}
+	// Converting to url.Values causes ObjectMeta data to be lost.
+	// Per https://pkg.go.dev/k8s.io/apimachinery@v0.18.2/pkg/conversion/queryparams?tab=doc#Convert,
+	// embedded maps and structs cannot be converted.
+	// Copying ObjectMeta to simplify testing.
+	decoded.ObjectMeta = r.ObjectMeta
+	if !reflect.DeepEqual(decoded, r) {
+		t.Errorf("expected BinaryBuildRequestOptions to be %s, got %s", r, decoded)
 	}
 }
 
