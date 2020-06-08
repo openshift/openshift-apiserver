@@ -63,6 +63,8 @@ const (
 	AggregatedEditRoleName          = "system:openshift:aggregate-to-edit"
 	AggregatedViewRoleName          = "system:openshift:aggregate-to-view"
 	AggregatedClusterReaderRoleName = "system:openshift:aggregate-to-cluster-reader"
+	AggregatedBasicUserRoleName     = "system:openshift:aggregate-to-basic-user"
+	AggregatedStorageAdminRoleName  = "system:openshift:aggregate-to-storage-admin"
 	SelfProvisionerRoleName         = "self-provisioner"
 	BasicUserRoleName               = "basic-user"
 	StatusCheckerRoleName           = "cluster-status"

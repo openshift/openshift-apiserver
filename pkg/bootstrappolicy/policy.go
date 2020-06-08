@@ -290,8 +290,23 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			},
 		},
 		{
+			// Aggregated: cluster-csi-snapshot-controller-operator needs to grant storage-admin permissions to manage
+			// VolumeSnapshotContents (=~PV) and VolumeSnapshotClasses (=~StorageClass).
 			ObjectMeta: metav1.ObjectMeta{
 				Name: StorageAdminRoleName,
+			},
+			AggregationRule: &rbacv1.AggregationRule{
+				ClusterRoleSelectors: []metav1.LabelSelector{
+					{
+						MatchLabels: map[string]string{"storage.openshift.io/aggregate-to-storage-admin": "true"},
+					},
+				},
+			},
+		},
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:   AggregatedStorageAdminRoleName,
+				Labels: map[string]string{"storage.openshift.io/aggregate-to-storage-admin": "true"},
 			},
 			Rules: []rbacv1.PolicyRule{
 				rbacv1helpers.NewRule(readWrite...).Groups(kapiGroup).Resources("persistentvolumes").RuleOrDie(),
@@ -423,11 +438,26 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			},
 		},
 		{
+			// Aggregated: cluster-csi-snapshot-controller-operator needs to grant basic-user permissions to read
+			// non-namespaced VolumeSnapshotClasses.
 			ObjectMeta: metav1.ObjectMeta{
 				Name: BasicUserRoleName,
 				Annotations: map[string]string{
 					openShiftDescription: "A user that can get basic information about projects.",
 				},
+			},
+			AggregationRule: &rbacv1.AggregationRule{
+				ClusterRoleSelectors: []metav1.LabelSelector{
+					{
+						MatchLabels: map[string]string{"authorization.openshift.io/aggregate-to-basic-user": "true"},
+					},
+				},
+			},
+		},
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:   AggregatedBasicUserRoleName,
+				Labels: map[string]string{"authorization.openshift.io/aggregate-to-basic-user": "true"},
 			},
 			Rules: []rbacv1.PolicyRule{
 				rbacv1helpers.NewRule("get").Groups(userGroup, legacyUserGroup).Resources("users").Names("~").RuleOrDie(),
@@ -862,5 +892,7 @@ func addDefaultMetadata(obj runtime.Object) {
 func GetBootstrapClusterRolesToAggregate() map[string]string {
 	return map[string]string{
 		ClusterReaderRoleName: AggregatedClusterReaderRoleName,
+		BasicUserRoleName:     AggregatedBasicUserRoleName,
+		StorageAdminRoleName:  AggregatedStorageAdminRoleName,
 	}
 }
