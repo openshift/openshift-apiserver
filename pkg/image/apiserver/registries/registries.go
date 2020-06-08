@@ -4,8 +4,9 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/containers/image/pkg/sysregistriesv2"
+
 	apioperatorsv1alpha1 "github.com/openshift/api/operator/v1alpha1"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
 
 // scopeMatchesRegistry returns true if a scope value (as in sysregistriesv2.Registry.Prefix / sysregistriesv2.Endpoint.Location)

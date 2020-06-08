@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/containers/image/pkg/sysregistriesv2"
 	"golang.org/x/net/context"
 
 	"github.com/docker/distribution"
@@ -29,7 +30,6 @@ import (
 	imageref "github.com/openshift/library-go/pkg/image/reference"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	dockerregistry "github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
 
 func init() {

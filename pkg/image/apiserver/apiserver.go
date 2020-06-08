@@ -14,6 +14,7 @@ import (
 
 	"k8s.io/klog"
 
+	"github.com/containers/image/pkg/sysregistriesv2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -45,7 +46,6 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestreamtag"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagetag"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
 
 type ExtraConfig struct {

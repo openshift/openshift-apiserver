@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/containers/image/pkg/sysregistriesv2"
 	gocontext "golang.org/x/net/context"
 
 	authorizationapi "k8s.io/api/authorization/v1"
@@ -39,7 +40,6 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registries"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
 
 // ImporterFunc returns an instance of the importer that should be used per invocation.

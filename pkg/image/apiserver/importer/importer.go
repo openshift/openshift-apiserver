@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/containers/image/pkg/sysregistriesv2"
 	"github.com/docker/distribution"
 	"github.com/docker/distribution/manifest/manifestlist"
 	"github.com/docker/distribution/manifest/schema1"
@@ -32,7 +33,6 @@ import (
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
 
 // Add a dockerregistry.Client to the passed context with this key to support v1 container image registry importing
