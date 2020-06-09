@@ -53,12 +53,14 @@ func Convert_v1_RollingDeploymentStrategyParams_To_apps_RollingDeploymentStrateg
 	out.TimeoutSeconds = in.TimeoutSeconds
 
 	if in.Pre != nil {
-		if err := s.Convert(&in.Pre, &out.Pre, 0); err != nil {
+		out.Pre = &newer.LifecycleHook{}
+		if err := Convert_v1_LifecycleHook_To_apps_LifecycleHook(in.Pre, out.Pre, s); err != nil {
 			return err
 		}
 	}
 	if in.Post != nil {
-		if err := s.Convert(&in.Post, &out.Post, 0); err != nil {
+		out.Post = &newer.LifecycleHook{}
+		if err := Convert_v1_LifecycleHook_To_apps_LifecycleHook(in.Post, out.Post, s); err != nil {
 			return err
 		}
 	}
@@ -81,12 +83,14 @@ func Convert_apps_RollingDeploymentStrategyParams_To_v1_RollingDeploymentStrateg
 	out.TimeoutSeconds = in.TimeoutSeconds
 
 	if in.Pre != nil {
-		if err := s.Convert(&in.Pre, &out.Pre, 0); err != nil {
+		out.Pre = &v1.LifecycleHook{}
+		if err := Convert_apps_LifecycleHook_To_v1_LifecycleHook(in.Pre, out.Pre, s); err != nil {
 			return err
 		}
 	}
 	if in.Post != nil {
-		if err := s.Convert(&in.Post, &out.Post, 0); err != nil {
+		out.Post = &v1.LifecycleHook{}
+		if err := Convert_apps_LifecycleHook_To_v1_LifecycleHook(in.Post, out.Post, s); err != nil {
 			return err
 		}
 	}
