@@ -920,6 +920,7 @@ func autoConvert_v1_BuildLogOptions_To_build_BuildLogOptions(in *v1.BuildLogOpti
 	out.LimitBytes = (*int64)(unsafe.Pointer(in.LimitBytes))
 	out.NoWait = in.NoWait
 	out.Version = (*int64)(unsafe.Pointer(in.Version))
+	out.InsecureSkipTLSVerifyBackend = in.InsecureSkipTLSVerifyBackend
 	return nil
 }
 
@@ -939,6 +940,7 @@ func autoConvert_build_BuildLogOptions_To_v1_BuildLogOptions(in *build.BuildLogO
 	out.LimitBytes = (*int64)(unsafe.Pointer(in.LimitBytes))
 	out.NoWait = in.NoWait
 	out.Version = (*int64)(unsafe.Pointer(in.Version))
+	out.InsecureSkipTLSVerifyBackend = in.InsecureSkipTLSVerifyBackend
 	return nil
 }
 

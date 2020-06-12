@@ -21,12 +21,13 @@ const (
 // DEPRECATED: Reserved for apiserver, do not use outside of it
 func BuildToPodLogOptions(opts *buildapi.BuildLogOptions) *kapi.PodLogOptions {
 	return &kapi.PodLogOptions{
-		Follow:       opts.Follow,
-		SinceSeconds: opts.SinceSeconds,
-		SinceTime:    opts.SinceTime,
-		Timestamps:   opts.Timestamps,
-		TailLines:    opts.TailLines,
-		LimitBytes:   opts.LimitBytes,
+		Follow:                       opts.Follow,
+		SinceSeconds:                 opts.SinceSeconds,
+		SinceTime:                    opts.SinceTime,
+		Timestamps:                   opts.Timestamps,
+		TailLines:                    opts.TailLines,
+		LimitBytes:                   opts.LimitBytes,
+		InsecureSkipTLSVerifyBackend: opts.InsecureSkipTLSVerifyBackend,
 	}
 }
 
