@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"math/rand"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/google/gofuzz"
+	fuzz "github.com/google/gofuzz"
 
 	"k8s.io/apimachinery/pkg/api/apitesting"
 	"k8s.io/apimachinery/pkg/api/apitesting/fuzzer"
@@ -22,7 +23,7 @@ import (
 	kapitesting "k8s.io/kubernetes/pkg/api/testing"
 	"k8s.io/kubernetes/pkg/apis/apps"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
-	"k8s.io/kubernetes/pkg/apis/core/v1"
+	v1 "k8s.io/kubernetes/pkg/apis/core/v1"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 	extensionsv1beta1 "k8s.io/kubernetes/pkg/apis/extensions/v1beta1"
 
@@ -529,7 +530,7 @@ func TestSpecificKind(t *testing.T) {
 	legacyscheme.Scheme.Log(t)
 	defer legacyscheme.Scheme.Log(nil)
 
-	gvk := authorizationapi.SchemeGroupVersion.WithKind("ClusterRole")
+	gvk := buildv1.SchemeGroupVersion.WithKind("BinaryBuildRequestOptions")
 	// TODO: make upstream CodecFactory customizable
 	codecs := serializer.NewCodecFactory(legacyscheme.Scheme)
 	for i := 0; i < fuzzIters; i++ {
@@ -558,6 +559,47 @@ func TestRoundTripDockerImage(t *testing.T) {
 	for gvk := range dockerImageTypes {
 		roundtrip.RoundTripSpecificKindWithoutProtobuf(t, gvk, legacyscheme.Scheme, legacyscheme.Codecs, fuzzer, nil)
 		roundtrip.RoundTripSpecificKindWithoutProtobuf(t, gvk, legacyscheme.Scheme, legacyscheme.Codecs, fuzzer, nil)
+	}
+}
+
+func TestBinaryBuildRequestOptionsFuzz(t *testing.T) {
+	seed := rand.Int63()
+	fuzzer := originFuzzer(t, seed)
+	for i := 0; i < 1000; i++ {
+		r := &buildv1.BinaryBuildRequestOptions{}
+		fuzzer.Fuzz(r)
+		urlOut := &url.Values{}
+		err := legacyscheme.Scheme.Convert(r, urlOut, nil)
+		if err != nil {
+			t.Errorf("failed to convert buildv1.BinaryBuildRequestOptions to url.Values: %v", err)
+		}
+		decoded := &buildv1.BinaryBuildRequestOptions{}
+		err = legacyscheme.Scheme.Convert(urlOut, decoded, nil)
+		if err != nil {
+			t.Errorf("failed to convert url.Values to buildv1.BinaryBuildRequestOptions: %v", err)
+		}
+		// Converting to url.Values causes ObjectMeta data to be lost.
+		// Per https://pkg.go.dev/k8s.io/apimachinery@v0.18.2/pkg/conversion/queryparams?tab=doc#Convert,
+		// embedded maps and structs cannot be converted.
+		// As such, simple `reflect.DeepEqual` comparisons cannot be used for this test.
+		if decoded.AsFile != r.AsFile {
+			t.Errorf("expected AsFile to be %q, got %q", r.AsFile, decoded.AsFile)
+		}
+		if decoded.Commit != r.Commit {
+			t.Errorf("expected Commit to be %q, got %q", r.Commit, decoded.Commit)
+		}
+		if decoded.Message != r.Message {
+			t.Errorf("expected Message to be %q, got %q", r.Message, decoded.Message)
+		}
+		if decoded.AuthorName != r.AuthorName {
+			t.Errorf("expected AuthorName to be %q, got %q", r.AuthorName, decoded.AuthorName)
+		}
+		if decoded.CommitterName != r.CommitterName {
+			t.Errorf("expected CommitterName to be %q, got %q", r.CommitterName, decoded.CommitterName)
+		}
+		if decoded.CommitterEmail != r.CommitterEmail {
+			t.Errorf("expected CommitterEmail to be %q, got %q", r.CommitterEmail, decoded.CommitterEmail)
+		}
 	}
 }
 
