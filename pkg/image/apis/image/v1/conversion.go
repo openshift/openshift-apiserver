@@ -192,6 +192,50 @@ func Convert_image_ImageStreamStatus_To_v1_ImageStreamStatus(in *newer.ImageStre
 	return s.Convert(&in.Tags, &out.Tags, 0)
 }
 
+func Convert_image_TagEventConditionArray_to_v1_TagEventConditionArray(in *[]newer.TagEventCondition, out *[]v1.TagEventCondition, s conversion.Scope) error {
+	for _, o := range *in {
+		n := v1.TagEventCondition{}
+		if err := Convert_image_TagEventCondition_To_v1_TagEventCondition(&o, &n, s); err != nil {
+			return err
+		}
+		*out = append(*out, n)
+	}
+	return nil
+}
+
+func Convert_v1_TagEventConditionArray_to_image_TagEventConditionArray(in *[]v1.TagEventCondition, out *[]newer.TagEventCondition, s conversion.Scope) error {
+	for _, o := range *in {
+		n := newer.TagEventCondition{}
+		if err := Convert_v1_TagEventCondition_To_image_TagEventCondition(&o, &n, s); err != nil {
+			return err
+		}
+		*out = append(*out, n)
+	}
+	return nil
+}
+
+func Convert_image_TagEventArray_to_v1_TagEventArray(in *[]newer.TagEvent, out *[]v1.TagEvent, s conversion.Scope) error {
+	for _, o := range *in {
+		n := v1.TagEvent{}
+		if err := Convert_image_TagEvent_To_v1_TagEvent(&o, &n, s); err != nil {
+			return err
+		}
+		*out = append(*out, n)
+	}
+	return nil
+}
+
+func Convert_v1_TagEventArray_to_image_TagEventArray(in *[]v1.TagEvent, out *[]newer.TagEvent, s conversion.Scope) error {
+	for _, o := range *in {
+		n := newer.TagEvent{}
+		if err := Convert_v1_TagEvent_To_image_TagEvent(&o, &n, s); err != nil {
+			return err
+		}
+		*out = append(*out, n)
+	}
+	return nil
+}
+
 func Convert_v1_NamedTagEventListArray_to_api_TagEventListArray(in *[]v1.NamedTagEventList, out *map[string]newer.TagEventList, s conversion.Scope) error {
 	for _, curr := range *in {
 		newTagEventList := newer.TagEventList{}
@@ -258,6 +302,26 @@ func Convert_image_TagReferenceMap_to_v1_TagReferenceArray(in *map[string]newer.
 }
 
 func AddConversionFuncs(s *runtime.Scheme) error {
+	if err := s.AddConversionFunc((*[]newer.TagEventCondition)(nil), (*[]v1.TagEventCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_image_TagEventConditionArray_to_v1_TagEventConditionArray(a.(*[]newer.TagEventCondition), b.(*[]v1.TagEventCondition), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*[]v1.TagEventCondition)(nil), (*[]newer.TagEventCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_TagEventConditionArray_to_image_TagEventConditionArray(a.(*[]v1.TagEventCondition), b.(*[]newer.TagEventCondition), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*[]newer.TagEvent)(nil), (*[]v1.TagEvent)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_image_TagEventArray_to_v1_TagEventArray(a.(*[]newer.TagEvent), b.(*[]v1.TagEvent), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*[]v1.TagEvent)(nil), (*[]newer.TagEvent)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_TagEventArray_to_image_TagEventArray(a.(*[]v1.TagEvent), b.(*[]newer.TagEvent), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddConversionFunc((*[]v1.NamedTagEventList)(nil), (*map[string]newer.TagEventList)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_NamedTagEventListArray_to_api_TagEventListArray(a.(*[]v1.NamedTagEventList), b.(*map[string]newer.TagEventList), scope)
 	}); err != nil {
