@@ -257,6 +257,118 @@ func Convert_image_TagReferenceMap_to_v1_TagReferenceArray(in *map[string]newer.
 	return nil
 }
 
+func Convert_dockerpre012_DockerConfig_to_docker10_DockerConfig(in *dockerpre012.DockerConfig, out *docker10.DockerConfig, s conversion.Scope) error {
+	out.Hostname = in.Hostname
+	out.Domainname = in.Domainname
+	out.User = in.User
+	out.Memory = in.Memory
+	out.MemorySwap = in.MemorySwap
+	out.CPUShares = in.CPUShares
+	out.CPUSet = in.CPUSet
+	out.AttachStdin = in.AttachStdin
+	out.AttachStdout = in.AttachStdout
+	out.AttachStderr = in.AttachStderr
+	out.PortSpecs = in.PortSpecs
+	out.ExposedPorts = in.ExposedPorts
+	out.Tty = in.Tty
+	out.OpenStdin = in.OpenStdin
+	out.StdinOnce = in.StdinOnce
+	out.Env = in.Env
+	out.Cmd = in.Cmd
+	out.DNS = in.DNS
+	out.Image = in.Image
+	out.Volumes = in.Volumes
+	out.VolumesFrom = in.VolumesFrom
+	out.WorkingDir = in.WorkingDir
+	out.Entrypoint = in.Entrypoint
+	out.NetworkDisabled = in.NetworkDisabled
+	out.SecurityOpts = in.SecurityOpts
+	out.OnBuild = in.OnBuild
+	out.Labels = in.Labels
+	return nil
+}
+
+func Convert_docker10_DockerConfig_to_dockerpre012_DockerConfig(in *docker10.DockerConfig, out *dockerpre012.DockerConfig, s conversion.Scope) error {
+	out.Hostname = in.Hostname
+	out.Domainname = in.Domainname
+	out.User = in.User
+	out.Memory = in.Memory
+	out.MemorySwap = in.MemorySwap
+	out.CPUShares = in.CPUShares
+	out.CPUSet = in.CPUSet
+	out.AttachStdin = in.AttachStdin
+	out.AttachStdout = in.AttachStdout
+	out.AttachStderr = in.AttachStderr
+	out.PortSpecs = in.PortSpecs
+	out.ExposedPorts = in.ExposedPorts
+	out.Tty = in.Tty
+	out.OpenStdin = in.OpenStdin
+	out.StdinOnce = in.StdinOnce
+	out.Env = in.Env
+	out.Cmd = in.Cmd
+	out.DNS = in.DNS
+	out.Image = in.Image
+	out.Volumes = in.Volumes
+	out.VolumesFrom = in.VolumesFrom
+	out.WorkingDir = in.WorkingDir
+	out.Entrypoint = in.Entrypoint
+	out.NetworkDisabled = in.NetworkDisabled
+	out.SecurityOpts = in.SecurityOpts
+	out.OnBuild = in.OnBuild
+	out.Labels = in.Labels
+	return nil
+}
+
+func Convert_docker10_DockerImage_to_dockerpre012_DockerImage(in *docker10.DockerImage, out *dockerpre012.DockerImage, s conversion.Scope) error {
+	out.ID = in.ID
+	out.Parent = in.Parent
+	out.Comment = in.Comment
+	out.Created = in.Created
+	out.Container = in.Container
+	out.DockerVersion = in.DockerVersion
+	out.Author = in.Author
+	out.Architecture = in.Architecture
+	out.Size = in.Size
+
+	if err := s.Convert(&in.ContainerConfig, &out.ContainerConfig, 0); err != nil {
+		return err
+	}
+
+	if in.Config != nil {
+		out.Config = &dockerpre012.DockerConfig{}
+		if err := s.Convert(in.Config, out.Config, 0); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func Convert_dockerpre012_DockerImage_to_docker10_DockerImage(in *dockerpre012.DockerImage, out *docker10.DockerImage, s conversion.Scope) error {
+	out.ID = in.ID
+	out.Parent = in.Parent
+	out.Comment = in.Comment
+	out.Created = in.Created
+	out.Container = in.Container
+	out.DockerVersion = in.DockerVersion
+	out.Author = in.Author
+	out.Architecture = in.Architecture
+	out.Size = in.Size
+
+	if err := s.Convert(&in.ContainerConfig, &out.ContainerConfig, 0); err != nil {
+		return err
+	}
+
+	if in.Config != nil {
+		out.Config = &docker10.DockerConfig{}
+		if err := s.Convert(in.Config, out.Config, 0); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func AddConversionFuncs(s *runtime.Scheme) error {
 	if err := s.AddConversionFunc((*[]v1.NamedTagEventList)(nil), (*map[string]newer.TagEventList)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_NamedTagEventListArray_to_api_TagEventListArray(a.(*[]v1.NamedTagEventList), b.(*map[string]newer.TagEventList), scope)
@@ -278,7 +390,26 @@ func AddConversionFuncs(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-
+	if err := s.AddConversionFunc((*docker10.DockerConfig)(nil), (*dockerpre012.DockerConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_docker10_DockerConfig_to_dockerpre012_DockerConfig(a.(*docker10.DockerConfig), b.(*dockerpre012.DockerConfig), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*dockerpre012.DockerConfig)(nil), (*docker10.DockerConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_dockerpre012_DockerConfig_to_docker10_DockerConfig(a.(*dockerpre012.DockerConfig), b.(*docker10.DockerConfig), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*docker10.DockerImage)(nil), (*dockerpre012.DockerImage)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_docker10_DockerImage_to_dockerpre012_DockerImage(a.(*docker10.DockerImage), b.(*dockerpre012.DockerImage), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*dockerpre012.DockerImage)(nil), (*docker10.DockerImage)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_dockerpre012_DockerImage_to_docker10_DockerImage(a.(*dockerpre012.DockerImage), b.(*docker10.DockerImage), scope)
+	}); err != nil {
+		return err
+	}
 	return nil
 }
 
