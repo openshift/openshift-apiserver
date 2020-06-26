@@ -794,6 +794,7 @@ func importRepositoryFromDockerV1(ctx gocontext.Context, repository *importRepos
 	}
 
 	// load digests
+	imported := false
 	for i := range repository.Digests {
 		importDigest := &repository.Digests[i]
 		if importDigest.Err != nil || importDigest.Image != nil {
@@ -811,6 +812,7 @@ func importRepositoryFromDockerV1(ctx gocontext.Context, repository *importRepos
 			importDigest.Err = err
 			continue
 		}
+		imported = true
 	}
 
 	for i := range repository.Tags {
@@ -830,6 +832,11 @@ func importRepositoryFromDockerV1(ctx gocontext.Context, repository *importRepos
 			importTag.Err = err
 			continue
 		}
+		imported = true
+	}
+
+	if imported {
+		v1ImageImportsCounter.WithLabelValues(repository.Ref.String()).Inc()
 	}
 }
 
