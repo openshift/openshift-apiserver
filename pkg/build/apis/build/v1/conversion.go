@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"net/url"
+
 	"k8s.io/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -146,6 +148,50 @@ func Convert_build_BuildStrategy_To_v1_BuildStrategy(in *newer.BuildStrategy, ou
 		out.Type = v1.JenkinsPipelineBuildStrategyType
 	default:
 		out.Type = ""
+	}
+	return nil
+}
+
+func Convert_url_Values_To_v1_BinaryBuildRequestOptions(in *url.Values, out *v1.BinaryBuildRequestOptions, s conversion.Scope) error {
+	if in == nil || out == nil {
+		return nil
+	}
+	out.AsFile = in.Get("asFile")
+	out.Commit = in.Get("revision.commit")
+	out.Message = in.Get("revision.message")
+	out.AuthorName = in.Get("revision.authorName")
+	out.AuthorEmail = in.Get("revision.authorEmail")
+	out.CommitterName = in.Get("revision.committerName")
+	out.CommitterEmail = in.Get("revision.committerEmail")
+	return nil
+}
+
+func Convert_v1_BinaryBuildRequestOptions_To_url_Values(in *v1.BinaryBuildRequestOptions, out *url.Values, s conversion.Scope) error {
+	if in == nil || out == nil {
+		return nil
+	}
+	out.Set("asFile", in.AsFile)
+	out.Set("revision.commit", in.Commit)
+	out.Set("revision.message", in.Message)
+	out.Set("revision.authorName", in.AuthorName)
+	out.Set("revision.authorEmail", in.AuthorEmail)
+	out.Set("revision.committerName", in.CommitterName)
+	out.Set("revision.committerEmail", in.CommitterEmail)
+	return nil
+}
+
+// AddCustomConversionFuncs adds conversion functions which cannot be automatically generated.
+// This is typically due to the objects not having 1:1 field mappings.
+func AddCustomConversionFuncs(scheme *runtime.Scheme) error {
+	if err := scheme.AddConversionFunc((*url.Values)(nil), (*v1.BinaryBuildRequestOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_url_Values_To_v1_BinaryBuildRequestOptions(a.(*url.Values), b.(*v1.BinaryBuildRequestOptions), scope)
+	}); err != nil {
+		return err
+	}
+	if err := scheme.AddConversionFunc((*v1.BinaryBuildRequestOptions)(nil), (*url.Values)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_BinaryBuildRequestOptions_To_url_Values(a.(*v1.BinaryBuildRequestOptions), b.(*url.Values), scope)
+	}); err != nil {
+		return err
 	}
 	return nil
 }
