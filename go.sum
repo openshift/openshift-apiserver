@@ -583,8 +583,6 @@ github.com/openshift/api v0.0.0-20200326152221-912866ddb162/go.mod h1:RKMJ5CBnlj
 github.com/openshift/api v0.0.0-20200326160804-ecb9283fe820/go.mod h1:RKMJ5CBnljLfnej+BJ/xnOWc3kZDvJUaIAEq2oKSPtE=
 github.com/openshift/api v0.0.0-20200327145400-6efe1ee417e1 h1:3K/nqFY7qkqBuuSaiOUDUucOFTQ5Su3u/vWEgEDGPks=
 github.com/openshift/api v0.0.0-20200327145400-6efe1ee417e1/go.mod h1:RKMJ5CBnljLfnej+BJ/xnOWc3kZDvJUaIAEq2oKSPtE=
-github.com/openshift/api v0.0.0-20200424083944-0422dc17083e h1:VDcwVyMEVbLyekLmtob1TEf8GfP454Afc2hO3FkgBps=
-github.com/openshift/api v0.0.0-20200424083944-0422dc17083e/go.mod h1:VnbEzX8SAaRj7Yfl836NykdQIlbEjfL6/CD+AaJQg5Q=
 github.com/openshift/api v0.0.0-20200521162313-4090b8d67ad8 h1:hmeRDYagWib4YM2xFGv7AQ4r/+1wCl27pOii9kHmPT4=
 github.com/openshift/api v0.0.0-20200521162313-4090b8d67ad8/go.mod h1:TkhafijfTiRi1Q3120/ZSE4oIWKQ4DGRh3byPywv4Mw=
 github.com/openshift/apiserver-library-go v0.0.0-20200403094534-263ee09c7716 h1:Bgs6/Ldm/3OVAdubsCVc+PImrMEKNvatJ63/Ll4NxBg=
@@ -597,8 +595,6 @@ github.com/openshift/client-go v0.0.0-20200326155132-2a6cd50aedd0 h1:kMiuiZXH1Gd
 github.com/openshift/client-go v0.0.0-20200326155132-2a6cd50aedd0/go.mod h1:uUQ4LClRO+fg5MF/P6QxjMCb1C9f7Oh4RKepftDnEJE=
 github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d h1:tupVADlF1SZrGy0Y0kg1FKUi2mVPzRwxVb+8LLMu8ws=
 github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d/go.mod h1:XmfFzbwryblvZ29NebonirM7RBuNEO7+yVCOapaouAk=
-github.com/openshift/kubernetes-apiserver v0.0.0-20200403085848-ec5d03abc6b3 h1:L6nWiANecX8aSFA/ce3nNBL2DFE2fZgEM6AmkmlP25g=
-github.com/openshift/kubernetes-apiserver v0.0.0-20200403085848-ec5d03abc6b3/go.mod h1:3S2O6FeBBd6XTo0njUrLxiqk8GNy6wWOftjhJcXYnjw=
 github.com/openshift/kubernetes-apiserver v0.0.0-20200508080521-a1e664981171 h1:jJxVhfHMuMmV3jUze8xAi6+QxlddCH3aqYgiKJ4DL/4=
 github.com/openshift/kubernetes-apiserver v0.0.0-20200508080521-a1e664981171/go.mod h1:3S2O6FeBBd6XTo0njUrLxiqk8GNy6wWOftjhJcXYnjw=
 github.com/openshift/library-go v0.0.0-20200327125526-163b2f0d6264/go.mod h1:CfydoH0B+RYs22uQZQ36A1mz5m5zhucpMGh8t5s71v4=
@@ -608,8 +604,6 @@ github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d h1:fLITXDjxMSv
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d/go.mod h1:LJM49W8fBVSj+rvcopJZu9mgH5Tx6HwLHySIYeGeu4k=
 github.com/openshift/source-to-image v0.0.0-20200213141744-eed2850f2187 h1:WuKQPKSuKEV+r2ez9bXmJWm9LqO5LnJN5Z4zLVJ/ptQ=
 github.com/openshift/source-to-image v0.0.0-20200213141744-eed2850f2187/go.mod h1:HEWMBvkkwGoJo+CMxnfYJW6O52zc052D83XBUo1zFRw=
-github.com/openshift/source-to-image v1.3.1-0.20200213141744-eed2850f2187 h1:1eVKqhy+oDaHjQ8QJBbmgMRmlXxMi7+D8uXlfVNn4cY=
-github.com/openshift/source-to-image v1.3.1-0.20200213141744-eed2850f2187/go.mod h1:HEWMBvkkwGoJo+CMxnfYJW6O52zc052D83XBUo1zFRw=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/ostreedev/ostree-go v0.0.0-20190702140239-759a8c1ac913/go.mod h1:J6OG6YJVEWopen4avK3VNQSnALmmjvniMmni/YFYAwc=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=

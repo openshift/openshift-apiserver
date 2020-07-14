@@ -13,6 +13,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-openapi/errors v0.19.2
 	github.com/go-openapi/spec v0.19.3
+	github.com/google/btree v1.0.0
 	github.com/google/gofuzz v1.1.0
 	github.com/hashicorp/golang-lru v0.5.1
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
