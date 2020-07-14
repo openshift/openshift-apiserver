@@ -1,4 +1,4 @@
-package oauth
+package validators
 
 import (
 	"context"
@@ -9,14 +9,15 @@ import (
 	"k8s.io/klog"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
 
 	oauthv1 "github.com/openshift/api/oauth/v1"
 	userv1 "github.com/openshift/api/user/v1"
 	oauthclient "github.com/openshift/client-go/oauth/clientset/versioned/typed/oauth/v1"
 	oauthclientlister "github.com/openshift/client-go/oauth/listers/oauth/v1"
-	"k8s.io/kubernetes/openshift-kube-apiserver/authentication/oauth/rankedset"
+
+	"github.com/openshift/openshift-apiserver/pkg/tokenvalidation/validators/rankedset"
 )
 
 var errTimedout = errors.New("token timed out")
@@ -59,13 +60,13 @@ type TimeoutValidator struct {
 	clock           clock.Clock                  // allows us to control time during unit tests
 }
 
-func NewTimeoutValidator(tokens oauthclient.OAuthAccessTokenInterface, oauthClients oauthclientlister.OAuthClientLister, defaultTimeout int32, minValidTimeout int32) *TimeoutValidator {
+func NewTimeoutValidator(tokens oauthclient.OAuthAccessTokenInterface, oauthClients oauthclientlister.OAuthClientLister, defaultTimeout time.Duration, minValidTimeout int32) *TimeoutValidator {
 	a := &TimeoutValidator{
 		oauthClients:   oauthClients,
 		tokens:         tokens,
 		tokenChannel:   make(chan *tokenData),
 		data:           rankedset.New(),
-		defaultTimeout: timeoutAsDuration(defaultTimeout),
+		defaultTimeout: defaultTimeout,
 		tickerInterval: timeoutAsDuration(minValidTimeout / 3), // we tick at least 3 times within each timeout period
 		clock:          clock.RealClock{},
 	}

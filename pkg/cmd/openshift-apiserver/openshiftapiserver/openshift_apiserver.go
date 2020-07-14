@@ -50,6 +50,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeallocationcontroller"
 	securityapiserver "github.com/openshift/openshift-apiserver/pkg/security/apiserver"
 	templateapiserver "github.com/openshift/openshift-apiserver/pkg/template/apiserver"
+	"github.com/openshift/openshift-apiserver/pkg/tokenvalidation"
 	userapiserver "github.com/openshift/openshift-apiserver/pkg/user/apiserver"
 	"github.com/openshift/openshift-apiserver/pkg/version"
 
@@ -90,6 +91,9 @@ type OpenshiftAPIExtraConfig struct {
 
 	// oauth API server
 	ServiceAccountMethod string
+
+	// token validation
+	AccessTokenInactivityTimeout time.Duration
 
 	ClusterQuotaMappingController *clusterquotamapping.ClusterQuotaMappingController
 }
@@ -385,6 +389,25 @@ func (c *completedConfig) withUserAPIServer(delegateAPIServer genericapiserver.D
 	return server.GenericAPIServer, nil
 }
 
+func (c *completedConfig) withTokenValidation(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
+	cfg := &tokenvalidation.TokenValidationServerConfig{
+		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
+		ExtraConfig: tokenvalidation.ExtraConfig{
+			KubeAPIServerClientConfig:    c.ExtraConfig.KubeAPIServerClientConfig,
+			AccessTokenInactivityTimeout: c.ExtraConfig.AccessTokenInactivityTimeout,
+		},
+	}
+
+	config := cfg.Complete()
+	server, err := config.New(delegateAPIServer)
+	if err != nil {
+		return nil, err
+	}
+
+	return server.GenericAPIServer, nil
+
+}
+
 func (c *completedConfig) WithOpenAPIAggregationController(delegatedAPIServer *genericapiserver.GenericAPIServer) error {
 	// We must remove openapi config-related fields from the head of the delegation chain that we pass to the OpenAPI aggregation controller.
 	// This is necessary in order to prevent conflicts with the aggregation controller, as it expects the apiserver passed to it to have
@@ -437,6 +460,7 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withSecurityAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withTemplateAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withUserAPIServer)
+	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withTokenValidation)
 
 	genericServer, err := c.GenericConfig.New("openshift-apiserver", delegateAPIServer)
 	if err != nil {

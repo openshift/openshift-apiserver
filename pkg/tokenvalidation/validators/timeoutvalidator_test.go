@@ -1,86 +1,19 @@
-package oauth
+package validators
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/clock"
-	"k8s.io/apiserver/pkg/authentication/authenticator"
-	clienttesting "k8s.io/client-go/testing"
 
 	oauthv1 "github.com/openshift/api/oauth/v1"
 	userv1 "github.com/openshift/api/user/v1"
 	oauthfake "github.com/openshift/client-go/oauth/clientset/versioned/fake"
 	oauthclient "github.com/openshift/client-go/oauth/clientset/versioned/typed/oauth/v1"
-	userfake "github.com/openshift/client-go/user/clientset/versioned/fake"
 )
-
-func TestAuthenticateTokenInvalidUID(t *testing.T) {
-	fakeOAuthClient := oauthfake.NewSimpleClientset(
-		&oauthv1.OAuthAccessToken{
-			ObjectMeta: metav1.ObjectMeta{Name: "token", CreationTimestamp: metav1.Time{Time: time.Now()}},
-			ExpiresIn:  600, // 10 minutes
-			UserName:   "foo",
-			UserUID:    string("bar1"),
-		},
-	)
-	fakeUserClient := userfake.NewSimpleClientset(&userv1.User{ObjectMeta: metav1.ObjectMeta{Name: "foo", UID: "bar2"}})
-
-	tokenAuthenticator := NewTokenAuthenticator(fakeOAuthClient.OauthV1().OAuthAccessTokens(), fakeUserClient.UserV1().Users(), NoopGroupMapper{}, nil, NewUIDValidator())
-
-	userInfo, found, err := tokenAuthenticator.AuthenticateToken(context.TODO(), "token")
-	if found {
-		t.Error("Found token, but it should be missing!")
-	}
-	if err.Error() != "user.UID (bar2) does not match token.userUID (bar1)" {
-		t.Errorf("Unexpected error: %v", err)
-	}
-	if userInfo != nil {
-		t.Errorf("Unexpected user: %v", userInfo)
-	}
-}
-
-func TestAuthenticateTokenNotFoundSuppressed(t *testing.T) {
-	fakeOAuthClient := oauthfake.NewSimpleClientset()
-	fakeUserClient := userfake.NewSimpleClientset()
-	tokenAuthenticator := NewTokenAuthenticator(fakeOAuthClient.OauthV1().OAuthAccessTokens(), fakeUserClient.UserV1().Users(), NoopGroupMapper{}, nil)
-
-	userInfo, found, err := tokenAuthenticator.AuthenticateToken(context.TODO(), "token")
-	if found {
-		t.Error("Found token, but it should be missing!")
-	}
-	if err != errLookup {
-		t.Error("Expected not found error to be suppressed with lookup error")
-	}
-	if userInfo != nil {
-		t.Errorf("Unexpected user: %v", userInfo)
-	}
-}
-
-func TestAuthenticateTokenOtherGetErrorSuppressed(t *testing.T) {
-	fakeOAuthClient := oauthfake.NewSimpleClientset()
-	fakeOAuthClient.PrependReactor("get", "oauthaccesstokens", func(action clienttesting.Action) (handled bool, ret runtime.Object, err error) {
-		return true, nil, errors.New("get error")
-	})
-	fakeUserClient := userfake.NewSimpleClientset()
-	tokenAuthenticator := NewTokenAuthenticator(fakeOAuthClient.OauthV1().OAuthAccessTokens(), fakeUserClient.UserV1().Users(), NoopGroupMapper{}, nil)
-
-	userInfo, found, err := tokenAuthenticator.AuthenticateToken(context.TODO(), "token")
-	if found {
-		t.Error("Found token, but it should be missing!")
-	}
-	if err != errLookup {
-		t.Error("Expected custom get error to be suppressed with lookup error")
-	}
-	if userInfo != nil {
-		t.Errorf("Unexpected user: %v", userInfo)
-	}
-}
 
 func TestAuthenticateTokenTimeout(t *testing.T) {
 	stopCh := make(chan struct{})
@@ -136,14 +69,13 @@ func TestAuthenticateTokenTimeout(t *testing.T) {
 		InactivityTimeoutSeconds: 5, // super short timeout
 	}
 	fakeOAuthClient := oauthfake.NewSimpleClientset(&testToken, &quickToken, &slowToken, &emergToken, &testClient, &quickClient, &slowClient)
-	fakeUserClient := userfake.NewSimpleClientset(&userv1.User{ObjectMeta: metav1.ObjectMeta{Name: "foo", UID: "bar"}})
 	accessTokenGetter := fakeOAuthClient.OauthV1().OAuthAccessTokens()
 	oauthClients := fakeOAuthClient.OauthV1().OAuthClients()
 	lister := &fakeOAuthClientLister{
 		clients: oauthClients,
 	}
 
-	timeouts := NewTimeoutValidator(accessTokenGetter, lister, defaultTimeout, minTimeout)
+	timeouts := NewTimeoutValidator(accessTokenGetter, lister, time.Duration(defaultTimeout)*time.Second, minTimeout)
 
 	// inject fake clock, which has some interesting properties
 	// 1. A sleep will cause at most one ticker event, regardless of how long the sleep was
@@ -171,27 +103,25 @@ func TestAuthenticateTokenTimeout(t *testing.T) {
 	// add some padding to all sleep invocations to make sure we are not failing on any boundary values
 	buffer := time.Nanosecond
 
-	tokenAuthenticator := NewTokenAuthenticator(accessTokenGetter, fakeUserClient.UserV1().Users(), NoopGroupMapper{}, nil, timeouts)
-
 	go timeouts.Run(stopCh)
 
 	// TIME: 0 seconds have passed here
 
 	// first time should succeed for all
-	checkToken(t, "testToken", tokenAuthenticator, accessTokenGetter, testClock, true)
+	checkToken(t, "testToken", timeouts, accessTokenGetter, testClock, false)
 	wait(t, putTokenSync)
 
-	checkToken(t, "quickToken", tokenAuthenticator, accessTokenGetter, testClock, true)
+	checkToken(t, "quickToken", timeouts, accessTokenGetter, testClock, false)
 	wait(t, putTokenSync)
 
 	wait(t, timeoutsSync) // from emergency flush because quickToken has a short enough timeout
 
-	checkToken(t, "slowToken", tokenAuthenticator, accessTokenGetter, testClock, true)
+	checkToken(t, "slowToken", timeouts, accessTokenGetter, testClock, false)
 	wait(t, putTokenSync)
 
 	// this should cause an emergency flush, if not the next auth will fail,
 	// as the token will be timed out
-	checkToken(t, "emergToken", tokenAuthenticator, accessTokenGetter, testClock, true)
+	checkToken(t, "emergToken", timeouts, accessTokenGetter, testClock, false)
 	wait(t, putTokenSync)
 
 	wait(t, timeoutsSync) // from emergency flush because emergToken has a super short timeout
@@ -205,7 +135,7 @@ func TestAuthenticateTokenTimeout(t *testing.T) {
 	// TIME: 6th second
 
 	// See if emergency flush happened
-	checkToken(t, "emergToken", tokenAuthenticator, accessTokenGetter, testClock, true)
+	checkToken(t, "emergToken", timeouts, accessTokenGetter, testClock, false)
 	wait(t, putTokenSync)
 
 	wait(t, timeoutsSync) // from emergency flush because emergToken has a super short timeout
@@ -231,10 +161,10 @@ func TestAuthenticateTokenTimeout(t *testing.T) {
 	}
 
 	// this should fail, thus no call to wait(t, putTokenSync)
-	checkToken(t, "quickToken", tokenAuthenticator, accessTokenGetter, testClock, false)
+	checkToken(t, "quickToken", timeouts, accessTokenGetter, testClock, true)
 
 	// while this should get updated
-	checkToken(t, "testToken", tokenAuthenticator, accessTokenGetter, testClock, true)
+	checkToken(t, "testToken", timeouts, accessTokenGetter, testClock, false)
 	wait(t, putTokenSync)
 
 	wait(t, timeoutsSync)
@@ -248,13 +178,13 @@ func TestAuthenticateTokenTimeout(t *testing.T) {
 	// TIME: 27th second
 
 	// this should get updated
-	checkToken(t, "slowToken", tokenAuthenticator, accessTokenGetter, testClock, true)
+	checkToken(t, "slowToken", timeouts, accessTokenGetter, testClock, false)
 	wait(t, putTokenSync)
 
 	wait(t, timeoutsSync)
 
 	// while this should not fail
-	checkToken(t, "testToken", tokenAuthenticator, accessTokenGetter, testClock, true)
+	checkToken(t, "testToken", timeouts, accessTokenGetter, testClock, false)
 	wait(t, putTokenSync)
 
 	wait(t, timeoutsSync)
@@ -285,7 +215,7 @@ func TestAuthenticateTokenTimeout(t *testing.T) {
 	wait(t, timeoutsSync)
 
 	// while this should not fail
-	checkToken(t, "testToken", tokenAuthenticator, accessTokenGetter, testClock, true)
+	checkToken(t, "testToken", timeouts, accessTokenGetter, testClock, false)
 	wait(t, putTokenSync)
 
 	wait(t, timeoutsSync)
@@ -301,46 +231,22 @@ func TestAuthenticateTokenTimeout(t *testing.T) {
 	}
 }
 
-type fakeOAuthClientLister struct {
-	clients oauthclient.OAuthClientInterface
-}
-
-func (f fakeOAuthClientLister) Get(name string) (*oauthv1.OAuthClient, error) {
-	return f.clients.Get(context.TODO(), name, metav1.GetOptions{})
-}
-
-func (f fakeOAuthClientLister) List(selector labels.Selector) ([]*oauthv1.OAuthClient, error) {
-	panic("not used")
-}
-
-func checkToken(t *testing.T, name string, authf authenticator.Token, tokens oauthclient.OAuthAccessTokenInterface, current clock.Clock, present bool) {
+func checkToken(t *testing.T, name string, validator *TimeoutValidator, tokens oauthclient.OAuthAccessTokenInterface, current clock.Clock, timedOut bool) {
 	t.Helper()
-	userInfo, found, err := authf.AuthenticateToken(context.TODO(), name)
-	if present {
-		if !found {
-			t.Errorf("Did not find token %s!", name)
-		}
-		if err != nil {
-			t.Errorf("Unexpected error checking for token %s: %v", name, err)
-		}
-		if userInfo == nil {
-			t.Errorf("Did not get a user for token %s!", name)
-		}
-	} else {
-		if found {
-			token, tokenErr := tokens.Get(context.TODO(), name, metav1.GetOptions{})
-			if tokenErr != nil {
-				t.Fatal(tokenErr)
-			}
-			t.Errorf("Found token (created=%s, timeout=%di, now=%s), but it should be gone!",
-				token.CreationTimestamp, token.InactivityTimeoutSeconds, current.Now())
-		}
-		if err != errTimedout {
-			t.Errorf("Unexpected error checking absence of token %s: %v", name, err)
-		}
-		if userInfo != nil {
-			t.Errorf("Unexpected user checking absence of token %s: %v", name, userInfo)
-		}
+	token, err := tokens.Get(context.TODO(), name, metav1.GetOptions{})
+	if err != nil {
+		t.Fatalf("Unexpected error checking for token %s: %v", name, err)
+	}
+
+	// at this point present == false && token != nil
+	err = validator.Validate(token, &userv1.User{})
+	switch {
+	case timedOut && err == errTimedout:
+		return
+	case timedOut && err != nil:
+		t.Errorf("Expected timed-out error, but got: %v", err)
+	case err != nil:
+		t.Errorf("Unexpected error checking token time-out %q: %v", name, err)
 	}
 }
 
@@ -351,4 +257,16 @@ func wait(t *testing.T, c chan struct{}) {
 	case <-time.After(30 * time.Second):
 		t.Fatal("failed to see channel event")
 	}
+}
+
+type fakeOAuthClientLister struct {
+	clients oauthclient.OAuthClientInterface
+}
+
+func (f fakeOAuthClientLister) Get(name string) (*oauthv1.OAuthClient, error) {
+	return f.clients.Get(context.TODO(), name, metav1.GetOptions{})
+}
+
+func (f fakeOAuthClientLister) List(selector labels.Selector) ([]*oauthv1.OAuthClient, error) {
+	panic("not used")
 }

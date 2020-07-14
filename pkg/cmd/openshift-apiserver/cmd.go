@@ -27,7 +27,9 @@ import (
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	"github.com/openshift/library-go/pkg/config/helpers"
 	"github.com/openshift/library-go/pkg/serviceability"
+
 	"github.com/openshift/openshift-apiserver/pkg/api/legacy"
+	tokenvalidationoptions "github.com/openshift/openshift-apiserver/pkg/tokenvalidation/options"
 )
 
 type OpenShiftAPIServer struct {
@@ -36,6 +38,8 @@ type OpenShiftAPIServer struct {
 
 	Authentication *genericapiserveroptions.DelegatingAuthenticationOptions
 	Authorization  *genericapiserveroptions.DelegatingAuthorizationOptions
+
+	TokenValidation *tokenvalidationoptions.TokenValidationOptions
 }
 
 var longDescription = templates.LongDesc(`
@@ -43,9 +47,10 @@ var longDescription = templates.LongDesc(`
 
 func NewOpenShiftAPIServerCommand(name string, out, errout io.Writer, stopCh <-chan struct{}) *cobra.Command {
 	options := &OpenShiftAPIServer{
-		Output:         out,
-		Authentication: genericapiserveroptions.NewDelegatingAuthenticationOptions(),
-		Authorization:  genericapiserveroptions.NewDelegatingAuthorizationOptions().WithAlwaysAllowPaths("/healthz", "/healthz/").WithAlwaysAllowGroups("system:masters"),
+		Output:          out,
+		Authentication:  genericapiserveroptions.NewDelegatingAuthenticationOptions(),
+		Authorization:   genericapiserveroptions.NewDelegatingAuthorizationOptions().WithAlwaysAllowPaths("/healthz", "/healthz/").WithAlwaysAllowGroups("system:masters"),
+		TokenValidation: tokenvalidationoptions.NewTokenValidationOptions(),
 	}
 
 	cmd := &cobra.Command{
@@ -87,6 +92,7 @@ func (o *OpenShiftAPIServer) AddFlags(flags *pflag.FlagSet) {
 
 	o.Authentication.AddFlags(flags)
 	o.Authorization.AddFlags(flags)
+	o.TokenValidation.AddFlags(flags)
 }
 
 func (o *OpenShiftAPIServer) Validate() error {
@@ -96,6 +102,7 @@ func (o *OpenShiftAPIServer) Validate() error {
 	}
 	errs = append(errs, o.Authentication.Validate()...)
 	errs = append(errs, o.Authorization.Validate()...)
+	errs = append(errs, o.TokenValidation.Validate()...)
 	return utilerrors.NewAggregate(errs)
 }
 
