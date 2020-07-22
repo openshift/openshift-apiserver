@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	gocontext "golang.org/x/net/context"
+	"github.com/containers/image/pkg/sysregistriesv2"
 
 	authorizationapi "k8s.io/api/authorization/v1"
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -26,6 +26,7 @@ import (
 
 	"github.com/openshift/api/image"
 	imagev1 "github.com/openshift/api/image/v1"
+	configclientv1 "github.com/openshift/client-go/config/clientset/versioned/typed/config/v1"
 	imageclientv1 "github.com/openshift/client-go/image/clientset/versioned/typed/image/v1"
 	operatorv1lister "github.com/openshift/client-go/operator/listers/operator/v1alpha1"
 	"github.com/openshift/library-go/pkg/authorization/authorizationutil"
@@ -39,7 +40,6 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registries"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
 
 // ImporterFunc returns an instance of the importer that should be used per invocation.
@@ -62,6 +62,7 @@ type REST struct {
 	strategy          *strategy
 	sarClient         authorizationclient.SubjectAccessReviewInterface
 	icspLister        operatorv1lister.ImageContentSourcePolicyLister
+	imageCfgV1Client  configclientv1.ImagesGetter
 }
 
 var _ rest.Creater = &REST{}
@@ -78,6 +79,7 @@ func NewREST(importFn ImporterFunc, streams imagestream.Registry, internalStream
 	registryWhitelister whitelist.RegistryWhitelister,
 	sarClient authorizationclient.SubjectAccessReviewInterface,
 	icspLister operatorv1lister.ImageContentSourcePolicyLister,
+	imageCfgV1Client configclientv1.ImagesGetter,
 ) *REST {
 	return &REST{
 		importFn:          importFn,
@@ -91,6 +93,7 @@ func NewREST(importFn ImporterFunc, streams imagestream.Registry, internalStream
 		strategy:          NewStrategy(registryWhitelister),
 		sarClient:         sarClient,
 		icspLister:        icspLister,
+		imageCfgV1Client:  imageCfgV1Client,
 	}
 }
 
@@ -205,9 +208,18 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		klog.Warningf("failed to load ImageContentSourcePolicy resources, mirrored images will not be found: %v", err)
 	}
 
-	v2regConf := &sysregistriesv2.V2RegistriesConf{}
-	err = registries.EditRegistriesConfig(v2regConf, nil, nil, icspRules)
+	imageConfig, err := r.imageCfgV1Client.Images().Get(ctx, "cluster", metav1.GetOptions{})
 	if err != nil {
+		return nil, kapierrors.NewInternalError(err)
+	}
+
+	v2regConf := &sysregistriesv2.V2RegistriesConf{}
+	if err = registries.EditRegistriesConfig(
+		v2regConf,
+		imageConfig.Spec.RegistrySources.InsecureRegistries,
+		imageConfig.Spec.RegistrySources.BlockedRegistries,
+		icspRules,
+	); err != nil {
 		klog.Warningf("failed to merge ImageContentSourcePolicy resources, mirrored images will not be found: %v", err)
 	}
 	for i, reg := range v2regConf.Registries {
@@ -223,7 +235,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		r.transport, r.insecureTransport, secretsList.Items,
 	)
 	imports := r.importFn(importCtx, v2regConf)
-	if err := imports.Import(ctx.(gocontext.Context), isi, stream); err != nil {
+	if err := imports.Import(ctx, isi, stream); err != nil {
 		return nil, kapierrors.NewInternalError(err)
 	}
 
@@ -246,7 +258,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 			r.transport, r.insecureTransport, nil,
 		)
 		imports := r.importFn(importCtx, v2regConf)
-		if err := imports.Import(ctx.(gocontext.Context), isi, stream); err != nil {
+		if err := imports.Import(ctx, isi, stream); err != nil {
 			return nil, kapierrors.NewInternalError(err)
 		}
 	}

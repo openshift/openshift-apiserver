@@ -14,6 +14,7 @@ import (
 
 	"k8s.io/klog"
 
+	"github.com/containers/image/pkg/sysregistriesv2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -27,6 +28,7 @@ import (
 
 	imagev1 "github.com/openshift/api/image/v1"
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
+	configv1client "github.com/openshift/client-go/config/clientset/versioned"
 	imagev1client "github.com/openshift/client-go/image/clientset/versioned"
 	operatorinformers "github.com/openshift/client-go/operator/informers/externalversions"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
@@ -45,7 +47,6 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestreamtag"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagetag"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/sysregistriesv2"
 )
 
 type ExtraConfig struct {
@@ -212,6 +213,11 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 		return nil, err
 	}
 
+	configV1Client, err := configv1client.NewForConfig(c.ExtraConfig.KubeAPIServerClientConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	imageStorage, err := imageetcd.NewREST(c.GenericConfig.RESTOptionsGetter)
 	if err != nil {
 		return nil, fmt.Errorf("error building REST storage: %v", err)
@@ -272,6 +278,7 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 		whitelister,
 		authorizationClient.SubjectAccessReviews(),
 		c.ExtraConfig.OperatorInformers.Operator().V1alpha1().ImageContentSourcePolicies().Lister(),
+		configV1Client.ConfigV1(),
 	)
 	imageStreamImageStorage := imagestreamimage.NewREST(imageRegistry, imageStreamRegistry)
 
