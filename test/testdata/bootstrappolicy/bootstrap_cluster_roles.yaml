@@ -1706,6 +1706,13 @@ items:
     name: system:router
   rules:
   - apiGroups:
+    - discovery.k8s.io
+    resources:
+    - endpointslices
+    verbs:
+    - list
+    - watch
+  - apiGroups:
     - ""
     resources:
     - endpoints
