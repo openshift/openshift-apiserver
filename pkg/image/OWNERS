@@ -2,10 +2,11 @@ reviewers:
   - bparees
   - smarterclayton
   - soltysh
-  - miminar
   - mfojtik
   - tnozicka
   - adambkaplan
+  - dmage
+  - ricardomaraschini
 approvers:
   - bparees
   - smarterclayton
@@ -13,3 +14,4 @@ approvers:
   - mfojtik
   - tnozicka
   - adambkaplan
+  - dmage
