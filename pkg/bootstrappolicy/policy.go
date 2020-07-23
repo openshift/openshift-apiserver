@@ -60,6 +60,7 @@ var (
 	schedulingGroup            = "scheduling.k8s.io"
 	kAuthzGroup                = kauthorizationapi.GroupName
 	kAuthnGroup                = kauthenticationapi.GroupName
+	discoveryGroup             = "discovery.k8s.io"
 
 	deployGroup         = oapps.GroupName
 	authzGroup          = authorization.GroupName
@@ -627,6 +628,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				Name: RouterRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
+				rbacv1helpers.NewRule("list", "watch").Groups(discoveryGroup).Resources("endpointslices").RuleOrDie(),
 				rbacv1helpers.NewRule("list", "watch").Groups(kapiGroup).Resources("endpoints").RuleOrDie(),
 				rbacv1helpers.NewRule("list", "watch").Groups(kapiGroup).Resources("services").RuleOrDie(),
 
