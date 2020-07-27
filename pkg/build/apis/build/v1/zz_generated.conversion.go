@@ -5,6 +5,7 @@
 package v1
 
 import (
+	url "net/url"
 	time "time"
 	unsafe "unsafe"
 
@@ -532,6 +533,16 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddConversionFunc((*build.SourceRevision)(nil), (*v1.SourceRevision)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_build_SourceRevision_To_v1_SourceRevision(a.(*build.SourceRevision), b.(*v1.SourceRevision), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*url.Values)(nil), (*v1.BinaryBuildRequestOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_url_Values_To_v1_BinaryBuildRequestOptions(a.(*url.Values), b.(*v1.BinaryBuildRequestOptions), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*v1.BinaryBuildRequestOptions)(nil), (*url.Values)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_BinaryBuildRequestOptions_To_url_Values(a.(*v1.BinaryBuildRequestOptions), b.(*url.Values), scope)
 	}); err != nil {
 		return err
 	}

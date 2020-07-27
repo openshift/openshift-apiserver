@@ -153,6 +153,13 @@ func SetObjectDefaults_DeploymentConfig(in *v1.DeploymentConfig) {
 			if a.VolumeSource.ScaleIO != nil {
 				corev1.SetDefaults_ScaleIOVolumeSource(a.VolumeSource.ScaleIO)
 			}
+			if a.VolumeSource.Ephemeral != nil {
+				if a.VolumeSource.Ephemeral.VolumeClaimTemplate != nil {
+					corev1.SetDefaults_PersistentVolumeClaimSpec(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec)
+					corev1.SetDefaults_ResourceList(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Limits)
+					corev1.SetDefaults_ResourceList(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Requests)
+				}
+			}
 		}
 		for i := range in.Spec.Template.Spec.InitContainers {
 			a := &in.Spec.Template.Spec.InitContainers[i]
