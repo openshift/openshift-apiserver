@@ -40,7 +40,8 @@ func TestCompatibility_v1_Pod(t *testing.T) {
 	testCompatibility(
 		t, "v1", input,
 		func(obj runtime.Object) field.ErrorList {
-			return validation.ValidatePod(obj.(*api.Pod), validation.PodValidationOptions{})
+			pod := obj.(*api.Pod)
+			return validation.ValidatePodSpec(&pod.Spec, &pod.ObjectMeta, field.NewPath("spec"))
 		},
 		map[string]string{
 			"spec.serviceAccount":     expectedServiceAccount,
