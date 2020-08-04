@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	v1 "github.com/openshift/openshift-apiserver/pkg/build/apis/build/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -310,7 +311,7 @@ func (h *binaryInstantiateHandler) handle(r io.Reader) (runtime.Object, error) {
 // cancel is false in which case it is a no-op.
 func (h *binaryInstantiateHandler) cancelBuild(build *buildapi.Build) {
 	var versionedBuild = &buildv1.Build{}
-	if err := legacyscheme.Scheme.Convert(build, versionedBuild, nil); err != nil {
+	if err := v1.Convert_build_Build_To_v1_Build(build, versionedBuild, nil); err != nil {
 		klog.Errorf("Unable to convert build to versioned build: %v", err)
 		return
 	}

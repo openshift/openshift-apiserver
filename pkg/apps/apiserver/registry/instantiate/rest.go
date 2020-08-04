@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	v1 "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -290,7 +291,7 @@ func canTrigger(
 
 	canTriggerByConfigChange := false
 	externalConfig := &appsv1.DeploymentConfig{}
-	if err := legacyscheme.Scheme.Convert(config, externalConfig, nil); err != nil {
+	if err := v1.Convert_apps_DeploymentConfig_To_v1_DeploymentConfig(config, externalConfig, nil); err != nil {
 		return false, nil, err
 	}
 	if appsutil.HasChangeTrigger(externalConfig) && // Our deployment config has a config change trigger
@@ -313,7 +314,7 @@ func decodeFromLatestDeployment(ctx context.Context, config *appsapi.DeploymentC
 		return config, nil
 	}
 	externalConfig := &appsv1.DeploymentConfig{}
-	if err := legacyscheme.Scheme.Convert(config, externalConfig, nil); err != nil {
+	if err := v1.Convert_apps_DeploymentConfig_To_v1_DeploymentConfig(config, externalConfig, nil); err != nil {
 		return nil, err
 	}
 	latestDeploymentName := appsutil.LatestDeploymentNameForConfig(externalConfig)
@@ -329,7 +330,7 @@ func decodeFromLatestDeployment(ctx context.Context, config *appsapi.DeploymentC
 		return nil, errors.NewInternalError(err)
 	}
 	internalConfig := &appsapi.DeploymentConfig{}
-	if err := legacyscheme.Scheme.Convert(decoded, internalConfig, nil); err != nil {
+	if err := v1.Convert_v1_DeploymentConfig_To_apps_DeploymentConfig(decoded, internalConfig, nil); err != nil {
 		return nil, err
 	}
 	return internalConfig, nil
