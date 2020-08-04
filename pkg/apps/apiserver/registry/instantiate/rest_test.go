@@ -10,7 +10,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 	clientgotesting "k8s.io/client-go/testing"
-	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 	kapihelper "k8s.io/kubernetes/pkg/apis/core/helper"
 
@@ -729,7 +728,7 @@ func TestCanTrigger(t *testing.T) {
 
 func makeDeployment(config *appsapi.DeploymentConfig) (*corev1.ReplicationController, error) {
 	configExternal := &appsv1.DeploymentConfig{}
-	if err := legacyscheme.Scheme.Convert(config, configExternal, nil); err != nil {
+	if err := appsv1conversions.Convert_apps_DeploymentConfig_To_v1_DeploymentConfig(config, configExternal, nil); err != nil {
 		return nil, err
 	}
 	return appsutil.MakeDeployment(configExternal)
