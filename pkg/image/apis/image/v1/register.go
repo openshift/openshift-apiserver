@@ -4,10 +4,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	corev1conversions "k8s.io/kubernetes/pkg/apis/core/v1"
 
-	"github.com/openshift/api/image/docker10"
-	"github.com/openshift/api/image/dockerpre012"
 	v1 "github.com/openshift/api/image/v1"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image"
+	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/docker10"
+	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/dockerpre012"
 )
 
 var (
@@ -15,8 +15,8 @@ var (
 		image.Install,
 		v1.Install,
 		corev1conversions.AddToScheme,
-		docker10.AddToScheme,
-		dockerpre012.AddToScheme,
+		docker10.Install,
+		dockerpre012.Install,
 
 		addFieldSelectorKeyConversions,
 		AddConversionFuncs,
