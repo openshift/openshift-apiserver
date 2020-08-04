@@ -15,8 +15,8 @@ import (
 	buildv1 "github.com/openshift/api/build/v1"
 	"github.com/openshift/library-go/pkg/build/buildutil"
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
+	v1 "github.com/openshift/openshift-apiserver/pkg/build/apis/build/v1"
 	"github.com/openshift/openshift-apiserver/pkg/build/apiserver/webhook"
-	"k8s.io/kubernetes/pkg/api/legacyscheme"
 )
 
 // WebHookPlugin used for processing manual(or other) webhook requests.
@@ -73,7 +73,8 @@ func (p *WebHookPlugin) Extract(buildCfg *buildv1.BuildConfig, trigger *buildv1.
 		warning := webhook.NewWarning(fmt.Sprintf("error unmarshalling payload: %v, ignoring payload and continuing with build", err))
 		return revision, envvars, dockerStrategyOptions, true, warning
 	}
-	if err := legacyscheme.Scheme.Convert(versionedData, internalData, nil); err != nil {
+
+	if err := v1.Convert_v1_GenericWebHookEvent_To_build_GenericWebHookEvent(versionedData, internalData, nil); err != nil {
 		return revision, envvars, dockerStrategyOptions, false, errors.NewBadRequest(err.Error())
 	}
 
