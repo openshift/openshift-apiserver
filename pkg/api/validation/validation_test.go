@@ -232,8 +232,20 @@ func TestPodSpecNodeSelectorUpdateDisallowed(t *testing.T) {
 	oldPod := &kapi.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			ResourceVersion: "1",
+			Name:            "test",
+			Namespace:       "test",
 		},
 		Spec: kapi.PodSpec{
+			Containers: []kapi.Container{
+				{
+					Name:                     "test",
+					Image:                    "test",
+					TerminationMessagePolicy: kapi.TerminationMessageFallbackToLogsOnError,
+					ImagePullPolicy:          kapi.PullAlways,
+				},
+			},
+			RestartPolicy: kapi.RestartPolicyAlways,
+			DNSPolicy:     kapi.DNSClusterFirst,
 			NodeSelector: map[string]string{
 				"foo": "bar",
 			},
@@ -241,7 +253,7 @@ func TestPodSpecNodeSelectorUpdateDisallowed(t *testing.T) {
 	}
 
 	if errs := validation.ValidatePodUpdate(oldPod, oldPod, validation.PodValidationOptions{}); len(errs) != 0 {
-		t.Fatal("expected no errors")
+		t.Fatalf("expected no errors, got: %+v", errs)
 	}
 
 	newPod := *oldPod
