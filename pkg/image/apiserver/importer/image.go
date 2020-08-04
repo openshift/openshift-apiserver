@@ -13,6 +13,7 @@ import (
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	"github.com/openshift/api/image/dockerpre012"
+
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	dockerregistry "github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
 )

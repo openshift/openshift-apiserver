@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	v1 "github.com/openshift/openshift-apiserver/pkg/build/apis/build/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -18,7 +19,6 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/klog"
-	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/credentialprovider"
 	credentialprovidersecrets "k8s.io/kubernetes/pkg/credentialprovider/secrets"
 
@@ -200,7 +200,7 @@ func updateBuildArgs(oldArgs *[]corev1.EnvVar, newArgs []corev1.EnvVar) []corev1
 // DEPRECATED: Use only by apiserver
 func (g *BuildGenerator) InstantiateInternal(ctx context.Context, request *buildapi.BuildRequest, opts metav1.CreateOptions) (*buildapi.Build, error) {
 	versionedRequest := &buildv1.BuildRequest{}
-	if err := legacyscheme.Scheme.Convert(request, versionedRequest, nil); err != nil {
+	if err := v1.Convert_build_BuildRequest_To_v1_BuildRequest(request, versionedRequest, nil); err != nil {
 		return nil, fmt.Errorf("failed to convert internal BuildRequest to external: %v", err)
 	}
 	build, err := g.Instantiate(ctx, versionedRequest, opts)
@@ -208,7 +208,7 @@ func (g *BuildGenerator) InstantiateInternal(ctx context.Context, request *build
 		return nil, err
 	}
 	internalBuild := &buildapi.Build{}
-	if err := legacyscheme.Scheme.Convert(build, internalBuild, nil); err != nil {
+	if err := v1.Convert_v1_Build_To_build_Build(build, internalBuild, nil); err != nil {
 		return nil, fmt.Errorf("failed to convert external Build to internal: %v", err)
 	}
 	return internalBuild, nil
@@ -385,7 +385,7 @@ func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.Bu
 // DEPRECATED: Use only in apiserver
 func (g *BuildGenerator) CloneInternal(ctx context.Context, request *buildapi.BuildRequest) (*buildapi.Build, error) {
 	versionedRequest := &buildv1.BuildRequest{}
-	if err := legacyscheme.Scheme.Convert(request, versionedRequest, nil); err != nil {
+	if err := v1.Convert_build_BuildRequest_To_v1_BuildRequest(request, versionedRequest, nil); err != nil {
 		return nil, err
 	}
 	build, err := g.Clone(ctx, versionedRequest)
@@ -393,7 +393,7 @@ func (g *BuildGenerator) CloneInternal(ctx context.Context, request *buildapi.Bu
 		return nil, err
 	}
 	internalBuild := &buildapi.Build{}
-	if err := legacyscheme.Scheme.Convert(build, internalBuild, nil); err != nil {
+	if err := v1.Convert_v1_Build_To_build_Build(build, internalBuild, nil); err != nil {
 		return nil, err
 	}
 	return internalBuild, nil
