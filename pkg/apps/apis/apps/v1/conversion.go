@@ -3,6 +3,7 @@ package v1
 import (
 	"strings"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
@@ -101,11 +102,13 @@ func Convert_apps_RollingDeploymentStrategyParams_To_v1_RollingDeploymentStrateg
 	if out.MaxSurge == nil {
 		out.MaxSurge = &intstr.IntOrString{}
 	}
-	if err := s.Convert(&in.MaxUnavailable, out.MaxUnavailable, 0); err != nil {
+
+	if err := metav1.Convert_intstr_IntOrString_To_intstr_IntOrString(&in.MaxUnavailable, out.MaxUnavailable, nil); err != nil {
 		return err
 	}
-	if err := s.Convert(&in.MaxSurge, out.MaxSurge, 0); err != nil {
+	if err := metav1.Convert_intstr_IntOrString_To_intstr_IntOrString(&in.MaxSurge, out.MaxSurge, nil); err != nil {
 		return err
 	}
+
 	return nil
 }
