@@ -126,8 +126,9 @@ func (imp *ImageStreamImporter) allowRegistryInsecureAccess(
 	if imp.regConf == nil {
 		return policy.Insecure
 	}
+	regURL := ref.DockerClientDefaults().Registry
 	for _, reg := range imp.regConf.Registries {
-		if reg.Location == ref.Registry {
+		if reg.Location == regURL {
 			return policy.Insecure || reg.Insecure
 		}
 	}
@@ -139,8 +140,9 @@ func (imp *ImageStreamImporter) blockedRegistry(ref imageapi.DockerImageReferenc
 	if imp.regConf == nil {
 		return false
 	}
+	regURL := ref.DockerClientDefaults().Registry
 	for _, reg := range imp.regConf.Registries {
-		if reg.Location == ref.Registry {
+		if reg.Location == regURL {
 			return reg.Blocked
 		}
 	}
