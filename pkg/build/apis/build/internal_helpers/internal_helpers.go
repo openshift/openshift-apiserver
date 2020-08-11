@@ -1,9 +1,12 @@
 package internal_helpers
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 
 	"github.com/openshift/library-go/pkg/build/naming"
+
+	buildv1 "github.com/openshift/api/build/v1"
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 )
 
@@ -21,6 +24,18 @@ const (
 // DEPRECATED: Reserved for apiserver, do not use outside of it
 func BuildToPodLogOptions(opts *buildapi.BuildLogOptions) *kapi.PodLogOptions {
 	return &kapi.PodLogOptions{
+		Follow:                       opts.Follow,
+		SinceSeconds:                 opts.SinceSeconds,
+		SinceTime:                    opts.SinceTime,
+		Timestamps:                   opts.Timestamps,
+		TailLines:                    opts.TailLines,
+		LimitBytes:                   opts.LimitBytes,
+		InsecureSkipTLSVerifyBackend: opts.InsecureSkipTLSVerifyBackend,
+	}
+}
+
+func PodLogOptionsToBuildLogOptions(opts *corev1.PodLogOptions) buildv1.BuildLogOptions {
+	return buildv1.BuildLogOptions{
 		Follow:                       opts.Follow,
 		SinceSeconds:                 opts.SinceSeconds,
 		SinceTime:                    opts.SinceTime,
