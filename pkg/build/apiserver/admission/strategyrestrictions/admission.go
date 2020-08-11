@@ -8,34 +8,26 @@ import (
 
 	authorizationv1 "k8s.io/api/authorization/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apiserver/pkg/admission"
-	"k8s.io/apiserver/pkg/admission/initializer"
 	"k8s.io/client-go/kubernetes"
 	authorizationclient "k8s.io/client-go/kubernetes/typed/authorization/v1"
 	"k8s.io/client-go/rest"
 	kapihelper "k8s.io/kubernetes/pkg/apis/core/helper"
 
+	"k8s.io/apiserver/pkg/admission"
+	"k8s.io/apiserver/pkg/admission/initializer"
+
 	"github.com/openshift/api/build"
 	buildclient "github.com/openshift/client-go/build/clientset/versioned"
 	"github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig"
 	"github.com/openshift/library-go/pkg/authorization/authorizationutil"
+
 	"github.com/openshift/openshift-apiserver/pkg/api/legacy"
 	"github.com/openshift/openshift-apiserver/pkg/bootstrappolicy"
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 	buildv1helpers "github.com/openshift/openshift-apiserver/pkg/build/apis/build/v1"
 )
-
-// provides a way to convert between internal and external.  Please don't used this to serialize and deserialize
-// Use this for places where you have to convert to some kind of a helper.  It happens in apiserver flows where you have
-// internal objects available
-var internalExternalScheme = runtime.NewScheme()
-
-func init() {
-	utilruntime.Must(buildv1helpers.Install(internalExternalScheme))
-}
 
 func Register(plugins *admission.Plugins) {
 	plugins.Register("build.openshift.io/BuildByStrategy",
@@ -210,7 +202,7 @@ func (a *buildByStrategy) checkBuildRequestAuthorization(ctx context.Context, re
 			return admission.NewForbidden(attr, err)
 		}
 		internalBuild := &buildapi.Build{}
-		if err := internalExternalScheme.Convert(build, internalBuild, nil); err != nil {
+		if err := buildv1helpers.Convert_v1_Build_To_build_Build(build, internalBuild, nil); err != nil {
 			return admission.NewForbidden(attr, err)
 		}
 		return a.checkBuildAuthorization(ctx, internalBuild, attr)
@@ -222,7 +214,7 @@ func (a *buildByStrategy) checkBuildRequestAuthorization(ctx context.Context, re
 			return admission.NewForbidden(attr, err)
 		}
 		internalBuildConfig := &buildapi.BuildConfig{}
-		if err := internalExternalScheme.Convert(buildConfig, internalBuildConfig, nil); err != nil {
+		if err := buildv1helpers.Convert_v1_BuildConfig_To_build_BuildConfig(buildConfig, internalBuildConfig, nil); err != nil {
 			return admission.NewForbidden(attr, err)
 		}
 		return a.checkBuildConfigAuthorization(ctx, internalBuildConfig, attr)
