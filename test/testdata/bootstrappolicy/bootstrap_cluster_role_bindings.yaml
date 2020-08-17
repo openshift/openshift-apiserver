@@ -549,21 +549,6 @@ items:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
-    name: system:openshift:controller:ingress-to-route-controller
-  roleRef:
-    apiGroup: rbac.authorization.k8s.io
-    kind: ClusterRole
-    name: system:openshift:controller:ingress-to-route-controller
-  subjects:
-  - kind: ServiceAccount
-    name: ingress-to-route-controller
-    namespace: openshift-infra
-- apiVersion: rbac.authorization.k8s.io/v1
-  kind: ClusterRoleBinding
-  metadata:
-    annotations:
-      rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:pv-recycler-controller
   roleRef:
     apiGroup: rbac.authorization.k8s.io

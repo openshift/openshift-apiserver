@@ -29,7 +29,6 @@ const (
 	InfraPersistentVolumeRecyclerControllerServiceAccountName   = "pv-recycler-controller"
 	InfraResourceQuotaControllerServiceAccountName              = "resourcequota-controller"
 	InfraDefaultRoleBindingsControllerServiceAccountName        = "default-rolebindings-controller"
-	InfraIngressToRouteControllerServiceAccountName             = "ingress-to-route-controller"
 
 	// template instance controller watches for TemplateInstance object creation
 	// and instantiates templates as a result.
@@ -286,18 +285,6 @@ func init() {
 		Rules: []rbacv1.PolicyRule{
 			rbacv1helpers.NewRule("list", "watch", "update").Groups(kapiGroup).Resources("services").RuleOrDie(),
 			rbacv1helpers.NewRule("update").Groups(kapiGroup).Resources("services/status").RuleOrDie(),
-			eventsRule(),
-		},
-	})
-
-	// ingress-to-route-controller
-	addControllerRole(rbacv1.ClusterRole{
-		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraIngressToRouteControllerServiceAccountName},
-		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("get", "list", "watch").Groups(kapiGroup).Resources("secrets", "services").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "list", "watch").Groups(extensionsGroup).Resources("ingress").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "list", "watch", "create", "update", "patch", "delete").Groups(routeGroup).Resources("routes").RuleOrDie(),
-			rbacv1helpers.NewRule("create", "update").Groups(routeGroup).Resources("routes/custom-host").RuleOrDie(),
 			eventsRule(),
 		},
 	})
