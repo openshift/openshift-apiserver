@@ -24,12 +24,10 @@ require (
 	github.com/openshift/client-go v0.0.0-20200326155132-2a6cd50aedd0
 	github.com/openshift/library-go v0.0.0-20200402123743-4015ba624cae
 	github.com/openshift/source-to-image v0.0.0-20200213141744-eed2850f2187
-	github.com/pkg/errors v0.8.1
-	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738
-	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
+	golang.org/x/text v0.3.3 // indirect
 	k8s.io/api v0.18.3
 	k8s.io/apiextensions-apiserver v0.18.0
 	k8s.io/apimachinery v0.18.3
