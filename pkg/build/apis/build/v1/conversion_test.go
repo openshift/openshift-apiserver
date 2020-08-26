@@ -2,12 +2,15 @@ package v1
 
 import (
 	"testing"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/conversion/queryparams"
-	runtime "k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/apimachinery/pkg/util/diff"
 	kinternal "k8s.io/kubernetes/pkg/apis/core"
 
 	v1 "github.com/openshift/api/build/v1"
@@ -384,6 +387,49 @@ func TestImageChangeTriggerNilImageChangePointer(t *testing.T) {
 	for _, ic := range internalBC.Spec.Triggers {
 		if ic.ImageChange == nil {
 			t.Errorf("Expected trigger to have ImageChange value")
+		}
+	}
+}
+
+func TestBuildLogOptionsOptions(t *testing.T) {
+	sinceSeconds := int64(1)
+	sinceTime := metav1.NewTime(time.Date(2000, 1, 1, 12, 34, 56, 0, time.UTC).Local())
+	tailLines := int64(2)
+	limitBytes := int64(3)
+
+	unversionedBuildLogOptions := &internal.BuildLogOptions{
+		Container:    "mycontainer",
+		Follow:       true,
+		Previous:     true,
+		SinceSeconds: &sinceSeconds,
+		SinceTime:    &sinceTime,
+		Timestamps:   true,
+		TailLines:    &tailLines,
+		LimitBytes:   &limitBytes,
+	}
+	versionedBuildLogOptions, err := scheme.ConvertToVersion(unversionedBuildLogOptions, v1.GroupVersion)
+	if err != nil {
+		t.Fatal(err)
+	}
+	params, err := queryparams.Convert(versionedBuildLogOptions)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// checks "query params -> versioned" conversion
+	{
+		convertedVersionedBuildLogOptions := &v1.BuildLogOptions{}
+		if err := scheme.Convert(&params, convertedVersionedBuildLogOptions, nil); err != nil {
+			t.Fatal(err)
+		}
+
+		// TypeMeta is not filled by the conversion functions
+		// Setting it manually to simplify testing.
+		convertedVersionedBuildLogOptions.TypeMeta.Kind = "BuildLogOptions"
+		convertedVersionedBuildLogOptions.TypeMeta.APIVersion = v1.GroupVersion.String()
+
+		if !apiequality.Semantic.DeepEqual(convertedVersionedBuildLogOptions, versionedBuildLogOptions) {
+			t.Fatalf("Unexpected deserialization:\n%s", diff.ObjectGoPrintSideBySide(versionedBuildLogOptions, convertedVersionedBuildLogOptions))
 		}
 	}
 }
