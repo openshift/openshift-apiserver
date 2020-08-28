@@ -617,6 +617,11 @@ func (s Strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 // Decorate decorates stream.Status.DockerImageRepository using the logic from
 // dockerImageRepository().
 func (s Strategy) Decorate(obj runtime.Object) error {
+	// when the watch cache is on the object might be wrapped with cachingObject
+	// unwrap it if that's the case and decorate
+	if co, ok := obj.(runtime.CacheableObject); ok {
+		obj = co.GetObject()
+	}
 	switch t := obj.(type) {
 	case *imageapi.ImageStream:
 		t.Status.DockerImageRepository = s.dockerImageRepository(context.TODO(), t, true)
