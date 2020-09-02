@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	v1 "github.com/openshift/api/image/v1"
 	"k8s.io/apimachinery/pkg/util/diff"
 
+	v1 "github.com/openshift/api/image/v1"
 	newer "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	imagev1 "github.com/openshift/openshift-apiserver/pkg/image/apis/image/v1"
 

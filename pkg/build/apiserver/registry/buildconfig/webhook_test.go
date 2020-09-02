@@ -18,10 +18,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
+	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	clientesting "k8s.io/client-go/testing"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
-
-	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 
 	buildv1 "github.com/openshift/api/build/v1"
 	buildfake "github.com/openshift/client-go/build/clientset/versioned/fake"
@@ -32,7 +31,6 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/build/apiserver/webhook/bitbucket"
 	"github.com/openshift/openshift-apiserver/pkg/build/apiserver/webhook/github"
 	"github.com/openshift/openshift-apiserver/pkg/build/apiserver/webhook/gitlab"
-	// _ "github.com/openshift/openshift-apiserver/pkg/api/install"
 )
 
 type fakeInstantiator interface {

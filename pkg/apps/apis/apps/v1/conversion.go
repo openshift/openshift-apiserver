@@ -46,7 +46,7 @@ func Convert_apps_DeploymentTriggerImageChangeParams_To_v1_DeploymentTriggerImag
 	return nil
 }
 
-func Convert_v1_RollingDeploymentStrategyParams_To_apps_RollingDeploymentStrategyParams(in *v1.RollingDeploymentStrategyParams, out *newer.RollingDeploymentStrategyParams, _ conversion.Scope) error {
+func Convert_v1_RollingDeploymentStrategyParams_To_apps_RollingDeploymentStrategyParams(in *v1.RollingDeploymentStrategyParams, out *newer.RollingDeploymentStrategyParams, s conversion.Scope) error {
 	SetDefaults_RollingDeploymentStrategyParams(in)
 
 	out.UpdatePeriodSeconds = in.UpdatePeriodSeconds
@@ -55,23 +55,23 @@ func Convert_v1_RollingDeploymentStrategyParams_To_apps_RollingDeploymentStrateg
 
 	if in.Pre != nil {
 		out.Pre = &newer.LifecycleHook{}
-		if err := Convert_v1_LifecycleHook_To_apps_LifecycleHook(in.Pre, out.Pre, nil); err != nil {
+		if err := Convert_v1_LifecycleHook_To_apps_LifecycleHook(in.Pre, out.Pre, s); err != nil {
 			return err
 		}
 	}
 	if in.Post != nil {
 		out.Post = &newer.LifecycleHook{}
-		if err := Convert_v1_LifecycleHook_To_apps_LifecycleHook(in.Post, out.Post, nil); err != nil {
+		if err := Convert_v1_LifecycleHook_To_apps_LifecycleHook(in.Post, out.Post, s); err != nil {
 			return err
 		}
 	}
 	if in.MaxUnavailable != nil {
-		if err := metav1.Convert_intstr_IntOrString_To_intstr_IntOrString(in.MaxUnavailable, &out.MaxUnavailable, nil); err != nil {
+		if err := metav1.Convert_intstr_IntOrString_To_intstr_IntOrString(in.MaxUnavailable, &out.MaxUnavailable, s); err != nil {
 			return err
 		}
 	}
 	if in.MaxSurge != nil {
-		if err := metav1.Convert_intstr_IntOrString_To_intstr_IntOrString(in.MaxSurge, &out.MaxSurge, nil); err != nil {
+		if err := metav1.Convert_intstr_IntOrString_To_intstr_IntOrString(in.MaxSurge, &out.MaxSurge, s); err != nil {
 			return err
 		}
 	}
@@ -79,20 +79,20 @@ func Convert_v1_RollingDeploymentStrategyParams_To_apps_RollingDeploymentStrateg
 	return nil
 }
 
-func Convert_apps_RollingDeploymentStrategyParams_To_v1_RollingDeploymentStrategyParams(in *newer.RollingDeploymentStrategyParams, out *v1.RollingDeploymentStrategyParams, _ conversion.Scope) error {
+func Convert_apps_RollingDeploymentStrategyParams_To_v1_RollingDeploymentStrategyParams(in *newer.RollingDeploymentStrategyParams, out *v1.RollingDeploymentStrategyParams, s conversion.Scope) error {
 	out.UpdatePeriodSeconds = in.UpdatePeriodSeconds
 	out.IntervalSeconds = in.IntervalSeconds
 	out.TimeoutSeconds = in.TimeoutSeconds
 
 	if in.Pre != nil {
 		out.Pre = &v1.LifecycleHook{}
-		if err := Convert_apps_LifecycleHook_To_v1_LifecycleHook(in.Pre, out.Pre, nil); err != nil {
+		if err := Convert_apps_LifecycleHook_To_v1_LifecycleHook(in.Pre, out.Pre, s); err != nil {
 			return err
 		}
 	}
 	if in.Post != nil {
 		out.Post = &v1.LifecycleHook{}
-		if err := Convert_apps_LifecycleHook_To_v1_LifecycleHook(in.Post, out.Post, nil); err != nil {
+		if err := Convert_apps_LifecycleHook_To_v1_LifecycleHook(in.Post, out.Post, s); err != nil {
 			return err
 		}
 	}
@@ -104,10 +104,10 @@ func Convert_apps_RollingDeploymentStrategyParams_To_v1_RollingDeploymentStrateg
 		out.MaxSurge = &intstr.IntOrString{}
 	}
 
-	if err := metav1.Convert_intstr_IntOrString_To_intstr_IntOrString(&in.MaxUnavailable, out.MaxUnavailable, nil); err != nil {
+	if err := metav1.Convert_intstr_IntOrString_To_intstr_IntOrString(&in.MaxUnavailable, out.MaxUnavailable, s); err != nil {
 		return err
 	}
-	if err := metav1.Convert_intstr_IntOrString_To_intstr_IntOrString(&in.MaxSurge, out.MaxSurge, nil); err != nil {
+	if err := metav1.Convert_intstr_IntOrString_To_intstr_IntOrString(&in.MaxSurge, out.MaxSurge, s); err != nil {
 		return err
 	}
 

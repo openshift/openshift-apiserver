@@ -126,7 +126,6 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 		return nil, err
 	}
 
-	// authInfoResolverWrapper := webhook.NewDefaultAuthenticationInfoResolverWrapper(nil, genericConfig.EgressSelector, genericConfig.LoopbackClientConfig)
 	auditFlags := configflags.AuditFlags(&config.AuditConfig, configflags.ArgsWithPrefix(config.APIServerArguments, "audit-"))
 	auditOpt := genericapiserveroptions.NewAuditOptions()
 	fs := pflag.NewFlagSet("audit", pflag.ContinueOnError)
@@ -139,16 +138,6 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	}
 	if err := auditOpt.ApplyTo(
 		&genericConfig.Config,
-		/*
-			genericConfig.Config.LoopbackClientConfig,
-			informers.kubernetesInformers,
-			genericapiserveroptions.NewProcessInfo("openshift-apiserver", "openshift-apiserver"),
-			&genericapiserveroptions.WebhookOptions{
-				AuthInfoResolverWrapper: authInfoResolverWrapper,
-				// the openshift-apiserver runs on cluster as a normal pod, accessed by a service, so it should always have access to the service network
-				ServiceResolver: aggregatorapiserver.NewClusterIPServiceResolver(informers.kubernetesInformers.Core().V1().Services().Lister()),
-			},
-		*/
 	); err != nil {
 		return nil, err
 	}
