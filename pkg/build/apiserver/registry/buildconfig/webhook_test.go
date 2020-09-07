@@ -20,7 +20,6 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	clientesting "k8s.io/client-go/testing"
-	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 
 	buildv1 "github.com/openshift/api/build/v1"
@@ -32,7 +31,6 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/build/apiserver/webhook/bitbucket"
 	"github.com/openshift/openshift-apiserver/pkg/build/apiserver/webhook/github"
 	"github.com/openshift/openshift-apiserver/pkg/build/apiserver/webhook/gitlab"
-	// _ "github.com/openshift/openshift-apiserver/pkg/api/install"
 )
 
 type fakeInstantiator interface {
@@ -542,7 +540,7 @@ func TestInvokeWebhookErrorCreateBuild(t *testing.T) {
 }
 
 func TestGeneratedBuildTriggerInfoGenericWebHook(t *testing.T) {
-	revision := &buildv1.SourceRevision{
+	externalRevision := &buildv1.SourceRevision{
 		Git: &buildv1.GitSourceRevision{
 			Author: buildv1.SourceControlUser{
 				Name:  "John Doe",
@@ -556,16 +554,11 @@ func TestGeneratedBuildTriggerInfoGenericWebHook(t *testing.T) {
 		},
 	}
 
-	externalRevision := &buildv1.SourceRevision{}
-	if err := legacyscheme.Scheme.Convert(revision, externalRevision, nil); err != nil {
-		panic(err)
-	}
-
 	buildtriggerCause := webhook.GenerateBuildTriggerInfo(externalRevision, "generic")
 	hiddenSecret := "<secret>"
 	for _, cause := range buildtriggerCause {
 		if !reflect.DeepEqual(externalRevision, cause.GenericWebHook.Revision) {
-			t.Errorf("Expected returned revision to equal: %v", revision)
+			t.Errorf("Expected returned externalRevision to equal: %v", externalRevision)
 		}
 		if cause.GenericWebHook.Secret != hiddenSecret {
 			t.Errorf("Expected obfuscated secret to be: %s", hiddenSecret)
@@ -577,7 +570,7 @@ func TestGeneratedBuildTriggerInfoGenericWebHook(t *testing.T) {
 }
 
 func TestGeneratedBuildTriggerInfoGitHubWebHook(t *testing.T) {
-	revision := &buildv1.SourceRevision{
+	externalRevision := &buildv1.SourceRevision{
 		Git: &buildv1.GitSourceRevision{
 			Author: buildv1.SourceControlUser{
 				Name:  "John Doe",
@@ -590,16 +583,12 @@ func TestGeneratedBuildTriggerInfoGitHubWebHook(t *testing.T) {
 			Message: "A random act of kindness",
 		},
 	}
-	externalRevision := &buildv1.SourceRevision{}
-	if err := legacyscheme.Scheme.Convert(revision, externalRevision, nil); err != nil {
-		panic(err)
-	}
 
 	buildtriggerCause := webhook.GenerateBuildTriggerInfo(externalRevision, "github")
 	hiddenSecret := "<secret>"
 	for _, cause := range buildtriggerCause {
 		if !reflect.DeepEqual(externalRevision, cause.GitHubWebHook.Revision) {
-			t.Errorf("Expected returned revision to equal: %v", revision)
+			t.Errorf("Expected returned externalRevision to equal: %v", externalRevision)
 		}
 		if cause.GitHubWebHook.Secret != hiddenSecret {
 			t.Errorf("Expected obfuscated secret to be: %s", hiddenSecret)
@@ -611,7 +600,7 @@ func TestGeneratedBuildTriggerInfoGitHubWebHook(t *testing.T) {
 }
 
 func TestGeneratedBuildTriggerInfoGitLabWebHook(t *testing.T) {
-	revision := &buildv1.SourceRevision{
+	externalRevision := &buildv1.SourceRevision{
 		Git: &buildv1.GitSourceRevision{
 			Author: buildv1.SourceControlUser{
 				Name:  "John Doe",
@@ -624,16 +613,12 @@ func TestGeneratedBuildTriggerInfoGitLabWebHook(t *testing.T) {
 			Message: "A random act of kindness",
 		},
 	}
-	externalRevision := &buildv1.SourceRevision{}
-	if err := legacyscheme.Scheme.Convert(revision, externalRevision, nil); err != nil {
-		panic(err)
-	}
 
 	buildtriggerCause := webhook.GenerateBuildTriggerInfo(externalRevision, "gitlab")
 	hiddenSecret := "<secret>"
 	for _, cause := range buildtriggerCause {
 		if !reflect.DeepEqual(externalRevision, cause.GitLabWebHook.Revision) {
-			t.Errorf("Expected returned revision to equal: %v", revision)
+			t.Errorf("Expected returned externalRevision to equal: %v", externalRevision)
 		}
 		if cause.GitLabWebHook.Secret != hiddenSecret {
 			t.Errorf("Expected obfuscated secret to be: %s", hiddenSecret)
@@ -645,7 +630,7 @@ func TestGeneratedBuildTriggerInfoGitLabWebHook(t *testing.T) {
 }
 
 func TestGeneratedBuildTriggerInfoBitbucketWebHook(t *testing.T) {
-	revision := &buildv1.SourceRevision{
+	externalRevision := &buildv1.SourceRevision{
 		Git: &buildv1.GitSourceRevision{
 			Author: buildv1.SourceControlUser{
 				Name:  "John Doe",
@@ -658,16 +643,12 @@ func TestGeneratedBuildTriggerInfoBitbucketWebHook(t *testing.T) {
 			Message: "A random act of kindness",
 		},
 	}
-	externalRevision := &buildv1.SourceRevision{}
-	if err := legacyscheme.Scheme.Convert(revision, externalRevision, nil); err != nil {
-		panic(err)
-	}
 
 	buildtriggerCause := webhook.GenerateBuildTriggerInfo(externalRevision, "bitbucket")
 	hiddenSecret := "<secret>"
 	for _, cause := range buildtriggerCause {
 		if !reflect.DeepEqual(externalRevision, cause.BitbucketWebHook.Revision) {
-			t.Errorf("Expected returned revision to equal: %v", revision)
+			t.Errorf("Expected returned externalRevision to equal: %v", externalRevision)
 		}
 		if cause.BitbucketWebHook.Secret != hiddenSecret {
 			t.Errorf("Expected obfuscated secret to be: %s", hiddenSecret)

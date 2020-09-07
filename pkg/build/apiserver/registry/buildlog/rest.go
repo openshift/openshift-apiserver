@@ -17,8 +17,8 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	kubetypedclient "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/klog"
-	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
+	v1 "k8s.io/kubernetes/pkg/apis/core/v1"
 
 	"github.com/openshift/api/build"
 	buildv1 "github.com/openshift/api/build/v1"
@@ -333,7 +333,11 @@ func (r *REST) New() runtime.Object {
 func (r *REST) pipeLogs(ctx context.Context, namespace, buildPodName string, containerLogOpts *kapi.PodLogOptions, writer io.Writer) error {
 	klog.V(4).Infof("pulling build pod logs for %s/%s, container %s", namespace, buildPodName, containerLogOpts.Container)
 
-	logRequest := r.PodClient.Pods(namespace).GetLogs(buildPodName, podLogOptionsToV1(containerLogOpts))
+	options := &corev1.PodLogOptions{}
+	if err := v1.Convert_core_PodLogOptions_To_v1_PodLogOptions(containerLogOpts, options, nil); err != nil {
+		return err
+	}
+	logRequest := r.PodClient.Pods(namespace).GetLogs(buildPodName, options)
 	readerCloser, err := logRequest.Stream(ctx)
 	if err != nil {
 		klog.Errorf("error: could not write build log for pod %q to stream due to: %v", buildPodName, err)
@@ -344,16 +348,6 @@ func (r *REST) pipeLogs(ctx context.Context, namespace, buildPodName string, con
 	// dump all container logs from the log stream into a single output stream that we'll send back to the client.
 	_, err = io.Copy(writer, readerCloser)
 	return err
-}
-
-// podLogOptionsToV1 converts internal PodLogOptions to external.
-// TODO: While the PodLogOptions struct is relatively cheap, we should fix this at some point.
-func podLogOptionsToV1(options *kapi.PodLogOptions) *corev1.PodLogOptions {
-	newOptions := &corev1.PodLogOptions{}
-	if err := legacyscheme.Scheme.Convert(options, newOptions, nil); err != nil {
-		panic(err)
-	}
-	return newOptions
 }
 
 // 3rd party tools, such as istio auto-inject, may add sidecar containers to
@@ -370,7 +364,11 @@ func selectBuilderContainer(containers []corev1.Container) string {
 }
 
 func (r *REST) getSimpleLogs(ctx context.Context, podNamespace, podName string, logOpts *kapi.PodLogOptions) (runtime.Object, error) {
-	logRequest := r.PodClient.Pods(podNamespace).GetLogs(podName, podLogOptionsToV1(logOpts))
+	options := &corev1.PodLogOptions{}
+	if err := v1.Convert_core_PodLogOptions_To_v1_PodLogOptions(logOpts, options, nil); err != nil {
+		return nil, err
+	}
+	logRequest := r.PodClient.Pods(podNamespace).GetLogs(podName, options)
 
 	readerCloser, err := logRequest.Stream(ctx)
 	if err != nil {

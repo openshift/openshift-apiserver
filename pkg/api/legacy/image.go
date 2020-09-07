@@ -12,6 +12,8 @@ import (
 	imagev1 "github.com/openshift/api/image/v1"
 	"github.com/openshift/openshift-apiserver/pkg/api/apihelpers"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image"
+	imagedocker10helpers "github.com/openshift/openshift-apiserver/pkg/image/apis/image/docker10"
+	imagedockerpre012helpers "github.com/openshift/openshift-apiserver/pkg/image/apis/image/dockerpre012"
 	imagev1helpers "github.com/openshift/openshift-apiserver/pkg/image/apis/image/v1"
 )
 
@@ -28,6 +30,8 @@ func InstallInternalLegacyImage(scheme *runtime.Scheme) {
 		addLegacyImageFieldSelectorKeyConversions,
 		imagev1helpers.RegisterDefaults,
 		imagev1helpers.RegisterConversions,
+		imagedockerpre012helpers.RegisterConversions,
+		imagedocker10helpers.RegisterConversions,
 	)
 	utilruntime.Must(schemeBuilder.AddToScheme(scheme))
 }

@@ -2,54 +2,9 @@ package docker10
 
 import (
 	"time"
+
+	"github.com/openshift/api/image/docker10"
 )
-
-// DockerImage is the type representing a container image and its various properties when
-// retrieved from the Docker client API.
-type DockerImage struct {
-	ID              string        `json:"Id"`
-	Parent          string        `json:"Parent,omitempty"`
-	Comment         string        `json:"Comment,omitempty"`
-	Created         time.Time     `json:"Created,omitempty"`
-	Container       string        `json:"Container,omitempty"`
-	ContainerConfig DockerConfig  `json:"ContainerConfig,omitempty"`
-	DockerVersion   string        `json:"DockerVersion,omitempty"`
-	Author          string        `json:"Author,omitempty"`
-	Config          *DockerConfig `json:"Config,omitempty"`
-	Architecture    string        `json:"Architecture,omitempty"`
-	Size            int64         `json:"Size,omitempty"`
-}
-
-// DockerConfig is the list of configuration options used when creating a container.
-type DockerConfig struct {
-	Hostname        string              `json:"Hostname,omitempty"`
-	Domainname      string              `json:"Domainname,omitempty"`
-	User            string              `json:"User,omitempty"`
-	Memory          int64               `json:"Memory,omitempty"`
-	MemorySwap      int64               `json:"MemorySwap,omitempty"`
-	CPUShares       int64               `json:"CpuShares,omitempty"`
-	CPUSet          string              `json:"Cpuset,omitempty"`
-	AttachStdin     bool                `json:"AttachStdin,omitempty"`
-	AttachStdout    bool                `json:"AttachStdout,omitempty"`
-	AttachStderr    bool                `json:"AttachStderr,omitempty"`
-	PortSpecs       []string            `json:"PortSpecs,omitempty"`
-	ExposedPorts    map[string]struct{} `json:"ExposedPorts,omitempty"`
-	Tty             bool                `json:"Tty,omitempty"`
-	OpenStdin       bool                `json:"OpenStdin,omitempty"`
-	StdinOnce       bool                `json:"StdinOnce,omitempty"`
-	Env             []string            `json:"Env,omitempty"`
-	Cmd             []string            `json:"Cmd,omitempty"`
-	DNS             []string            `json:"Dns,omitempty"` // For Docker API v1.9 and below only
-	Image           string              `json:"Image,omitempty"`
-	Volumes         map[string]struct{} `json:"Volumes,omitempty"`
-	VolumesFrom     string              `json:"VolumesFrom,omitempty"`
-	WorkingDir      string              `json:"WorkingDir,omitempty"`
-	Entrypoint      []string            `json:"Entrypoint,omitempty"`
-	NetworkDisabled bool                `json:"NetworkDisabled,omitempty"`
-	SecurityOpts    []string            `json:"SecurityOpts,omitempty"`
-	OnBuild         []string            `json:"OnBuild,omitempty"`
-	Labels          map[string]string   `json:"Labels,omitempty"`
-}
 
 // Descriptor describes targeted content. Used in conjunction with a blob
 // store, a descriptor can be used to fetch, store and target any kind of
@@ -101,17 +56,17 @@ type DockerHistory struct {
 // DockerV1CompatibilityImage represents the structured v1
 // compatibility information.
 type DockerV1CompatibilityImage struct {
-	ID              string        `json:"id"`
-	Parent          string        `json:"parent,omitempty"`
-	Comment         string        `json:"comment,omitempty"`
-	Created         time.Time     `json:"created"`
-	Container       string        `json:"container,omitempty"`
-	ContainerConfig DockerConfig  `json:"container_config,omitempty"`
-	DockerVersion   string        `json:"docker_version,omitempty"`
-	Author          string        `json:"author,omitempty"`
-	Config          *DockerConfig `json:"config,omitempty"`
-	Architecture    string        `json:"architecture,omitempty"`
-	Size            int64         `json:"size,omitempty"`
+	ID              string                 `json:"id"`
+	Parent          string                 `json:"parent,omitempty"`
+	Comment         string                 `json:"comment,omitempty"`
+	Created         time.Time              `json:"created"`
+	Container       string                 `json:"container,omitempty"`
+	ContainerConfig docker10.DockerConfig  `json:"container_config,omitempty"`
+	DockerVersion   string                 `json:"docker_version,omitempty"`
+	Author          string                 `json:"author,omitempty"`
+	Config          *docker10.DockerConfig `json:"config,omitempty"`
+	Architecture    string                 `json:"architecture,omitempty"`
+	Size            int64                  `json:"size,omitempty"`
 }
 
 // DockerV1CompatibilityImageSize represents the structured v1
@@ -122,22 +77,22 @@ type DockerV1CompatibilityImageSize struct {
 
 // DockerImageConfig stores the image configuration
 type DockerImageConfig struct {
-	ID              string                `json:"id"`
-	Parent          string                `json:"parent,omitempty"`
-	Comment         string                `json:"comment,omitempty"`
-	Created         time.Time             `json:"created"`
-	Container       string                `json:"container,omitempty"`
-	ContainerConfig DockerConfig          `json:"container_config,omitempty"`
-	DockerVersion   string                `json:"docker_version,omitempty"`
-	Author          string                `json:"author,omitempty"`
-	Config          *DockerConfig         `json:"config,omitempty"`
-	Architecture    string                `json:"architecture,omitempty"`
-	Size            int64                 `json:"size,omitempty"`
-	RootFS          *DockerConfigRootFS   `json:"rootfs,omitempty"`
-	History         []DockerConfigHistory `json:"history,omitempty"`
-	OS              string                `json:"os,omitempty"`
-	OSVersion       string                `json:"os.version,omitempty"`
-	OSFeatures      []string              `json:"os.features,omitempty"`
+	ID              string                 `json:"id"`
+	Parent          string                 `json:"parent,omitempty"`
+	Comment         string                 `json:"comment,omitempty"`
+	Created         time.Time              `json:"created"`
+	Container       string                 `json:"container,omitempty"`
+	ContainerConfig docker10.DockerConfig  `json:"container_config,omitempty"`
+	DockerVersion   string                 `json:"docker_version,omitempty"`
+	Author          string                 `json:"author,omitempty"`
+	Config          *docker10.DockerConfig `json:"config,omitempty"`
+	Architecture    string                 `json:"architecture,omitempty"`
+	Size            int64                  `json:"size,omitempty"`
+	RootFS          *DockerConfigRootFS    `json:"rootfs,omitempty"`
+	History         []DockerConfigHistory  `json:"history,omitempty"`
+	OS              string                 `json:"os,omitempty"`
+	OSVersion       string                 `json:"os.version,omitempty"`
+	OSFeatures      []string               `json:"os.features,omitempty"`
 }
 
 // DockerConfigHistory stores build commands that were used to create an image

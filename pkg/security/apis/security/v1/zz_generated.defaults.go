@@ -76,6 +76,13 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 		if a.VolumeSource.ScaleIO != nil {
 			corev1.SetDefaults_ScaleIOVolumeSource(a.VolumeSource.ScaleIO)
 		}
+		if a.VolumeSource.Ephemeral != nil {
+			if a.VolumeSource.Ephemeral.VolumeClaimTemplate != nil {
+				corev1.SetDefaults_PersistentVolumeClaimSpec(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec)
+				corev1.SetDefaults_ResourceList(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Limits)
+				corev1.SetDefaults_ResourceList(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Requests)
+			}
+		}
 	}
 	for i := range in.Spec.Template.Spec.InitContainers {
 		a := &in.Spec.Template.Spec.InitContainers[i]
@@ -273,6 +280,13 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 			}
 			if b.VolumeSource.ScaleIO != nil {
 				corev1.SetDefaults_ScaleIOVolumeSource(b.VolumeSource.ScaleIO)
+			}
+			if b.VolumeSource.Ephemeral != nil {
+				if b.VolumeSource.Ephemeral.VolumeClaimTemplate != nil {
+					corev1.SetDefaults_PersistentVolumeClaimSpec(&b.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec)
+					corev1.SetDefaults_ResourceList(&b.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Limits)
+					corev1.SetDefaults_ResourceList(&b.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Requests)
+				}
 			}
 		}
 		for j := range a.PodSecurityPolicySubjectReviewStatus.Template.Spec.InitContainers {
@@ -474,6 +488,13 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 		if a.VolumeSource.ScaleIO != nil {
 			corev1.SetDefaults_ScaleIOVolumeSource(a.VolumeSource.ScaleIO)
 		}
+		if a.VolumeSource.Ephemeral != nil {
+			if a.VolumeSource.Ephemeral.VolumeClaimTemplate != nil {
+				corev1.SetDefaults_PersistentVolumeClaimSpec(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec)
+				corev1.SetDefaults_ResourceList(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Limits)
+				corev1.SetDefaults_ResourceList(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Requests)
+			}
+		}
 	}
 	for i := range in.Spec.Template.Spec.InitContainers {
 		a := &in.Spec.Template.Spec.InitContainers[i]
@@ -669,6 +690,13 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 		}
 		if a.VolumeSource.ScaleIO != nil {
 			corev1.SetDefaults_ScaleIOVolumeSource(a.VolumeSource.ScaleIO)
+		}
+		if a.VolumeSource.Ephemeral != nil {
+			if a.VolumeSource.Ephemeral.VolumeClaimTemplate != nil {
+				corev1.SetDefaults_PersistentVolumeClaimSpec(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec)
+				corev1.SetDefaults_ResourceList(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Limits)
+				corev1.SetDefaults_ResourceList(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Requests)
+			}
 		}
 	}
 	for i := range in.Status.Template.Spec.InitContainers {
@@ -869,6 +897,13 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 		if a.VolumeSource.ScaleIO != nil {
 			corev1.SetDefaults_ScaleIOVolumeSource(a.VolumeSource.ScaleIO)
 		}
+		if a.VolumeSource.Ephemeral != nil {
+			if a.VolumeSource.Ephemeral.VolumeClaimTemplate != nil {
+				corev1.SetDefaults_PersistentVolumeClaimSpec(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec)
+				corev1.SetDefaults_ResourceList(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Limits)
+				corev1.SetDefaults_ResourceList(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Requests)
+			}
+		}
 	}
 	for i := range in.Spec.Template.Spec.InitContainers {
 		a := &in.Spec.Template.Spec.InitContainers[i]
@@ -1064,6 +1099,13 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 		}
 		if a.VolumeSource.ScaleIO != nil {
 			corev1.SetDefaults_ScaleIOVolumeSource(a.VolumeSource.ScaleIO)
+		}
+		if a.VolumeSource.Ephemeral != nil {
+			if a.VolumeSource.Ephemeral.VolumeClaimTemplate != nil {
+				corev1.SetDefaults_PersistentVolumeClaimSpec(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec)
+				corev1.SetDefaults_ResourceList(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Limits)
+				corev1.SetDefaults_ResourceList(&a.VolumeSource.Ephemeral.VolumeClaimTemplate.Spec.Resources.Requests)
+			}
 		}
 	}
 	for i := range in.Status.Template.Spec.InitContainers {

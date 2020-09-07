@@ -60,7 +60,7 @@ func InternalImageWithMetadata(image *imageapi.Image) error {
 			return err
 		}
 
-		if err := imageapi.Convert_compatibility_to_api_DockerImage(&v1Metadata, &image.DockerImageMetadata); err != nil {
+		if err := dockerapi10.Convert_DockerV1CompatibilityImage_to_image_DockerImage(&v1Metadata, &image.DockerImageMetadata); err != nil {
 			return err
 		}
 	case 2:
@@ -75,7 +75,7 @@ func InternalImageWithMetadata(image *imageapi.Image) error {
 			return fmt.Errorf("failed to parse dockerImageConfig: %v", err)
 		}
 
-		if err := imageapi.Convert_imageconfig_to_api_DockerImage(&config, &image.DockerImageMetadata); err != nil {
+		if err := dockerapi10.Convert_DockerImageConfig_to_image_DockerImage(&config, &image.DockerImageMetadata); err != nil {
 			return err
 		}
 		image.DockerImageMetadata.ID = manifest.Config.Digest
