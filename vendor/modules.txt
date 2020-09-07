@@ -908,7 +908,7 @@ k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v0.19.0 => github.com/openshift/kubernetes-apiserver v0.0.0-20200901074819-8028178308f0
+# k8s.io/apiserver v0.19.0 => github.com/openshift/kubernetes-apiserver v0.0.0-20200907145057-b96d25345a7b
 k8s.io/apiserver/pkg/admission
 k8s.io/apiserver/pkg/admission/configuration
 k8s.io/apiserver/pkg/admission/initializer
@@ -1654,13 +1654,13 @@ sigs.k8s.io/kustomize/pkg/transformers
 sigs.k8s.io/kustomize/pkg/transformers/config
 sigs.k8s.io/kustomize/pkg/transformers/config/defaultconfig
 sigs.k8s.io/kustomize/pkg/types
-# sigs.k8s.io/structured-merge-diff/v3 v3.0.1-0.20200706213357-43c19bbb7fba
-sigs.k8s.io/structured-merge-diff/v3/fieldpath
-sigs.k8s.io/structured-merge-diff/v3/merge
+# sigs.k8s.io/structured-merge-diff/v3 v3.0.0-20200116222232-67a7b8c61874
 sigs.k8s.io/structured-merge-diff/v3/schema
-sigs.k8s.io/structured-merge-diff/v3/typed
-sigs.k8s.io/structured-merge-diff/v3/value
 # sigs.k8s.io/structured-merge-diff/v4 v4.0.1
+sigs.k8s.io/structured-merge-diff/v4/fieldpath
+sigs.k8s.io/structured-merge-diff/v4/merge
+sigs.k8s.io/structured-merge-diff/v4/schema
+sigs.k8s.io/structured-merge-diff/v4/typed
 sigs.k8s.io/structured-merge-diff/v4/value
 # sigs.k8s.io/yaml v1.2.0
 sigs.k8s.io/yaml
