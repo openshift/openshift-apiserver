@@ -99,6 +99,13 @@ type IngressControllerSpec struct {
 	// the generated certificate's CA will be automatically integrated with the
 	// cluster's trust store.
 	//
+	// If a wildcard certificate is used and shared by multiple
+	// HTTP/2 enabled routes (which implies ALPN) then clients
+	// (i.e., notably browsers) are at liberty to reuse open
+	// connections. This means a client can reuse a connection to
+	// another route and that is likely to fail. This behaviour is
+	// generally known as connection coalescing.
+	//
 	// The in-use certificate (whether generated or user-specified) will be
 	// automatically integrated with OpenShift's built-in OAuth server.
 	//
@@ -607,8 +614,9 @@ type IngressControllerCaptureHTTPHeader struct {
 	Name string `json:"name"`
 
 	// maxLength specifies a maximum length for the header value.  If a
-	// header value exceeds this length, the value will be truncated in
-	// the log message.
+	// header value exceeds this length, the value will be truncated in the
+	// log message.  Note that the ingress controller may impose a separate
+	// bound on the total length of HTTP headers in a request.
 	//
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Minimum=1
@@ -634,6 +642,70 @@ type IngressControllerCaptureHTTPHeaders struct {
 	// +nullable
 	// +optional
 	Response []IngressControllerCaptureHTTPHeader `json:"response,omitempty"`
+}
+
+// CookieMatchType indicates the type of matching used against cookie names to
+// select a cookie for capture.
+// +kubebuilder:validation:Enum=Exact;Prefix
+type CookieMatchType string
+
+const (
+	// CookieMatchTypeExact indicates that an exact string match should be
+	// performed.
+	CookieMatchTypeExact CookieMatchType = "Exact"
+	// CookieMatchTypePrefix indicates that a string prefix match should be
+	// performed.
+	CookieMatchTypePrefix CookieMatchType = "Prefix"
+)
+
+// IngressControllerCaptureHTTPCookie describes an HTTP cookie that should be
+// captured.
+// +union
+type IngressControllerCaptureHTTPCookie struct {
+	// matchType specifies the type of match to be performed on the cookie
+	// name.  Allowed values are "Exact" for an exact string match and
+	// "Prefix" for a string prefix match.  If "Exact" is specified, a name
+	// must be specified in the name field.  If "Prefix" is provided, a
+	// prefix must be specified in the namePrefix field.  For example,
+	// specifying matchType "Prefix" and namePrefix "foo" will capture a
+	// cookie named "foo" or "foobar" but not one named "bar".  The first
+	// matching cookie is captured.
+	//
+	// +unionDiscriminator
+	// +kubebuilder:validation:Required
+	// +required
+	MatchType CookieMatchType `json:"matchType,omitempty"`
+
+	// name specifies a cookie name.  Its value must be a valid HTTP cookie
+	// name as defined in RFC 6265 section 4.1.
+	//
+	// +kubebuilder:validation:Pattern="^[-!#$%&'*+.0-9A-Z^_`a-z|~]*$"
+	// +kubebuilder:validation:MinLength=0
+	// +kubebuilder:validation:MaxLength=1024
+	// +optional
+	Name string `json:"name"`
+
+	// namePrefix specifies a cookie name prefix.  Its value must be a valid
+	// HTTP cookie name as defined in RFC 6265 section 4.1.
+	//
+	// +kubebuilder:validation:Pattern="^[-!#$%&'*+.0-9A-Z^_`a-z|~]*$"
+	// +kubebuilder:validation:MinLength=0
+	// +kubebuilder:validation:MaxLength=1024
+	// +optional
+	NamePrefix string `json:"namePrefix"`
+
+	// maxLength specifies a maximum length of the string that will be
+	// logged, which includes the cookie name, cookie value, and
+	// one-character delimiter.  If the log entry exceeds this length, the
+	// value will be truncated in the log message.  Note that the ingress
+	// controller may impose a separate bound on the total length of HTTP
+	// headers in a request.
+	//
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=1024
+	// +required
+	MaxLength int `json:"maxLength"`
 }
 
 // AccessLogging describes how client requests should be logged.
@@ -672,6 +744,14 @@ type AccessLogging struct {
 	//
 	// +optional
 	HTTPCaptureHeaders IngressControllerCaptureHTTPHeaders `json:"httpCaptureHeaders,omitempty"`
+
+	// httpCaptureCookies specifies HTTP cookies that should be captured in
+	// access logs.  If this field is empty, no cookies are captured.
+	//
+	// +nullable
+	// +optional
+	// +kubebuilder:validation:MaxItems=1
+	HTTPCaptureCookies []IngressControllerCaptureHTTPCookie `json:"httpCaptureCookies,omitempty"`
 }
 
 // IngressControllerLogging describes what should be logged where.
@@ -701,6 +781,35 @@ const (
 	NeverHTTPHeaderPolicy IngressControllerHTTPHeaderPolicy = "Never"
 )
 
+// IngressControllerHTTPUniqueIdHeaderPolicy describes configuration for a
+// unique id header.
+type IngressControllerHTTPUniqueIdHeaderPolicy struct {
+	// name specifies the name of the HTTP header (for example, "unique-id")
+	// that the ingress controller should inject into HTTP requests.  The
+	// field's value must be a valid HTTP header name as defined in RFC 2616
+	// section 4.2.  If the field is empty, no header is injected.
+	//
+	// +optional
+	// +kubebuilder:validation:Pattern="^$|^[-!#$%&'*+.0-9A-Z^_`a-z|~]+$"
+	// +kubebuilder:validation:MinLength=0
+	// +kubebuilder:validation:MaxLength=1024
+	Name string `json:"name,omitempty"`
+
+	// format specifies the format for the injected HTTP header's value.
+	// This field has no effect unless name is specified.  For the
+	// HAProxy-based ingress controller implementation, this format uses the
+	// same syntax as the HTTP log format.  If the field is empty, the
+	// default value is "%{+X}o\\ %ci:%cp_%fi:%fp_%Ts_%rt:%pid"; see the
+	// corresponding HAProxy documentation:
+	// http://cbonte.github.io/haproxy-dconv/2.0/configuration.html#8.2.3
+	//
+	// +optional
+	// +kubebuilder:validation:Pattern="^(%(%|(\\{[-+]?[QXE](,[-+]?[QXE])*\\})?([A-Za-z]+|\\[[.0-9A-Z_a-z]+(\\([^)]+\\))?(,[.0-9A-Z_a-z]+(\\([^)]+\\))?)*\\]))|[^%[:cntrl:]])*$"
+	// +kubebuilder:validation:MinLength=0
+	// +kubebuilder:validation:MaxLength=1024
+	Format string `json:"format,omitempty"`
+}
+
 // IngressControllerHTTPHeaders specifies how the IngressController handles
 // certain HTTP headers.
 type IngressControllerHTTPHeaders struct {
@@ -725,6 +834,18 @@ type IngressControllerHTTPHeaders struct {
 	//
 	// +optional
 	ForwardedHeaderPolicy IngressControllerHTTPHeaderPolicy `json:"forwardedHeaderPolicy,omitempty"`
+
+	// uniqueId describes configuration for a custom HTTP header that the
+	// ingress controller should inject into incoming HTTP requests.
+	// Typically, this header is configured to have a value that is unique
+	// to the HTTP request.  The header can be used by applications or
+	// included in access logs to facilitate tracing individual HTTP
+	// requests.
+	//
+	// If this field is empty, no such header is injected into requests.
+	//
+	// +optional
+	UniqueId IngressControllerHTTPUniqueIdHeaderPolicy `json:"uniqueId,omitempty"`
 }
 
 var (
