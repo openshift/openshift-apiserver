@@ -59,7 +59,7 @@ replace (
 	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.19.0
 	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.19.0
 	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.19.0
-	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20200427153329-656914f816f9
+	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20200805222855-6aeccd4b50c6
 	k8s.io/kube-proxy => k8s.io/kube-proxy v0.19.0
 	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.19.0
 	k8s.io/kubectl => k8s.io/kubectl v0.19.0
