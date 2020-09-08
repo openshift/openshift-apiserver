@@ -8,11 +8,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	apirequest "k8s.io/apiserver/pkg/endpoints/request"
-	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/client-go/kubernetes"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
-	"k8s.io/kubernetes/pkg/api/legacyscheme"
+
+	v1 "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps/v1"
+	apirequest "k8s.io/apiserver/pkg/endpoints/request"
+	"k8s.io/apiserver/pkg/registry/rest"
 
 	"github.com/openshift/api/apps"
 	appsclient "github.com/openshift/client-go/apps/clientset/versioned"
@@ -20,6 +21,7 @@ import (
 
 	"github.com/openshift/library-go/pkg/apps/appsserialization"
 	"github.com/openshift/library-go/pkg/apps/appsutil"
+
 	appsapi "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 	"github.com/openshift/openshift-apiserver/pkg/apps/apis/apps/validation"
 )
@@ -91,13 +93,13 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		return nil, newInvalidError(rollback, err.Error())
 	}
 
-	to, err := appsserialization.DecodeDeploymentConfig(targetDeployment)
+	fromConfig, err := appsserialization.DecodeDeploymentConfig(targetDeployment)
 	if err != nil {
 		return nil, newInvalidError(rollback, fmt.Sprintf("couldn't decode deployment config from deployment: %v", err))
 	}
 
-	toInternal := &appsapi.DeploymentConfig{}
-	if err := legacyscheme.Scheme.Convert(to, toInternal, nil); err != nil {
+	toConfig := &appsapi.DeploymentConfig{}
+	if err := v1.Convert_v1_DeploymentConfig_To_apps_DeploymentConfig(fromConfig, toConfig, nil); err != nil {
 		return nil, apierrors.NewInternalError(err)
 	}
 
@@ -109,11 +111,11 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	}
 
 	fromInternal := &appsapi.DeploymentConfig{}
-	if err := legacyscheme.Scheme.Convert(from, fromInternal, nil); err != nil {
+	if err := v1.Convert_v1_DeploymentConfig_To_apps_DeploymentConfig(from, fromInternal, nil); err != nil {
 		return nil, apierrors.NewInternalError(err)
 	}
 
-	return r.generator.GenerateRollback(fromInternal, toInternal, &rollback.Spec)
+	return r.generator.GenerateRollback(fromInternal, toConfig, &rollback.Spec)
 }
 
 func newInvalidError(rollback *appsapi.DeploymentConfigRollback, reason string) error {

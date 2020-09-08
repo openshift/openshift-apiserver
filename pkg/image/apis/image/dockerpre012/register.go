@@ -2,21 +2,17 @@ package dockerpre012
 
 import (
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-)
+	corev1conversions "k8s.io/kubernetes/pkg/apis/core/v1"
 
-const (
-	GroupName       = "image.openshift.io"
-	LegacyGroupName = ""
+	"github.com/openshift/api/image/dockerpre012"
+	"github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 )
 
 var (
-	SchemeGroupVersion       = schema.GroupVersion{Group: GroupName, Version: "pre012"}
-	LegacySchemeGroupVersion = schema.GroupVersion{Group: LegacyGroupName, Version: "pre012"}
-
-	SchemeBuilder = runtime.NewSchemeBuilder(addConversionFuncs)
-	AddToScheme   = SchemeBuilder.AddToScheme
-
-	LegacySchemeBuilder    = runtime.NewSchemeBuilder(addConversionFuncs)
-	AddToSchemeInCoreGroup = LegacySchemeBuilder.AddToScheme
+	localSchemeBuilder = runtime.NewSchemeBuilder(
+		image.Install,
+		corev1conversions.AddToScheme,
+		dockerpre012.AddToScheme,
+	)
+	Install = localSchemeBuilder.AddToScheme
 )

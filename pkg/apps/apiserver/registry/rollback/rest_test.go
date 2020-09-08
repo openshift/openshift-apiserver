@@ -9,11 +9,11 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	apirequest "k8s.io/apiserver/pkg/endpoints/request"
-	apiserverrest "k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/client-go/kubernetes/fake"
 	clientgotesting "k8s.io/client-go/testing"
-	"k8s.io/kubernetes/pkg/api/legacyscheme"
+
+	apirequest "k8s.io/apiserver/pkg/endpoints/request"
+	apiserverrest "k8s.io/apiserver/pkg/registry/rest"
 
 	"github.com/openshift/api/apps"
 	appsv1 "github.com/openshift/api/apps/v1"
@@ -67,9 +67,7 @@ func TestCreateOk(t *testing.T) {
 	kc := &fake.Clientset{}
 	kc.AddReactor("get", "replicationcontrollers", func(action clientgotesting.Action) (handled bool, ret runtime.Object, err error) {
 		deployment, _ := appsutil.MakeDeployment(appstest.OkDeploymentConfig(1))
-		deploymentInternal := &corev1.ReplicationController{}
-		legacyscheme.Scheme.Convert(deployment, deploymentInternal, nil)
-		return true, deploymentInternal, nil
+		return true, deployment, nil
 	})
 
 	obj, err := NewREST(oc, kc).Create(apirequest.NewDefaultContext(), &appsapi.DeploymentConfigRollback{
@@ -123,9 +121,7 @@ func TestCreateGeneratorError(t *testing.T) {
 	kc := &fake.Clientset{}
 	kc.AddReactor("get", "replicationcontrollers", func(action clientgotesting.Action) (handled bool, ret runtime.Object, err error) {
 		deployment, _ := appsutil.MakeDeployment(appstest.OkDeploymentConfig(1))
-		internalDeployment := &corev1.ReplicationController{}
-		legacyscheme.Scheme.Convert(deployment, internalDeployment, nil)
-		return true, internalDeployment, nil
+		return true, deployment, nil
 	})
 
 	rest := REST{
@@ -184,10 +180,8 @@ func TestCreateInvalidDeployment(t *testing.T) {
 	kc.AddReactor("get", "replicationcontrollers", func(action clientgotesting.Action) (handled bool, ret runtime.Object, err error) {
 		// invalidate the encoded config
 		deployment, _ := appsutil.MakeDeployment(appstest.OkDeploymentConfig(1))
-		internalDeployment := &corev1.ReplicationController{}
-		legacyscheme.Scheme.Convert(deployment, internalDeployment, nil)
-		internalDeployment.Annotations[appsv1.DeploymentEncodedConfigAnnotation] = ""
-		return true, internalDeployment, nil
+		deployment.Annotations[appsv1.DeploymentEncodedConfigAnnotation] = ""
+		return true, deployment, nil
 	})
 
 	obj, err := NewREST(oc, kc).Create(apirequest.NewDefaultContext(), &appsapi.DeploymentConfigRollback{
@@ -215,9 +209,7 @@ func TestCreateMissingDeploymentConfig(t *testing.T) {
 	kc := &fake.Clientset{}
 	kc.AddReactor("get", "replicationcontrollers", func(action clientgotesting.Action) (handled bool, ret runtime.Object, err error) {
 		deployment, _ := appsutil.MakeDeployment(appstest.OkDeploymentConfig(1))
-		internalDeployment := &corev1.ReplicationController{}
-		legacyscheme.Scheme.Convert(deployment, internalDeployment, nil)
-		return true, internalDeployment, nil
+		return true, deployment, nil
 	})
 
 	obj, err := NewREST(oc, kc).Create(apirequest.NewDefaultContext(), &appsapi.DeploymentConfigRollback{

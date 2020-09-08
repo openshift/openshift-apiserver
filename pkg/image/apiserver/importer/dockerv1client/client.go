@@ -19,71 +19,68 @@ import (
 	"k8s.io/klog"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/conversion"
 	knet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/client-go/transport"
-	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	"github.com/openshift/library-go/pkg/image/reference"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/docker10"
 )
 
-// this is the only entrypoint which deals in github.com/fsouza/go-dockerclient.Image and expects to use our conversion capability to coerce an external
-// type into an api type.  Localize the crazy here.
-// TODO this scheme needs to be configurable or we're going to end up with weird problems.
-func init() {
-	dockerToInternal := func(in *docker.Image, out *imageapi.DockerImage, s conversion.Scope) error {
-		if err := s.Convert(&in.Config, &out.Config, conversion.AllowDifferentFieldTypeNames); err != nil {
-			return err
+func Convert_docker_Config_to_image_DockerConfig(in *docker.Config, out *imageapi.DockerConfig) {
+	out.Hostname = in.Hostname
+	out.Domainname = in.Domainname
+	out.User = in.User
+	out.Memory = in.Memory
+	out.MemorySwap = in.MemorySwap
+	out.CPUShares = in.CPUShares
+	out.CPUSet = in.CPUSet
+	out.AttachStdin = in.AttachStdin
+	out.AttachStdout = in.AttachStdout
+	out.AttachStderr = in.AttachStderr
+	out.PortSpecs = in.PortSpecs
+	if in.ExposedPorts == nil {
+		out.ExposedPorts = nil
+	} else {
+		out.ExposedPorts = make(map[string]struct{})
+		for k, v := range in.ExposedPorts {
+			out.ExposedPorts[string(k)] = v
 		}
-		if err := s.Convert(&in.ContainerConfig, &out.ContainerConfig, conversion.AllowDifferentFieldTypeNames); err != nil {
-			return err
-		}
-		out.ID = in.ID
-		out.Parent = in.Parent
-		out.Comment = in.Comment
-		out.Created = metav1.NewTime(in.Created)
-		out.Container = in.Container
-		out.DockerVersion = in.DockerVersion
-		out.Author = in.Author
-		out.Architecture = in.Architecture
-		out.Size = in.Size
-		return nil
 	}
-	// Convert docker client object to internal object
-	internalToDocker := func(in *imageapi.DockerImage, out *docker.Image, s conversion.Scope) error {
-		if err := s.Convert(&in.Config, &out.Config, conversion.AllowDifferentFieldTypeNames); err != nil {
-			return err
-		}
-		if err := s.Convert(&in.ContainerConfig, &out.ContainerConfig, conversion.AllowDifferentFieldTypeNames); err != nil {
-			return err
-		}
-		out.ID = in.ID
-		out.Parent = in.Parent
-		out.Comment = in.Comment
-		out.Created = in.Created.Time
-		out.Container = in.Container
-		out.DockerVersion = in.DockerVersion
-		out.Author = in.Author
-		out.Architecture = in.Architecture
-		out.Size = in.Size
-		return nil
-	}
+	out.Tty = in.Tty
+	out.OpenStdin = in.OpenStdin
+	out.StdinOnce = in.StdinOnce
+	out.Env = in.Env
+	out.Cmd = in.Cmd
+	out.DNS = in.DNS
+	out.Image = in.Image
+	out.Volumes = in.Volumes
+	out.VolumesFrom = in.VolumesFrom
+	out.WorkingDir = in.WorkingDir
+	out.Entrypoint = in.Entrypoint
+	out.NetworkDisabled = in.NetworkDisabled
+	out.SecurityOpts = in.SecurityOpts
+	out.OnBuild = in.OnBuild
+	out.Labels = in.Labels
+}
 
-	if err := legacyscheme.Scheme.AddConversionFunc((*docker.Image)(nil), (*imageapi.DockerImage)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return dockerToInternal(a.(*docker.Image), b.(*imageapi.DockerImage), scope)
-	}); err != nil {
-		// If the conversion function is malformed, detect it immediately.
-		panic(err)
+func Convert_docker_Image_to_image_DockerImage(in *docker.Image, out *imageapi.DockerImage) {
+	if in.Config == nil {
+		out.Config = nil
+	} else {
+		out.Config = &imageapi.DockerConfig{}
+		Convert_docker_Config_to_image_DockerConfig(in.Config, out.Config)
 	}
-
-	if err := legacyscheme.Scheme.AddConversionFunc((*imageapi.DockerImage)(nil), (*docker.Image)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return internalToDocker(a.(*imageapi.DockerImage), b.(*docker.Image), scope)
-	}); err != nil {
-		// If the conversion function is malformed, detect it immediately.
-		panic(err)
-	}
+	Convert_docker_Config_to_image_DockerConfig(&in.ContainerConfig, &out.ContainerConfig)
+	out.ID = in.ID
+	out.Parent = in.Parent
+	out.Comment = in.Comment
+	out.Created = metav1.NewTime(in.Created)
+	out.Container = in.Container
+	out.DockerVersion = in.DockerVersion
+	out.Author = in.Author
+	out.Architecture = in.Architecture
+	out.Size = in.Size
 }
 
 type Image struct {

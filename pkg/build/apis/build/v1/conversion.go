@@ -3,6 +3,7 @@ package v1
 import (
 	"net/url"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -180,6 +181,71 @@ func Convert_v1_BinaryBuildRequestOptions_To_url_Values(in *v1.BinaryBuildReques
 	return nil
 }
 
+func Convert_url_Values_To_v1_BuildLogOptions(in *url.Values, out *v1.BuildLogOptions, s conversion.Scope) error {
+	if in == nil || out == nil {
+		return nil
+	}
+
+	*out = v1.BuildLogOptions{}
+
+	if values, ok := map[string][]string(*in)["container"]; ok && len(values) > 0 {
+		if err := runtime.Convert_Slice_string_To_string(&values, &out.Container, s); err != nil {
+			return err
+		}
+	}
+	if values, ok := map[string][]string(*in)["follow"]; ok && len(values) > 0 {
+		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Follow, s); err != nil {
+			return err
+		}
+	}
+	if values, ok := map[string][]string(*in)["previous"]; ok && len(values) > 0 {
+		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Previous, s); err != nil {
+			return err
+		}
+	}
+	if values, ok := map[string][]string(*in)["sinceSeconds"]; ok && len(values) > 0 {
+		if err := runtime.Convert_Slice_string_To_Pointer_int64(&values, &out.SinceSeconds, s); err != nil {
+			return err
+		}
+	}
+	if values, ok := map[string][]string(*in)["sinceTime"]; ok && len(values) > 0 {
+		if err := metav1.Convert_Slice_string_To_Pointer_v1_Time(&values, &out.SinceTime, s); err != nil {
+			return err
+		}
+	}
+	if values, ok := map[string][]string(*in)["timestamps"]; ok && len(values) > 0 {
+		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Timestamps, s); err != nil {
+			return err
+		}
+	}
+	if values, ok := map[string][]string(*in)["tailLines"]; ok && len(values) > 0 {
+		if err := runtime.Convert_Slice_string_To_Pointer_int64(&values, &out.TailLines, s); err != nil {
+			return err
+		}
+	}
+	if values, ok := map[string][]string(*in)["limitBytes"]; ok && len(values) > 0 {
+		if err := runtime.Convert_Slice_string_To_Pointer_int64(&values, &out.LimitBytes, s); err != nil {
+			return err
+		}
+	}
+	if values, ok := map[string][]string(*in)["nowait"]; ok && len(values) > 0 {
+		if err := runtime.Convert_Slice_string_To_bool(&values, &out.NoWait, s); err != nil {
+			return err
+		}
+	}
+	if values, ok := map[string][]string(*in)["version"]; ok && len(values) > 0 {
+		if err := runtime.Convert_Slice_string_To_Pointer_int64(&values, &out.Version, s); err != nil {
+			return err
+		}
+	}
+	if values, ok := map[string][]string(*in)["insecureSkipTLSVerifyBackend"]; ok && len(values) > 0 {
+		if err := runtime.Convert_Slice_string_To_bool(&values, &out.InsecureSkipTLSVerifyBackend, s); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // AddCustomConversionFuncs adds conversion functions which cannot be automatically generated.
 // This is typically due to the objects not having 1:1 field mappings.
 func AddCustomConversionFuncs(scheme *runtime.Scheme) error {
@@ -193,7 +259,9 @@ func AddCustomConversionFuncs(scheme *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	return nil
+	return scheme.AddConversionFunc((*url.Values)(nil), (*v1.BuildLogOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_url_Values_To_v1_BuildLogOptions(a.(*url.Values), b.(*v1.BuildLogOptions), scope)
+	})
 }
 
 func AddFieldSelectorKeyConversions(scheme *runtime.Scheme) error {
