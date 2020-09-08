@@ -118,6 +118,7 @@ API rule violation: list_type_missing,github.com/openshift/api/config/v1,Serving
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,TLSProfileSpec,Ciphers
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,featureSetBuilder,forceOff
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,featureSetBuilder,forceOn
+API rule violation: list_type_missing,github.com/openshift/api/helm/v1beta1,HelmChartRepositoryStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,Image,DockerImageLayers
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,Image,DockerImageSignatures
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,Image,Signatures
@@ -222,6 +223,7 @@ API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolp
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,NetworkControllerConfig,ClusterNetworks
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,OpenShiftControllerManagerConfig,Controllers
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,ServiceAccountControllerConfig,ManagedNames
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,AccessLogging,HTTPCaptureCookies
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSSpec,Servers
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ForwardPlugin,Upstreams
@@ -735,6 +737,7 @@ API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatu
 API rule violation: names_match,github.com/openshift/api/config/v1,RequestHeaderIdentityProvider,ClientCA
 API rule violation: names_match,github.com/openshift/api/config/v1,featureSetBuilder,forceOff
 API rule violation: names_match,github.com/openshift/api/config/v1,featureSetBuilder,forceOn
+API rule violation: names_match,github.com/openshift/api/helm/v1beta1,HelmChartRepositorySpec,DisplayName
 API rule violation: names_match,github.com/openshift/api/image/v1,DockerImageReference,ID
 API rule violation: names_match,github.com/openshift/api/image/v1,DockerImageReference,Name
 API rule violation: names_match,github.com/openshift/api/image/v1,DockerImageReference,Namespace

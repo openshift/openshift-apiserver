@@ -541,6 +541,11 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddConversionFunc((*url.Values)(nil), (*v1.BuildLogOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_url_Values_To_v1_BuildLogOptions(a.(*url.Values), b.(*v1.BuildLogOptions), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddConversionFunc((*v1.BinaryBuildRequestOptions)(nil), (*url.Values)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_BinaryBuildRequestOptions_To_url_Values(a.(*v1.BinaryBuildRequestOptions), b.(*url.Values), scope)
 	}); err != nil {
