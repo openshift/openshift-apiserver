@@ -15,6 +15,7 @@ var (
 		v1.Install,
 		corev1conversions.AddToScheme,
 		extensionsv1beta1conversions.AddToScheme,
+		AddCustomConversionFuncs,
 		RegisterDefaults,
 	)
 	Install = localSchemeBuilder.AddToScheme
