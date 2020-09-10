@@ -5,6 +5,7 @@
 package v1
 
 import (
+	url "net/url"
 	unsafe "unsafe"
 
 	v1 "github.com/openshift/api/apps/v1"
@@ -231,6 +232,11 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddConversionFunc((*apps.RollingDeploymentStrategyParams)(nil), (*v1.RollingDeploymentStrategyParams)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_apps_RollingDeploymentStrategyParams_To_v1_RollingDeploymentStrategyParams(a.(*apps.RollingDeploymentStrategyParams), b.(*v1.RollingDeploymentStrategyParams), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*url.Values)(nil), (*v1.DeploymentLogOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_url_Values_To_v1_DeploymentLogOptions(a.(*url.Values), b.(*v1.DeploymentLogOptions), scope)
 	}); err != nil {
 		return err
 	}
