@@ -74,6 +74,10 @@ func init() {
 	addDeadClusterRole("system:deploymentconfig-controller")
 	addDeadClusterRole("system:deployment-controller")
 
+	// these were moved under system:openshift:openshift-controller-manager:*
+	addDeadClusterRole("system:openshift:controller:ingress-to-route-controller")
+	addDeadClusterRoleBinding("system:openshift:controller:ingress-to-route-controller", "system:openshift:controller:ingress-to-route-controller")
+
 	// this was replaced by the node authorizer
 	addDeadClusterRoleBinding("system:nodes", "system:node")
 
