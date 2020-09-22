@@ -963,6 +963,11 @@ const (
 type BuildConfigStatus struct {
 	// lastVersion is used to inform about number of last triggered build.
 	LastVersion int64 `json:"lastVersion" protobuf:"varint,1,opt,name=lastVersion"`
+
+	// imageChangeTriggersState is used to capture the runtime state of any ImageChangeTrigers,
+	// including the lastTriggeredImageID and paused fields.  The same type is reused for both spec and status to help
+	// the ImageChangeController correlate between the two.
+	ImageChangeTriggersState []ImageChangeTrigger `json:"imageChangeTriggersState,omitempty" protobuf:"bytes,2,rep,name=imageChangeTriggersState"`
 }
 
 // SecretLocalReference contains information that points to the local secret being used
@@ -992,6 +997,8 @@ type WebHookTrigger struct {
 type ImageChangeTrigger struct {
 	// lastTriggeredImageID is used internally by the ImageChangeController to save last
 	// used image ID for build
+	// NOTE: this needs to be set only in the status, not spec, to avoid unnecessary triggering of builds
+	// when BuildConfig's are reapplied.
 	LastTriggeredImageID string `json:"lastTriggeredImageID,omitempty" protobuf:"bytes,1,opt,name=lastTriggeredImageID"`
 
 	// from is a reference to an ImageStreamTag that will trigger a build when updated
