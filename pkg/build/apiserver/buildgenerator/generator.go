@@ -349,13 +349,18 @@ func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.Bu
 		return fmt.Errorf("build config %s/%s has already instantiated a build for imageid %s", bc.Namespace, bc.Name, triggeredBy.Name)
 	}
 	// Update last triggered image id for all image change triggers
+	ictToUpdate := []buildv1.ImageChangeTrigger{}
 	for _, trigger := range bc.Spec.Triggers {
 		if trigger.Type != buildv1.ImageChangeBuildTriggerType {
 			continue
 		}
 		// Use the requested image id for the trigger that caused the build, otherwise resolve to the latest
 		if triggeredBy != nil && trigger.ImageChange == requestTrigger {
-			trigger.ImageChange.LastTriggeredImageID = triggeredBy.Name
+			ictToUpdate = append(ictToUpdate, buildv1.ImageChangeTrigger{
+				LastTriggeredImageID: triggeredBy.Name,
+				From:                 trigger.ImageChange.From,
+				Paused:               false,
+			})
 			continue
 		}
 
@@ -376,7 +381,30 @@ func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.Bu
 			// Otherwise, warn that an error occurred, but continue
 			klog.Warningf("Could not resolve trigger reference for build config %s/%s: %#v", bc.Namespace, bc.Name, triggerImageRef)
 		}
-		trigger.ImageChange.LastTriggeredImageID = image
+		ictToUpdate = append(ictToUpdate, buildv1.ImageChangeTrigger{
+			LastTriggeredImageID: image,
+			From:                 triggerImageRef,
+			Paused:               false,
+		})
+	}
+	if len(bc.Status.ImageChangeTriggersState) == 0 {
+		bc.Status.ImageChangeTriggersState = ictToUpdate
+		return nil
+	}
+	for outer, existingTrigger := range bc.Status.ImageChangeTriggersState {
+		for _, updatedTrigger := range ictToUpdate {
+			if existingTrigger.From == nil || updatedTrigger.From == nil {
+				bc.Status.ImageChangeTriggersState[outer].LastTriggeredImageID = updatedTrigger.LastTriggeredImageID
+				continue
+			}
+			if existingTrigger.From.Name == updatedTrigger.From.Name &&
+				existingTrigger.From.Namespace == updatedTrigger.From.Namespace &&
+				existingTrigger.From.Kind == updatedTrigger.From.Kind {
+				bc.Status.ImageChangeTriggersState[outer].LastTriggeredImageID = updatedTrigger.LastTriggeredImageID
+				break
+			}
+
+		}
 	}
 	return nil
 }
@@ -949,9 +977,9 @@ func getNextBuildNameFromBuild(build *buildv1.Build, buildConfig *buildv1.BuildC
 
 // getStrategyImageChangeTrigger returns the ImageChangeTrigger that corresponds to the BuildConfig's strategy
 func getStrategyImageChangeTrigger(bc *buildv1.BuildConfig) *buildv1.ImageChangeTrigger {
-	for _, trigger := range bc.Spec.Triggers {
-		if trigger.Type == buildv1.ImageChangeBuildTriggerType && trigger.ImageChange.From == nil {
-			return trigger.ImageChange
+	for _, trigger := range bc.Status.ImageChangeTriggersState {
+		if trigger.From == nil {
+			return &trigger
 		}
 	}
 	return nil
@@ -963,10 +991,9 @@ func getImageChangeTriggerForRef(bc *buildv1.BuildConfig, ref *corev1.ObjectRefe
 	if ref == nil || ref.Kind != "ImageStreamTag" {
 		return nil
 	}
-	for _, trigger := range bc.Spec.Triggers {
-		if trigger.Type == buildv1.ImageChangeBuildTriggerType && trigger.ImageChange.From != nil &&
-			trigger.ImageChange.From.Name == ref.Name && trigger.ImageChange.From.Namespace == ref.Namespace {
-			return trigger.ImageChange
+	for _, trigger := range bc.Status.ImageChangeTriggersState {
+		if trigger.From != nil && trigger.From.Name == ref.Name && trigger.From.Namespace == ref.Namespace {
+			return &trigger
 		}
 	}
 	return nil

@@ -316,7 +316,7 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 				Kind: "ImageStreamTag",
 				Name: "image3:tag3",
 			},
-			triggerIndex: 1,
+			triggerIndex: 0,
 			triggers:     defaultTriggers(),
 		},
 		{
@@ -325,7 +325,7 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 				Kind: "ImageStreamTag",
 				Name: "image1:tag1",
 			},
-			triggerIndex: 2,
+			triggerIndex: 1,
 			triggers:     defaultTriggers(),
 		},
 		{
@@ -335,7 +335,7 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 				Name:      "image2:tag2",
 				Namespace: "image2ns",
 			},
-			triggerIndex: 3,
+			triggerIndex: 2,
 			triggers:     defaultTriggers(),
 		},
 		{
@@ -449,24 +449,23 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 		if tc.errorExpected {
 			continue
 		}
-		for i := range bc.Spec.Triggers {
+		for i := range bc.Status.ImageChangeTriggersState {
 			if i == tc.triggerIndex {
 				// Verify that the trigger got updated
-				if bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID != imageID {
+				if bc.Status.ImageChangeTriggersState[i].LastTriggeredImageID != imageID {
 					t.Errorf("%s: expected trigger at index %d to contain imageID %s", tc.name, i, imageID)
 				}
 				continue
 			}
 			// Ensure that other triggers are updated with the latest container imagev1 ref
-			if bc.Spec.Triggers[i].Type == buildv1.ImageChangeBuildTriggerType {
-				from := bc.Spec.Triggers[i].ImageChange.From
-				if from == nil {
-					from = buildutil.GetInputReference(bc.Spec.Strategy)
-				}
-				if bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID != ("ref/" + from.Name) {
-					t.Errorf("%s: expected LastTriggeredImageID for trigger at %d (%+v) to be %s. Got: %s", tc.name, i, bc.Spec.Triggers[i].ImageChange.From, "ref/"+from.Name, bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID)
-				}
+			from := bc.Status.ImageChangeTriggersState[i].From
+			if from == nil {
+				from = buildutil.GetInputReference(bc.Spec.Strategy)
 			}
+			if bc.Status.ImageChangeTriggersState[i].LastTriggeredImageID != ("ref/" + from.Name) {
+				t.Errorf("%s: expected LastTriggeredImageID for trigger at %d (%+v) to be %s. Got: %s", tc.name, i, bc.Status.ImageChangeTriggersState[i].From, "ref/"+from.Name, bc.Status.ImageChangeTriggersState[i].LastTriggeredImageID)
+			}
+
 		}
 	}
 }
