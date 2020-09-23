@@ -356,6 +356,8 @@ func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.Bu
 		}
 		// Use the requested image id for the trigger that caused the build, otherwise resolve to the latest
 		if triggeredBy != nil && trigger.ImageChange == requestTrigger {
+			//TODO temporarily still update spec until OCM is switched to status as well
+			trigger.ImageChange.LastTriggeredImageID = triggeredBy.Name
 			ictToUpdate = append(ictToUpdate, buildv1.ImageChangeTrigger{
 				LastTriggeredImageID: triggeredBy.Name,
 				From:                 trigger.ImageChange.From,
@@ -381,6 +383,8 @@ func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.Bu
 			// Otherwise, warn that an error occurred, but continue
 			klog.Warningf("Could not resolve trigger reference for build config %s/%s: %#v", bc.Namespace, bc.Name, triggerImageRef)
 		}
+		//TODO temporarily still update spec until OCM is switched to status as well
+		trigger.ImageChange.LastTriggeredImageID = image
 		ictToUpdate = append(ictToUpdate, buildv1.ImageChangeTrigger{
 			LastTriggeredImageID: image,
 			From:                 triggerImageRef,
