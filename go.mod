@@ -20,6 +20,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0-rc1
 	github.com/openshift/api v3.9.1-0.20190923175213-ecbc01928def+incompatible
 	github.com/openshift/apiserver-library-go v0.0.0-20200117193640-5b4a83e36885
+	github.com/openshift/build-machinery-go v0.0.0-20200211121458-5e3d6e570160
 	github.com/openshift/client-go v0.0.0-20200116152001-92a2713fa240
 	github.com/openshift/library-go v0.0.0-20200120084036-bb27e57e2f2b
 	github.com/openshift/source-to-image v0.0.0-20191104225151-1877e115164b
