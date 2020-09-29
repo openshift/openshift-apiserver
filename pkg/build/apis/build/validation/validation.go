@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	kpath "k8s.io/apimachinery/pkg/api/validation/path"

@@ -21,7 +21,7 @@ import (
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 	openapicontroller "k8s.io/kube-aggregator/pkg/controllers/openapi"
 	"k8s.io/kube-aggregator/pkg/controllers/openapi/aggregator"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"

@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/client-go/util/flowcontrol"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 
 	"github.com/openshift/api/image"
 	imagev1 "github.com/openshift/api/image/v1"
@@ -569,7 +569,7 @@ func (imp *ImageStreamImporter) getManifest(
 		errs = append(errs, err)
 	}
 
-	if klog.V(5) {
+	if klog.V(5).Enabled() {
 		out := make([]string, len(pullSources))
 		for i, pullSource := range pullSources {
 			out[i] = pullSource.Reference.String()

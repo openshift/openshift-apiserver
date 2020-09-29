@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 
 	"github.com/containers/image/pkg/sysregistriesv2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

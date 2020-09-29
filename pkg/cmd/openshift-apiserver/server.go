@@ -2,7 +2,7 @@ package openshift_apiserver
 
 import (
 	"github.com/openshift/library-go/pkg/serviceability"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"

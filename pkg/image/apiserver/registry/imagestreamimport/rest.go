@@ -19,7 +19,7 @@ import (
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
 	authorizationclient "k8s.io/client-go/kubernetes/typed/authorization/v1"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 	kapihelper "k8s.io/kubernetes/pkg/apis/core/helper"
@@ -377,7 +377,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 			klog.V(4).Infof("stream did not change: %#v", stream)
 			obj, err = original, nil
 		} else {
-			if klog.V(4) {
+			if klog.V(4).Enabled() {
 				klog.V(4).Infof("updating stream %s", diff.ObjectDiff(original, stream))
 			}
 			stream.Annotations[imagev1.DockerImageRepositoryCheckAnnotation] = now.UTC().Format(time.RFC3339)

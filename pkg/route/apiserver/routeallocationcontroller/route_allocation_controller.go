@@ -1,7 +1,7 @@
 package routeallocationcontroller
 
 import (
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeinterfaces"
