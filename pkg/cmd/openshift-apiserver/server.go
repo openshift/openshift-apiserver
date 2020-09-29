@@ -2,6 +2,7 @@ package openshift_apiserver
 
 import (
 	"github.com/openshift/library-go/pkg/serviceability"
+	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/fakepkg"
 	"k8s.io/klog"
 
 	genericapiserver "k8s.io/apiserver/pkg/server"
@@ -45,6 +46,7 @@ func RunOpenShiftAPIServer(serverConfig *openshiftcontrolplanev1.OpenShiftAPISer
 	}
 
 	klog.Infof("Starting master on %s (%s)", serverConfig.ServingInfo.BindAddress, version.Get().String())
+	fakepkg.CallMe()
 
 	return preparedOpenshiftAPIServer.Run(stopCh)
 }
