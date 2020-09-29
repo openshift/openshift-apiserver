@@ -18,7 +18,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
 	"k8s.io/client-go/tools/clientcmd/api"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 	kcmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"k8s.io/kubectl/pkg/util/templates"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"

@@ -17,7 +17,7 @@ import (
 	"k8s.io/client-go/informers"
 	corev1listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/rest"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 
 	"github.com/openshift/api/project"
 	usertypedclient "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"

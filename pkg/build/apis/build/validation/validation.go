@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	kpath "k8s.io/apimachinery/pkg/api/validation/path"
@@ -27,7 +27,6 @@ import (
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 	buildinternalhelpers "github.com/openshift/openshift-apiserver/pkg/build/apis/build/internal_helpers"
 	imageapivalidation "github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation"
-	s2igit "github.com/openshift/source-to-image/pkg/scm/git"
 )
 
 // ValidateBuild tests required fields for a Build.
@@ -262,7 +261,7 @@ func validateGitSource(git *buildapi.GitBuildSource, fldPath *field.Path) field.
 	allErrs := field.ErrorList{}
 	if len(git.URI) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("uri"), ""))
-	} else if _, err := s2igit.Parse(git.URI); err != nil {
+	} else if _, err := parseGitURL(git.URI); err != nil {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("uri"), git.URI, err.Error()))
 	}
 	if git.HTTPProxy != nil && len(*git.HTTPProxy) != 0 {

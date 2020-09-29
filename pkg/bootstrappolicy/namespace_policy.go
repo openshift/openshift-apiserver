@@ -5,7 +5,7 @@ import (
 
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 	rbacv1helpers "k8s.io/kubernetes/pkg/apis/rbac/v1"
 )
 

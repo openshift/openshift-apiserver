@@ -19,7 +19,7 @@ import (
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 	securityvalidation "github.com/openshift/openshift-apiserver/pkg/security/apis/security/validation"
 	podsecuritypolicysubjectreview "github.com/openshift/openshift-apiserver/pkg/security/apiserver/registry/podsecuritypolicysubjectreview"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 )
 
 // REST implements the RESTStorage interface in terms of an Registry.
