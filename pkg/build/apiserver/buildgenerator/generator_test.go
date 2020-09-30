@@ -914,7 +914,7 @@ func TestGenerateBuildFromConfig(t *testing.T) {
 	strategy := mockDockerStrategyForDockerImage(originalImage, metav1.GetOptions{})
 	output := MockOutput()
 	resources := mockResources()
-	expectedLabel := "test-build-config-4"
+	expectedLabel := "test-build-config-4.3.0.ipv6-2019-11-27-0001-build"
 	bc := &buildv1.BuildConfig{
 		ObjectMeta: metav1.ObjectMeta{
 			UID: "test-uid",
@@ -2190,6 +2190,62 @@ func TestOverrideSourceStrategyIncrementalOption(t *testing.T) {
 	}
 	if *build.Spec.Strategy.SourceStrategy.Incremental != true {
 		t.Errorf("Spec.Strategy.SourceStrategy.Incremental was overwritten by nil buildRequest option, but should not have been")
+	}
+}
+
+func TestLabelValue(t *testing.T) {
+	testCases := []struct {
+		name           string
+		input          string
+		expectedOutput string
+	}{
+		{
+			name:           "allow-decimals",
+			input:          "my.label.with.decimals",
+			expectedOutput: "my.label.with.decimals",
+		},
+		{
+			name:           "do-not-end-with-a-decimal",
+			input:          "my.label.ends.with.a.decimal.",
+			expectedOutput: "my.label.ends.with.a.decimal",
+		},
+		{
+			name:           "allow-hyphens",
+			input:          "my-label-with-hyphens",
+			expectedOutput: "my-label-with-hyphens",
+		},
+		{
+			name:           "do-not-end-with-a-hyphen",
+			input:          "my-label-ends-with-a-hyphen-",
+			expectedOutput: "my-label-ends-with-a-hyphen",
+		},
+		{
+			name:           "allow-underscores",
+			input:          "my_label_with_underscores",
+			expectedOutput: "my_label_with_underscores",
+		},
+		{
+			name:           "do-not-end-with-an-underscore",
+			input:          "my_label_ends_with_an_underscore_",
+			expectedOutput: "my_label_ends_with_an_underscore",
+		},
+		{
+			name:           "truncate-to-63-characters",
+			input:          "myreallylonglabelthatshouldbelessthan63charactersbutismorethanthat",
+			expectedOutput: "myreallylonglabelthatshouldbelessthan63charactersbutismorethant",
+		},
+		{
+			name:           "allow-a-label-with-semantic-versioning",
+			input:          "some-label-v4.3.2-beta3",
+			expectedOutput: "some-label-v4.3.2-beta3",
+		},
+	}
+
+	for _, tc := range testCases {
+		result := labelValue(tc.input)
+		if result != tc.expectedOutput {
+			t.Errorf("tc %s got %s for %s instead of %s", tc.name, result, tc.input, tc.expectedOutput)
+		}
 	}
 }
 
