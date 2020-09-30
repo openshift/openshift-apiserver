@@ -1011,7 +1011,7 @@ func labelValue(name string) string {
 	// first, try to truncate from the end to find a valid
 	// label
 	for end > 0 {
-		errStrs := validation.IsDNS1123Label(newName)
+		errStrs := validation.IsValidLabelValue(newName)
 		if len(errStrs) == 0 {
 			return newName
 		}
