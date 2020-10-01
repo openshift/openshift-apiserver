@@ -23,7 +23,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.1
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
 	github.com/opencontainers/go-digest v1.0.0-rc1
-	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6 // indirect
+	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6
 	github.com/openshift/api v0.0.0-20200901182017-7ac89ba6b971
 	github.com/openshift/apiserver-library-go v0.0.0-20200901140731-1236dc23c728
 	github.com/openshift/build-machinery-go v0.0.0-20200819073603-48aa266c95f7
