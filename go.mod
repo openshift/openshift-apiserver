@@ -14,21 +14,22 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-openapi/errors v0.19.2
 	github.com/go-openapi/spec v0.19.3
-	github.com/google/gofuzz v1.0.0
+	github.com/google/gofuzz v1.1.0
 	github.com/hashicorp/golang-lru v0.5.1
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
 	github.com/opencontainers/go-digest v1.0.0-rc1
 	github.com/openshift/api v3.9.1-0.20190923175213-ecbc01928def+incompatible
-	github.com/openshift/apiserver-library-go v0.0.0-20200117193640-5b4a83e36885
+	github.com/openshift/apiserver-library-go v0.0.0-20201008105736-8e890364877b
+	github.com/openshift/build-machinery-go v0.0.0-20200211121458-5e3d6e570160
 	github.com/openshift/client-go v0.0.0-20200116152001-92a2713fa240
-	github.com/openshift/library-go v0.0.0-20200120084036-bb27e57e2f2b
+	github.com/openshift/library-go v0.0.0-20200921144613-67f7770bf823
 	github.com/openshift/source-to-image v0.0.0-20191104225151-1877e115164b
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738
-	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
+	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 	k8s.io/api v0.17.3
 	k8s.io/apiextensions-apiserver v0.17.3
 	k8s.io/apimachinery v0.17.3
