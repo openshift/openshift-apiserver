@@ -249,3 +249,82 @@ func TestBuildConfigLegacyStrategy(t *testing.T) {
 		t.Errorf("Expected error validating")
 	}
 }
+
+func TestCreateGeneration(t *testing.T) {
+	var tests = []struct {
+		input              *buildapi.BuildConfig
+		expectedGeneration int64
+	}{
+		// 0 - empty build, prepare for create should add condition new
+		{
+			input:              &buildapi.BuildConfig{},
+			expectedGeneration: 1,
+		},
+	}
+
+	for _, test := range tests {
+		GroupStrategy.PrepareForCreate(apirequest.NewDefaultContext(), test.input)
+
+		if test.input.Generation != test.expectedGeneration {
+			t.Errorf("incorrect generation detected, wanted: %v, got %v", test.expectedGeneration, test.input.Generation)
+		}
+	}
+
+}
+
+func TestUpdateGeneration(t *testing.T) {
+	var tests = []struct {
+		input              *buildapi.BuildConfig
+		update             *buildapi.BuildConfig
+		expectedGeneration int64
+	}{
+		// 0 - empty build, prepare for create should add condition new
+		{
+			input: &buildapi.BuildConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Generation: 1,
+				},
+			},
+			update: &buildapi.BuildConfig{
+				Spec: buildapi.BuildConfigSpec{
+					CommonSpec: buildapi.CommonSpec{
+						Strategy: buildapi.BuildStrategy{
+							DockerStrategy: &buildapi.DockerBuildStrategy{
+								NoCache: true,
+							},
+						},
+					},
+				},
+			},
+			expectedGeneration: 2,
+		},
+		{
+			input: &buildapi.BuildConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Generation: 2,
+				},
+			},
+			update: &buildapi.BuildConfig{
+				Spec: buildapi.BuildConfigSpec{
+					CommonSpec: buildapi.CommonSpec{
+						Strategy: buildapi.BuildStrategy{
+							DockerStrategy: &buildapi.DockerBuildStrategy{
+								NoCache: true,
+							},
+						},
+					},
+				},
+			},
+			expectedGeneration: 3,
+		},
+	}
+
+	for _, test := range tests {
+		GroupStrategy.PrepareForUpdate(apirequest.NewDefaultContext(), test.update, test.input)
+
+		if test.update.Generation != test.expectedGeneration {
+			t.Errorf("incorrect generation detected, wanted: %v, got %v", test.expectedGeneration, test.input.Generation)
+		}
+	}
+
+}

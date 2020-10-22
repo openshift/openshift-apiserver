@@ -87,6 +87,7 @@ func manageConditions(build *buildapi.Build) {
 // PrepareForCreate clears fields that are not allowed to be set by end users on creation.
 func (strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 	build := obj.(*buildapi.Build)
+	build.Generation = 1
 	if len(build.Status.Phase) == 0 {
 		build.Status.Phase = buildapi.BuildPhaseNew
 	}
@@ -110,6 +111,10 @@ func (strategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
 		newBuild.Status.Message = oldBuild.Status.Message
 	}
 	manageConditions(newBuild)
+
+	if !reflect.DeepEqual(oldBuild.Spec, newBuild.Spec) {
+		newBuild.Generation = oldBuild.Generation + 1
+	}
 }
 
 // Canonicalize normalizes the object after validation.

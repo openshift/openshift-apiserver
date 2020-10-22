@@ -2,6 +2,7 @@ package buildconfig
 
 import (
 	"context"
+	"reflect"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -57,6 +58,7 @@ func (strategy) Canonicalize(obj runtime.Object) {
 // This is invoked by the Group and Legacy strategies.
 func (s strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 	bc := obj.(*buildapi.BuildConfig)
+	bc.Generation = 1
 	dropUnknownTriggers(bc)
 }
 
@@ -69,6 +71,10 @@ func (strategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
 	// get conflicts with existing builds.
 	if newBC.Status.LastVersion < oldBC.Status.LastVersion {
 		newBC.Status.LastVersion = oldBC.Status.LastVersion
+	}
+
+	if !reflect.DeepEqual(oldBC.Spec, newBC.Spec) || newBC.Status.LastVersion != oldBC.Status.LastVersion {
+		newBC.Generation = oldBC.Generation + 1
 	}
 }
 
