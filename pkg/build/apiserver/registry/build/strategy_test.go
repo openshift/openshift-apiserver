@@ -462,3 +462,82 @@ func TestManageConditions(t *testing.T) {
 	}
 
 }
+
+func TestCreateGeneration(t *testing.T) {
+	var tests = []struct {
+		input              *buildapi.Build
+		expectedGeneration int64
+	}{
+		// 0 - empty build, prepare for create should add condition new
+		{
+			input:              &buildapi.Build{},
+			expectedGeneration: 1,
+		},
+	}
+
+	for _, test := range tests {
+		Strategy.PrepareForCreate(apirequest.NewDefaultContext(), test.input)
+
+		if test.input.Generation != test.expectedGeneration {
+			t.Errorf("incorrect generation detected, wanted: %v, got %v", test.expectedGeneration, test.input.Generation)
+		}
+	}
+
+}
+
+func TestUpdateGeneration(t *testing.T) {
+	var tests = []struct {
+		input              *buildapi.Build
+		update             *buildapi.Build
+		expectedGeneration int64
+	}{
+		// 0 - empty build, prepare for create should add condition new
+		{
+			input: &buildapi.Build{
+				ObjectMeta: metav1.ObjectMeta{
+					Generation: 1,
+				},
+			},
+			update: &buildapi.Build{
+				Spec: buildapi.BuildSpec{
+					CommonSpec: buildapi.CommonSpec{
+						Strategy: buildapi.BuildStrategy{
+							DockerStrategy: &buildapi.DockerBuildStrategy{
+								NoCache: false,
+							},
+						},
+					},
+				},
+			},
+			expectedGeneration: 2,
+		},
+		{
+			input: &buildapi.Build{
+				ObjectMeta: metav1.ObjectMeta{
+					Generation: 2,
+				},
+			},
+			update: &buildapi.Build{
+				Spec: buildapi.BuildSpec{
+					CommonSpec: buildapi.CommonSpec{
+						Strategy: buildapi.BuildStrategy{
+							DockerStrategy: &buildapi.DockerBuildStrategy{
+								NoCache: false,
+							},
+						},
+					},
+				},
+			},
+			expectedGeneration: 3,
+		},
+	}
+
+	for _, test := range tests {
+		Strategy.PrepareForUpdate(apirequest.NewDefaultContext(), test.update, test.input)
+
+		if test.update.Generation != test.expectedGeneration {
+			t.Errorf("incorrect generation detected, wanted: %v, got %v", test.expectedGeneration, test.input.Generation)
+		}
+	}
+
+}
