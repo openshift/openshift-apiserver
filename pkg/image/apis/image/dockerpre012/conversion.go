@@ -11,10 +11,10 @@ import (
 
 // Convert docker client object to internal object, but only when this package is included
 func Convert_dockerpre012_ImagePre_012_to_api_DockerImage(in *dockerpre012.ImagePre012, out *newer.DockerImage, s conversion.Scope) error {
-	if err := s.Convert(in.Config, &out.Config, conversion.AllowDifferentFieldTypeNames); err != nil {
+	if err := s.Convert(in.Config, &out.Config); err != nil {
 		return err
 	}
-	if err := s.Convert(&in.ContainerConfig, &out.ContainerConfig, conversion.AllowDifferentFieldTypeNames); err != nil {
+	if err := s.Convert(&in.ContainerConfig, &out.ContainerConfig); err != nil {
 		return err
 	}
 	out.ID = in.ID
@@ -29,10 +29,10 @@ func Convert_dockerpre012_ImagePre_012_to_api_DockerImage(in *dockerpre012.Image
 	return nil
 }
 func Convert_api_DockerImage_to_dockerpre012_ImagePre_012(in *newer.DockerImage, out *dockerpre012.ImagePre012, s conversion.Scope) error {
-	if err := s.Convert(&in.Config, &out.Config, conversion.AllowDifferentFieldTypeNames); err != nil {
+	if err := s.Convert(&in.Config, &out.Config); err != nil {
 		return err
 	}
-	if err := s.Convert(&in.ContainerConfig, &out.ContainerConfig, conversion.AllowDifferentFieldTypeNames); err != nil {
+	if err := s.Convert(&in.ContainerConfig, &out.ContainerConfig); err != nil {
 		return err
 	}
 	out.ID = in.ID
