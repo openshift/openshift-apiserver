@@ -47,6 +47,7 @@ require (
 )
 
 replace (
+        github.com/openshift/library-go => /Users/lszaszki/go/src/github.com/openshift/library-go
 	github.com/docker/distribution => github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d
 	github.com/docker/docker => github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d
 	github.com/moby/buildkit => github.com/dmcgowan/buildkit v0.0.0-20170731200553-da2b9dc7dab9

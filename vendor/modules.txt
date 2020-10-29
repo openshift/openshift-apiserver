@@ -410,7 +410,7 @@ github.com/openshift/client-go/user/informers/externalversions/internalinterface
 github.com/openshift/client-go/user/informers/externalversions/user
 github.com/openshift/client-go/user/informers/externalversions/user/v1
 github.com/openshift/client-go/user/listers/user/v1
-# github.com/openshift/library-go v0.0.0-20200907120738-ea57b121ba1a
+# github.com/openshift/library-go v0.0.0-20200907120738-ea57b121ba1a => /Users/lszaszki/go/src/github.com/openshift/library-go
 github.com/openshift/library-go/pkg/apiserver/admission/admissionregistrationtesting
 github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig
 github.com/openshift/library-go/pkg/apiserver/admission/admissiontimeout
@@ -433,6 +433,7 @@ github.com/openshift/library-go/pkg/image/internal/reference
 github.com/openshift/library-go/pkg/image/reference
 github.com/openshift/library-go/pkg/image/registryclient
 github.com/openshift/library-go/pkg/legacyapi/legacygroupification
+github.com/openshift/library-go/pkg/network
 github.com/openshift/library-go/pkg/oauth/oauthserviceaccountclient
 github.com/openshift/library-go/pkg/quota/clusterquotamapping
 github.com/openshift/library-go/pkg/quota/quotautil
