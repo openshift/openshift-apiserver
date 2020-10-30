@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/docker/distribution"
 	"github.com/docker/distribution/manifest/schema1"
-	"github.com/docker/distribution/manifest/schema2"
 	"github.com/docker/distribution/registry/api/errcode"
 	godigest "github.com/opencontainers/go-digest"
 
@@ -53,7 +53,8 @@ func schema1ToImage(manifest *schema1.SignedManifest, d godigest.Digest) (*image
 	return image, nil
 }
 
-func schema2ToImage(manifest *schema2.DeserializedManifest, imageConfig []byte, d godigest.Digest) (*imageapi.Image, error) {
+// schema2OrOCIToImage converts a docker schema 2 or an oci schema manifest into an Image.
+func schema2OrOCIToImage(manifest distribution.Manifest, imageConfig []byte, d godigest.Digest) (*imageapi.Image, error) {
 	mediatype, payload, err := manifest.Payload()
 	if err != nil {
 		return nil, err
@@ -66,7 +67,14 @@ func schema2ToImage(manifest *schema2.DeserializedManifest, imageConfig []byte, 
 
 	payloadDigest := godigest.FromBytes(payload)
 	if len(d) > 0 && payloadDigest != d {
-		return nil, fmt.Errorf("content integrity error: the schema 2 manifest retrieved with digest %s does not match the digest calculated from the content %s", d, payloadDigest)
+		return nil, fmt.Errorf(
+			"content integrity error: the manifest retrieved (media type: %s) "+
+				"with digest %s does not match the digest calculated from "+
+				"the content %s",
+			mediatype,
+			d,
+			payloadDigest,
+		)
 	}
 	dockerImage.ID = payloadDigest.String()
 

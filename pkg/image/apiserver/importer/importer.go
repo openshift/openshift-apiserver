@@ -10,6 +10,7 @@ import (
 	"github.com/containers/image/pkg/sysregistriesv2"
 	"github.com/docker/distribution"
 	"github.com/docker/distribution/manifest/manifestlist"
+	"github.com/docker/distribution/manifest/ocischema"
 	"github.com/docker/distribution/manifest/schema1"
 	"github.com/docker/distribution/manifest/schema2"
 	"github.com/docker/distribution/reference"
@@ -678,7 +679,14 @@ func (imp *ImageStreamImporter) importManifest(
 			klog.V(5).Infof("unable to get image config by digest %q for image %s: %#v", d, ref.String(), getImportConfigErr)
 			return image, formatRepositoryError(ref, getImportConfigErr)
 		}
-		image, err = schema2ToImage(deserializedManifest, imageConfig, d)
+		image, err = schema2OrOCIToImage(deserializedManifest, imageConfig, d)
+	} else if deserializedManifest, isOCISchema := manifest.(*ocischema.DeserializedManifest); isOCISchema {
+		imageConfig, getImportConfigErr := b.Get(ctx, deserializedManifest.Config.Digest)
+		if getImportConfigErr != nil {
+			klog.V(5).Infof("unable to get image config by digest %q for image %s: %#v", d, ref.String(), getImportConfigErr)
+			return image, formatRepositoryError(ref, getImportConfigErr)
+		}
+		image, err = schema2OrOCIToImage(manifest, imageConfig, d)
 	} else {
 		err = fmt.Errorf("unsupported image manifest type: %T", manifest)
 		klog.V(5).Info(err)

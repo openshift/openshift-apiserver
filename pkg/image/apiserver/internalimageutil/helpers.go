@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/docker/distribution/manifest/ocischema"
 	"github.com/docker/distribution/manifest/schema1"
 	"github.com/docker/distribution/manifest/schema2"
 	godigest "github.com/opencontainers/go-digest"
+	imgspecv1 "github.com/opencontainers/image-spec/specs-go/v1"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -64,10 +66,17 @@ func InternalImageWithMetadata(image *imageapi.Image) error {
 			return err
 		}
 	case 2:
-		image.DockerImageManifestMediaType = schema2.MediaTypeManifest
+		if manifest.MediaType != "" {
+			image.DockerImageManifestMediaType = manifest.MediaType
+		} else if image.DockerImageManifestMediaType == "" {
+			image.DockerImageManifestMediaType = schema2.MediaTypeManifest
+		}
 
 		if len(image.DockerImageConfig) == 0 {
-			return fmt.Errorf("dockerImageConfig must not be empty for manifest schema 2")
+			return fmt.Errorf(
+				"dockerImageConfig must not be empty for manifest type %q",
+				image.DockerImageManifestMediaType,
+			)
 		}
 
 		config := dockerapi10.DockerImageConfig{}
@@ -166,7 +175,7 @@ func reorderImageLayers(image *imageapi.Image) {
 		switch image.DockerImageManifestMediaType {
 		case schema1.MediaTypeManifest, schema1.MediaTypeSignedManifest:
 			layersOrder = imagev1.DockerImageLayersOrderAscending
-		case schema2.MediaTypeManifest:
+		case schema2.MediaTypeManifest, imgspecv1.MediaTypeImageManifest:
 			layersOrder = imagev1.DockerImageLayersOrderDescending
 		default:
 			return
@@ -196,6 +205,15 @@ func ManifestMatchesImage(image *imageapi.Image, newManifest []byte) (bool, erro
 	v := dgst.Verifier()
 	var canonical []byte
 	switch image.DockerImageManifestMediaType {
+	case imgspecv1.MediaTypeImageManifest:
+		var m ocischema.DeserializedManifest
+		if err := json.Unmarshal(newManifest, &m); err != nil {
+			return false, err
+		}
+		_, canonical, err = m.Payload()
+		if err != nil {
+			return false, err
+		}
 	case schema2.MediaTypeManifest:
 		var m schema2.DeserializedManifest
 		if err := json.Unmarshal(newManifest, &m); err != nil {
@@ -223,8 +241,23 @@ func ManifestMatchesImage(image *imageapi.Image, newManifest []byte) (bool, erro
 // ImageConfigMatchesImage returns true if the provided image config matches a digest
 // stored in the manifest of the image.
 func ImageConfigMatchesImage(image *imageapi.Image, imageConfig []byte) (bool, error) {
-	if image.DockerImageManifestMediaType != schema2.MediaTypeManifest {
+	if image.DockerImageManifestMediaType != schema2.MediaTypeManifest &&
+		image.DockerImageManifestMediaType != imgspecv1.MediaTypeImageManifest {
 		return false, nil
+	}
+
+	if image.DockerImageManifestMediaType == imgspecv1.MediaTypeImageManifest {
+		var m ocischema.DeserializedManifest
+		if err := json.Unmarshal([]byte(image.DockerImageManifest), &m); err != nil {
+			return false, err
+		}
+
+		v := m.Config.Digest.Verifier()
+		if _, err := v.Write(imageConfig); err != nil {
+			return false, err
+		}
+
+		return v.Verified(), nil
 	}
 
 	var m schema2.DeserializedManifest

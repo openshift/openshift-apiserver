@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/docker/distribution/manifest/schema2"
+	imgspecv1 "github.com/opencontainers/image-spec/specs-go/v1"
+
 	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -126,7 +129,8 @@ func NewImageLayerIndex(lw ImageListWatch) ImageLayerIndex {
 // an image. Images older than schema2 in Docker do not have a config blob - the manifest
 // has that data embedded.
 func configFromImage(image *imagev1.Image) *imagev1.ImageLayer {
-	if image.DockerImageManifestMediaType != "application/vnd.docker.distribution.manifest.v2+json" {
+	if image.DockerImageManifestMediaType != schema2.MediaTypeManifest &&
+		image.DockerImageManifestMediaType != imgspecv1.MediaTypeImageManifest {
 		return nil
 	}
 	meta := &imageapi.DockerImage{}
@@ -134,9 +138,13 @@ func configFromImage(image *imagev1.Image) *imagev1.ImageLayer {
 		utilruntime.HandleError(fmt.Errorf("Unable to decode image for layer cache: %v", err))
 		return nil
 	}
+	mediatype := schema2.MediaTypeImageConfig
+	if image.DockerImageManifestMediaType == imgspecv1.MediaTypeImageManifest {
+		mediatype = imgspecv1.MediaTypeImageConfig
+	}
 	return &imagev1.ImageLayer{
 		Name:      meta.ID,
-		MediaType: "application/vnd.docker.container.image.v1+json",
+		MediaType: mediatype,
 	}
 }
 
@@ -155,7 +163,7 @@ type ImageLayers struct {
 func imageLayersForImage(image *imagev1.Image) *ImageLayers {
 	mediaType := image.DockerImageManifestMediaType
 	if len(mediaType) == 0 {
-		mediaType = "application/vnd.docker.distribution.manifest.v2+json"
+		mediaType = schema2.MediaTypeManifest
 	}
 	return &ImageLayers{
 		Name:            image.Name,
