@@ -241,7 +241,7 @@ github.com/opencontainers/image-spec/specs-go/v1
 # github.com/opencontainers/runc v1.0.0-rc91.0.20200707015106-819fcc687efb
 github.com/opencontainers/runc/libcontainer/system
 github.com/opencontainers/runc/libcontainer/user
-# github.com/openshift/api v0.0.0-20201019163320-c6a5ec25f267
+# github.com/openshift/api v0.0.0-20201102162614-9252afb032e1
 github.com/openshift/api
 github.com/openshift/api/annotations
 github.com/openshift/api/apps
