@@ -5,7 +5,6 @@ import (
 	authorizationvalidation "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization/validation"
 	buildvalidation "github.com/openshift/openshift-apiserver/pkg/build/apis/build/validation"
 	imagevalidation "github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation"
-	oauthvalidation "github.com/openshift/openshift-apiserver/pkg/oauth/apis/oauth/validation"
 	projectvalidation "github.com/openshift/openshift-apiserver/pkg/project/apis/project/validation"
 	quotavalidation "github.com/openshift/openshift-apiserver/pkg/quota/apis/quota/validation"
 	routevalidation "github.com/openshift/openshift-apiserver/pkg/route/apis/route/validation"
@@ -17,7 +16,6 @@ import (
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	oauthapi "github.com/openshift/openshift-apiserver/pkg/oauth/apis/oauth"
 	projectapi "github.com/openshift/openshift-apiserver/pkg/project/apis/project"
 	quotaapi "github.com/openshift/openshift-apiserver/pkg/quota/apis/quota"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
@@ -60,12 +58,6 @@ func registerAll() {
 	Validator.MustRegister(&imageapi.ImageStreamImport{}, true, imagevalidation.ValidateImageStreamImport, nil)
 	Validator.MustRegister(&imageapi.ImageStreamMapping{}, true, imagevalidation.ValidateImageStreamMapping, nil)
 	Validator.MustRegister(&imageapi.ImageStreamTag{}, true, imagevalidation.ValidateImageStreamTag, imagevalidation.ValidateImageStreamTagUpdate)
-
-	Validator.MustRegister(&oauthapi.OAuthAccessToken{}, false, oauthvalidation.ValidateAccessToken, oauthvalidation.ValidateAccessTokenUpdate)
-	Validator.MustRegister(&oauthapi.OAuthAuthorizeToken{}, false, oauthvalidation.ValidateAuthorizeToken, oauthvalidation.ValidateAuthorizeTokenUpdate)
-	Validator.MustRegister(&oauthapi.OAuthClient{}, false, oauthvalidation.ValidateClient, oauthvalidation.ValidateClientUpdate)
-	Validator.MustRegister(&oauthapi.OAuthClientAuthorization{}, false, oauthvalidation.ValidateClientAuthorization, oauthvalidation.ValidateClientAuthorizationUpdate)
-	Validator.MustRegister(&oauthapi.OAuthRedirectReference{}, true, oauthvalidation.ValidateOAuthRedirectReference, nil)
 
 	Validator.MustRegister(&projectapi.Project{}, false, projectvalidation.ValidateProject, projectvalidation.ValidateProjectUpdate)
 	Validator.MustRegister(&projectapi.ProjectRequest{}, false, projectvalidation.ValidateProjectRequest, nil)

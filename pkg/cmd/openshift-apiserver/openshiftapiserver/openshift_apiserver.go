@@ -41,7 +41,6 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver/configprocessing"
 	imageapiserver "github.com/openshift/openshift-apiserver/pkg/image/apiserver"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
-	oauthapiserver "github.com/openshift/openshift-apiserver/pkg/oauth/apiserver"
 	projectapiserver "github.com/openshift/openshift-apiserver/pkg/project/apiserver"
 	projectauth "github.com/openshift/openshift-apiserver/pkg/project/auth"
 	projectcache "github.com/openshift/openshift-apiserver/pkg/project/cache"
@@ -87,9 +86,6 @@ type OpenshiftAPIExtraConfig struct {
 	ProjectRequestTemplate    string
 	ProjectRequestMessage     string
 	RESTMapper                *restmapper.DeferredDiscoveryRESTMapper
-
-	// oauth API server
-	ServiceAccountMethod string
 
 	ClusterQuotaMappingController *clusterquotamapping.ClusterQuotaMappingController
 }
@@ -238,25 +234,6 @@ func (c *completedConfig) withImageAPIServer(delegateAPIServer genericapiserver.
 			Scheme:                             legacyscheme.Scheme,
 			AdditionalTrustedCA:                c.ExtraConfig.AdditionalTrustedCA,
 			OperatorInformers:                  c.ExtraConfig.OperatorInformers,
-		},
-	}
-	config := cfg.Complete()
-	server, err := config.New(delegateAPIServer)
-	if err != nil {
-		return nil, err
-	}
-
-	return server.GenericAPIServer, nil
-}
-
-func (c *completedConfig) withOAuthAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
-	cfg := &oauthapiserver.OAuthAPIServerConfig{
-		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
-		ExtraConfig: oauthapiserver.ExtraConfig{
-			KubeAPIServerClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
-			ServiceAccountMethod:      c.ExtraConfig.ServiceAccountMethod,
-			Codecs:                    legacyscheme.Codecs,
-			Scheme:                    legacyscheme.Scheme,
 		},
 	}
 	config := cfg.Complete()
@@ -430,7 +407,6 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withAuthorizationAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withBuildAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withImageAPIServer)
-	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withOAuthAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withProjectAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withQuotaAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withRouteAPIServer)

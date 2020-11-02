@@ -17,7 +17,6 @@ ALL_FQ_APIS=(
     github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization/v1
     github.com/openshift/openshift-apiserver/pkg/build/apis/build/v1
     github.com/openshift/openshift-apiserver/pkg/image/apis/image/v1
-    github.com/openshift/openshift-apiserver/pkg/oauth/apis/oauth/v1
     github.com/openshift/openshift-apiserver/pkg/project/apis/project/v1
     github.com/openshift/openshift-apiserver/pkg/quota/apis/quota/v1
     github.com/openshift/openshift-apiserver/pkg/route/apis/route/v1
