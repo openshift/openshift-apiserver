@@ -24,7 +24,7 @@ require (
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
 	github.com/opencontainers/go-digest v1.0.0-rc1
 	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6
-	github.com/openshift/api v0.0.0-20201019163320-c6a5ec25f267
+	github.com/openshift/api v0.0.0-20201102162614-9252afb032e1
 	github.com/openshift/apiserver-library-go v0.0.0-20200901140731-1236dc23c728
 	github.com/openshift/build-machinery-go v0.0.0-20200917070002-f171684f77ab
 	github.com/openshift/client-go v0.0.0-20201020074620-f8fd44879f7c
