@@ -3,7 +3,7 @@ module github.com/openshift/openshift-apiserver
 go 1.13
 
 require (
-	github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd
+	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/containers/image v3.0.2+incompatible
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
@@ -25,7 +25,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0-rc1
 	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6
 	github.com/openshift/api v0.0.0-20201120165435-072a4cd8ca42
-	github.com/openshift/apiserver-library-go v0.0.0-20200901140731-1236dc23c728
+	github.com/openshift/apiserver-library-go v0.0.0-20201204115753-d48a1b462aa6
 	github.com/openshift/build-machinery-go v0.0.0-20200917070002-f171684f77ab
 	github.com/openshift/client-go v0.0.0-20201123133249-10558821f936
 	github.com/openshift/library-go v0.0.0-20201102091359-c4fa0f5b3a08
