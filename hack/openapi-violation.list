@@ -210,6 +210,7 @@ API rule violation: list_type_missing,github.com/openshift/api/oauth/v1,OAuthCli
 API rule violation: list_type_missing,github.com/openshift/api/oauth/v1,OAuthClient,ScopeRestrictions
 API rule violation: list_type_missing,github.com/openshift/api/oauth/v1,OAuthClientAuthorization,Scopes
 API rule violation: list_type_missing,github.com/openshift/api/oauth/v1,ScopeRestriction,ExactValues
+API rule violation: list_type_missing,github.com/openshift/api/oauth/v1,UserOAuthAccessToken,Scopes
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,BuildDefaultsConfig,Env
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,BuildDefaultsConfig,ImageLabels
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,BuildOverridesConfig,ImageLabels

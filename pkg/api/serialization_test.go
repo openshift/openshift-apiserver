@@ -528,8 +528,8 @@ func TestSpecificKind(t *testing.T) {
 	seed := int64(2703387474910584091)
 	fuzzer := originFuzzer(t, seed)
 
-	//legacyscheme.Scheme.Log(t)
-	//defer legacyscheme.Scheme.Log(nil)
+	legacyscheme.Scheme.Log(t)
+	defer legacyscheme.Scheme.Log(nil)
 
 	gvk := buildv1.SchemeGroupVersion.WithKind("BinaryBuildRequestOptions")
 	// TODO: make upstream CodecFactory customizable
