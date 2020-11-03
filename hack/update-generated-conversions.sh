@@ -25,7 +25,6 @@ ALL_FQ_APIS=(
     github.com/openshift/openshift-apiserver/pkg/route/apis/route/v1
     github.com/openshift/openshift-apiserver/pkg/security/apis/security/v1
     github.com/openshift/openshift-apiserver/pkg/template/apis/template/v1
-    github.com/openshift/openshift-apiserver/pkg/user/apis/user/v1
 )
 
 ALL_PEERS=(

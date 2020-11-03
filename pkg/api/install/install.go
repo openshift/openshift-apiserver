@@ -33,7 +33,6 @@ import (
 	route "github.com/openshift/openshift-apiserver/pkg/route/apis/route/install"
 	security "github.com/openshift/openshift-apiserver/pkg/security/apis/security/install"
 	template "github.com/openshift/openshift-apiserver/pkg/template/apis/template/install"
-	user "github.com/openshift/openshift-apiserver/pkg/user/apis/user/install"
 )
 
 func InstallInternalOpenShift(scheme *runtime.Scheme) {
@@ -46,7 +45,6 @@ func InstallInternalOpenShift(scheme *runtime.Scheme) {
 	route.Install(scheme)
 	security.Install(scheme)
 	template.Install(scheme)
-	user.Install(scheme)
 }
 
 func InstallInternalKube(scheme *runtime.Scheme) {

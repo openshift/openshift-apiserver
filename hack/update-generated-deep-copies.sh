@@ -24,7 +24,6 @@ ALL_FQ_APIS=(
     github.com/openshift/openshift-apiserver/pkg/route/apis/route
     github.com/openshift/openshift-apiserver/pkg/security/apis/security
     github.com/openshift/openshift-apiserver/pkg/template/apis/template
-    github.com/openshift/openshift-apiserver/pkg/user/apis/user
 )
 
 echo "Generating deepcopy funcs"

@@ -36,7 +36,6 @@ func InstallInternalLegacyAll(scheme *runtime.Scheme) {
 	InstallInternalLegacyRoute(scheme)
 	InstallInternalLegacySecurity(scheme)
 	InstallInternalLegacyTemplate(scheme)
-	InstallInternalLegacyUser(scheme)
 }
 
 func InstallExternalLegacyAll(scheme *runtime.Scheme) {
@@ -50,5 +49,4 @@ func InstallExternalLegacyAll(scheme *runtime.Scheme) {
 	InstallExternalLegacyRoute(scheme)
 	InstallExternalLegacySecurity(scheme)
 	InstallExternalLegacyTemplate(scheme)
-	InstallExternalLegacyUser(scheme)
 }

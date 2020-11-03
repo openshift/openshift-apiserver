@@ -10,7 +10,6 @@ import (
 	routevalidation "github.com/openshift/openshift-apiserver/pkg/route/apis/route/validation"
 	securityvalidation "github.com/openshift/openshift-apiserver/pkg/security/apis/security/validation"
 	templatevalidation "github.com/openshift/openshift-apiserver/pkg/template/apis/template/validation"
-	uservalidation "github.com/openshift/openshift-apiserver/pkg/user/apis/user/validation"
 
 	appsapi "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
@@ -21,7 +20,6 @@ import (
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 	templateapi "github.com/openshift/openshift-apiserver/pkg/template/apis/template"
-	userapi "github.com/openshift/openshift-apiserver/pkg/user/apis/user"
 )
 
 func init() {
@@ -67,11 +65,6 @@ func registerAll() {
 	Validator.MustRegister(&templateapi.Template{}, true, templatevalidation.ValidateTemplate, templatevalidation.ValidateTemplateUpdate)
 	Validator.MustRegister(&templateapi.TemplateInstance{}, true, templatevalidation.ValidateTemplateInstance, templatevalidation.ValidateTemplateInstanceUpdate)
 	Validator.MustRegister(&templateapi.BrokerTemplateInstance{}, false, templatevalidation.ValidateBrokerTemplateInstance, templatevalidation.ValidateBrokerTemplateInstanceUpdate)
-
-	Validator.MustRegister(&userapi.User{}, false, uservalidation.ValidateUser, uservalidation.ValidateUserUpdate)
-	Validator.MustRegister(&userapi.Identity{}, false, uservalidation.ValidateIdentity, uservalidation.ValidateIdentityUpdate)
-	Validator.MustRegister(&userapi.UserIdentityMapping{}, false, uservalidation.ValidateUserIdentityMapping, uservalidation.ValidateUserIdentityMappingUpdate)
-	Validator.MustRegister(&userapi.Group{}, false, uservalidation.ValidateGroup, uservalidation.ValidateGroupUpdate)
 
 	Validator.MustRegister(&securityapi.SecurityContextConstraints{}, false, securityvalidation.ValidateSecurityContextConstraints, securityvalidation.ValidateSecurityContextConstraintsUpdate)
 	Validator.MustRegister(&securityapi.PodSecurityPolicySubjectReview{}, true, securityvalidation.ValidatePodSecurityPolicySubjectReview, nil)

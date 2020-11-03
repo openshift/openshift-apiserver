@@ -31,6 +31,7 @@ import (
 	buildv1 "github.com/openshift/api/build/v1"
 	"github.com/openshift/library-go/pkg/image/imageutil"
 
+	uservalidation "github.com/openshift/apiserver-library-go/pkg/apivalidation"
 	oapps "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 	"github.com/openshift/openshift-apiserver/pkg/build/apis/build"
@@ -38,7 +39,6 @@ import (
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 	templateapi "github.com/openshift/openshift-apiserver/pkg/template/apis/template"
-	uservalidation "github.com/openshift/openshift-apiserver/pkg/user/apis/user/validation"
 
 	_ "k8s.io/kubernetes/pkg/apis/core/install"
 
