@@ -1045,7 +1045,7 @@ k8s.io/cli-runtime/pkg/kustomize/k8sdeps/transformer/patch
 k8s.io/cli-runtime/pkg/kustomize/k8sdeps/validator
 k8s.io/cli-runtime/pkg/printers
 k8s.io/cli-runtime/pkg/resource
-# k8s.io/client-go v0.19.2 => k8s.io/client-go v0.19.2
+# k8s.io/client-go v0.19.2 => github.com/openshift/kubernetes-client-go v0.0.0-20201104094117-806c7d66cfea
 k8s.io/client-go/discovery
 k8s.io/client-go/discovery/cached
 k8s.io/client-go/discovery/cached/disk

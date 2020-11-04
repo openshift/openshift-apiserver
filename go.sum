@@ -547,6 +547,8 @@ github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d h1:t
 github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d/go.mod h1:XmfFzbwryblvZ29NebonirM7RBuNEO7+yVCOapaouAk=
 github.com/openshift/kubernetes-apiserver v0.0.0-20201019143247-401ead4ea686 h1:yTlrZWiH+yKUJ3NMl+uDnCr+yj+58nCc0GtkltpWY5I=
 github.com/openshift/kubernetes-apiserver v0.0.0-20201019143247-401ead4ea686/go.mod h1:FreAq0bJ2vtZFj9Ago/X0oNGC51GfubKK/ViOKfVAOA=
+github.com/openshift/kubernetes-client-go v0.0.0-20201104094117-806c7d66cfea h1:MY3sLcj2kfsjN36hEs0736bcyNFdUAOQLHXNL9u3+bc=
+github.com/openshift/kubernetes-client-go v0.0.0-20201104094117-806c7d66cfea/go.mod h1:S5wPhCqyDNAlzM9CnEdgTGV4OqhsW3jGO1UM1epwfJA=
 github.com/openshift/library-go v0.0.0-20200831114015-2ab0c61c15de/go.mod h1:6vwp+YhYOIlj8MpkQKkebTTSn2TuYyvgiAFQ206jIEQ=
 github.com/openshift/library-go v0.0.0-20201102091359-c4fa0f5b3a08 h1:Z+8t3ooTH2T+J/GoCZbgaOk5WqNZgPuHlUAKMfG1FEk=
 github.com/openshift/library-go v0.0.0-20201102091359-c4fa0f5b3a08/go.mod h1:1xYaYQcQsn+AyCRsvOU+Qn5z6GGiCmcblXkT/RZLVfo=
@@ -968,8 +970,6 @@ k8s.io/apimachinery v0.19.2 h1:5Gy9vQpAGTKHPVOh5c4plE274X8D/6cuEiTO2zve7tc=
 k8s.io/apimachinery v0.19.2/go.mod h1:DnPGDnARWFvYa3pMHgSxtbZb7gpzzAZ1pTfaUNDVlmA=
 k8s.io/cli-runtime v0.19.2 h1:d4uOtKhy3ImdaKqZJ8yQgLrdtUwsJLfP4Dw7L/kVPOo=
 k8s.io/cli-runtime v0.19.2/go.mod h1:CMynmJM4Yf02TlkbhKxoSzi4Zf518PukJ5xep/NaNeY=
-k8s.io/client-go v0.19.2 h1:gMJuU3xJZs86L1oQ99R4EViAADUPMHHtS9jFshasHSc=
-k8s.io/client-go v0.19.2/go.mod h1:S5wPhCqyDNAlzM9CnEdgTGV4OqhsW3jGO1UM1epwfJA=
 k8s.io/cloud-provider v0.19.2 h1:NoQzH5OT6S7fL9lU3boQ2bXfoEJ8pT0om0vvBBPmM2s=
 k8s.io/cloud-provider v0.19.2/go.mod h1:aj+g++cXa2EcXhwXPpqf81wNGxtXxAZjvPoIFjMRtIc=
 k8s.io/cluster-bootstrap v0.19.2/go.mod h1:bzngsppPfdt9vAHUnDIEoMNsxD2b6XArVVH/W9PDDFk=
