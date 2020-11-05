@@ -226,8 +226,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.IntermediateTLSProfile":                                                   schema_openshift_api_config_v1_IntermediateTLSProfile(ref),
 		"github.com/openshift/api/config/v1.KeystoneIdentityProvider":                                                 schema_openshift_api_config_v1_KeystoneIdentityProvider(ref),
 		"github.com/openshift/api/config/v1.KubeClientConfig":                                                         schema_openshift_api_config_v1_KubeClientConfig(ref),
-		"github.com/openshift/api/config/v1.KubevirtPlatformSpec":                                                     schema_openshift_api_config_v1_KubevirtPlatformSpec(ref),
-		"github.com/openshift/api/config/v1.KubevirtPlatformStatus":                                                   schema_openshift_api_config_v1_KubevirtPlatformStatus(ref),
 		"github.com/openshift/api/config/v1.LDAPAttributeMapping":                                                     schema_openshift_api_config_v1_LDAPAttributeMapping(ref),
 		"github.com/openshift/api/config/v1.LDAPIdentityProvider":                                                     schema_openshift_api_config_v1_LDAPIdentityProvider(ref),
 		"github.com/openshift/api/config/v1.LeaderElection":                                                           schema_openshift_api_config_v1_LeaderElection(ref),
@@ -448,8 +446,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/oauth/v1.OAuthRedirectReference":                                                    schema_openshift_api_oauth_v1_OAuthRedirectReference(ref),
 		"github.com/openshift/api/oauth/v1.RedirectReference":                                                         schema_openshift_api_oauth_v1_RedirectReference(ref),
 		"github.com/openshift/api/oauth/v1.ScopeRestriction":                                                          schema_openshift_api_oauth_v1_ScopeRestriction(ref),
-		"github.com/openshift/api/oauth/v1.UserOAuthAccessToken":                                                      schema_openshift_api_oauth_v1_UserOAuthAccessToken(ref),
-		"github.com/openshift/api/oauth/v1.UserOAuthAccessTokenList":                                                  schema_openshift_api_oauth_v1_UserOAuthAccessTokenList(ref),
 		"github.com/openshift/api/openshiftcontrolplane/v1.BuildControllerConfig":                                     schema_openshift_api_openshiftcontrolplane_v1_BuildControllerConfig(ref),
 		"github.com/openshift/api/openshiftcontrolplane/v1.BuildDefaultsConfig":                                       schema_openshift_api_openshiftcontrolplane_v1_BuildDefaultsConfig(ref),
 		"github.com/openshift/api/openshiftcontrolplane/v1.BuildOverridesConfig":                                      schema_openshift_api_openshiftcontrolplane_v1_BuildOverridesConfig(ref),
@@ -524,7 +520,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.IPAMConfig":                                                             schema_openshift_api_operator_v1_IPAMConfig(ref),
 		"github.com/openshift/api/operator/v1.IngressController":                                                      schema_openshift_api_operator_v1_IngressController(ref),
 		"github.com/openshift/api/operator/v1.IngressControllerCaptureHTTPCookie":                                     schema_openshift_api_operator_v1_IngressControllerCaptureHTTPCookie(ref),
-		"github.com/openshift/api/operator/v1.IngressControllerCaptureHTTPCookieUnion":                                schema_openshift_api_operator_v1_IngressControllerCaptureHTTPCookieUnion(ref),
 		"github.com/openshift/api/operator/v1.IngressControllerCaptureHTTPHeader":                                     schema_openshift_api_operator_v1_IngressControllerCaptureHTTPHeader(ref),
 		"github.com/openshift/api/operator/v1.IngressControllerCaptureHTTPHeaders":                                    schema_openshift_api_operator_v1_IngressControllerCaptureHTTPHeaders(ref),
 		"github.com/openshift/api/operator/v1.IngressControllerHTTPHeaders":                                           schema_openshift_api_operator_v1_IngressControllerHTTPHeaders(ref),
@@ -8579,7 +8574,7 @@ func schema_openshift_api_config_v1_ClusterOperatorStatusCondition(ref common.Re
 					},
 					"message": {
 						SchemaProps: spec.SchemaProps{
-							Description: "message provides additional information about the current condition. This is only to be consumed by humans.  It may contain Line Feed characters (U+000A), which should be rendered as new lines.",
+							Description: "message provides additional information about the current condition. This is only to be consumed by humans.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -10809,7 +10804,7 @@ func schema_openshift_api_config_v1_InfrastructureStatus(ref common.ReferenceCal
 					},
 					"etcdDiscoveryDomain": {
 						SchemaProps: spec.SchemaProps{
-							Description: "etcdDiscoveryDomain is the domain used to fetch the SRV records for discovering etcd servers and clients. For more info: https://github.com/etcd-io/etcd/blob/329be66e8b3f9e2e6af83c123ff89297e49ebd15/Documentation/op-guide/clustering.md#dns-discovery deprecated: as of 4.7, this field is no longer set or honored.  It will be removed in a future release.",
+							Description: "etcdDiscoveryDomain is the domain used to fetch the SRV records for discovering etcd servers and clients. For more info: https://github.com/etcd-io/etcd/blob/329be66e8b3f9e2e6af83c123ff89297e49ebd15/Documentation/op-guide/clustering.md#dns-discovery",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -10943,13 +10938,6 @@ func schema_openshift_api_config_v1_IngressSpec(ref common.ReferenceCallback) co
 							Format:      "",
 						},
 					},
-					"appsDomain": {
-						SchemaProps: spec.SchemaProps{
-							Description: "appsDomain is an optional domain to use instead of the one specified in the domain field when a Route is created without specifying an explicit host. If appsDomain is nonempty, this value is used to generate default host values for Route. Unlike domain, appsDomain may be modified after installation. This assumes a new ingresscontroller has been setup with a wildcard certificate.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
 				},
 				Required: []string{"domain"},
 			},
@@ -11051,44 +11039,6 @@ func schema_openshift_api_config_v1_KubeClientConfig(ref common.ReferenceCallbac
 		},
 		Dependencies: []string{
 			"github.com/openshift/api/config/v1.ClientConnectionOverrides"},
-	}
-}
-
-func schema_openshift_api_config_v1_KubevirtPlatformSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "KubevirtPlatformSpec holds the desired state of the kubevirt infrastructure provider. This only includes fields that can be modified in the cluster.",
-				Type:        []string{"object"},
-			},
-		},
-	}
-}
-
-func schema_openshift_api_config_v1_KubevirtPlatformStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "KubevirtPlatformStatus holds the current status of the kubevirt infrastructure provider.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"apiServerInternalIP": {
-						SchemaProps: spec.SchemaProps{
-							Description: "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI points to. It is the IP for a self-hosted load balancer in front of the API servers.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"ingressIP": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ingressIP is an external IP which routes to the default ingress controller. The IP is a suitable target of a wildcard DNS record used to resolve default route host names.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
 	}
 }
 
@@ -12229,7 +12179,7 @@ func schema_openshift_api_config_v1_PlatformSpec(ref common.ReferenceCallback) c
 				Properties: map[string]spec.Schema{
 					"type": {
 						SchemaProps: spec.SchemaProps{
-							Description: "type is the underlying infrastructure provider for the cluster. This value controls whether infrastructure automation such as service load balancers, dynamic volume provisioning, machine creation and deletion, and other integrations are enabled. If None, no infrastructure automation is enabled. Allowed values are \"AWS\", \"Azure\", \"BareMetal\", \"GCP\", \"Libvirt\", \"OpenStack\", \"VSphere\", \"oVirt\", \"KubeVirt\" and \"None\". Individual components may not support all platforms, and must handle unrecognized platforms as None if they do not support that platform.",
+							Description: "type is the underlying infrastructure provider for the cluster. This value controls whether infrastructure automation such as service load balancers, dynamic volume provisioning, machine creation and deletion, and other integrations are enabled. If None, no infrastructure automation is enabled. Allowed values are \"AWS\", \"Azure\", \"BareMetal\", \"GCP\", \"Libvirt\", \"OpenStack\", \"VSphere\", \"oVirt\", and \"None\". Individual components may not support all platforms, and must handle unrecognized platforms as None if they do not support that platform.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -12282,18 +12232,12 @@ func schema_openshift_api_config_v1_PlatformSpec(ref common.ReferenceCallback) c
 							Ref:         ref("github.com/openshift/api/config/v1.IBMCloudPlatformSpec"),
 						},
 					},
-					"kubevirt": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kubevirt contains settings specific to the kubevirt infrastructure provider.",
-							Ref:         ref("github.com/openshift/api/config/v1.KubevirtPlatformSpec"),
-						},
-					},
 				},
 				Required: []string{"type"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.AWSPlatformSpec", "github.com/openshift/api/config/v1.AzurePlatformSpec", "github.com/openshift/api/config/v1.BareMetalPlatformSpec", "github.com/openshift/api/config/v1.GCPPlatformSpec", "github.com/openshift/api/config/v1.IBMCloudPlatformSpec", "github.com/openshift/api/config/v1.KubevirtPlatformSpec", "github.com/openshift/api/config/v1.OpenStackPlatformSpec", "github.com/openshift/api/config/v1.OvirtPlatformSpec", "github.com/openshift/api/config/v1.VSpherePlatformSpec"},
+			"github.com/openshift/api/config/v1.AWSPlatformSpec", "github.com/openshift/api/config/v1.AzurePlatformSpec", "github.com/openshift/api/config/v1.BareMetalPlatformSpec", "github.com/openshift/api/config/v1.GCPPlatformSpec", "github.com/openshift/api/config/v1.IBMCloudPlatformSpec", "github.com/openshift/api/config/v1.OpenStackPlatformSpec", "github.com/openshift/api/config/v1.OvirtPlatformSpec", "github.com/openshift/api/config/v1.VSpherePlatformSpec"},
 	}
 }
 
@@ -12359,18 +12303,12 @@ func schema_openshift_api_config_v1_PlatformStatus(ref common.ReferenceCallback)
 							Ref:         ref("github.com/openshift/api/config/v1.IBMCloudPlatformStatus"),
 						},
 					},
-					"kubevirt": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kubevirt contains settings specific to the kubevirt infrastructure provider.",
-							Ref:         ref("github.com/openshift/api/config/v1.KubevirtPlatformStatus"),
-						},
-					},
 				},
 				Required: []string{"type"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.AWSPlatformStatus", "github.com/openshift/api/config/v1.AzurePlatformStatus", "github.com/openshift/api/config/v1.BareMetalPlatformStatus", "github.com/openshift/api/config/v1.GCPPlatformStatus", "github.com/openshift/api/config/v1.IBMCloudPlatformStatus", "github.com/openshift/api/config/v1.KubevirtPlatformStatus", "github.com/openshift/api/config/v1.OpenStackPlatformStatus", "github.com/openshift/api/config/v1.OvirtPlatformStatus", "github.com/openshift/api/config/v1.VSpherePlatformStatus"},
+			"github.com/openshift/api/config/v1.AWSPlatformStatus", "github.com/openshift/api/config/v1.AzurePlatformStatus", "github.com/openshift/api/config/v1.BareMetalPlatformStatus", "github.com/openshift/api/config/v1.GCPPlatformStatus", "github.com/openshift/api/config/v1.IBMCloudPlatformStatus", "github.com/openshift/api/config/v1.OpenStackPlatformStatus", "github.com/openshift/api/config/v1.OvirtPlatformStatus", "github.com/openshift/api/config/v1.VSpherePlatformStatus"},
 	}
 }
 
@@ -21943,157 +21881,6 @@ func schema_openshift_api_oauth_v1_ScopeRestriction(ref common.ReferenceCallback
 	}
 }
 
-func schema_openshift_api_oauth_v1_UserOAuthAccessToken(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "UserOAuthAccessToken is a virtual resource to mirror OAuthAccessTokens to the user the access token was issued for",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"clientName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ClientName references the client that created this token.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"expiresIn": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ExpiresIn is the seconds from CreationTime before this token expires.",
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
-					"scopes": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Scopes is an array of the requested scopes.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
-					"redirectURI": {
-						SchemaProps: spec.SchemaProps{
-							Description: "RedirectURI is the redirection associated with the token.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"userName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "UserName is the user name associated with this token",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"userUID": {
-						SchemaProps: spec.SchemaProps{
-							Description: "UserUID is the unique UID associated with this token",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"authorizeToken": {
-						SchemaProps: spec.SchemaProps{
-							Description: "AuthorizeToken contains the token that authorized this token",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"refreshToken": {
-						SchemaProps: spec.SchemaProps{
-							Description: "RefreshToken is the value by which this token can be renewed. Can be blank.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"inactivityTimeoutSeconds": {
-						SchemaProps: spec.SchemaProps{
-							Description: "InactivityTimeoutSeconds is the value in seconds, from the CreationTimestamp, after which this token can no longer be used. The value is automatically incremented when the token is used.",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_openshift_api_oauth_v1_UserOAuthAccessTokenList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "UserOAuthAccessTokenList is a collection of access tokens issued on behalf of the requesting user",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/openshift/api/oauth/v1.UserOAuthAccessToken"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/openshift/api/oauth/v1.UserOAuthAccessToken", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
 func schema_openshift_api_openshiftcontrolplane_v1_BuildControllerConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -23494,7 +23281,7 @@ func schema_openshift_api_operator_v1_AuthenticationSpec(ref common.ReferenceCal
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -23712,7 +23499,7 @@ func schema_openshift_api_operator_v1_CSISnapshotControllerSpec(ref common.Refer
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -23915,7 +23702,7 @@ func schema_openshift_api_operator_v1_CloudCredentialSpec(ref common.ReferenceCa
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -24128,7 +23915,7 @@ func schema_openshift_api_operator_v1_ClusterCSIDriverSpec(ref common.ReferenceC
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -24360,7 +24147,7 @@ func schema_openshift_api_operator_v1_ConfigSpec(ref common.ReferenceCallback) c
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -24653,7 +24440,7 @@ func schema_openshift_api_operator_v1_ConsoleSpec(ref common.ReferenceCallback) 
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -25159,7 +24946,7 @@ func schema_openshift_api_operator_v1_EtcdSpec(ref common.ReferenceCallback) com
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -25544,53 +25331,7 @@ func schema_openshift_api_operator_v1_IngressControllerCaptureHTTPCookie(ref com
 						map[string]interface{}{
 							"discriminator": "matchType",
 							"fields-to-discriminateBy": map[string]interface{}{
-								"name":       "Name",
-								"namePrefix": "NamePrefix",
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func schema_openshift_api_operator_v1_IngressControllerCaptureHTTPCookieUnion(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "IngressControllerCaptureHTTPCookieUnion describes optional fields of an HTTP cookie that should be captured.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"matchType": {
-						SchemaProps: spec.SchemaProps{
-							Description: "matchType specifies the type of match to be performed on the cookie name.  Allowed values are \"Exact\" for an exact string match and \"Prefix\" for a string prefix match.  If \"Exact\" is specified, a name must be specified in the name field.  If \"Prefix\" is provided, a prefix must be specified in the namePrefix field.  For example, specifying matchType \"Prefix\" and namePrefix \"foo\" will capture a cookie named \"foo\" or \"foobar\" but not one named \"bar\".  The first matching cookie is captured.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "name specifies a cookie name.  Its value must be a valid HTTP cookie name as defined in RFC 6265 section 4.1.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"namePrefix": {
-						SchemaProps: spec.SchemaProps{
-							Description: "namePrefix specifies a cookie name prefix.  Its value must be a valid HTTP cookie name as defined in RFC 6265 section 4.1.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-			VendorExtensible: spec.VendorExtensible{
-				Extensions: spec.Extensions{
-					"x-kubernetes-unions": []interface{}{
-						map[string]interface{}{
-							"discriminator": "matchType",
-							"fields-to-discriminateBy": map[string]interface{}{
+								"maxLength":  "MaxLength",
 								"name":       "Name",
 								"namePrefix": "NamePrefix",
 							},
@@ -26063,7 +25804,7 @@ func schema_openshift_api_operator_v1_KubeAPIServerSpec(ref common.ReferenceCall
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -26316,7 +26057,7 @@ func schema_openshift_api_operator_v1_KubeControllerManagerSpec(ref common.Refer
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -26569,7 +26310,7 @@ func schema_openshift_api_operator_v1_KubeSchedulerSpec(ref common.ReferenceCall
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -26820,7 +26561,7 @@ func schema_openshift_api_operator_v1_KubeStorageVersionMigratorSpec(ref common.
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -27114,7 +26855,7 @@ func schema_openshift_api_operator_v1_MyOperatorResourceSpec(ref common.Referenc
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -27368,7 +27109,7 @@ func schema_openshift_api_operator_v1_NetworkSpec(ref common.ReferenceCallback) 
 					},
 					"logLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "logLevel allows configuring the logging level of the components deployed by the operator. Currently only Kuryr SDN is affected by this setting. Please note that turning on extensive logging may affect performance. The default value is \"Normal\".\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "logLevel allows configuring the logging level of the components deployed by the operator. Currently only Kuryr SDN is affected by this setting. Please note that turning on extensive logging may affect performance. The default value is \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -27665,7 +27406,7 @@ func schema_openshift_api_operator_v1_OpenShiftAPIServerSpec(ref common.Referenc
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -27875,7 +27616,7 @@ func schema_openshift_api_operator_v1_OpenShiftControllerManagerSpec(ref common.
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -28080,7 +27821,7 @@ func schema_openshift_api_operator_v1_OperatorSpec(ref common.ReferenceCallback)
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -28229,7 +27970,7 @@ func schema_openshift_api_operator_v1_ProxyConfig(ref common.ReferenceCallback) 
 				Properties: map[string]spec.Schema{
 					"iptablesSyncPeriod": {
 						SchemaProps: spec.SchemaProps{
-							Description: "An internal kube-proxy parameter. In older releases of OCP, this sometimes needed to be adjusted in large clusters for performance reasons, but this is no longer necessary, and there is no reason to change this from the default value. Default: 30s",
+							Description: "The period that iptables rules are refreshed. Default: 30s",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -28456,7 +28197,7 @@ func schema_openshift_api_operator_v1_ServiceCASpec(ref common.ReferenceCallback
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -28659,7 +28400,7 @@ func schema_openshift_api_operator_v1_ServiceCatalogAPIServerSpec(ref common.Ref
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -28862,7 +28603,7 @@ func schema_openshift_api_operator_v1_ServiceCatalogControllerManagerSpec(ref co
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -29165,7 +28906,7 @@ func schema_openshift_api_operator_v1_StaticPodOperatorSpec(ref common.Reference
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -29440,7 +29181,7 @@ func schema_openshift_api_operator_v1_StorageSpec(ref common.ReferenceCallback) 
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -32834,7 +32575,7 @@ func schema_openshift_api_route_v1_TLSConfig(ref common.ReferenceCallback) commo
 				Properties: map[string]spec.Schema{
 					"termination": {
 						SchemaProps: spec.SchemaProps{
-							Description: "termination indicates termination type.\n\n* edge - TLS termination is done by the router and http is used to communicate with the backend (default) * passthrough - Traffic is sent straight to the destination without the router providing TLS termination * reencrypt - TLS termination is done by the router and https is used to communicate with the backend",
+							Description: "termination indicates termination type.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -34277,7 +34018,7 @@ func schema_openshift_api_servicecertsigner_v1alpha1_ServiceCertSignerOperatorCo
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
 							Type:        []string{"string"},
 							Format:      "",
 						},

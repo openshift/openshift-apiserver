@@ -130,8 +130,7 @@ type ClusterOperatorStatusCondition struct {
 	Reason string `json:"reason,omitempty"`
 
 	// message provides additional information about the current condition.
-	// This is only to be consumed by humans.  It may contain Line Feed
-	// characters (U+000A), which should be rendered as new lines.
+	// This is only to be consumed by humans.
 	// +optional
 	Message string `json:"message,omitempty"`
 }

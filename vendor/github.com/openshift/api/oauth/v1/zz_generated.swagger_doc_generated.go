@@ -150,12 +150,4 @@ func (ScopeRestriction) SwaggerDoc() map[string]string {
 	return map_ScopeRestriction
 }
 
-var map_UserOAuthAccessTokenList = map[string]string{
-	"": "UserOAuthAccessTokenList is a collection of access tokens issued on behalf of the requesting user",
-}
-
-func (UserOAuthAccessTokenList) SwaggerDoc() map[string]string {
-	return map_UserOAuthAccessTokenList
-}
-
 // AUTO-GENERATED FUNCTIONS END HERE

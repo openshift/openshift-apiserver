@@ -56,16 +56,12 @@ type OperatorSpec struct {
 	// Defaults to "Normal".
 	// +optional
 	// +kubebuilder:default=Normal
-	LogLevel LogLevel `json:"logLevel,omitempty"`
+	LogLevel LogLevel `json:"logLevel"`
 
 	// operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a
 	// simple way to manage coarse grained logging choices that operators have to interpret for themselves.
-	//
-	// Valid values are: "Normal", "Debug", "Trace", "TraceAll".
-	// Defaults to "Normal".
 	// +optional
-	// +kubebuilder:default=Normal
-	OperatorLogLevel LogLevel `json:"operatorLogLevel,omitempty"`
+	OperatorLogLevel LogLevel `json:"operatorLogLevel"`
 
 	// unsupportedConfigOverrides holds a sparse config that will override any previously set options.  It only needs to be the fields to override
 	// it will end up overlaying in the following order:
@@ -85,7 +81,6 @@ type OperatorSpec struct {
 	ObservedConfig runtime.RawExtension `json:"observedConfig"`
 }
 
-// +kubebuilder:validation:Enum="";Normal;Debug;Trace;TraceAll
 type LogLevel string
 
 var (
