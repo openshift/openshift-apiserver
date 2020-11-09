@@ -24,6 +24,16 @@ func init() {
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterConversions(s *runtime.Scheme) error {
+	if err := s.AddConversionFunc((*v1.SecretList)(nil), (*core.SecretList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_image_v1_SecretList_To_v1_SecretList(a.(*v1.SecretList), b.(*core.SecretList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*core.SecretList)(nil), (*v1.SecretList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_SecretList_To_image_v1_SecretList(a.(*core.SecretList), b.(*v1.SecretList), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*v1.ImageBlobReferences)(nil), (*image.ImageBlobReferences)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_ImageBlobReferences_To_image_ImageBlobReferences(a.(*v1.ImageBlobReferences), b.(*image.ImageBlobReferences), scope)
 	}); err != nil {

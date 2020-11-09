@@ -321,6 +321,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/image/v1.NamedTagEventList":                                                         schema_openshift_api_image_v1_NamedTagEventList(ref),
 		"github.com/openshift/api/image/v1.RepositoryImportSpec":                                                      schema_openshift_api_image_v1_RepositoryImportSpec(ref),
 		"github.com/openshift/api/image/v1.RepositoryImportStatus":                                                    schema_openshift_api_image_v1_RepositoryImportStatus(ref),
+		"github.com/openshift/api/image/v1.SecretList":                                                                schema_openshift_api_image_v1_SecretList(ref),
 		"github.com/openshift/api/image/v1.SignatureCondition":                                                        schema_openshift_api_image_v1_SignatureCondition(ref),
 		"github.com/openshift/api/image/v1.SignatureGenericEntity":                                                    schema_openshift_api_image_v1_SignatureGenericEntity(ref),
 		"github.com/openshift/api/image/v1.SignatureIssuer":                                                           schema_openshift_api_image_v1_SignatureIssuer(ref),
@@ -15200,6 +15201,55 @@ func schema_openshift_api_image_v1_RepositoryImportStatus(ref common.ReferenceCa
 		},
 		Dependencies: []string{
 			"github.com/openshift/api/image/v1.ImageImportStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.Status"},
+	}
+}
+
+func schema_openshift_api_image_v1_SecretList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SecretList is a list of Secret.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Items is a list of secret objects. More info: https://kubernetes.io/docs/concepts/configuration/secret",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/api/core/v1.Secret"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.Secret", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
 	}
 }
 
