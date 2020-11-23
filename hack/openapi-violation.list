@@ -781,6 +781,7 @@ API rule violation: names_match,github.com/openshift/api/operator/v1,AWSLoadBala
 API rule violation: names_match,github.com/openshift/api/operator/v1,AWSLoadBalancerParameters,NetworkLoadBalancerParameters
 API rule violation: names_match,github.com/openshift/api/operator/v1,AuthenticationStatus,OAuthAPIServer
 API rule violation: names_match,github.com/openshift/api/operator/v1,DefaultNetworkDefinition,OpenShiftSDNConfig
+API rule violation: names_match,github.com/openshift/api/operator/v1,OVNKubernetesConfig,IPsecConfig
 API rule violation: names_match,github.com/openshift/api/operator/v1alpha1,OperatorStatus,CurrentAvailability
 API rule violation: names_match,github.com/openshift/api/operator/v1alpha1,OperatorStatus,TargetAvailability
 API rule violation: names_match,github.com/openshift/api/operatorcontrolplane/v1alpha1,LogEntry,Start

@@ -523,6 +523,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.HostNetworkStrategy":                                                    schema_openshift_api_operator_v1_HostNetworkStrategy(ref),
 		"github.com/openshift/api/operator/v1.HybridOverlayConfig":                                                    schema_openshift_api_operator_v1_HybridOverlayConfig(ref),
 		"github.com/openshift/api/operator/v1.IPAMConfig":                                                             schema_openshift_api_operator_v1_IPAMConfig(ref),
+		"github.com/openshift/api/operator/v1.IPsecConfig":                                                            schema_openshift_api_operator_v1_IPsecConfig(ref),
 		"github.com/openshift/api/operator/v1.IngressController":                                                      schema_openshift_api_operator_v1_IngressController(ref),
 		"github.com/openshift/api/operator/v1.IngressControllerCaptureHTTPCookie":                                     schema_openshift_api_operator_v1_IngressControllerCaptureHTTPCookie(ref),
 		"github.com/openshift/api/operator/v1.IngressControllerCaptureHTTPCookieUnion":                                schema_openshift_api_operator_v1_IngressControllerCaptureHTTPCookieUnion(ref),
@@ -12766,6 +12767,25 @@ func schema_openshift_api_config_v1_RegistrySources(ref common.ReferenceCallback
 							},
 						},
 					},
+					"containerRuntimeSearchRegistries": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "containerRuntimeSearchRegistries are registries that will be searched when pulling images that do not have fully qualified domains in their pull specs. Registries will be searched in the order provided in the list. Note: this search list only works with the container runtime, i.e CRI-O. Will NOT work with builds or imagestream imports.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -13070,7 +13090,7 @@ func schema_openshift_api_config_v1_SchedulerSpec(ref common.ReferenceCallback) 
 				Properties: map[string]spec.Schema{
 					"policy": {
 						SchemaProps: spec.SchemaProps{
-							Description: "policy is a reference to a ConfigMap containing scheduler policy which has user specified predicates and priorities. If this ConfigMap is not available scheduler will default to use DefaultAlgorithmProvider. The namespace for this configmap is openshift-config.",
+							Description: "DEPRECATED: the scheduler Policy API has been deprecated and will be removed in a future release. policy is a reference to a ConfigMap containing scheduler policy which has user specified predicates and priorities. If this ConfigMap is not available scheduler will default to use DefaultAlgorithmProvider. The namespace for this configmap is openshift-config.",
 							Ref:         ref("github.com/openshift/api/config/v1.ConfigMapNameReference"),
 						},
 					},
@@ -25504,6 +25524,25 @@ func schema_openshift_api_operator_v1_IPAMConfig(ref common.ReferenceCallback) c
 	}
 }
 
+func schema_openshift_api_operator_v1_IPsecConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"enable": {
+						SchemaProps: spec.SchemaProps{
+							Description: "enable enables IPsec encryption for pod-to-pod traffic on the pod network within the cluster. Default is false.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_operator_v1_IngressController(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -27590,11 +27629,17 @@ func schema_openshift_api_operator_v1_OVNKubernetesConfig(ref common.ReferenceCa
 							Ref:         ref("github.com/openshift/api/operator/v1.HybridOverlayConfig"),
 						},
 					},
+					"ipsecConfig": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ipsecConfig enables and configures IPsec for pods on the pod network within the cluster.",
+							Ref:         ref("github.com/openshift/api/operator/v1.IPsecConfig"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/operator/v1.HybridOverlayConfig"},
+			"github.com/openshift/api/operator/v1.HybridOverlayConfig", "github.com/openshift/api/operator/v1.IPsecConfig"},
 	}
 }
 
