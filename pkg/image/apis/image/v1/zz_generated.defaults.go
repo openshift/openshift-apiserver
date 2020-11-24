@@ -7,6 +7,7 @@ package v1
 import (
 	v1 "github.com/openshift/api/image/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
+	corev1 "k8s.io/kubernetes/pkg/apis/core/v1"
 )
 
 // RegisterDefaults adds defaulters functions to the given scheme.
@@ -20,6 +21,7 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 	scheme.AddTypeDefaultingFunc(&v1.ImageStreamTagList{}, func(obj interface{}) { SetObjectDefaults_ImageStreamTagList(obj.(*v1.ImageStreamTagList)) })
 	scheme.AddTypeDefaultingFunc(&v1.ImageTag{}, func(obj interface{}) { SetObjectDefaults_ImageTag(obj.(*v1.ImageTag)) })
 	scheme.AddTypeDefaultingFunc(&v1.ImageTagList{}, func(obj interface{}) { SetObjectDefaults_ImageTagList(obj.(*v1.ImageTagList)) })
+	scheme.AddTypeDefaultingFunc(&v1.SecretList{}, func(obj interface{}) { SetObjectDefaults_SecretList(obj.(*v1.SecretList)) })
 	return nil
 }
 
@@ -74,5 +76,12 @@ func SetObjectDefaults_ImageTagList(in *v1.ImageTagList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_ImageTag(a)
+	}
+}
+
+func SetObjectDefaults_SecretList(in *v1.SecretList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		corev1.SetObjectDefaults_Secret(a)
 	}
 }

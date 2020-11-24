@@ -185,7 +185,7 @@ type ImageStreamList struct {
 }
 
 // +genclient
-// +genclient:method=Secrets,verb=get,subresource=secrets,result=k8s.io/api/core/v1.SecretList
+// +genclient:method=Secrets,verb=get,subresource=secrets,result=github.com/openshift/api/image/v1.SecretList
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // ImageStream stores a mapping of tags to images, metadata overrides that are applied
