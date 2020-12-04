@@ -13,8 +13,8 @@ import (
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 
+	uservalidation "github.com/openshift/apiserver-library-go/pkg/apivalidation"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
-	uservalidation "github.com/openshift/openshift-apiserver/pkg/user/apis/user/validation"
 )
 
 func ValidateSelfSubjectRulesReview(review *authorizationapi.SelfSubjectRulesReview) field.ErrorList {

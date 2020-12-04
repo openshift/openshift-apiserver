@@ -19,13 +19,11 @@ ALL_FQ_APIS=(
     github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization
     github.com/openshift/openshift-apiserver/pkg/build/apis/build
     github.com/openshift/openshift-apiserver/pkg/image/apis/image
-    github.com/openshift/openshift-apiserver/pkg/oauth/apis/oauth
     github.com/openshift/openshift-apiserver/pkg/project/apis/project
     github.com/openshift/openshift-apiserver/pkg/quota/apis/quota
     github.com/openshift/openshift-apiserver/pkg/route/apis/route
     github.com/openshift/openshift-apiserver/pkg/security/apis/security
     github.com/openshift/openshift-apiserver/pkg/template/apis/template
-    github.com/openshift/openshift-apiserver/pkg/user/apis/user
 )
 
 echo "Generating deepcopy funcs"

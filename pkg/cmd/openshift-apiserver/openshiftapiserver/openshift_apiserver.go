@@ -41,7 +41,6 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver/configprocessing"
 	imageapiserver "github.com/openshift/openshift-apiserver/pkg/image/apiserver"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
-	oauthapiserver "github.com/openshift/openshift-apiserver/pkg/oauth/apiserver"
 	projectapiserver "github.com/openshift/openshift-apiserver/pkg/project/apiserver"
 	projectauth "github.com/openshift/openshift-apiserver/pkg/project/auth"
 	projectcache "github.com/openshift/openshift-apiserver/pkg/project/cache"
@@ -50,7 +49,6 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeallocationcontroller"
 	securityapiserver "github.com/openshift/openshift-apiserver/pkg/security/apiserver"
 	templateapiserver "github.com/openshift/openshift-apiserver/pkg/template/apiserver"
-	userapiserver "github.com/openshift/openshift-apiserver/pkg/user/apiserver"
 	"github.com/openshift/openshift-apiserver/pkg/version"
 
 	// register api groups
@@ -87,9 +85,6 @@ type OpenshiftAPIExtraConfig struct {
 	ProjectRequestTemplate    string
 	ProjectRequestMessage     string
 	RESTMapper                *restmapper.DeferredDiscoveryRESTMapper
-
-	// oauth API server
-	ServiceAccountMethod string
 
 	ClusterQuotaMappingController *clusterquotamapping.ClusterQuotaMappingController
 }
@@ -249,25 +244,6 @@ func (c *completedConfig) withImageAPIServer(delegateAPIServer genericapiserver.
 	return server.GenericAPIServer, nil
 }
 
-func (c *completedConfig) withOAuthAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
-	cfg := &oauthapiserver.OAuthAPIServerConfig{
-		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
-		ExtraConfig: oauthapiserver.ExtraConfig{
-			KubeAPIServerClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
-			ServiceAccountMethod:      c.ExtraConfig.ServiceAccountMethod,
-			Codecs:                    legacyscheme.Codecs,
-			Scheme:                    legacyscheme.Scheme,
-		},
-	}
-	config := cfg.Complete()
-	server, err := config.New(delegateAPIServer)
-	if err != nil {
-		return nil, err
-	}
-
-	return server.GenericAPIServer, nil
-}
-
 func (c *completedConfig) withProjectAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
 	cfg := &projectapiserver.ProjectAPIServerConfig{
 		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
@@ -368,23 +344,6 @@ func (c *completedConfig) withTemplateAPIServer(delegateAPIServer genericapiserv
 	return server.GenericAPIServer, nil
 }
 
-func (c *completedConfig) withUserAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
-	cfg := &userapiserver.UserConfig{
-		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
-		ExtraConfig: userapiserver.ExtraConfig{
-			Codecs: legacyscheme.Codecs,
-			Scheme: legacyscheme.Scheme,
-		},
-	}
-	config := cfg.Complete()
-	server, err := config.New(delegateAPIServer)
-	if err != nil {
-		return nil, err
-	}
-
-	return server.GenericAPIServer, nil
-}
-
 func (c *completedConfig) WithOpenAPIAggregationController(delegatedAPIServer *genericapiserver.GenericAPIServer) error {
 	// We must remove openapi config-related fields from the head of the delegation chain that we pass to the OpenAPI aggregation controller.
 	// This is necessary in order to prevent conflicts with the aggregation controller, as it expects the apiserver passed to it to have
@@ -430,13 +389,11 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withAuthorizationAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withBuildAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withImageAPIServer)
-	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withOAuthAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withProjectAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withQuotaAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withRouteAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withSecurityAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withTemplateAPIServer)
-	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withUserAPIServer)
 
 	genericServer, err := c.GenericConfig.New("openshift-apiserver", delegateAPIServer)
 	if err != nil {

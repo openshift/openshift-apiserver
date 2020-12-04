@@ -20,6 +20,7 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/openshift/api/project"
+	uservalidation "github.com/openshift/apiserver-library-go/pkg/apivalidation"
 	usertypedclient "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
 	"github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig"
 	"github.com/openshift/library-go/pkg/config/helpers"
@@ -28,7 +29,6 @@ import (
 	requestlimitapi "github.com/openshift/openshift-apiserver/pkg/project/apiserver/admission/apis/requestlimit"
 	v1 "github.com/openshift/openshift-apiserver/pkg/project/apiserver/admission/apis/requestlimit/v1"
 	requestlimitapivalidation "github.com/openshift/openshift-apiserver/pkg/project/apiserver/admission/apis/requestlimit/validation"
-	uservalidation "github.com/openshift/openshift-apiserver/pkg/user/apis/user/validation"
 )
 
 // allowedTerminatingProjects is the number of projects that are owned by a user, are in terminating state,

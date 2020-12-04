@@ -31,15 +31,14 @@ import (
 	buildv1 "github.com/openshift/api/build/v1"
 	"github.com/openshift/library-go/pkg/image/imageutil"
 
+	uservalidation "github.com/openshift/apiserver-library-go/pkg/apivalidation"
 	oapps "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 	"github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	oauthapi "github.com/openshift/openshift-apiserver/pkg/oauth/apis/oauth"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 	templateapi "github.com/openshift/openshift-apiserver/pkg/template/apis/template"
-	uservalidation "github.com/openshift/openshift-apiserver/pkg/user/apis/user/validation"
 
 	_ "k8s.io/kubernetes/pkg/apis/core/install"
 
@@ -423,18 +422,6 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 			c.FuzzNoCustom(j)
 			j.Spec.Template.Spec.InitContainers = nil
 			j.Status.Template.Spec.InitContainers = nil
-		},
-		func(j *oauthapi.OAuthAuthorizeToken, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
-			if len(j.CodeChallenge) > 0 && len(j.CodeChallengeMethod) == 0 {
-				j.CodeChallengeMethod = "plain"
-			}
-		},
-		func(j *oauthapi.OAuthClientAuthorization, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
-			if len(j.Scopes) == 0 {
-				j.Scopes = append(j.Scopes, "user:full")
-			}
 		},
 		func(j *routeapi.RouteSpec, c fuzz.Continue) {
 			c.FuzzNoCustom(j)

@@ -31,13 +31,11 @@ func InstallInternalLegacyAll(scheme *runtime.Scheme) {
 	InstallInternalLegacyAuthorization(scheme)
 	InstallInternalLegacyBuild(scheme)
 	InstallInternalLegacyImage(scheme)
-	InstallInternalLegacyOAuth(scheme)
 	InstallInternalLegacyProject(scheme)
 	InstallInternalLegacyQuota(scheme)
 	InstallInternalLegacyRoute(scheme)
 	InstallInternalLegacySecurity(scheme)
 	InstallInternalLegacyTemplate(scheme)
-	InstallInternalLegacyUser(scheme)
 }
 
 func InstallExternalLegacyAll(scheme *runtime.Scheme) {
@@ -46,11 +44,9 @@ func InstallExternalLegacyAll(scheme *runtime.Scheme) {
 	InstallExternalLegacyBuild(scheme)
 	InstallExternalLegacyImage(scheme)
 	InstallExternalLegacyNetwork(scheme)
-	InstallExternalLegacyOAuth(scheme)
 	InstallExternalLegacyProject(scheme)
 	InstallExternalLegacyQuota(scheme)
 	InstallExternalLegacyRoute(scheme)
 	InstallExternalLegacySecurity(scheme)
 	InstallExternalLegacyTemplate(scheme)
-	InstallExternalLegacyUser(scheme)
 }

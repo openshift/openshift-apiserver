@@ -10,8 +10,8 @@ import (
 	api "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/rbac"
 
+	"github.com/openshift/apiserver-library-go/pkg/apivalidation"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
-	"github.com/openshift/openshift-apiserver/pkg/user/apis/user/validation"
 )
 
 var (
@@ -344,7 +344,7 @@ func convert_rbac_Annotations_To_authorization_Annotations(in map[string]string)
 
 func determineUserKind(user string) string {
 	kind := authorizationapi.UserKind
-	if len(validation.ValidateUserName(user, false)) != 0 {
+	if len(apivalidation.ValidateUserName(user, false)) != 0 {
 		kind = authorizationapi.SystemUserKind
 	}
 	return kind
@@ -352,7 +352,7 @@ func determineUserKind(user string) string {
 
 func determineGroupKind(group string) string {
 	kind := authorizationapi.GroupKind
-	if len(validation.ValidateGroupName(group, false)) != 0 {
+	if len(apivalidation.ValidateGroupName(group, false)) != 0 {
 		kind = authorizationapi.SystemGroupKind
 	}
 	return kind

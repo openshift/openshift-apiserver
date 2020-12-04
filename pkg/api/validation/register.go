@@ -5,25 +5,21 @@ import (
 	authorizationvalidation "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization/validation"
 	buildvalidation "github.com/openshift/openshift-apiserver/pkg/build/apis/build/validation"
 	imagevalidation "github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation"
-	oauthvalidation "github.com/openshift/openshift-apiserver/pkg/oauth/apis/oauth/validation"
 	projectvalidation "github.com/openshift/openshift-apiserver/pkg/project/apis/project/validation"
 	quotavalidation "github.com/openshift/openshift-apiserver/pkg/quota/apis/quota/validation"
 	routevalidation "github.com/openshift/openshift-apiserver/pkg/route/apis/route/validation"
 	securityvalidation "github.com/openshift/openshift-apiserver/pkg/security/apis/security/validation"
 	templatevalidation "github.com/openshift/openshift-apiserver/pkg/template/apis/template/validation"
-	uservalidation "github.com/openshift/openshift-apiserver/pkg/user/apis/user/validation"
 
 	appsapi "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	oauthapi "github.com/openshift/openshift-apiserver/pkg/oauth/apis/oauth"
 	projectapi "github.com/openshift/openshift-apiserver/pkg/project/apis/project"
 	quotaapi "github.com/openshift/openshift-apiserver/pkg/quota/apis/quota"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 	templateapi "github.com/openshift/openshift-apiserver/pkg/template/apis/template"
-	userapi "github.com/openshift/openshift-apiserver/pkg/user/apis/user"
 )
 
 func init() {
@@ -61,12 +57,6 @@ func registerAll() {
 	Validator.MustRegister(&imageapi.ImageStreamMapping{}, true, imagevalidation.ValidateImageStreamMapping, nil)
 	Validator.MustRegister(&imageapi.ImageStreamTag{}, true, imagevalidation.ValidateImageStreamTag, imagevalidation.ValidateImageStreamTagUpdate)
 
-	Validator.MustRegister(&oauthapi.OAuthAccessToken{}, false, oauthvalidation.ValidateAccessToken, oauthvalidation.ValidateAccessTokenUpdate)
-	Validator.MustRegister(&oauthapi.OAuthAuthorizeToken{}, false, oauthvalidation.ValidateAuthorizeToken, oauthvalidation.ValidateAuthorizeTokenUpdate)
-	Validator.MustRegister(&oauthapi.OAuthClient{}, false, oauthvalidation.ValidateClient, oauthvalidation.ValidateClientUpdate)
-	Validator.MustRegister(&oauthapi.OAuthClientAuthorization{}, false, oauthvalidation.ValidateClientAuthorization, oauthvalidation.ValidateClientAuthorizationUpdate)
-	Validator.MustRegister(&oauthapi.OAuthRedirectReference{}, true, oauthvalidation.ValidateOAuthRedirectReference, nil)
-
 	Validator.MustRegister(&projectapi.Project{}, false, projectvalidation.ValidateProject, projectvalidation.ValidateProjectUpdate)
 	Validator.MustRegister(&projectapi.ProjectRequest{}, false, projectvalidation.ValidateProjectRequest, nil)
 
@@ -75,11 +65,6 @@ func registerAll() {
 	Validator.MustRegister(&templateapi.Template{}, true, templatevalidation.ValidateTemplate, templatevalidation.ValidateTemplateUpdate)
 	Validator.MustRegister(&templateapi.TemplateInstance{}, true, templatevalidation.ValidateTemplateInstance, templatevalidation.ValidateTemplateInstanceUpdate)
 	Validator.MustRegister(&templateapi.BrokerTemplateInstance{}, false, templatevalidation.ValidateBrokerTemplateInstance, templatevalidation.ValidateBrokerTemplateInstanceUpdate)
-
-	Validator.MustRegister(&userapi.User{}, false, uservalidation.ValidateUser, uservalidation.ValidateUserUpdate)
-	Validator.MustRegister(&userapi.Identity{}, false, uservalidation.ValidateIdentity, uservalidation.ValidateIdentityUpdate)
-	Validator.MustRegister(&userapi.UserIdentityMapping{}, false, uservalidation.ValidateUserIdentityMapping, uservalidation.ValidateUserIdentityMappingUpdate)
-	Validator.MustRegister(&userapi.Group{}, false, uservalidation.ValidateGroup, uservalidation.ValidateGroupUpdate)
 
 	Validator.MustRegister(&securityapi.SecurityContextConstraints{}, false, securityvalidation.ValidateSecurityContextConstraints, securityvalidation.ValidateSecurityContextConstraintsUpdate)
 	Validator.MustRegister(&securityapi.PodSecurityPolicySubjectReview{}, true, securityvalidation.ValidatePodSecurityPolicySubjectReview, nil)
