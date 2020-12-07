@@ -28,7 +28,7 @@ require (
 	github.com/openshift/apiserver-library-go v0.0.0-20200901140731-1236dc23c728
 	github.com/openshift/build-machinery-go v0.0.0-20200819073603-48aa266c95f7
 	github.com/openshift/client-go v0.0.0-20200827190008-3062137373b5
-	github.com/openshift/library-go v0.0.0-20200907120738-ea57b121ba1a
+	github.com/openshift/library-go v0.0.0-20201123124259-522c6f69be23
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd v0.5.0-alpha.5.0.20200819165624-17cef6e3e9d5
@@ -55,7 +55,7 @@ replace (
 	k8s.io/apimachinery => k8s.io/apimachinery v0.19.0
 	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20201207110950-476028df0fd8
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.19.0
-	k8s.io/client-go => k8s.io/client-go v0.19.0
+	k8s.io/client-go => github.com/openshift/kubernetes-client-go v0.0.0-20201207133257-210b92e25f6a
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.19.0
 	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.19.0
 	k8s.io/code-generator => k8s.io/code-generator v0.19.0
