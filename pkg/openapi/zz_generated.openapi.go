@@ -26068,6 +26068,21 @@ func schema_openshift_api_operator_v1_ConsoleSpec(ref common.ReferenceCallback) 
 							Ref:         ref("github.com/openshift/api/operator/v1.ConsoleConfigRoute"),
 						},
 					},
+					"plugins": {
+						SchemaProps: spec.SchemaProps{
+							Description: "plugins defines a list of enabled console plugin names.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"managementState", "providers"},
 			},
