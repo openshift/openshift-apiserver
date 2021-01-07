@@ -5,7 +5,7 @@ source "$(dirname "${BASH_SOURCE}")/lib/init.sh"
 SCRIPT_ROOT=$(dirname ${BASH_SOURCE})/..
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd ${SCRIPT_ROOT}; ls -d -1 ./vendor/k8s.io/kube-openapi 2>/dev/null || echo ../../../k8s.io/kube-openapi)}
 
-GOFLAGS="" go install ./${CODEGEN_PKG}/cmd/openapi-gen
+GOFLAGS="" go install -mod=vendor ./${CODEGEN_PKG}/cmd/openapi-gen
 
 function codegen::join() { local IFS="$1"; shift; echo "$*"; }
 
@@ -51,4 +51,3 @@ ${GOPATH}/bin/openapi-gen \
   --output-package "${ORIGIN_PREFIX}/pkg/openapi" \
   --report-filename "${SCRIPT_ROOT}/hack/openapi-violation.list" \
   "$@"
-
