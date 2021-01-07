@@ -14,6 +14,7 @@ import (
 
 	v1 "github.com/openshift/api/image/v1"
 	"github.com/openshift/library-go/pkg/image/reference"
+	"github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	newer "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 )
 
@@ -143,6 +144,14 @@ func Convert_v1_Image_To_image_Image(in *v1.Image, out *newer.Image, s conversio
 	}
 
 	return nil
+}
+
+func Convert_runtime_RawExtension_To_image_DockerImage(in *runtime.RawExtension, out *image.DockerImage, s conversion.Scope) error {
+	return s.Convert(in, out)
+}
+
+func Convert_image_DockerImage_To_runtime_RawExtension(in *image.DockerImage, out *runtime.RawExtension, s conversion.Scope) error {
+	return s.Convert(in, out)
 }
 
 func Convert_v1_ImageStreamSpec_To_image_ImageStreamSpec(in *v1.ImageStreamSpec, out *newer.ImageStreamSpec, s conversion.Scope) error {
@@ -364,6 +373,16 @@ func AddConversionFuncs(s *runtime.Scheme) error {
 	}
 	if err := s.AddConversionFunc((*core.SecretList)(nil), (*v1.SecretList)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_SecretList_To_image_v1_SecretList(a.(*core.SecretList), b.(*v1.SecretList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*runtime.RawExtension)(nil), (*image.DockerImage)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_runtime_RawExtension_To_image_DockerImage(a.(*runtime.RawExtension), b.(*image.DockerImage), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*image.DockerImage)(nil), (*runtime.RawExtension)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_image_DockerImage_To_runtime_RawExtension(a.(*image.DockerImage), b.(*runtime.RawExtension), scope)
 	}); err != nil {
 		return err
 	}
