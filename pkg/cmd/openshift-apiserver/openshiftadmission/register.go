@@ -2,9 +2,9 @@ package openshiftadmission
 
 import (
 	"k8s.io/apiserver/pkg/admission"
+	"k8s.io/apiserver/pkg/admission/plugin/resourcequota"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/kubernetes/plugin/pkg/admission/gc"
-	"k8s.io/kubernetes/plugin/pkg/admission/resourcequota"
 
 	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy"
 	quotaclusterresourcequota "github.com/openshift/apiserver-library-go/pkg/admission/quota/clusterresourcequota"

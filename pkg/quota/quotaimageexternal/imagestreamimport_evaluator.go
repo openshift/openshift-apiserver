@@ -10,8 +10,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	kadmission "k8s.io/apiserver/pkg/admission"
-	kquota "k8s.io/kubernetes/pkg/quota/v1"
-	"k8s.io/kubernetes/pkg/quota/v1/generic"
+	kquota "k8s.io/apiserver/pkg/quota/v1"
+	"k8s.io/apiserver/pkg/quota/v1/generic"
 
 	imagev1 "github.com/openshift/api/image/v1"
 	imagev1lister "github.com/openshift/client-go/image/listers/image/v1"

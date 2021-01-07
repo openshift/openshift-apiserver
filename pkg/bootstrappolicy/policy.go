@@ -17,7 +17,6 @@ import (
 	"k8s.io/kubernetes/pkg/apis/policy"
 	"k8s.io/kubernetes/pkg/apis/rbac"
 	rbacv1helpers "k8s.io/kubernetes/pkg/apis/rbac/v1"
-	"k8s.io/kubernetes/pkg/apis/settings"
 	"k8s.io/kubernetes/pkg/apis/storage"
 	"k8s.io/kubernetes/plugin/pkg/auth/authorizer/rbac/bootstrappolicy"
 
@@ -56,7 +55,6 @@ var (
 	policyGroup                = policy.GroupName
 	rbacGroup                  = rbac.GroupName
 	storageGroup               = storage.GroupName
-	settingsGroup              = settings.GroupName
 	schedulingGroup            = "scheduling.k8s.io"
 	kAuthzGroup                = kauthorizationapi.GroupName
 	kAuthnGroup                = kauthenticationapi.GroupName
@@ -194,8 +192,6 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				rbacv1helpers.NewRule(read...).Groups(policyGroup).Resources("podsecuritypolicies", "poddisruptionbudgets/status").RuleOrDie(),
 
 				rbacv1helpers.NewRule(read...).Groups(rbacGroup).Resources("roles", "rolebindings", "clusterroles", "clusterrolebindings").RuleOrDie(),
-
-				rbacv1helpers.NewRule(read...).Groups(settingsGroup).Resources("podpresets").RuleOrDie(),
 
 				rbacv1helpers.NewRule(read...).Groups(storageGroup).Resources("csidrivers", "csinodes", "storageclasses", "volumeattachments", "volumeattachments/status").RuleOrDie(),
 

@@ -19,8 +19,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/authentication/user"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
+	kquota "k8s.io/apiserver/pkg/quota/v1"
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
-	kquota "k8s.io/kubernetes/pkg/quota/v1"
 
 	"github.com/openshift/api/image"
 	imagev1 "github.com/openshift/api/image/v1"

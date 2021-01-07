@@ -212,14 +212,6 @@ items:
     - list
     - watch
   - apiGroups:
-    - settings.k8s.io
-    resources:
-    - podpresets
-    verbs:
-    - get
-    - list
-    - watch
-  - apiGroups:
     - storage.k8s.io
     resources:
     - csidrivers

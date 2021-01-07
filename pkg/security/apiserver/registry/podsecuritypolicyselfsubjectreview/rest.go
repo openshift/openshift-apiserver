@@ -4,22 +4,21 @@ import (
 	"context"
 	"fmt"
 
-	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apiserver/pkg/authentication/user"
-	apirequest "k8s.io/apiserver/pkg/endpoints/request"
-	"k8s.io/apiserver/pkg/registry/rest"
-	"k8s.io/client-go/kubernetes"
-	coreapi "k8s.io/kubernetes/pkg/apis/core"
-	"k8s.io/kubernetes/pkg/serviceaccount"
-
 	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sccmatching"
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 	securityvalidation "github.com/openshift/openshift-apiserver/pkg/security/apis/security/validation"
 	podsecuritypolicysubjectreview "github.com/openshift/openshift-apiserver/pkg/security/apiserver/registry/podsecuritypolicysubjectreview"
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	authserviceaccount "k8s.io/apiserver/pkg/authentication/serviceaccount"
+	"k8s.io/apiserver/pkg/authentication/user"
+	apirequest "k8s.io/apiserver/pkg/endpoints/request"
+	"k8s.io/apiserver/pkg/registry/rest"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
+	coreapi "k8s.io/kubernetes/pkg/apis/core"
 )
 
 // REST implements the RESTStorage interface in terms of an Registry.
@@ -66,7 +65,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 	users := []user.Info{userInfo}
 	saName := pspssr.Spec.Template.Spec.ServiceAccountName
 	if len(saName) > 0 {
-		users = append(users, serviceaccount.UserInfo(ns, saName, ""))
+		users = append(users, authserviceaccount.UserInfo(ns, saName, ""))
 	}
 
 	matchedConstraints, err := r.sccMatcher.FindApplicableSCCs(ctx, ns, users...)
