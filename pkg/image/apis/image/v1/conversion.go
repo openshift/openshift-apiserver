@@ -67,7 +67,7 @@ func Convert_image_Image_To_v1_Image(in *newer.Image, out *v1.Image, s conversio
 	if in.Signatures != nil {
 		out.Signatures = make([]v1.ImageSignature, len(in.Signatures))
 		for i := range in.Signatures {
-			if err := s.Convert(&in.Signatures[i], &out.Signatures[i], conversion.DestFromSource); err != nil {
+			if err := s.Convert(&in.Signatures[i], &out.Signatures[i]); err != nil {
 				return err
 			}
 		}
@@ -105,7 +105,7 @@ func Convert_v1_Image_To_image_Image(in *v1.Image, out *newer.Image, s conversio
 		if err := runtime.DecodeInto(dockerImageCodecs.UniversalDecoder(), in.DockerImageMetadata.Raw, obj); err != nil {
 			return err
 		}
-		if err := s.Convert(obj, &out.DockerImageMetadata, conversion.DestFromSource); err != nil {
+		if err := s.Convert(obj, &out.DockerImageMetadata); err != nil {
 			return err
 		}
 	}
@@ -125,7 +125,7 @@ func Convert_v1_Image_To_image_Image(in *v1.Image, out *newer.Image, s conversio
 	if in.Signatures != nil {
 		out.Signatures = make([]newer.ImageSignature, len(in.Signatures))
 		for i := range in.Signatures {
-			if err := s.Convert(&in.Signatures[i], &out.Signatures[i], conversion.DestFromSource); err != nil {
+			if err := s.Convert(&in.Signatures[i], &out.Signatures[i]); err != nil {
 				return err
 			}
 		}
@@ -149,7 +149,7 @@ func Convert_v1_ImageStreamSpec_To_image_ImageStreamSpec(in *v1.ImageStreamSpec,
 	out.LookupPolicy = newer.ImageLookupPolicy{Local: in.LookupPolicy.Local}
 	out.DockerImageRepository = in.DockerImageRepository
 	out.Tags = make(map[string]newer.TagReference)
-	return s.Convert(&in.Tags, &out.Tags, conversion.DestFromSource)
+	return s.Convert(&in.Tags, &out.Tags)
 }
 
 func Convert_image_ImageStreamSpec_To_v1_ImageStreamSpec(in *newer.ImageStreamSpec, out *v1.ImageStreamSpec, s conversion.Scope) error {
@@ -165,7 +165,7 @@ func Convert_image_ImageStreamSpec_To_v1_ImageStreamSpec(in *newer.ImageStreamSp
 		}
 	}
 	out.Tags = make([]v1.TagReference, 0, 0)
-	return s.Convert(&in.Tags, &out.Tags, conversion.DestFromSource)
+	return s.Convert(&in.Tags, &out.Tags)
 }
 
 func Convert_v1_ImageStreamStatus_To_image_ImageStreamStatus(in *v1.ImageStreamStatus, out *newer.ImageStreamStatus, s conversion.Scope) error {
@@ -274,7 +274,7 @@ func Convert_image_TagEventListArray_to_v1_NamedTagEventListArray(in *map[string
 func Convert_v1_TagReferenceArray_to_api_TagReferenceMap(in *[]v1.TagReference, out *map[string]newer.TagReference, s conversion.Scope) error {
 	for _, curr := range *in {
 		r := newer.TagReference{}
-		if err := s.Convert(&curr, &r, conversion.DestFromSource); err != nil {
+		if err := s.Convert(&curr, &r); err != nil {
 			return err
 		}
 		(*out)[curr.Name] = r
@@ -291,7 +291,7 @@ func Convert_image_TagReferenceMap_to_v1_TagReferenceArray(in *map[string]newer.
 	for _, tag := range allTags {
 		newTagReference := (*in)[tag]
 		oldTagReference := v1.TagReference{}
-		if err := s.Convert(&newTagReference, &oldTagReference, conversion.DestFromSource); err != nil {
+		if err := s.Convert(&newTagReference, &oldTagReference); err != nil {
 			return err
 		}
 		oldTagReference.Name = tag
