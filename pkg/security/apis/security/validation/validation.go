@@ -283,7 +283,7 @@ func ValidatePodSecurityPolicySubjectReview(podSecurityPolicySubjectReview *secu
 
 func validatePodSecurityPolicySubjectReviewSpec(spec *securityapi.PodSecurityPolicySubjectReviewSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, kapivalidation.ValidatePodSpec(&spec.Template.Spec, &spec.Template.ObjectMeta, fldPath.Child("template", "spec"))...)
+	allErrs = append(allErrs, kapivalidation.ValidatePodSpec(&spec.Template.Spec, &spec.Template.ObjectMeta, fldPath.Child("template", "spec"), kapivalidation.PodValidationOptions{})...)
 	// make sure we never pass an empty user list to FindApplicableSCCs as it will consider that as matching all SCCs
 	if len(spec.User) == 0 && len(spec.Groups) == 0 && len(spec.Template.Spec.ServiceAccountName) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("user"), "at least one of user, groups or serviceAccountName must be specified"))
@@ -300,7 +300,7 @@ func ValidatePodSecurityPolicySelfSubjectReview(podSecurityPolicySelfSubjectRevi
 
 func validatePodSecurityPolicySelfSubjectReviewSpec(podSecurityPolicySelfSubjectReviewSpec *securityapi.PodSecurityPolicySelfSubjectReviewSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, kapivalidation.ValidatePodSpec(&podSecurityPolicySelfSubjectReviewSpec.Template.Spec, &podSecurityPolicySelfSubjectReviewSpec.Template.ObjectMeta, fldPath.Child("template", "spec"))...)
+	allErrs = append(allErrs, kapivalidation.ValidatePodSpec(&podSecurityPolicySelfSubjectReviewSpec.Template.Spec, &podSecurityPolicySelfSubjectReviewSpec.Template.ObjectMeta, fldPath.Child("template", "spec"), kapivalidation.PodValidationOptions{})...)
 	return allErrs
 }
 
@@ -313,7 +313,7 @@ func ValidatePodSecurityPolicyReview(podSecurityPolicyReview *securityapi.PodSec
 
 func validatePodSecurityPolicyReviewSpec(podSecurityPolicyReviewSpec *securityapi.PodSecurityPolicyReviewSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, kapivalidation.ValidatePodSpec(&podSecurityPolicyReviewSpec.Template.Spec, &podSecurityPolicyReviewSpec.Template.ObjectMeta, fldPath.Child("template", "spec"))...)
+	allErrs = append(allErrs, kapivalidation.ValidatePodSpec(&podSecurityPolicyReviewSpec.Template.Spec, &podSecurityPolicyReviewSpec.Template.ObjectMeta, fldPath.Child("template", "spec"), kapivalidation.PodValidationOptions{})...)
 	allErrs = append(allErrs, validateServiceAccountNames(podSecurityPolicyReviewSpec.ServiceAccountNames, fldPath.Child("serviceAccountNames"))...)
 	return allErrs
 }
