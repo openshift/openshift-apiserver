@@ -413,6 +413,8 @@ github.com/jtolds/gls v4.20.0+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfV
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
 github.com/jung-kurt/gofpdf v1.0.3-0.20190309125859-24315acbbda5/go.mod h1:7Id9E/uU8ce6rXgefFLlgrJj/GYY22cpxn+r32jIOes=
 github.com/karrick/godirwalk v1.7.5/go.mod h1:2c9FRhkDxdIbgkOnCEvnSWs71Bhugbl46shStcFDJ34=
+github.com/kevinrizza/library-go v0.0.0-20201216155812-db26a7547735 h1:80SMEJKb6mIY+jS5HsiCIuVPIqJ3tRB1NuiKiTr4IwU=
+github.com/kevinrizza/library-go v0.0.0-20201216155812-db26a7547735/go.mod h1:1xYaYQcQsn+AyCRsvOU+Qn5z6GGiCmcblXkT/RZLVfo=
 github.com/kisielk/errcheck v1.1.0/go.mod h1:EZBBE59ingxPouuu3KfxchcWSUPOHkagtvWXihfKN4Q=
 github.com/kisielk/errcheck v1.2.0 h1:reN85Pxc5larApoH1keMBiu2GWtPqXQ1nc9gx+jOU+E=
 github.com/kisielk/errcheck v1.2.0/go.mod h1:/BMXB+zMLi60iA8Vv6Ksmxu/1UDYcXs4uQLJ+jE2L00=
@@ -545,9 +547,6 @@ github.com/openshift/kubernetes-apiserver v0.0.0-20201118100029-304f639eba13 h1:
 github.com/openshift/kubernetes-apiserver v0.0.0-20201118100029-304f639eba13/go.mod h1:FreAq0bJ2vtZFj9Ago/X0oNGC51GfubKK/ViOKfVAOA=
 github.com/openshift/kubernetes-client-go v0.0.0-20201104094117-806c7d66cfea h1:MY3sLcj2kfsjN36hEs0736bcyNFdUAOQLHXNL9u3+bc=
 github.com/openshift/kubernetes-client-go v0.0.0-20201104094117-806c7d66cfea/go.mod h1:S5wPhCqyDNAlzM9CnEdgTGV4OqhsW3jGO1UM1epwfJA=
-github.com/openshift/library-go v0.0.0-20201020083322-646ad9742a1e/go.mod h1:qbwvTwCy4btqEcqU3oI59CopNgcRgZUPXG4Y2jc+B4E=
-github.com/openshift/library-go v0.0.0-20201102091359-c4fa0f5b3a08 h1:Z+8t3ooTH2T+J/GoCZbgaOk5WqNZgPuHlUAKMfG1FEk=
-github.com/openshift/library-go v0.0.0-20201102091359-c4fa0f5b3a08/go.mod h1:1xYaYQcQsn+AyCRsvOU+Qn5z6GGiCmcblXkT/RZLVfo=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d h1:fLITXDjxMSvUDjnXs/zljIWktbST9+Om8XbrmmM7T4I=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d/go.mod h1:LJM49W8fBVSj+rvcopJZu9mgH5Tx6HwLHySIYeGeu4k=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
