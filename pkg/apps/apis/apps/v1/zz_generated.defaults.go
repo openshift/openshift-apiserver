@@ -5,6 +5,8 @@
 package v1
 
 import (
+	"reflect"
+
 	v1 "github.com/openshift/api/apps/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	corev1 "k8s.io/kubernetes/pkg/apis/core/v1"
@@ -166,7 +168,9 @@ func SetObjectDefaults_DeploymentConfig(in *v1.DeploymentConfig) {
 			corev1.SetDefaults_Container(a)
 			for j := range a.Ports {
 				b := &a.Ports[j]
-				corev1.SetDefaults_ContainerPort(b)
+				if reflect.ValueOf(b.Protocol).IsZero() {
+					b.Protocol = "TCP"
+				}
 			}
 			for j := range a.Env {
 				b := &a.Env[j]
@@ -214,7 +218,9 @@ func SetObjectDefaults_DeploymentConfig(in *v1.DeploymentConfig) {
 			corev1.SetDefaults_Container(a)
 			for j := range a.Ports {
 				b := &a.Ports[j]
-				corev1.SetDefaults_ContainerPort(b)
+				if reflect.ValueOf(b.Protocol).IsZero() {
+					b.Protocol = "TCP"
+				}
 			}
 			for j := range a.Env {
 				b := &a.Env[j]
@@ -259,9 +265,12 @@ func SetObjectDefaults_DeploymentConfig(in *v1.DeploymentConfig) {
 		}
 		for i := range in.Spec.Template.Spec.EphemeralContainers {
 			a := &in.Spec.Template.Spec.EphemeralContainers[i]
+			corev1.SetDefaults_EphemeralContainer(a)
 			for j := range a.EphemeralContainerCommon.Ports {
 				b := &a.EphemeralContainerCommon.Ports[j]
-				corev1.SetDefaults_ContainerPort(b)
+				if reflect.ValueOf(b.Protocol).IsZero() {
+					b.Protocol = "TCP"
+				}
 			}
 			for j := range a.EphemeralContainerCommon.Env {
 				b := &a.EphemeralContainerCommon.Env[j]
