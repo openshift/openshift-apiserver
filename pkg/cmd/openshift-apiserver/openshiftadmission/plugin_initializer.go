@@ -10,14 +10,14 @@ import (
 	"k8s.io/apiserver/pkg/admission/initializer"
 	webhookinitializer "k8s.io/apiserver/pkg/admission/plugin/webhook/initializer"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
+	"k8s.io/apiserver/pkg/quota/v1/generic"
 	"k8s.io/apiserver/pkg/util/webhook"
 	kexternalinformers "k8s.io/client-go/informers"
 	kubeclientgoclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/component-base/featuregate"
 	aggregatorapiserver "k8s.io/kube-aggregator/pkg/apiserver"
-	kadmission "k8s.io/kubernetes/pkg/kubeapiserver/admission"
-	"k8s.io/kubernetes/pkg/quota/v1/generic"
+	kubeapiserveradmission "k8s.io/kubernetes/pkg/kubeapiserver/admission"
 	"k8s.io/kubernetes/pkg/quota/v1/install"
 
 	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy"
@@ -86,7 +86,7 @@ func NewPluginInitializer(
 		authorizer,
 		featureGates,
 	)
-	kubePluginInitializer := kadmission.NewPluginInitializer(
+	kubePluginInitializer := kubeapiserveradmission.NewPluginInitializer(
 		cloudConfig,
 		restMapper,
 		generic.NewConfiguration(quotaRegistry.List(), map[schema.GroupResource]struct{}{}))

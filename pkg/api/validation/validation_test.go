@@ -18,7 +18,7 @@ import (
 // Ensures that `nil` can be passed to validation functions validating top-level objects
 func TestNilPath(t *testing.T) {
 	var nilPath *field.Path = nil
-	if s := nilPath.String(); s != "" {
+	if s := nilPath.String(); s != "<nil>" {
 		t.Errorf("Unexpected nil path: %q", s)
 	}
 
@@ -39,7 +39,7 @@ func TestNilPath(t *testing.T) {
 }
 
 func TestNameFunc(t *testing.T) {
-	const nameRulesMessage = `a DNS-1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')`
+	const nameRulesMessage = `a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')`
 
 	for apiType, validationInfo := range Validator.typeToValidator {
 		if !validationInfo.HasObjectMeta {

@@ -4,23 +4,22 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sccmatching"
+	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
+	securityvalidation "github.com/openshift/openshift-apiserver/pkg/security/apis/security/validation"
+	"github.com/openshift/openshift-apiserver/pkg/security/apiserver/registry/podsecuritypolicysubjectreview"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
+	authserviceaccount "k8s.io/apiserver/pkg/authentication/serviceaccount"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/client-go/kubernetes"
 	corev1listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/klog/v2"
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
-	"k8s.io/kubernetes/pkg/serviceaccount"
-
-	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sccmatching"
-	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
-	securityvalidation "github.com/openshift/openshift-apiserver/pkg/security/apis/security/validation"
-	"github.com/openshift/openshift-apiserver/pkg/security/apiserver/registry/podsecuritypolicysubjectreview"
 )
 
 // REST implements the RESTStorage interface in terms of an Registry.
@@ -73,7 +72,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 	errs := []error{}
 	newStatus := securityapi.PodSecurityPolicyReviewStatus{}
 	for _, sa := range serviceAccounts {
-		userInfo := serviceaccount.UserInfo(ns, sa.Name, "")
+		userInfo := authserviceaccount.UserInfo(ns, sa.Name, "")
 		saConstraints, err := r.sccMatcher.FindApplicableSCCs(ctx, ns, userInfo)
 		if err != nil {
 			errs = append(errs, fmt.Errorf("unable to find SecurityContextConstraints for ServiceAccount %s: %v", sa.Name, err))

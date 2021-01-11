@@ -7,7 +7,7 @@ CODEGEN_PKG=${CODEGEN_PKG:-$(cd ${SCRIPT_ROOT}; ls -d -1 ./vendor/k8s.io/code-ge
 
 verify="${VERIFY:-}"
 
-GOFLAGS="" go install ./${CODEGEN_PKG}/cmd/defaulter-gen
+GOFLAGS="" go install -mod=vendor ./${CODEGEN_PKG}/cmd/defaulter-gen
 
 function codegen::join() { local IFS="$1"; shift; echo "$*"; }
 

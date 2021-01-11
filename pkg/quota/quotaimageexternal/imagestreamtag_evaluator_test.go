@@ -8,9 +8,9 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	kquota "k8s.io/apiserver/pkg/quota/v1"
 	clientgotesting "k8s.io/client-go/testing"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
-	kquota "k8s.io/kubernetes/pkg/quota/v1"
 
 	imagev1 "github.com/openshift/api/image/v1"
 	fakeimagev1client "github.com/openshift/client-go/image/clientset/versioned/fake"

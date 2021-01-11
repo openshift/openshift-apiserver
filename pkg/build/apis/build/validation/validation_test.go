@@ -1391,7 +1391,7 @@ func TestValidateStrategy(t *testing.T) {
 		// 0
 		{
 			t:    field.ErrorTypeInvalid,
-			path: "",
+			path: "<nil>",
 			strategy: &buildapi.BuildStrategy{
 				SourceStrategy:          &buildapi.SourceBuildStrategy{},
 				DockerStrategy:          &buildapi.DockerBuildStrategy{},

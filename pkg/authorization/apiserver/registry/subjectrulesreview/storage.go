@@ -14,6 +14,7 @@ import (
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
 	rbaclisters "k8s.io/client-go/listers/rbac/v1"
+	helpersrbacvalidation "k8s.io/component-helpers/auth/rbac/validation"
 	rbacv1helpers "k8s.io/kubernetes/pkg/apis/rbac/v1"
 	rbacregistryvalidation "k8s.io/kubernetes/pkg/registry/rbac/validation"
 
@@ -94,7 +95,7 @@ func GetEffectivePolicyRules(ctx context.Context, ruleResolver rbacregistryvalid
 		errors = append(errors, err)
 	}
 	for _, rule := range namespaceRules {
-		rules = append(rules, rbacregistryvalidation.BreakdownRule(rule)...)
+		rules = append(rules, helpersrbacvalidation.BreakdownRule(rule)...)
 	}
 
 	if scopes := user.GetExtra()[authorizationapi.ScopesKey]; len(scopes) > 0 {
@@ -118,7 +119,7 @@ func filterRulesByScopes(rules []rbacv1.PolicyRule, scopes []string, namespace s
 
 	filteredRules := []rbacv1.PolicyRule{}
 	for _, rule := range rules {
-		if allowed, _ := rbacregistryvalidation.Covers(scopeRules, []rbacv1.PolicyRule{rule}); allowed {
+		if allowed, _ := helpersrbacvalidation.Covers(scopeRules, []rbacv1.PolicyRule{rule}); allowed {
 			filteredRules = append(filteredRules, rule)
 		}
 	}

@@ -6,7 +6,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	kquota "k8s.io/kubernetes/pkg/quota/v1"
+	kquota "k8s.io/apiserver/pkg/quota/v1"
 
 	imagev1 "github.com/openshift/api/image/v1"
 	fakeimagev1client "github.com/openshift/client-go/image/clientset/versioned/fake"
