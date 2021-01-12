@@ -8,6 +8,7 @@ import (
 	"k8s.io/klog/v2"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -65,9 +66,14 @@ func (p *ProjectCache) GetNamespace(name string) (*corev1.Namespace, error) {
 	} else {
 		// Our watch maybe latent, so we make a best effort to get the object, and only fail if not found
 		namespace, err = p.Client.Get(context.TODO(), name, metav1.GetOptions{})
+		// Deleted namespaces can cause error log spam
+		if errors.IsNotFound(err) {
+			klog.V(4).Infof("namespace %s does not exists", name)
+			return nil, err
+		}
 		// the namespace does not exist, so prevent create and update in that namespace
 		if err != nil {
-			return nil, fmt.Errorf("namespace %s does not exist", name)
+			return nil, fmt.Errorf("failed to get namespace %q: %v", name, err)
 		}
 		klog.V(4).Infof("found %s via storage lookup", name)
 	}

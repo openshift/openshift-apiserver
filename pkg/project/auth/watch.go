@@ -7,6 +7,7 @@ import (
 	"k8s.io/klog/v2"
 
 	corev1 "k8s.io/api/core/v1"
+	kapierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -147,6 +148,10 @@ func (w *userProjectWatcher) GroupMembershipChanged(namespaceName string, users,
 
 	case hasAccess:
 		namespace, err := w.projectCache.GetNamespace(namespaceName)
+		if kapierrs.IsNotFound(err) {
+			delete(w.knownProjects, namespaceName)
+			return
+		}
 		if err != nil {
 			utilruntime.HandleError(err)
 			return
