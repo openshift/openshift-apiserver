@@ -1519,6 +1519,20 @@ items:
     - get
     - list
   - apiGroups:
+    - batch
+    resources:
+    - jobs
+    verbs:
+    - get
+    - list
+  - apiGroups:
+    - batch
+    resources:
+    - cronjobs
+    verbs:
+    - get
+    - list
+  - apiGroups:
     - apps
     - extensions
     resources:
@@ -1539,6 +1553,14 @@ items:
     - extensions
     resources:
     - replicasets
+    verbs:
+    - get
+    - list
+  - apiGroups:
+    - apps
+    - extensions
+    resources:
+    - statefulsets
     verbs:
     - get
     - list

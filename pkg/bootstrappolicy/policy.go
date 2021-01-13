@@ -563,9 +563,12 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				rbacv1helpers.NewRule("list").Groups(kapiGroup).Resources("limitranges").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list").Groups(buildGroup, legacyBuildGroup).Resources("buildconfigs", "builds").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list").Groups(batchGroup).Resources("jobs").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list").Groups(batchGroup).Resources("cronjobs").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list").Groups(appsGroup, extensionsGroup).Resources("daemonsets").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list").Groups(appsGroup, extensionsGroup).Resources("deployments").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list").Groups(appsGroup, extensionsGroup).Resources("replicasets").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list").Groups(appsGroup, extensionsGroup).Resources("statefulsets").RuleOrDie(),
 
 				rbacv1helpers.NewRule("delete").Groups(imageGroup, legacyImageGroup).Resources("images").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list", "watch").Groups(imageGroup, legacyImageGroup).Resources("images", "imagestreams").RuleOrDie(),
