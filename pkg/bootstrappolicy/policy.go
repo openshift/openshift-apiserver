@@ -179,10 +179,6 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 
 				rbacv1helpers.NewRule(read...).Groups(coordinationGroup).Resources("leases").RuleOrDie(),
 
-				rbacv1helpers.NewRule(read...).Groups(extensionsGroup).Resources("daemonsets/status", "deployments/status", "horizontalpodautoscalers",
-					"horizontalpodautoscalers/status", "ingresses/status", "jobs", "jobs/status", "podsecuritypolicies", "replicasets/status", "replicationcontrollers",
-					"storageclasses", "thirdpartyresources").RuleOrDie(),
-
 				rbacv1helpers.NewRule(read...).Groups(eventsGroup).Resources("events").RuleOrDie(),
 
 				rbacv1helpers.NewRule(read...).Groups(networkingGroup).Resources("ingresses/status").RuleOrDie(),
@@ -352,7 +348,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 
 				rbacv1helpers.NewRule(readWrite...).Groups(templateGroup, legacyTemplateGroup).Resources("templates", "templateconfigs", "processedtemplates", "templateinstances").RuleOrDie(),
 
-				rbacv1helpers.NewRule(readWrite...).Groups(extensionsGroup, networkingGroup).Resources("networkpolicies").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(networkingGroup).Resources("networkpolicies").RuleOrDie(),
 
 				// backwards compatibility
 				rbacv1helpers.NewRule(readWrite...).Groups(buildGroup, legacyBuildGroup).Resources("buildlogs").RuleOrDie(),
@@ -394,7 +390,7 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 
 				rbacv1helpers.NewRule(readWrite...).Groups(templateGroup, legacyTemplateGroup).Resources("templates", "templateconfigs", "processedtemplates", "templateinstances").RuleOrDie(),
 
-				rbacv1helpers.NewRule(readWrite...).Groups(extensionsGroup, networkingGroup).Resources("networkpolicies").RuleOrDie(),
+				rbacv1helpers.NewRule(readWrite...).Groups(networkingGroup).Resources("networkpolicies").RuleOrDie(),
 
 				// backwards compatibility
 				rbacv1helpers.NewRule(readWrite...).Groups(buildGroup, legacyBuildGroup).Resources("buildlogs").RuleOrDie(),
@@ -565,10 +561,10 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 				rbacv1helpers.NewRule("get", "list").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list").Groups(batchGroup).Resources("jobs").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list").Groups(batchGroup).Resources("cronjobs").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "list").Groups(appsGroup, extensionsGroup).Resources("daemonsets").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "list").Groups(appsGroup, extensionsGroup).Resources("deployments").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "list").Groups(appsGroup, extensionsGroup).Resources("replicasets").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "list").Groups(appsGroup, extensionsGroup).Resources("statefulsets").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list").Groups(appsGroup).Resources("daemonsets").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list").Groups(appsGroup).Resources("deployments").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list").Groups(appsGroup).Resources("replicasets").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list").Groups(appsGroup).Resources("statefulsets").RuleOrDie(),
 
 				rbacv1helpers.NewRule("delete").Groups(imageGroup, legacyImageGroup).Resources("images").RuleOrDie(),
 				rbacv1helpers.NewRule("get", "list", "watch").Groups(imageGroup, legacyImageGroup).Resources("images", "imagestreams").RuleOrDie(),
@@ -673,7 +669,6 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 			Rules: []rbacv1.PolicyRule{
 				rbacv1helpers.NewRule(read...).Groups(networkGroup, legacyNetworkGroup).Resources("egressnetworkpolicies", "hostsubnets", "netnamespaces").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(kapiGroup).Resources("nodes", "namespaces").RuleOrDie(),
-				rbacv1helpers.NewRule(read...).Groups(extensionsGroup).Resources("networkpolicies").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(networkingGroup).Resources("networkpolicies").RuleOrDie(),
 				rbacv1helpers.NewRule("get").Groups(networkGroup, legacyNetworkGroup).Resources("clusternetworks").RuleOrDie(),
 				rbacv1helpers.NewRule("create", "update", "patch").Groups(kapiGroup).Resources("events").RuleOrDie(),
