@@ -2794,6 +2794,7 @@ items:
     resources:
     - endpoints
     - replicationcontrollers/scale
+    - services
     verbs:
     - get
     - update

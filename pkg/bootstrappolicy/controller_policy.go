@@ -269,7 +269,7 @@ func init() {
 	addControllerRole(rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraUnidlingControllerServiceAccountName},
 		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("get", "update").Groups(kapiGroup).Resources("replicationcontrollers/scale", "endpoints").RuleOrDie(),
+			rbacv1helpers.NewRule("get", "update").Groups(kapiGroup).Resources("replicationcontrollers/scale", "endpoints", "services").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "update", "patch").Groups(kapiGroup).Resources("replicationcontrollers").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "update", "patch").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "update").Groups(extensionsGroup, appsGroup).Resources("replicasets/scale", "deployments/scale").RuleOrDie(),
