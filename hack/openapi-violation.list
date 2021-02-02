@@ -225,6 +225,7 @@ API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolp
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,OpenShiftControllerManagerConfig,Controllers
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,ServiceAccountControllerConfig,ManagedNames
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,AccessLogging,HTTPCaptureCookies
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ConsoleSpec,Plugins
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSSpec,Servers
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DeveloperConsoleCatalogCategory,Subcategories

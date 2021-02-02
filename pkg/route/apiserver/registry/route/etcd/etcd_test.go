@@ -95,7 +95,7 @@ func TestCreate(t *testing.T) {
 }
 
 func TestCreateWithAllocation(t *testing.T) {
-	allocator := &testAllocator{Hostname: "bar"}
+	allocator := &testAllocator{Hostname: "bar.com"}
 	storage, server := newStorage(t, allocator)
 	defer server.Terminate(t)
 	defer storage.Store.DestroyFunc()
@@ -105,7 +105,7 @@ func TestCreateWithAllocation(t *testing.T) {
 		t.Fatalf("unable to create object: %v", err)
 	}
 	result := obj.(*routeapi.Route)
-	if result.Spec.Host != "bar" {
+	if result.Spec.Host != "bar.com" {
 		t.Fatalf("unexpected route: %#v", result)
 	}
 	if v, ok := result.Annotations[route.HostGeneratedAnnotationKey]; !ok || v != "true" {
