@@ -84,8 +84,9 @@ func collapseEmptyStatusTags(stream *imageapi.ImageStream) {
 func (s Strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 	stream := obj.(*imageapi.ImageStream)
 	stream.Status = imageapi.ImageStreamStatus{
-		DockerImageRepository: s.dockerImageRepository(ctx, stream, false),
-		Tags:                  make(map[string]imageapi.TagEventList),
+		DockerImageRepository:       s.dockerImageRepository(ctx, stream, false),
+		PublicDockerImageRepository: s.publicDockerImageRepository(stream),
+		Tags:                        make(map[string]imageapi.TagEventList),
 	}
 	stream.Generation = 1
 	for tag, ref := range stream.Spec.Tags {
@@ -582,6 +583,7 @@ func (s Strategy) prepareForUpdate(ctx context.Context, obj, old runtime.Object,
 		stream.Status = oldStream.Status
 	}
 	stream.Status.DockerImageRepository = s.dockerImageRepository(ctx, stream, true)
+	stream.Status.PublicDockerImageRepository = s.publicDockerImageRepository(stream)
 
 	// ensure that users cannot change spec tag generation to any value except 0
 	updateSpecTagGenerationsForUpdate(stream, oldStream)
@@ -617,11 +619,6 @@ func (s Strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 // Decorate decorates stream.Status.DockerImageRepository using the logic from
 // dockerImageRepository().
 func (s Strategy) Decorate(obj runtime.Object) error {
-	// when the watch cache is on the object might be wrapped with cachingObject
-	// unwrap it if that's the case and decorate
-	if co, ok := obj.(runtime.CacheableObject); ok {
-		obj = co.GetObject()
-	}
 	switch t := obj.(type) {
 	case *imageapi.ImageStream:
 		t.Status.DockerImageRepository = s.dockerImageRepository(context.TODO(), t, true)
@@ -633,7 +630,8 @@ func (s Strategy) Decorate(obj runtime.Object) error {
 			is.Status.PublicDockerImageRepository = s.publicDockerImageRepository(is)
 		}
 	default:
-		return kerrors.NewBadRequest(fmt.Sprintf("not an ImageStream nor ImageStreamList: %v", obj))
+		// This was not an object we can decorate.  This is not an error, as the
+		// caching layer can pass through here, too.
 	}
 	return nil
 }
@@ -700,6 +698,7 @@ func (s InternalStrategy) PrepareForCreate(ctx context.Context, obj runtime.Obje
 	stream := obj.(*imageapi.ImageStream)
 
 	stream.Status.DockerImageRepository = s.dockerImageRepository(ctx, stream, false)
+	stream.Status.PublicDockerImageRepository = s.publicDockerImageRepository(stream)
 	stream.Generation = 1
 	for tag, ref := range stream.Spec.Tags {
 		ref.Generation = &stream.Generation
