@@ -901,7 +901,7 @@ k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v0.19.0 => github.com/openshift/kubernetes-apiserver v0.0.0-20201207110950-476028df0fd8
+# k8s.io/apiserver v0.19.0 => github.com/openshift/kubernetes-apiserver v0.0.0-20210125130948-91782b3d8850
 k8s.io/apiserver/pkg/admission
 k8s.io/apiserver/pkg/admission/configuration
 k8s.io/apiserver/pkg/admission/initializer
