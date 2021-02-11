@@ -391,7 +391,7 @@ github.com/openshift/client-go/user/informers/externalversions/internalinterface
 github.com/openshift/client-go/user/informers/externalversions/user
 github.com/openshift/client-go/user/informers/externalversions/user/v1
 github.com/openshift/client-go/user/listers/user/v1
-# github.com/openshift/library-go v0.0.0-20200424095618-2aeb4725dadf
+# github.com/openshift/library-go v0.0.0-20201209131625-07b0830b8740
 github.com/openshift/library-go/pkg/apiserver/admission/admissionregistrationtesting
 github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig
 github.com/openshift/library-go/pkg/apiserver/admission/admissiontimeout
@@ -414,6 +414,7 @@ github.com/openshift/library-go/pkg/image/internal/reference
 github.com/openshift/library-go/pkg/image/reference
 github.com/openshift/library-go/pkg/image/registryclient
 github.com/openshift/library-go/pkg/legacyapi/legacygroupification
+github.com/openshift/library-go/pkg/network
 github.com/openshift/library-go/pkg/oauth/oauthserviceaccountclient
 github.com/openshift/library-go/pkg/quota/clusterquotamapping
 github.com/openshift/library-go/pkg/quota/quotautil
@@ -837,7 +838,7 @@ k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v0.18.9 => github.com/openshift/kubernetes-apiserver v0.0.0-20200921103752-4ddb9a66debc
+# k8s.io/apiserver v0.18.9 => github.com/openshift/kubernetes-apiserver v0.0.0-20201209103546-c5587e940bd4
 k8s.io/apiserver/pkg/admission
 k8s.io/apiserver/pkg/admission/configuration
 k8s.io/apiserver/pkg/admission/initializer
@@ -980,7 +981,7 @@ k8s.io/cli-runtime/pkg/kustomize/k8sdeps/transformer/patch
 k8s.io/cli-runtime/pkg/kustomize/k8sdeps/validator
 k8s.io/cli-runtime/pkg/printers
 k8s.io/cli-runtime/pkg/resource
-# k8s.io/client-go v0.18.9 => k8s.io/client-go v0.18.9
+# k8s.io/client-go v0.18.9 => github.com/openshift/kubernetes-client-go v0.0.0-20201209131240-ad062a7baf0b
 k8s.io/client-go/discovery
 k8s.io/client-go/discovery/cached
 k8s.io/client-go/discovery/cached/disk

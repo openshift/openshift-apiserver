@@ -21,7 +21,7 @@ require (
 	github.com/openshift/apiserver-library-go v0.0.0-20200424204558-a0c2e02f336f
 	github.com/openshift/build-machinery-go v0.0.0-20200424080330-082bf86082cc
 	github.com/openshift/client-go v0.0.0-20200521150516-05eb9880269c
-	github.com/openshift/library-go v0.0.0-20200424095618-2aeb4725dadf
+	github.com/openshift/library-go v0.0.0-20201209131625-07b0830b8740
 	github.com/openshift/source-to-image v1.3.1-0.20200213141744-eed2850f2187
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
@@ -50,9 +50,9 @@ replace (
 	k8s.io/api => k8s.io/api v0.18.9
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.18.9
 	k8s.io/apimachinery => k8s.io/apimachinery v0.18.9
-	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20200921103752-4ddb9a66debc
+	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20201209103546-c5587e940bd4
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.18.9
-	k8s.io/client-go => k8s.io/client-go v0.18.9
+	k8s.io/client-go => github.com/openshift/kubernetes-client-go v0.0.0-20201209131240-ad062a7baf0b
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.18.9
 	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.18.9
 	k8s.io/code-generator => k8s.io/code-generator v0.18.9
