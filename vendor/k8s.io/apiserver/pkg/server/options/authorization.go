@@ -264,7 +264,8 @@ func (rtr *roundTripReporter) roundTripWithDelegate(req *http.Request, delegate 
 
 	grepPrefix := "cb:sar"
 
-	if rsp != nil && (rsp.StatusCode >= 400 && rsp.StatusCode < 600) {
+	if rsp != nil {
+	//if rsp != nil && (rsp.StatusCode >= 400 && rsp.StatusCode < 600) {
 		klog.Infof("%s:sc: unexpected HTTP status code %d returned, url %v", grepPrefix, rsp.StatusCode, req.URL.Path)
 	}
 
