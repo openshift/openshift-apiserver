@@ -39,6 +39,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	if err != nil {
 		return nil, err
 	}
+
 	kubeClient, err := kubernetes.NewForConfig(kubeClientConfig)
 	if err != nil {
 		return nil, err

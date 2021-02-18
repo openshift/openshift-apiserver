@@ -19,6 +19,8 @@ package options
 import (
 	"fmt"
 	"time"
+	"net/http"
+	"strings"
 
 	"github.com/spf13/pflag"
 	"k8s.io/klog/v2"
@@ -216,10 +218,63 @@ func (s *DelegatingAuthorizationOptions) getClient() (kubernetes.Interface, erro
 	clientConfig.Burst = 400
 	clientConfig.Timeout = s.ClientTimeout
 
+	// REMOVE THIS CODE BEFORE 4.8 RELEASE
+	klog.Info("If you are seeing this line on a production cluster, call the OCP police immediately")
+	clientConfig.Wrap(newRoundTripperForSARRequests())
+	// END OF REMOVE
+
 	// make the client use protobuf
 	protoConfig := rest.CopyConfig(clientConfig)
 	protoConfig.AcceptContentTypes = "application/vnd.kubernetes.protobuf,application/json"
 	protoConfig.ContentType = "application/vnd.kubernetes.protobuf"
 
 	return kubernetes.NewForConfig(protoConfig)
+}
+
+
+func newRoundTripperForSARRequests() func(http.RoundTripper) http.RoundTripper {
+	return func(rt http.RoundTripper) http.RoundTripper {
+		return &sarRoundTripper{baseRT: rt, rtr: newRoundTripReporter()}
+	}
+}
+
+type sarRoundTripper struct {
+	baseRT http.RoundTripper
+	rtr    *roundTripReporter
+}
+
+func (srt *sarRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	if strings.Contains("/apis/authorization.k8s.io/v1/subjectaccessreviews", req.URL.Path) {
+		return srt.rtr.roundTripWithDelegate(req, srt.baseRT)
+	}
+	return srt.baseRT.RoundTrip(req)
+}
+
+type roundTripReporter struct {
+}
+
+func newRoundTripReporter() *roundTripReporter {
+	return &roundTripReporter{}
+}
+
+func (rtr *roundTripReporter) roundTripWithDelegate(req *http.Request, delegate http.RoundTripper) (*http.Response, error) {
+	start := time.Now()
+	rsp, err := delegate.RoundTrip(req)
+	latency := time.Now().Sub(start)
+
+	grepPrefix := "cb:sar"
+
+	if rsp != nil && (rsp.StatusCode >= 400 && rsp.StatusCode < 600) {
+		klog.Infof("%s:sc: unexpected HTTP status code %d returned, url %v", grepPrefix, rsp.StatusCode, req.URL.Path)
+	}
+
+	if err != nil {
+		klog.Infof("%s:err: unexpected err %v returned", err)
+	}
+
+	if latency > time.Second {
+		klog.Infof("%s:lt: the request was too slow, it took %v", latency)
+	}
+
+	return rsp, err
 }
