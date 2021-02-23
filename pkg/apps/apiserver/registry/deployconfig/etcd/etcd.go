@@ -21,7 +21,6 @@ import (
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
 	"github.com/openshift/api/apps"
-	appsapiv1 "github.com/openshift/api/apps/v1"
 	"github.com/openshift/library-go/pkg/apps/appsutil"
 	"github.com/openshift/openshift-apiserver/pkg/api/legacy"
 	appsapi "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
@@ -95,8 +94,7 @@ func (r *ScaleREST) New() runtime.Object {
 
 func (r *ScaleREST) GroupVersionKind(containingGV schema.GroupVersion) schema.GroupVersionKind {
 	switch containingGV {
-	case appsapiv1.SchemeGroupVersion,
-		legacy.GroupVersion:
+	case legacy.GroupVersion:
 		return extensionsv1beta1.SchemeGroupVersion.WithKind("Scale")
 	default:
 		return autoscalingv1.SchemeGroupVersion.WithKind("Scale")
