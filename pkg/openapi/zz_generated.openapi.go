@@ -524,6 +524,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.EtcdSpec":                                                   schema_openshift_api_operator_v1_EtcdSpec(ref),
 		"github.com/openshift/api/operator/v1.EtcdStatus":                                                 schema_openshift_api_operator_v1_EtcdStatus(ref),
 		"github.com/openshift/api/operator/v1.ForwardPlugin":                                              schema_openshift_api_operator_v1_ForwardPlugin(ref),
+		"github.com/openshift/api/operator/v1.GCPLoadBalancerParameters":                                  schema_openshift_api_operator_v1_GCPLoadBalancerParameters(ref),
 		"github.com/openshift/api/operator/v1.GenerationStatus":                                           schema_openshift_api_operator_v1_GenerationStatus(ref),
 		"github.com/openshift/api/operator/v1.HostNetworkStrategy":                                        schema_openshift_api_operator_v1_HostNetworkStrategy(ref),
 		"github.com/openshift/api/operator/v1.HybridOverlayConfig":                                        schema_openshift_api_operator_v1_HybridOverlayConfig(ref),
@@ -24924,13 +24925,6 @@ func schema_openshift_api_operator_v1_AuthenticationStatus(ref common.ReferenceC
 			SchemaProps: spec.SchemaProps{
 				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
-					"managingOAuthAPIServer": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ManagingOAuthAPIServer indicates whether this operator is managing OAuth related APIs. Setting this field to true will cause OAS-O to step down. Note that this field will be removed in the future releases, once https://github.com/openshift/enhancements/blob/master/enhancements/authentication/separate-oauth-resources.md is fully implemented",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
 					"oauthAPIServer": {
 						SchemaProps: spec.SchemaProps{
 							Description: "OAuthAPIServer holds status specific only to oauth-apiserver",
@@ -26966,6 +26960,26 @@ func schema_openshift_api_operator_v1_ForwardPlugin(ref common.ReferenceCallback
 					},
 				},
 				Required: []string{"upstreams"},
+			},
+		},
+	}
+}
+
+func schema_openshift_api_operator_v1_GCPLoadBalancerParameters(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GCPLoadBalancerParameters provides configuration settings that are specific to GCP load balancers.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"clientAccess": {
+						SchemaProps: spec.SchemaProps{
+							Description: "clientAccess describes how client access is restricted for internal load balancers.\n\nValid values are: * \"Global\": Specifying an internal load balancer with Global client access\n  allows clients from any region within the VPC to communicate with the load\n  balancer.\n\n    https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing#global_access\n\n* \"Local\": Specifying an internal load balancer with Local client access\n  means only clients within the same region (and VPC) as the GCP load balancer\n  can communicate with the load balancer. Note that this is the default behavior.\n\n    https://cloud.google.com/load-balancing/docs/internal#client_access",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
 			},
 		},
 	}
@@ -30125,6 +30139,12 @@ func schema_openshift_api_operator_v1_ProviderLoadBalancerParameters(ref common.
 							Ref:         ref("github.com/openshift/api/operator/v1.AWSLoadBalancerParameters"),
 						},
 					},
+					"gcp": {
+						SchemaProps: spec.SchemaProps{
+							Description: "gcp provides configuration settings that are specific to GCP load balancers.\n\nIf empty, defaults will be applied. See specific gcp fields for details about their defaults.",
+							Ref:         ref("github.com/openshift/api/operator/v1.GCPLoadBalancerParameters"),
+						},
+					},
 				},
 				Required: []string{"type"},
 			},
@@ -30135,6 +30155,7 @@ func schema_openshift_api_operator_v1_ProviderLoadBalancerParameters(ref common.
 							"discriminator": "type",
 							"fields-to-discriminateBy": map[string]interface{}{
 								"aws": "AWS",
+								"gcp": "GCP",
 							},
 						},
 					},
@@ -30142,7 +30163,7 @@ func schema_openshift_api_operator_v1_ProviderLoadBalancerParameters(ref common.
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/operator/v1.AWSLoadBalancerParameters"},
+			"github.com/openshift/api/operator/v1.AWSLoadBalancerParameters", "github.com/openshift/api/operator/v1.GCPLoadBalancerParameters"},
 	}
 }
 
