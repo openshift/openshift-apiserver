@@ -31,6 +31,7 @@ API rule violation: list_type_missing,github.com/openshift/api/authorization/v1,
 API rule violation: list_type_missing,github.com/openshift/api/authorization/v1,UserRestriction,Selectors
 API rule violation: list_type_missing,github.com/openshift/api/authorization/v1,UserRestriction,Users
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,BuildConfigSpec,Triggers
+API rule violation: list_type_missing,github.com/openshift/api/build/v1,BuildConfigStatus,ImageChangeTriggers
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,BuildOutput,ImageLabels
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,BuildPostCommitSpec,Args
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,BuildPostCommitSpec,Command
@@ -73,6 +74,10 @@ API rule violation: list_type_missing,github.com/openshift/api/config/v1,Cluster
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ClusterVersionStatus,AvailableUpdates
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ClusterVersionStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ClusterVersionStatus,History
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,ComponentRouteStatus,Conditions
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,ComponentRouteStatus,ConsumingUsers
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,ComponentRouteStatus,CurrentHostnames
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,ComponentRouteStatus,RelatedObjects
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,CustomFeatureGates,Disabled
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,CustomFeatureGates,Enabled
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,EtcdConnectionInfo,URLs
@@ -87,6 +92,8 @@ API rule violation: list_type_missing,github.com/openshift/api/config/v1,GitHubI
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ImageSpec,AllowedRegistriesForImport
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ImageSpec,ExternalRegistryHostnames
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ImageStatus,ExternalRegistryHostnames
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,IngressSpec,ComponentRoutes
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,IngressStatus,ComponentRoutes
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,LDAPAttributeMapping,Email
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,LDAPAttributeMapping,ID
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,LDAPAttributeMapping,Name
@@ -201,6 +208,7 @@ API rule violation: list_type_missing,github.com/openshift/api/network/v1,Egress
 API rule violation: list_type_missing,github.com/openshift/api/network/v1,HostSubnet,EgressCIDRs
 API rule violation: list_type_missing,github.com/openshift/api/network/v1,HostSubnet,EgressIPs
 API rule violation: list_type_missing,github.com/openshift/api/network/v1,NetNamespace,EgressIPs
+API rule violation: list_type_missing,github.com/openshift/api/networkoperator/v1,EgressRouterSpec,Addresses
 API rule violation: list_type_missing,github.com/openshift/api/oauth/v1,ClusterRoleScopeRestriction,Namespaces
 API rule violation: list_type_missing,github.com/openshift/api/oauth/v1,ClusterRoleScopeRestriction,RoleNames
 API rule violation: list_type_missing,github.com/openshift/api/oauth/v1,OAuthAccessToken,Scopes
@@ -226,6 +234,7 @@ API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolp
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,ServiceAccountControllerConfig,ManagedNames
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,AccessLogging,HTTPCaptureCookies
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ConsoleSpec,Plugins
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSNodePlacement,Tolerations
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSSpec,Servers
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DeveloperConsoleCatalogCategory,Subcategories
@@ -233,10 +242,12 @@ API rule violation: list_type_missing,github.com/openshift/api/operator/v1,Devel
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DeveloperConsoleCatalogCustomization,Categories
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ForwardPlugin,Upstreams
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,HybridOverlayConfig,HybridClusterNetwork
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,IPFIXConfig,Collectors
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,IngressControllerCaptureHTTPHeaders,Request
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,IngressControllerCaptureHTTPHeaders,Response
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,IngressControllerHTTPHeaders,HeaderNameCaseAdjustments
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,IngressControllerStatus,Conditions
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,NetFlowConfig,Collectors
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,NetworkSpec,AdditionalNetworks
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,NetworkSpec,ClusterNetwork
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,NetworkSpec,ServiceNetwork
@@ -244,6 +255,8 @@ API rule violation: list_type_missing,github.com/openshift/api/operator/v1,NodeP
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,NodeStatus,LastFailedRevisionErrors
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,OperatorStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,OperatorStatus,Generations
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ProjectAccess,AvailableClusterRoles
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,SFlowConfig,Collectors
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,Server,Zones
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,StaticIPAMConfig,Addresses
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,StaticIPAMConfig,Routes

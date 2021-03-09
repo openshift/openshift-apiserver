@@ -112,9 +112,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/build/v1.GitSourceRevision":                                             schema_openshift_api_build_v1_GitSourceRevision(ref),
 		"github.com/openshift/api/build/v1.ImageChangeCause":                                              schema_openshift_api_build_v1_ImageChangeCause(ref),
 		"github.com/openshift/api/build/v1.ImageChangeTrigger":                                            schema_openshift_api_build_v1_ImageChangeTrigger(ref),
+		"github.com/openshift/api/build/v1.ImageChangeTriggerStatus":                                      schema_openshift_api_build_v1_ImageChangeTriggerStatus(ref),
 		"github.com/openshift/api/build/v1.ImageLabel":                                                    schema_openshift_api_build_v1_ImageLabel(ref),
 		"github.com/openshift/api/build/v1.ImageSource":                                                   schema_openshift_api_build_v1_ImageSource(ref),
 		"github.com/openshift/api/build/v1.ImageSourcePath":                                               schema_openshift_api_build_v1_ImageSourcePath(ref),
+		"github.com/openshift/api/build/v1.ImageStreamTagReference":                                       schema_openshift_api_build_v1_ImageStreamTagReference(ref),
 		"github.com/openshift/api/build/v1.JenkinsPipelineBuildStrategy":                                  schema_openshift_api_build_v1_JenkinsPipelineBuildStrategy(ref),
 		"github.com/openshift/api/build/v1.ProxyConfig":                                                   schema_openshift_api_build_v1_ProxyConfig(ref),
 		"github.com/openshift/api/build/v1.SecretBuildSource":                                             schema_openshift_api_build_v1_SecretBuildSource(ref),
@@ -168,6 +170,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.ClusterVersionSpec":                                           schema_openshift_api_config_v1_ClusterVersionSpec(ref),
 		"github.com/openshift/api/config/v1.ClusterVersionStatus":                                         schema_openshift_api_config_v1_ClusterVersionStatus(ref),
 		"github.com/openshift/api/config/v1.ComponentOverride":                                            schema_openshift_api_config_v1_ComponentOverride(ref),
+		"github.com/openshift/api/config/v1.ComponentRouteSpec":                                           schema_openshift_api_config_v1_ComponentRouteSpec(ref),
+		"github.com/openshift/api/config/v1.ComponentRouteStatus":                                         schema_openshift_api_config_v1_ComponentRouteStatus(ref),
 		"github.com/openshift/api/config/v1.ConfigMapFileReference":                                       schema_openshift_api_config_v1_ConfigMapFileReference(ref),
 		"github.com/openshift/api/config/v1.ConfigMapNameReference":                                       schema_openshift_api_config_v1_ConfigMapNameReference(ref),
 		"github.com/openshift/api/config/v1.Console":                                                      schema_openshift_api_config_v1_Console(ref),
@@ -439,6 +443,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/network/v1.HostSubnetList":                                              schema_openshift_api_network_v1_HostSubnetList(ref),
 		"github.com/openshift/api/network/v1.NetNamespace":                                                schema_openshift_api_network_v1_NetNamespace(ref),
 		"github.com/openshift/api/network/v1.NetNamespaceList":                                            schema_openshift_api_network_v1_NetNamespaceList(ref),
+		"github.com/openshift/api/networkoperator/v1.EgressRouter":                                        schema_openshift_api_networkoperator_v1_EgressRouter(ref),
+		"github.com/openshift/api/networkoperator/v1.EgressRouterSpec":                                    schema_openshift_api_networkoperator_v1_EgressRouterSpec(ref),
 		"github.com/openshift/api/oauth/v1.ClusterRoleScopeRestriction":                                   schema_openshift_api_oauth_v1_ClusterRoleScopeRestriction(ref),
 		"github.com/openshift/api/oauth/v1.OAuthAccessToken":                                              schema_openshift_api_oauth_v1_OAuthAccessToken(ref),
 		"github.com/openshift/api/oauth/v1.OAuthAccessTokenList":                                          schema_openshift_api_oauth_v1_OAuthAccessTokenList(ref),
@@ -512,6 +518,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.ContainerLoggingDestinationParameters":                      schema_openshift_api_operator_v1_ContainerLoggingDestinationParameters(ref),
 		"github.com/openshift/api/operator/v1.DNS":                                                        schema_openshift_api_operator_v1_DNS(ref),
 		"github.com/openshift/api/operator/v1.DNSList":                                                    schema_openshift_api_operator_v1_DNSList(ref),
+		"github.com/openshift/api/operator/v1.DNSNodePlacement":                                           schema_openshift_api_operator_v1_DNSNodePlacement(ref),
 		"github.com/openshift/api/operator/v1.DNSSpec":                                                    schema_openshift_api_operator_v1_DNSSpec(ref),
 		"github.com/openshift/api/operator/v1.DNSStatus":                                                  schema_openshift_api_operator_v1_DNSStatus(ref),
 		"github.com/openshift/api/operator/v1.DefaultNetworkDefinition":                                   schema_openshift_api_operator_v1_DefaultNetworkDefinition(ref),
@@ -523,12 +530,14 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.EtcdList":                                                   schema_openshift_api_operator_v1_EtcdList(ref),
 		"github.com/openshift/api/operator/v1.EtcdSpec":                                                   schema_openshift_api_operator_v1_EtcdSpec(ref),
 		"github.com/openshift/api/operator/v1.EtcdStatus":                                                 schema_openshift_api_operator_v1_EtcdStatus(ref),
+		"github.com/openshift/api/operator/v1.ExportNetworkFlows":                                         schema_openshift_api_operator_v1_ExportNetworkFlows(ref),
 		"github.com/openshift/api/operator/v1.ForwardPlugin":                                              schema_openshift_api_operator_v1_ForwardPlugin(ref),
 		"github.com/openshift/api/operator/v1.GCPLoadBalancerParameters":                                  schema_openshift_api_operator_v1_GCPLoadBalancerParameters(ref),
 		"github.com/openshift/api/operator/v1.GenerationStatus":                                           schema_openshift_api_operator_v1_GenerationStatus(ref),
 		"github.com/openshift/api/operator/v1.HostNetworkStrategy":                                        schema_openshift_api_operator_v1_HostNetworkStrategy(ref),
 		"github.com/openshift/api/operator/v1.HybridOverlayConfig":                                        schema_openshift_api_operator_v1_HybridOverlayConfig(ref),
 		"github.com/openshift/api/operator/v1.IPAMConfig":                                                 schema_openshift_api_operator_v1_IPAMConfig(ref),
+		"github.com/openshift/api/operator/v1.IPFIXConfig":                                                schema_openshift_api_operator_v1_IPFIXConfig(ref),
 		"github.com/openshift/api/operator/v1.IPsecConfig":                                                schema_openshift_api_operator_v1_IPsecConfig(ref),
 		"github.com/openshift/api/operator/v1.IngressController":                                          schema_openshift_api_operator_v1_IngressController(ref),
 		"github.com/openshift/api/operator/v1.IngressControllerCaptureHTTPCookie":                         schema_openshift_api_operator_v1_IngressControllerCaptureHTTPCookie(ref),
@@ -541,6 +550,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.IngressControllerLogging":                                   schema_openshift_api_operator_v1_IngressControllerLogging(ref),
 		"github.com/openshift/api/operator/v1.IngressControllerSpec":                                      schema_openshift_api_operator_v1_IngressControllerSpec(ref),
 		"github.com/openshift/api/operator/v1.IngressControllerStatus":                                    schema_openshift_api_operator_v1_IngressControllerStatus(ref),
+		"github.com/openshift/api/operator/v1.IngressControllerTuningOptions":                             schema_openshift_api_operator_v1_IngressControllerTuningOptions(ref),
 		"github.com/openshift/api/operator/v1.KubeAPIServer":                                              schema_openshift_api_operator_v1_KubeAPIServer(ref),
 		"github.com/openshift/api/operator/v1.KubeAPIServerList":                                          schema_openshift_api_operator_v1_KubeAPIServerList(ref),
 		"github.com/openshift/api/operator/v1.KubeAPIServerSpec":                                          schema_openshift_api_operator_v1_KubeAPIServerSpec(ref),
@@ -563,6 +573,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.MyOperatorResource":                                         schema_openshift_api_operator_v1_MyOperatorResource(ref),
 		"github.com/openshift/api/operator/v1.MyOperatorResourceSpec":                                     schema_openshift_api_operator_v1_MyOperatorResourceSpec(ref),
 		"github.com/openshift/api/operator/v1.MyOperatorResourceStatus":                                   schema_openshift_api_operator_v1_MyOperatorResourceStatus(ref),
+		"github.com/openshift/api/operator/v1.NetFlowConfig":                                              schema_openshift_api_operator_v1_NetFlowConfig(ref),
 		"github.com/openshift/api/operator/v1.Network":                                                    schema_openshift_api_operator_v1_Network(ref),
 		"github.com/openshift/api/operator/v1.NetworkList":                                                schema_openshift_api_operator_v1_NetworkList(ref),
 		"github.com/openshift/api/operator/v1.NetworkSpec":                                                schema_openshift_api_operator_v1_NetworkSpec(ref),
@@ -584,10 +595,13 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.OperatorCondition":                                          schema_openshift_api_operator_v1_OperatorCondition(ref),
 		"github.com/openshift/api/operator/v1.OperatorSpec":                                               schema_openshift_api_operator_v1_OperatorSpec(ref),
 		"github.com/openshift/api/operator/v1.OperatorStatus":                                             schema_openshift_api_operator_v1_OperatorStatus(ref),
+		"github.com/openshift/api/operator/v1.PolicyAuditConfig":                                          schema_openshift_api_operator_v1_PolicyAuditConfig(ref),
 		"github.com/openshift/api/operator/v1.PrivateStrategy":                                            schema_openshift_api_operator_v1_PrivateStrategy(ref),
+		"github.com/openshift/api/operator/v1.ProjectAccess":                                              schema_openshift_api_operator_v1_ProjectAccess(ref),
 		"github.com/openshift/api/operator/v1.ProviderLoadBalancerParameters":                             schema_openshift_api_operator_v1_ProviderLoadBalancerParameters(ref),
 		"github.com/openshift/api/operator/v1.ProxyConfig":                                                schema_openshift_api_operator_v1_ProxyConfig(ref),
 		"github.com/openshift/api/operator/v1.RouteAdmissionPolicy":                                       schema_openshift_api_operator_v1_RouteAdmissionPolicy(ref),
+		"github.com/openshift/api/operator/v1.SFlowConfig":                                                schema_openshift_api_operator_v1_SFlowConfig(ref),
 		"github.com/openshift/api/operator/v1.Server":                                                     schema_openshift_api_operator_v1_Server(ref),
 		"github.com/openshift/api/operator/v1.ServiceCA":                                                  schema_openshift_api_operator_v1_ServiceCA(ref),
 		"github.com/openshift/api/operator/v1.ServiceCAList":                                              schema_openshift_api_operator_v1_ServiceCAList(ref),
@@ -5245,10 +5259,26 @@ func schema_openshift_api_build_v1_BuildConfigStatus(ref common.ReferenceCallbac
 							Format:      "int64",
 						},
 					},
+					"imageChangeTriggers": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ImageChangeTriggers is used to capture the runtime state of any ImageChangeTrigger specified in the BuildConfigSpec, including the value reconciled by the OpenShift APIServer for the lastTriggeredImageID.  There will be a single entry in this array for each entry in the BuildConfigSpec.Triggers array where the BuildTriggerPolicy.ImageChange pointer is set to a non-nil value.  The logical key for each entry in this array is expressed by the ImageStreamTagReference type.  That type captures the required elements for identifying the ImageStreamTag referenced by the more generic ObjectReference BuildTriggerPolicy.ImageChange.From.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/build/v1.ImageChangeTriggerStatus"),
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"lastVersion"},
 			},
 		},
+		Dependencies: []string{
+			"github.com/openshift/api/build/v1.ImageChangeTriggerStatus"},
 	}
 }
 
@@ -6108,7 +6138,7 @@ func schema_openshift_api_build_v1_BuildTriggerPolicy(ref common.ReferenceCallba
 				Properties: map[string]spec.Schema{
 					"type": {
 						SchemaProps: spec.SchemaProps{
-							Description: "type is the type of build trigger",
+							Description: "type is the type of build trigger. Valid values:\n\n- GitHub GitHubWebHookBuildTriggerType represents a trigger that launches builds on GitHub webhook invocations\n\n- Generic GenericWebHookBuildTriggerType represents a trigger that launches builds on generic webhook invocations\n\n- GitLab GitLabWebHookBuildTriggerType represents a trigger that launches builds on GitLab webhook invocations\n\n- Bitbucket BitbucketWebHookBuildTriggerType represents a trigger that launches builds on Bitbucket webhook invocations\n\n- ImageChange ImageChangeBuildTriggerType represents a trigger that launches builds on availability of a new version of an image\n\n- ConfigChange ConfigChangeBuildTriggerType will trigger a build on an initial build config creation WARNING: In the future the behavior will change to trigger a build on any config change",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -6938,7 +6968,7 @@ func schema_openshift_api_build_v1_ImageChangeTrigger(ref common.ReferenceCallba
 				Properties: map[string]spec.Schema{
 					"lastTriggeredImageID": {
 						SchemaProps: spec.SchemaProps{
-							Description: "lastTriggeredImageID is used internally by the ImageChangeController to save last used image ID for build",
+							Description: "lastTriggeredImageID is used internally by the ImageChangeController to save last used image ID for build This field is deprecated and will be removed in a future release. Deprecated",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -6961,6 +6991,42 @@ func schema_openshift_api_build_v1_ImageChangeTrigger(ref common.ReferenceCallba
 		},
 		Dependencies: []string{
 			"k8s.io/api/core/v1.ObjectReference"},
+	}
+}
+
+func schema_openshift_api_build_v1_ImageChangeTriggerStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ImageChangeTriggerStatus tracks the latest resolved status of the associated ImageChangeTrigger policy specified in the BuildConfigSpec.Triggers struct.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"lastTriggeredImageID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "lastTriggeredImageID represents, at the last time a Build for this BuildConfig was instantiated, the sha/id of the image referenced by the the ImageStreamTag cited in the 'from' of this struct. The lastTriggeredImageID field will be updated by the OpenShift APIServer on all instantiations of a Build from the BuildConfig it processes, regardless of what is considered the cause of instantiation. Specifically, an instantiation of a Build could have been manually requested, or could have resulted from changes with any of the Triggers defined in BuildConfigSpec.Triggers. The reason for always updating this field across all ImageChangeTriggerStatus instances is to prevent multiple builds being instantiated concurrently when multiple ImageChangeTriggers fire concurrently.  The system compares the the sha/id stored here with the associated ImageStreamTag's sha/id for the image.  If they match, then this trigger is not a valid reason for instantiating a Build.  So when ImageChangeTriggers fire concurrently, only one of them can \"win\", meaning selected as the cause for a Build instantiation request. Lastly, to clarify exactly what is meant by \"Build instantiation\", from a REST perspective, it is a HTTP POST of a BuildRequest object as the HTTP Body that is made to the OpenShift APIServer, where that HTTP POST also specifies the \"buildconfigs\" resource,  \"instantiate\" subresource, as well as the namespace and name of the BuildConfig.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"from": {
+						SchemaProps: spec.SchemaProps{
+							Description: "from is the ImageStreamTag that is used as the source of the trigger. This can come from an ImageStream tag referenced in this BuildConfig's Spec ImageChange Triggers, or the \"from\"\n this BuildConfig's build strategy if it happens to be an ImageStreamTag (where the user has specified an\nImageChange Trigger in the spec with a 'nil' for its 'from'.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/build/v1.ImageStreamTagReference"),
+						},
+					},
+					"lastTriggerTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "lastTriggerTime is the last time this particular ImageChangeTrigger fired, and that trigger firing was chosen as the cause for the Build being instantiated from this BuildConfig.  So on each Build instantiation, while lastTriggeredImageID will be updated regardless of whether this ImageChangeTrigger fired and deemed the cause for the Build Instantiation, this field is only updated when this trigger was in fact deemed the cause.  As such, it is valid that this field may not be set across all the ImageChangeTriggers, as they may have not yet been deemed to be the cause of a Build instantiation.  It is also valid that the times stored in lastTriggerTime will vary across all the ImageChangeTriggers, as the system explicitly picks only one trigger cause for a given Build.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/build/v1.ImageStreamTagReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 
@@ -7076,6 +7142,33 @@ func schema_openshift_api_build_v1_ImageSourcePath(ref common.ReferenceCallback)
 					},
 				},
 				Required: []string{"sourcePath", "destinationDir"},
+			},
+		},
+	}
+}
+
+func schema_openshift_api_build_v1_ImageStreamTagReference(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ImageStreamTagReference captures the required elements for identifying the ImageStreamTag referenced by the more generic ObjectReference BuildTriggerPolicy.ImageChange.From.  It is used by ImageChangeTriggerStatus, where a specific instance of ImageChangeTriggerStatus in maintained in BuildConfigStatus.ImageChangeTriggers for each entry in the BuildConfigSpec.Triggers array where the BuildTriggerPolicy.ImageChange pointer is set to a non-nil value",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "namespace is the namespace where the ImageStreamTag used for an ImageChangeTrigger is located",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "name is the name of the ImageStreamTag used for an ImageChangeTrigger",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
 			},
 		},
 	}
@@ -9251,6 +9344,151 @@ func schema_openshift_api_config_v1_ComponentOverride(ref common.ReferenceCallba
 				Required: []string{"kind", "group", "namespace", "name", "unmanaged"},
 			},
 		},
+	}
+}
+
+func schema_openshift_api_config_v1_ComponentRouteSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ComponentRouteSpec allows for configuration of a route's hostname and serving certificate.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "namespace is the namespace of the route to customize.\n\nThe namespace and name of this componentRoute must match a corresponding entry in the list of status.componentRoutes if the route is to be customized.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "name is the logical name of the route to customize.\n\nThe namespace and name of this componentRoute must match a corresponding entry in the list of status.componentRoutes if the route is to be customized.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"hostname": {
+						SchemaProps: spec.SchemaProps{
+							Description: "hostname is the hostname that should be used by the route.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"servingCertKeyPairSecret": {
+						SchemaProps: spec.SchemaProps{
+							Description: "servingCertKeyPairSecret is a reference to a secret of type `kubernetes.io/tls` in the openshift-config namespace. The serving cert/key pair must match and will be used by the operator to fulfill the intent of serving with this name. If the custom hostname uses the default routing suffix of the cluster, the Secret specification for a serving certificate will not be needed.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/config/v1.SecretNameReference"),
+						},
+					},
+				},
+				Required: []string{"namespace", "name", "hostname"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.SecretNameReference"},
+	}
+}
+
+func schema_openshift_api_config_v1_ComponentRouteStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ComponentRouteStatus contains information allowing configuration of a route's hostname and serving certificate.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "namespace is the namespace of the route to customize. It must be a real namespace. Using an actual namespace ensures that no two components will conflict and the same component can be installed multiple times.\n\nThe namespace and name of this componentRoute must match a corresponding entry in the list of spec.componentRoutes if the route is to be customized.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "name is the logical name of the route to customize. It does not have to be the actual name of a route resource but it cannot be renamed.\n\nThe namespace and name of this componentRoute must match a corresponding entry in the list of spec.componentRoutes if the route is to be customized.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"defaultHostname": {
+						SchemaProps: spec.SchemaProps{
+							Description: "defaultHostname is the hostname of this route prior to customization.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"consumingUsers": {
+						SchemaProps: spec.SchemaProps{
+							Description: "consumingUsers is a slice of ServiceAccounts that need to have read permission on the servingCertKeyPairSecret secret.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"currentHostnames": {
+						SchemaProps: spec.SchemaProps{
+							Description: "currentHostnames is the list of current names used by the route. Typically, this list should consist of a single hostname, but if multiple hostnames are supported by the route the operator may write multiple entries to this list.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"conditions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "conditions are used to communicate the state of the componentRoutes entry.\n\nSupported conditions include Available, Degraded and Progressing.\n\nIf available is true, the content served by the route can be accessed by users. This includes cases where a default may continue to serve content while the customized route specified by the cluster-admin is being configured.\n\nIf Degraded is true, that means something has gone wrong trying to handle the componentRoutes entry. The currentHostnames field may or may not be in effect.\n\nIf Progressing is true, that means the component is taking some action related to the componentRoutes entry.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.Condition"),
+									},
+								},
+							},
+						},
+					},
+					"relatedObjects": {
+						SchemaProps: spec.SchemaProps{
+							Description: "relatedObjects is a list of resources which are useful when debugging or inspecting how spec.componentRoutes is applied.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/config/v1.ObjectReference"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"namespace", "name", "defaultHostname", "relatedObjects"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.ObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Condition"},
 	}
 }
 
@@ -11498,10 +11736,26 @@ func schema_openshift_api_config_v1_IngressSpec(ref common.ReferenceCallback) co
 							Format:      "",
 						},
 					},
+					"componentRoutes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "componentRoutes is an optional list of routes that are managed by OpenShift components that a cluster-admin is able to configure the hostname and serving certificate for. The namespace and name of each route in this list should match an existing entry in the status.componentRoutes list.\n\nTo determine the set of configurable Routes, look at namespace and name of entries in the .status.componentRoutes list, where participating operators write the status of configurable routes.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/config/v1.ComponentRouteSpec"),
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"domain"},
 			},
 		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.ComponentRouteSpec"},
 	}
 }
 
@@ -11510,8 +11764,26 @@ func schema_openshift_api_config_v1_IngressStatus(ref common.ReferenceCallback) 
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"componentRoutes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "componentRoutes is where participating operators place the current route status for routes whose hostnames and serving certificates can be customized by the cluster-admin.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/config/v1.ComponentRouteStatus"),
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.ComponentRouteStatus"},
 	}
 }
 
@@ -22475,6 +22747,107 @@ func schema_openshift_api_network_v1_NetNamespaceList(ref common.ReferenceCallba
 	}
 }
 
+func schema_openshift_api_networkoperator_v1_EgressRouter(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "EgressRouter is a feature allowing the user to define an egress router that acts as a bridge between pods and external systems. The egress router runs a service that redirects egress traffic originating from a pod or a group of pods to a remote external system or multiple destinations as per configuration.\n\nIt is consumed by the cluster-network-operator. More specifically, given an EgressRouter CR with <name>, the CNO will create and manage: - A service called <name> - An egress pod called <name> - A NAD called <name>\n\n\nEgressRouter is a single egressrouter pod configuration object.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Specification of the desired egress router.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/networkoperator/v1.EgressRouterSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Observed status of EgressRouter.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/networkoperator/v1.EgressRouterStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/networkoperator/v1.EgressRouterSpec", "github.com/openshift/api/networkoperator/v1.EgressRouterStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_openshift_api_networkoperator_v1_EgressRouterSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "EgressRouterSpec contains the configuration for an egress router. Mode, networkInterface and addresses fields must be specified along with exactly one \"Config\" that matches the mode. Each config consists of parameters specific to that mode.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"mode": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Mode depicts the mode that is used for the egress router. The default mode is \"Redirect\" and is the only supported mode currently.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"redirect": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Redirect represents the configuration parameters specific to redirect mode.",
+							Ref:         ref("github.com/openshift/api/networkoperator/v1.RedirectConfig"),
+						},
+					},
+					"networkInterface": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Specification of interface to create/use. The default is macvlan. Currently only macvlan is supported.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/networkoperator/v1.EgressRouterInterface"),
+						},
+					},
+					"addresses": {
+						SchemaProps: spec.SchemaProps{
+							Description: "List of IP addresses to configure on the pod's secondary interface.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/networkoperator/v1.EgressRouterAddress"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"mode", "networkInterface", "addresses"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/networkoperator/v1.EgressRouterAddress", "github.com/openshift/api/networkoperator/v1.EgressRouterInterface", "github.com/openshift/api/networkoperator/v1.RedirectConfig"},
+	}
+}
+
 func schema_openshift_api_oauth_v1_ClusterRoleScopeRestriction(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -26009,11 +26382,18 @@ func schema_openshift_api_operator_v1_ConsoleCustomization(ref common.ReferenceC
 							Ref:         ref("github.com/openshift/api/operator/v1.DeveloperConsoleCatalogCustomization"),
 						},
 					},
+					"projectAccess": {
+						SchemaProps: spec.SchemaProps{
+							Description: "projectAccess allows customizing the available list of ClusterRoles in the Developer perspective Project access page which can be used by a project admin to specify roles to other users and restrict access within the project. If set, the list will replace the default ClusterRole options.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/operator/v1.ProjectAccess"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.ConfigMapFileReference", "github.com/openshift/api/operator/v1.DeveloperConsoleCatalogCustomization"},
+			"github.com/openshift/api/config/v1.ConfigMapFileReference", "github.com/openshift/api/operator/v1.DeveloperConsoleCatalogCustomization", "github.com/openshift/api/operator/v1.ProjectAccess"},
 	}
 }
 
@@ -26349,6 +26729,51 @@ func schema_openshift_api_operator_v1_DNSList(ref common.ReferenceCallback) comm
 	}
 }
 
+func schema_openshift_api_operator_v1_DNSNodePlacement(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "DNSNodePlacement describes the node scheduling configuration for DNS pods.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"nodeSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "nodeSelector is the node selector applied to DNS pods.\n\nIf empty, the default is used, which is currently the following:\n\n  beta.kubernetes.io/os: linux\n\nThis default is subject to change.\n\nIf set, the specified selector is used and replaces the default.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"tolerations": {
+						SchemaProps: spec.SchemaProps{
+							Description: "tolerations is a list of tolerations applied to DNS pods.\n\nThe default is an empty list.  This default is subject to change.\n\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/core/v1.Toleration"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.Toleration"},
+	}
+}
+
 func schema_openshift_api_operator_v1_DNSSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -26370,11 +26795,18 @@ func schema_openshift_api_operator_v1_DNSSpec(ref common.ReferenceCallback) comm
 							},
 						},
 					},
+					"nodePlacement": {
+						SchemaProps: spec.SchemaProps{
+							Description: "nodePlacement provides explicit control over the scheduling of DNS pods.\n\nGenerally, it is useful to run a DNS pod on every node so that DNS queries are always handled by a local DNS pod instead of going over the network to a DNS pod on another node.  However, security policies may require restricting the placement of DNS pods to specific nodes. For example, if a security policy prohibits pods on arbitrary nodes from communicating with the API, a node selector can be specified to restrict DNS pods to nodes that are permitted to communicate with the API.  Conversely, if running DNS pods on nodes with a particular taint is desired, a toleration can be specified for that taint.\n\nIf unset, defaults are used. See nodePlacement for more details.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/operator/v1.DNSNodePlacement"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/operator/v1.Server"},
+			"github.com/openshift/api/operator/v1.DNSNodePlacement", "github.com/openshift/api/operator/v1.Server"},
 	}
 }
 
@@ -26936,6 +27368,38 @@ func schema_openshift_api_operator_v1_EtcdStatus(ref common.ReferenceCallback) c
 	}
 }
 
+func schema_openshift_api_operator_v1_ExportNetworkFlows(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"netFlow": {
+						SchemaProps: spec.SchemaProps{
+							Description: "netFlow defines the NetFlow configuration.",
+							Ref:         ref("github.com/openshift/api/operator/v1.NetFlowConfig"),
+						},
+					},
+					"sFlow": {
+						SchemaProps: spec.SchemaProps{
+							Description: "sFlow defines the SFlow configuration.",
+							Ref:         ref("github.com/openshift/api/operator/v1.SFlowConfig"),
+						},
+					},
+					"ipfix": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ipfix defines IPFIX configuration.",
+							Ref:         ref("github.com/openshift/api/operator/v1.IPFIXConfig"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/operator/v1.IPFIXConfig", "github.com/openshift/api/operator/v1.NetFlowConfig", "github.com/openshift/api/operator/v1.SFlowConfig"},
+	}
+}
+
 func schema_openshift_api_operator_v1_ForwardPlugin(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -27053,6 +27517,15 @@ func schema_openshift_api_operator_v1_HostNetworkStrategy(ref common.ReferenceCa
 			SchemaProps: spec.SchemaProps{
 				Description: "HostNetworkStrategy holds parameters for the HostNetwork endpoint publishing strategy.",
 				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"protocol": {
+						SchemaProps: spec.SchemaProps{
+							Description: "protocol specifies whether the IngressController expects incoming connections to use plain TCP or whether the IngressController expects PROXY protocol.\n\nPROXY protocol can be used with load balancers that support it to communicate the source addresses of client connections when forwarding those connections to the IngressController.  Using PROXY protocol enables the IngressController to report those source addresses instead of reporting the load balancer's address in HTTP headers and logs.  Note that enabling PROXY protocol on the IngressController will cause connections to fail if you are not using a load balancer that uses PROXY protocol to forward connections to the IngressController.  See http://www.haproxy.org/download/2.2/doc/proxy-protocol.txt for information about PROXY protocol.\n\nThe following values are valid for this field:\n\n* The empty string. * \"TCP\". * \"PROXY\".\n\nThe empty string specifies the default, which is TCP without PROXY protocol.  Note that the default is subject to change.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
 			},
 		},
 	}
@@ -27121,6 +27594,33 @@ func schema_openshift_api_operator_v1_IPAMConfig(ref common.ReferenceCallback) c
 		},
 		Dependencies: []string{
 			"github.com/openshift/api/operator/v1.StaticIPAMConfig"},
+	}
+}
+
+func schema_openshift_api_operator_v1_IPFIXConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"collectors": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ipfixCollectors is list of strings formatted as ip:port",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 }
 
@@ -27518,6 +28018,13 @@ func schema_openshift_api_operator_v1_IngressControllerSpec(ref common.Reference
 							Format:      "",
 						},
 					},
+					"httpErrorCodePages": {
+						SchemaProps: spec.SchemaProps{
+							Description: "httpErrorCodePages specifies a configmap with custom error pages. The administrator must create this configmap in the openshift-config namespace. This configmap should have keys in the format \"error-page-<error code>.http\", where <error code> is an HTTP error code. For example, \"error-page-503.http\" defines an error page for HTTP 503 responses. Currently only error pages for 503 and 404 responses can be customized. Each value in the configmap should be the full response, including HTTP headers. Eg- https://raw.githubusercontent.com/openshift/router/fadab45747a9b30cc3f0a4b41ad2871f95827a93/images/router/haproxy/conf/error-page-503.http If this field is empty, the ingress controller uses the default error pages.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/config/v1.ConfigMapNameReference"),
+						},
+					},
 					"replicas": {
 						SchemaProps: spec.SchemaProps{
 							Description: "replicas is the desired number of ingress controller replicas. If unset, defaults to 2.",
@@ -27579,11 +28086,25 @@ func schema_openshift_api_operator_v1_IngressControllerSpec(ref common.Reference
 							Ref:         ref("github.com/openshift/api/operator/v1.IngressControllerHTTPHeaders"),
 						},
 					},
+					"tuningOptions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "tuningOptions defines parameters for adjusting the performance of ingress controller pods. All fields are optional and will use their respective defaults if not set. See specific tuningOptions fields for more details.\n\nSetting fields within tuningOptions is generally not recommended. The default values are suitable for most configurations.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/operator/v1.IngressControllerTuningOptions"),
+						},
+					},
+					"unsupportedConfigOverrides": {
+						SchemaProps: spec.SchemaProps{
+							Description: "unsupportedConfigOverrides allows specifying unsupported configuration options.  Its use is unsupported.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.TLSSecurityProfile", "github.com/openshift/api/operator/v1.EndpointPublishingStrategy", "github.com/openshift/api/operator/v1.IngressControllerHTTPHeaders", "github.com/openshift/api/operator/v1.IngressControllerLogging", "github.com/openshift/api/operator/v1.NodePlacement", "github.com/openshift/api/operator/v1.RouteAdmissionPolicy", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
+			"github.com/openshift/api/config/v1.ConfigMapNameReference", "github.com/openshift/api/config/v1.TLSSecurityProfile", "github.com/openshift/api/operator/v1.EndpointPublishingStrategy", "github.com/openshift/api/operator/v1.IngressControllerHTTPHeaders", "github.com/openshift/api/operator/v1.IngressControllerLogging", "github.com/openshift/api/operator/v1.IngressControllerTuningOptions", "github.com/openshift/api/operator/v1.NodePlacement", "github.com/openshift/api/operator/v1.RouteAdmissionPolicy", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector", "k8s.io/apimachinery/pkg/runtime.RawExtension"},
 	}
 }
 
@@ -27657,6 +28178,40 @@ func schema_openshift_api_operator_v1_IngressControllerStatus(ref common.Referen
 		},
 		Dependencies: []string{
 			"github.com/openshift/api/config/v1.TLSProfileSpec", "github.com/openshift/api/operator/v1.EndpointPublishingStrategy", "github.com/openshift/api/operator/v1.OperatorCondition"},
+	}
+}
+
+func schema_openshift_api_operator_v1_IngressControllerTuningOptions(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "IngressControllerTuningOptions specifies options for tuning the performance of ingress controller pods",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"headerBufferBytes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "headerBufferBytes describes how much memory should be reserved (in bytes) for IngressController connection sessions. Note that this value must be at least 16384 if HTTP/2 is enabled for the IngressController (https://tools.ietf.org/html/rfc7540). If this field is empty, the IngressController will use a default value of 32768 bytes.\n\nSetting this field is generally not recommended as headerBufferBytes values that are too small may break the IngressController and headerBufferBytes values that are too large could cause the IngressController to use significantly more memory than necessary.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"headerBufferMaxRewriteBytes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "headerBufferMaxRewriteBytes describes how much memory should be reserved (in bytes) from headerBufferBytes for HTTP header rewriting and appending for IngressController connection sessions. Note that incoming HTTP requests will be limited to (headerBufferBytes - headerBufferMaxRewriteBytes) bytes, meaning headerBufferBytes must be greater than headerBufferMaxRewriteBytes. If this field is empty, the IngressController will use a default value of 8192 bytes.\n\nSetting this field is generally not recommended as headerBufferMaxRewriteBytes values that are too small may break the IngressController and headerBufferMaxRewriteBytes values that are too large could cause the IngressController to use significantly more memory than necessary.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"threadCount": {
+						SchemaProps: spec.SchemaProps{
+							Description: "threadCount defines the number of threads created per HAProxy process. Creating more threads allows each ingress controller pod to handle more connections, at the cost of more system resources being used. If this field is empty, the IngressController will use the default value.  The current default is 4 threads, but this may change in future releases.\n\nSetting this field is generally not recommended. Increasing the number of HAProxy threads allows ingress controller pods to utilize more CPU time under load, potentially starving other pods if set too high. Reducing the number of threads may cause the ingress controller to perform poorly.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+			},
+		},
 	}
 }
 
@@ -28734,6 +29289,13 @@ func schema_openshift_api_operator_v1_KuryrConfig(ref common.ReferenceCallback) 
 							Format:      "int32",
 						},
 					},
+					"mtu": {
+						SchemaProps: spec.SchemaProps{
+							Description: "mtu is the MTU that Kuryr should use when creating pod networks in Neutron. The value has to be lower or equal to the MTU of the nodes network and Neutron has to allow creation of tenant networks with such MTU. If unset Pod networks will be created with the same MTU as the nodes network has.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
 				},
 			},
 		},
@@ -28983,6 +29545,33 @@ func schema_openshift_api_operator_v1_MyOperatorResourceStatus(ref common.Refere
 	}
 }
 
+func schema_openshift_api_operator_v1_NetFlowConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"collectors": {
+						SchemaProps: spec.SchemaProps{
+							Description: "netFlow defines the NetFlow collectors that will consume the flow data exported from OVS. It is a list of strings formatted as ip:port",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_operator_v1_Network(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -29179,6 +29768,13 @@ func schema_openshift_api_operator_v1_NetworkSpec(ref common.ReferenceCallback) 
 							Format:      "",
 						},
 					},
+					"useMultiNetworkPolicy": {
+						SchemaProps: spec.SchemaProps{
+							Description: "useMultiNetworkPolicy enables a controller which allows for MultiNetworkPolicy objects to be used on additional networks as created by Multus CNI. MultiNetworkPolicy are similar to NetworkPolicy objects, but NetworkPolicy objects only apply to the primary interface. With MultiNetworkPolicy, you can control the traffic that a pod can receive over the secondary interfaces. If unset, this property defaults to 'false' and MultiNetworkPolicy objects are ignored. If 'disableMultiNetwork' is 'true' then the value of this field is ignored.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
 					"deployKubeProxy": {
 						SchemaProps: spec.SchemaProps{
 							Description: "deployKubeProxy specifies whether or not a standalone kube-proxy should be deployed by the operator. Some network providers include kube-proxy or similar functionality. If unset, the plugin will attempt to select the correct value, which is false when OpenShift SDN and ovn-kubernetes are used and true otherwise.",
@@ -29200,12 +29796,18 @@ func schema_openshift_api_operator_v1_NetworkSpec(ref common.ReferenceCallback) 
 							Ref:         ref("github.com/openshift/api/operator/v1.ProxyConfig"),
 						},
 					},
+					"exportNetworkFlows": {
+						SchemaProps: spec.SchemaProps{
+							Description: "exportNetworkFlows enables and configures the export of network flow metadata from the pod network by using protocols NetFlow, SFlow or IPFIX. Currently only supported on OVN-Kubernetes plugin. If unset, flows will not be exported to any collector.",
+							Ref:         ref("github.com/openshift/api/operator/v1.ExportNetworkFlows"),
+						},
+					},
 				},
 				Required: []string{"managementState", "clusterNetwork", "serviceNetwork", "defaultNetwork"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/operator/v1.AdditionalNetworkDefinition", "github.com/openshift/api/operator/v1.ClusterNetworkEntry", "github.com/openshift/api/operator/v1.DefaultNetworkDefinition", "github.com/openshift/api/operator/v1.ProxyConfig", "k8s.io/apimachinery/pkg/runtime.RawExtension"},
+			"github.com/openshift/api/operator/v1.AdditionalNetworkDefinition", "github.com/openshift/api/operator/v1.ClusterNetworkEntry", "github.com/openshift/api/operator/v1.DefaultNetworkDefinition", "github.com/openshift/api/operator/v1.ExportNetworkFlows", "github.com/openshift/api/operator/v1.ProxyConfig", "k8s.io/apimachinery/pkg/runtime.RawExtension"},
 	}
 }
 
@@ -29316,6 +29918,15 @@ func schema_openshift_api_operator_v1_NodePortStrategy(ref common.ReferenceCallb
 			SchemaProps: spec.SchemaProps{
 				Description: "NodePortStrategy holds parameters for the NodePortService endpoint publishing strategy.",
 				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"protocol": {
+						SchemaProps: spec.SchemaProps{
+							Description: "protocol specifies whether the IngressController expects incoming connections to use plain TCP or whether the IngressController expects PROXY protocol.\n\nPROXY protocol can be used with load balancers that support it to communicate the source addresses of client connections when forwarding those connections to the IngressController.  Using PROXY protocol enables the IngressController to report those source addresses instead of reporting the load balancer's address in HTTP headers and logs.  Note that enabling PROXY protocol on the IngressController will cause connections to fail if you are not using a load balancer that uses PROXY protocol to forward connections to the IngressController.  See http://www.haproxy.org/download/2.2/doc/proxy-protocol.txt for information about PROXY protocol.\n\nThe following values are valid for this field:\n\n* The empty string. * \"TCP\". * \"PROXY\".\n\nThe empty string specifies the default, which is TCP without PROXY protocol.  Note that the default is subject to change.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
 			},
 		},
 	}
@@ -29447,11 +30058,17 @@ func schema_openshift_api_operator_v1_OVNKubernetesConfig(ref common.ReferenceCa
 							Ref:         ref("github.com/openshift/api/operator/v1.IPsecConfig"),
 						},
 					},
+					"policyAuditConfig": {
+						SchemaProps: spec.SchemaProps{
+							Description: "policyAuditConfig is the configuration for network policy audit events. If unset, reported defaults are used.",
+							Ref:         ref("github.com/openshift/api/operator/v1.PolicyAuditConfig"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/operator/v1.HybridOverlayConfig", "github.com/openshift/api/operator/v1.IPsecConfig"},
+			"github.com/openshift/api/operator/v1.HybridOverlayConfig", "github.com/openshift/api/operator/v1.IPsecConfig", "github.com/openshift/api/operator/v1.PolicyAuditConfig"},
 	}
 }
 
@@ -30107,12 +30724,80 @@ func schema_openshift_api_operator_v1_OperatorStatus(ref common.ReferenceCallbac
 	}
 }
 
+func schema_openshift_api_operator_v1_PolicyAuditConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"rateLimit": {
+						SchemaProps: spec.SchemaProps{
+							Description: "rateLimit is the approximate maximum number of messages to generate per-second per-node. If unset the default of 20 msg/sec is used.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"maxFileSize": {
+						SchemaProps: spec.SchemaProps{
+							Description: "maxFilesSize is the max size an ACL_audit log file is allowed to reach before rotation occurs Units are in MB and the Default is 50MB",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"destination": {
+						SchemaProps: spec.SchemaProps{
+							Description: "destination is the location for policy log messages. Regardless of this config, persistent logs will always be dumped to the host at /var/log/ovn/ however Additionally syslog output may be configured as follows. Valid values are: - \"libc\" -> to use the libc syslog() function of the host node's journdald process - \"udp:host:port\" -> for sending syslog over UDP - \"unix:file\" -> for using the UNIX domain socket directly - \"null\" -> to discard all messages logged to syslog The default is \"null\"",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"syslogFacility": {
+						SchemaProps: spec.SchemaProps{
+							Description: "syslogFacility the RFC5424 facility for generated messages, e.g. \"kern\". Default is \"local0\"",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_operator_v1_PrivateStrategy(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "PrivateStrategy holds parameters for the Private endpoint publishing strategy.",
 				Type:        []string{"object"},
+			},
+		},
+	}
+}
+
+func schema_openshift_api_operator_v1_ProjectAccess(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ProjectAccess contains options for project access roles",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"availableClusterRoles": {
+						SchemaProps: spec.SchemaProps{
+							Description: "availableClusterRoles is the list of ClusterRole names that are assignable to users through the project access tab.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	}
@@ -30236,6 +30921,33 @@ func schema_openshift_api_operator_v1_RouteAdmissionPolicy(ref common.ReferenceC
 							Description: "wildcardPolicy describes how routes with wildcard policies should be handled for the ingress controller. WildcardPolicy controls use of routes [1] exposed by the ingress controller based on the route's wildcard policy.\n\n[1] https://github.com/openshift/api/blob/master/route/v1/types.go\n\nNote: Updating WildcardPolicy from WildcardsAllowed to WildcardsDisallowed will cause admitted routes with a wildcard policy of Subdomain to stop working. These routes must be updated to a wildcard policy of None to be readmitted by the ingress controller.\n\nWildcardPolicy supports WildcardsAllowed and WildcardsDisallowed values.\n\nIf empty, defaults to \"WildcardsDisallowed\".",
 							Type:        []string{"string"},
 							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_openshift_api_operator_v1_SFlowConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"collectors": {
+						SchemaProps: spec.SchemaProps{
+							Description: "sFlowCollectors is list of strings formatted as ip:port",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
 						},
 					},
 				},
