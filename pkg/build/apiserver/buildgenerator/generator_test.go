@@ -915,6 +915,7 @@ func TestGenerateBuildFromConfig(t *testing.T) {
 	output := MockOutput()
 	resources := mockResources()
 	expectedLabel := "test-build-config-4.3.0.ipv6-2019-11-27-0001-build"
+	mountTrustedCA := true
 	bc := &buildv1.BuildConfig{
 		ObjectMeta: metav1.ObjectMeta{
 			UID: "test-uid",
@@ -931,9 +932,10 @@ func TestGenerateBuildFromConfig(t *testing.T) {
 						Commit: "1234",
 					},
 				},
-				Strategy:  strategy,
-				Output:    output,
-				Resources: resources,
+				Strategy:       strategy,
+				Output:         output,
+				Resources:      resources,
+				MountTrustedCA: &mountTrustedCA,
 			},
 		},
 		Status: buildv1.BuildConfigStatus{
@@ -994,6 +996,9 @@ func TestGenerateBuildFromConfig(t *testing.T) {
 	if build.OwnerReferences[0].Controller == nil || !*build.OwnerReferences[0].Controller {
 		t.Errorf("generated build does not have OwnerReference to parent BuildConfig marked as a controller relationship")
 	}
+	if !reflect.DeepEqual(build.Spec.MountTrustedCA, bc.Spec.MountTrustedCA) {
+		t.Error("generated build does not have MountTrustedCA copied")
+	}
 	// Test long name
 	bc.Name = strings.Repeat("a", 100)
 	build, err = generator.generateBuildFromConfig(apirequest.NewContext(), bc, revision, nil)
@@ -1011,6 +1016,7 @@ func TestGenerateBuildFromConfig(t *testing.T) {
 	if len(validateErrors) > 0 {
 		t.Fatalf("Unexpected validation errors %v", validateErrors)
 	}
+
 }
 
 func TestGenerateBuildWithImageTagForSourceStrategyImageRepository(t *testing.T) {

@@ -520,6 +520,7 @@ func (g *BuildGenerator) generateBuildFromConfig(ctx context.Context, bc *buildv
 				PostCommit:                bcCopy.Spec.PostCommit,
 				CompletionDeadlineSeconds: bcCopy.Spec.CompletionDeadlineSeconds,
 				NodeSelector:              bcCopy.Spec.NodeSelector,
+				MountTrustedCA:            bcCopy.Spec.MountTrustedCA,
 			},
 		},
 		ObjectMeta: metav1.ObjectMeta{

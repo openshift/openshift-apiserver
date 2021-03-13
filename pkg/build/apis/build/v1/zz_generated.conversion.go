@@ -1703,6 +1703,7 @@ func autoConvert_v1_CommonSpec_To_build_CommonSpec(in *v1.CommonSpec, out *build
 	}
 	out.CompletionDeadlineSeconds = (*int64)(unsafe.Pointer(in.CompletionDeadlineSeconds))
 	out.NodeSelector = *(*map[string]string)(unsafe.Pointer(&in.NodeSelector))
+	out.MountTrustedCA = (*bool)(unsafe.Pointer(in.MountTrustedCA))
 	return nil
 }
 
@@ -1739,6 +1740,7 @@ func autoConvert_build_CommonSpec_To_v1_CommonSpec(in *build.CommonSpec, out *v1
 	}
 	out.CompletionDeadlineSeconds = (*int64)(unsafe.Pointer(in.CompletionDeadlineSeconds))
 	out.NodeSelector = *(*v1.OptionalNodeSelector)(unsafe.Pointer(&in.NodeSelector))
+	out.MountTrustedCA = (*bool)(unsafe.Pointer(in.MountTrustedCA))
 	return nil
 }
 
