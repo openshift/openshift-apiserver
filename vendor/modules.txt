@@ -726,7 +726,7 @@ gopkg.in/inf.v0
 gopkg.in/natefinch/lumberjack.v2
 # gopkg.in/yaml.v2 v2.3.0
 gopkg.in/yaml.v2
-# k8s.io/api v0.20.1 => k8s.io/api v0.20.1
+# k8s.io/api v0.20.4 => k8s.io/api v0.20.4
 k8s.io/api/admission/v1
 k8s.io/api/admission/v1beta1
 k8s.io/api/admissionregistration/v1
@@ -773,7 +773,7 @@ k8s.io/api/scheduling/v1beta1
 k8s.io/api/storage/v1
 k8s.io/api/storage/v1alpha1
 k8s.io/api/storage/v1beta1
-# k8s.io/apiextensions-apiserver v0.20.1 => k8s.io/apiextensions-apiserver v0.20.1
+# k8s.io/apiextensions-apiserver v0.20.4 => k8s.io/apiextensions-apiserver v0.20.4
 k8s.io/apiextensions-apiserver/pkg/apihelpers
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/install
@@ -812,7 +812,7 @@ k8s.io/apiextensions-apiserver/pkg/generated/openapi
 k8s.io/apiextensions-apiserver/pkg/registry/customresource
 k8s.io/apiextensions-apiserver/pkg/registry/customresource/tableconvertor
 k8s.io/apiextensions-apiserver/pkg/registry/customresourcedefinition
-# k8s.io/apimachinery v0.20.1 => k8s.io/apimachinery v0.20.1
+# k8s.io/apimachinery v0.20.4 => k8s.io/apimachinery v0.20.4
 k8s.io/apimachinery/pkg/api/apitesting
 k8s.io/apimachinery/pkg/api/apitesting/fuzzer
 k8s.io/apimachinery/pkg/api/apitesting/roundtrip
@@ -877,7 +877,7 @@ k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v0.20.1 => github.com/openshift/kubernetes-apiserver v0.0.0-20210106144646-d2bf56fab5ef
+# k8s.io/apiserver v0.20.4 => github.com/openshift/kubernetes-apiserver v0.0.0-20210222103016-a023730276fe
 k8s.io/apiserver/pkg/admission
 k8s.io/apiserver/pkg/admission/configuration
 k8s.io/apiserver/pkg/admission/initializer
@@ -1018,7 +1018,7 @@ k8s.io/apiserver/plugin/pkg/audit/truncate
 k8s.io/apiserver/plugin/pkg/audit/webhook
 k8s.io/apiserver/plugin/pkg/authenticator/token/webhook
 k8s.io/apiserver/plugin/pkg/authorizer/webhook
-# k8s.io/cli-runtime v0.20.1 => k8s.io/cli-runtime v0.20.1
+# k8s.io/cli-runtime v0.20.4 => k8s.io/cli-runtime v0.20.4
 k8s.io/cli-runtime/pkg/genericclioptions
 k8s.io/cli-runtime/pkg/kustomize
 k8s.io/cli-runtime/pkg/kustomize/k8sdeps
@@ -1031,7 +1031,7 @@ k8s.io/cli-runtime/pkg/kustomize/k8sdeps/transformer/patch
 k8s.io/cli-runtime/pkg/kustomize/k8sdeps/validator
 k8s.io/cli-runtime/pkg/printers
 k8s.io/cli-runtime/pkg/resource
-# k8s.io/client-go v0.20.1 => k8s.io/client-go v0.20.1
+# k8s.io/client-go v0.20.4 => k8s.io/client-go v0.20.4
 k8s.io/client-go/discovery
 k8s.io/client-go/discovery/cached
 k8s.io/client-go/discovery/cached/disk
@@ -1271,14 +1271,14 @@ k8s.io/client-go/util/jsonpath
 k8s.io/client-go/util/keyutil
 k8s.io/client-go/util/retry
 k8s.io/client-go/util/workqueue
-# k8s.io/cloud-provider v0.20.1 => k8s.io/cloud-provider v0.20.1
+# k8s.io/cloud-provider v0.20.4 => k8s.io/cloud-provider v0.20.4
 k8s.io/cloud-provider
 k8s.io/cloud-provider/config
 k8s.io/cloud-provider/config/install
 k8s.io/cloud-provider/config/v1alpha1
 k8s.io/cloud-provider/controllers/service/config
 k8s.io/cloud-provider/controllers/service/config/v1alpha1
-# k8s.io/code-generator v0.20.1 => k8s.io/code-generator v0.20.1
+# k8s.io/code-generator v0.20.4 => k8s.io/code-generator v0.20.4
 k8s.io/code-generator
 k8s.io/code-generator/cmd/client-gen
 k8s.io/code-generator/cmd/client-gen/args
@@ -1312,7 +1312,7 @@ k8s.io/code-generator/cmd/set-gen
 k8s.io/code-generator/pkg/namer
 k8s.io/code-generator/pkg/util
 k8s.io/code-generator/third_party/forked/golang/reflect
-# k8s.io/component-base v0.20.1 => k8s.io/component-base v0.20.1
+# k8s.io/component-base v0.20.4 => k8s.io/component-base v0.20.4
 k8s.io/component-base/cli/flag
 k8s.io/component-base/config
 k8s.io/component-base/config/v1alpha1
@@ -1329,10 +1329,10 @@ k8s.io/component-base/metrics/prometheus/restclient
 k8s.io/component-base/metrics/prometheus/workqueue
 k8s.io/component-base/metrics/testutil
 k8s.io/component-base/version
-# k8s.io/component-helpers v0.20.1 => k8s.io/component-helpers v0.20.1
+# k8s.io/component-helpers v0.20.4 => k8s.io/component-helpers v0.20.4
 k8s.io/component-helpers/auth/rbac/reconciliation
 k8s.io/component-helpers/auth/rbac/validation
-# k8s.io/controller-manager v0.20.1 => k8s.io/controller-manager v0.20.1
+# k8s.io/controller-manager v0.20.4 => k8s.io/controller-manager v0.20.4
 k8s.io/controller-manager/config
 k8s.io/controller-manager/config/v1alpha1
 k8s.io/controller-manager/pkg/clientbuilder
@@ -1349,7 +1349,7 @@ k8s.io/gengo/parser
 k8s.io/gengo/types
 # k8s.io/klog/v2 v2.4.0
 k8s.io/klog/v2
-# k8s.io/kube-aggregator v0.20.1 => k8s.io/kube-aggregator v0.20.1
+# k8s.io/kube-aggregator v0.20.4 => k8s.io/kube-aggregator v0.20.4
 k8s.io/kube-aggregator/pkg/apis/apiregistration
 k8s.io/kube-aggregator/pkg/apis/apiregistration/install
 k8s.io/kube-aggregator/pkg/apis/apiregistration/v1
@@ -1395,7 +1395,7 @@ k8s.io/kube-openapi/pkg/validation/spec
 k8s.io/kube-openapi/pkg/validation/strfmt
 k8s.io/kube-openapi/pkg/validation/strfmt/bson
 k8s.io/kube-openapi/pkg/validation/validate
-# k8s.io/kubectl v0.20.1 => k8s.io/kubectl v0.20.1
+# k8s.io/kubectl v0.20.4 => k8s.io/kubectl v0.20.4
 k8s.io/kubectl/pkg/cmd/util
 k8s.io/kubectl/pkg/scheme
 k8s.io/kubectl/pkg/util/interrupt
