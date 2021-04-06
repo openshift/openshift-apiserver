@@ -46,6 +46,8 @@ github.com/JeffAshton/win_pdh v0.0.0-20161109143554-76bb4ee9f0ab/go.mod h1:3VYc5
 github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd/go.mod h1:64YHyfSL2R96J44Nlwm39UHepQbyR5q10x7iYa1ks2E=
 github.com/MakeNowJust/heredoc v1.0.0 h1:cXCdzVdstXyiTqTvfqk9SDHpKNjxuom+DOlyEeQ4pzQ=
 github.com/MakeNowJust/heredoc v1.0.0/go.mod h1:mG5amYoWBHf8vpLOuehzbGGw0EHxpZZ6lCpQ4fNJ8LE=
+github.com/Miciah/api v0.0.0-20210331215902-e4ad252ce053 h1:vY4V0Ro3MYdvyMxv/g3KTWQpYCmto6rlx1u3MrDrmpM=
+github.com/Miciah/api v0.0.0-20210331215902-e4ad252ce053/go.mod h1:aqU5Cq+kqKKPbDMqxo9FojgDeSpNJI7iuskjXjtojDg=
 github.com/Microsoft/go-winio v0.4.11/go.mod h1:VhR8bwka0BXejwEJY73c50VrPtXAaKcyvVC4A4RozmA=
 github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5/go.mod h1:tTuCMEN+UleMWgg9dVx4Hu52b1bJo+59jBh3ajtinzw=
 github.com/Microsoft/go-winio v0.4.15 h1:qkLXKzb1QoVatRyd/YlXZ/Kg0m5K3SPuoD82jjSOaBc=
@@ -519,9 +521,6 @@ github.com/opencontainers/runc v1.0.0-rc92/go.mod h1:X1zlU4p7wOlX4+WRCz+hvlRv8ph
 github.com/opencontainers/runtime-spec v1.0.2/go.mod h1:jwyrGlmzljRJv/Fgzds9SsS/C5hL+LL3ko9hs6T5lQ0=
 github.com/opencontainers/runtime-spec v1.0.3-0.20200728170252-4d89ac9fbff6/go.mod h1:jwyrGlmzljRJv/Fgzds9SsS/C5hL+LL3ko9hs6T5lQ0=
 github.com/opencontainers/selinux v1.6.0/go.mod h1:VVGKuOLlE7v4PJyT6h7mNWvq1rzqiriPsEqVhc+svHE=
-github.com/openshift/api v0.0.0-20201214114959-164a2fb63b5f/go.mod h1:aqU5Cq+kqKKPbDMqxo9FojgDeSpNJI7iuskjXjtojDg=
-github.com/openshift/api v0.0.0-20210222200543-70b287c0a0a5 h1:PwdrcuVguOBKjA6ZFHKzL+DnvSeF6cXkliyEJKBm7D0=
-github.com/openshift/api v0.0.0-20210222200543-70b287c0a0a5/go.mod h1:aqU5Cq+kqKKPbDMqxo9FojgDeSpNJI7iuskjXjtojDg=
 github.com/openshift/apiserver-library-go v0.0.0-20201214145556-6f1013f42f98 h1:JUz5O4PiBoEFhf/ZvwRary38hejR6E0LDEtyNro01TM=
 github.com/openshift/apiserver-library-go v0.0.0-20201214145556-6f1013f42f98/go.mod h1:bMWTKd7ZOYGyx1hVLipuA9LrIJw62V7Se99cZ/Volj8=
 github.com/openshift/build-machinery-go v0.0.0-20200917070002-f171684f77ab h1:lBrojddP6C9C2p67EMs2vcdpC8eF+H0DDom+fgI2IF0=
