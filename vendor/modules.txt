@@ -228,7 +228,7 @@ github.com/opencontainers/image-spec/specs-go/v1
 # github.com/opencontainers/runc v1.0.0-rc92
 github.com/opencontainers/runc/libcontainer/system
 github.com/opencontainers/runc/libcontainer/user
-# github.com/openshift/api v0.0.0-20210222200543-70b287c0a0a5
+# github.com/openshift/api v0.0.0-20210222200543-70b287c0a0a5 => github.com/Miciah/api v0.0.0-20210331215902-e4ad252ce053
 github.com/openshift/api
 github.com/openshift/api/annotations
 github.com/openshift/api/apps
@@ -252,6 +252,8 @@ github.com/openshift/api/kubecontrolplane/v1
 github.com/openshift/api/legacyconfig/v1
 github.com/openshift/api/network
 github.com/openshift/api/network/v1
+github.com/openshift/api/networkoperator
+github.com/openshift/api/networkoperator/v1
 github.com/openshift/api/oauth
 github.com/openshift/api/oauth/v1
 github.com/openshift/api/openshiftcontrolplane
@@ -328,8 +330,10 @@ github.com/openshift/client-go/build/clientset/versioned/scheme
 github.com/openshift/client-go/build/clientset/versioned/typed/build/v1
 github.com/openshift/client-go/build/clientset/versioned/typed/build/v1/fake
 github.com/openshift/client-go/config/clientset/versioned
+github.com/openshift/client-go/config/clientset/versioned/fake
 github.com/openshift/client-go/config/clientset/versioned/scheme
 github.com/openshift/client-go/config/clientset/versioned/typed/config/v1
+github.com/openshift/client-go/config/clientset/versioned/typed/config/v1/fake
 github.com/openshift/client-go/image/clientset/versioned
 github.com/openshift/client-go/image/clientset/versioned/fake
 github.com/openshift/client-go/image/clientset/versioned/scheme
@@ -371,8 +375,10 @@ github.com/openshift/client-go/quota/informers/externalversions/quota
 github.com/openshift/client-go/quota/informers/externalversions/quota/v1
 github.com/openshift/client-go/quota/listers/quota/v1
 github.com/openshift/client-go/route/clientset/versioned
+github.com/openshift/client-go/route/clientset/versioned/fake
 github.com/openshift/client-go/route/clientset/versioned/scheme
 github.com/openshift/client-go/route/clientset/versioned/typed/route/v1
+github.com/openshift/client-go/route/clientset/versioned/typed/route/v1/fake
 github.com/openshift/client-go/route/informers/externalversions
 github.com/openshift/client-go/route/informers/externalversions/internalinterfaces
 github.com/openshift/client-go/route/informers/externalversions/route
