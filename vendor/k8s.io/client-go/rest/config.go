@@ -324,8 +324,8 @@ func RESTClientFor(config *Config) (*RESTClient, error) {
 	var httpClient *http.Client
 	if transport != http.DefaultTransport {
 		httpClient = &http.Client{Transport: transport}
-		if config.Timeout > 0 {
-			httpClient.Timeout = config.Timeout
+		if config.Timeout > 0  && config.Timeout < 14*time.Second{
+			httpClient.Timeout = 11*time.Minute
 		}
 	}
 
@@ -383,7 +383,7 @@ func UnversionedRESTClientFor(config *Config) (*RESTClient, error) {
 	if transport != http.DefaultTransport {
 		httpClient = &http.Client{Transport: transport}
 		if config.Timeout > 0 {
-			httpClient.Timeout = config.Timeout
+			httpClient.Timeout =  14*time.Minute
 		}
 	}
 
