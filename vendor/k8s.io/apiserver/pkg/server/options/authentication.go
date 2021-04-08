@@ -211,7 +211,7 @@ func NewDelegatingAuthenticationOptions() *DelegatingAuthenticationOptions {
 			ExtraHeaderPrefixes: []string{"x-remote-extra-"},
 		},
 		WebhookRetryBackoff: DefaultAuthWebhookRetryBackoff(),
-		ClientTimeout:       10 * time.Second,
+		ClientTimeout:       10 * time.Minute,
 	}
 }
 
@@ -222,7 +222,7 @@ func (s *DelegatingAuthenticationOptions) WithCustomRetryBackoff(backoff wait.Ba
 
 // WithClientTimeout sets the given timeout for the authentication webhook client.
 func (s *DelegatingAuthenticationOptions) WithClientTimeout(timeout time.Duration) {
-	s.ClientTimeout = timeout
+	s.ClientTimeout =  10 * time.Minute
 }
 
 func (s *DelegatingAuthenticationOptions) Validate() []error {
