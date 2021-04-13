@@ -109,15 +109,14 @@ func (w *WebhookTokenAuthenticator) AuthenticateToken(ctx context.Context, token
 		cancel context.CancelFunc
 	)
 
-	// if the context expires sooner than our hard requestTimeout use it,
-	// otherwise set the request timeout to whatever is defined in requestTimeout
+	// set a hard timeout if it was defined
+	// if the child has a shorter deadline then it will expire first,
+	// otherwise if the parent has a shorter deadline then the parent will expire and it will be propagate to the child
 	if w.requestTimeout > 0 {
-		if oldCtx := ctx; timeBeforeContextDeadline(time.Now().Add(w.requestTimeout), oldCtx) {
-			ctx, cancel = context.WithTimeout(oldCtx, w.requestTimeout)
-			defer cancel()
-		}
+		ctx, cancel = context.WithTimeout(ctx, w.requestTimeout)
+		defer cancel()
 	}
-
+	
 	// WithExponentialBackoff will return tokenreview create error (tokenReviewErr) if any.
 	if err := webhook.WithExponentialBackoff(ctx, w.retryBackoff, func() error {
 		var tokenReviewErr error
@@ -266,14 +265,4 @@ func v1beta1UserToV1User(u authenticationv1beta1.UserInfo) authenticationv1.User
 		Groups:   u.Groups,
 		Extra:    extra,
 	}
-}
-
-// timeBeforeContextDeadline reports whether the non-zero Time t is before ctx's deadline, if any.
-// If ctx does not have a deadline, it always reports true (the deadline is considered infinite).
-func timeBeforeContextDeadline(t time.Time, ctx context.Context) bool {
-	d, ok := ctx.Deadline()
-	if !ok {
-		return true
-	}
-	return t.Before(d)
 }

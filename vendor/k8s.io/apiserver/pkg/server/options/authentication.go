@@ -195,9 +195,9 @@ type DelegatingAuthenticationOptions struct {
 	// before we fail the webhook call in order to limit the fan out that ensues when the system is degraded.
 	WebhookRetryBackoff *wait.Backoff
 
-	// RequestTimeout specifies a time limit for requests made by the authorization webhook client.
+	// TokenRequestTimeout specifies a time limit for requests made by the authorization webhook client.
 	// The default value is set to 10 seconds.
-	RequestTimeout time.Duration
+	TokenRequestTimeout time.Duration
 }
 
 func NewDelegatingAuthenticationOptions() *DelegatingAuthenticationOptions {
@@ -211,7 +211,7 @@ func NewDelegatingAuthenticationOptions() *DelegatingAuthenticationOptions {
 			ExtraHeaderPrefixes: []string{"x-remote-extra-"},
 		},
 		WebhookRetryBackoff: DefaultAuthWebhookRetryBackoff(),
-		RequestTimeout:      10 * time.Second,
+		TokenRequestTimeout:      10 * time.Second,
 	}
 }
 
@@ -222,7 +222,7 @@ func (s *DelegatingAuthenticationOptions) WithCustomRetryBackoff(backoff wait.Ba
 
 // WithRequestTimeout sets the given timeout for requests made by the authentication webhook client.
 func (s *DelegatingAuthenticationOptions) WithRequestTimeout(timeout time.Duration) {
-	s.RequestTimeout = timeout
+	s.TokenRequestTimeout = timeout
 }
 
 func (s *DelegatingAuthenticationOptions) Validate() []error {
@@ -277,7 +277,7 @@ func (s *DelegatingAuthenticationOptions) ApplyTo(authenticationInfo *server.Aut
 		Anonymous:           true,
 		CacheTTL:            s.CacheTTL,
 		WebhookRetryBackoff: s.WebhookRetryBackoff,
-		RequestTimeout:      s.RequestTimeout,
+		TokenAccessReviewTimeout:      s.TokenRequestTimeout,
 	}
 
 	client, err := s.getClient()
