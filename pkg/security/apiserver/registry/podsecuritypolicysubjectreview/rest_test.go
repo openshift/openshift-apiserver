@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
@@ -115,7 +116,7 @@ func TestAllowed(t *testing.T) {
 						SecurityContext:    &coreapi.PodSecurityContext{},
 						DNSPolicy:          coreapi.DNSClusterFirst,
 						ServiceAccountName: "default",
-						SchedulerName:      coreapi.DefaultSchedulerName,
+						SchedulerName:      corev1.DefaultSchedulerName,
 					},
 				},
 				User:   "foo",
@@ -184,7 +185,7 @@ func TestRequests(t *testing.T) {
 							SecurityContext:    &coreapi.PodSecurityContext{},
 							DNSPolicy:          coreapi.DNSClusterFirst,
 							ServiceAccountName: "A.B.C.D",
-							SchedulerName:      coreapi.DefaultSchedulerName,
+							SchedulerName:      corev1.DefaultSchedulerName,
 						},
 					},
 					User:   "foo",
@@ -210,7 +211,7 @@ func TestRequests(t *testing.T) {
 							SecurityContext:    &coreapi.PodSecurityContext{},
 							DNSPolicy:          coreapi.DNSClusterFirst,
 							ServiceAccountName: "default",
-							SchedulerName:      coreapi.DefaultSchedulerName,
+							SchedulerName:      corev1.DefaultSchedulerName,
 						},
 					},
 				},
@@ -239,7 +240,7 @@ func TestRequests(t *testing.T) {
 							SecurityContext:    &coreapi.PodSecurityContext{},
 							DNSPolicy:          coreapi.DNSClusterFirst,
 							ServiceAccountName: "default",
-							SchedulerName:      coreapi.DefaultSchedulerName,
+							SchedulerName:      corev1.DefaultSchedulerName,
 						},
 					},
 					User: "foo",
