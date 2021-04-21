@@ -1,6 +1,6 @@
 module github.com/openshift/openshift-apiserver
 
-go 1.13
+go 1.15
 
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
@@ -23,25 +23,25 @@ require (
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6
-	github.com/openshift/api v0.0.0-20210222200543-70b287c0a0a5
+	github.com/openshift/api v0.0.0-20210412200117-f60a0b2883ea
 	github.com/openshift/apiserver-library-go v0.0.0-20210331084747-7da6e575a5ac
-	github.com/openshift/build-machinery-go v0.0.0-20200917070002-f171684f77ab
+	github.com/openshift/build-machinery-go v0.0.0-20210209125900-0da259a2c359
 	github.com/openshift/client-go v0.0.0-20201214125552-e615e336eb49
 	github.com/openshift/library-go v0.0.0-20210113192829-cfbb3f4c80c2
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd v0.5.0-alpha.5.0.20200910180754-dd1b699fc489
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
-	k8s.io/api v0.20.4
+	k8s.io/api v0.21.0-rc.0
 	k8s.io/apiextensions-apiserver v0.20.4
-	k8s.io/apimachinery v0.20.4
+	k8s.io/apimachinery v0.21.0-rc.0
 	k8s.io/apiserver v0.20.4
 	k8s.io/client-go v0.20.4
 	k8s.io/cloud-provider v0.20.4
-	k8s.io/code-generator v0.20.4
+	k8s.io/code-generator v0.21.0-rc.0
 	k8s.io/component-base v0.20.4
 	k8s.io/component-helpers v0.20.4
-	k8s.io/klog/v2 v2.4.0
+	k8s.io/klog/v2 v2.8.0
 	k8s.io/kube-aggregator v0.20.4
 	k8s.io/kube-openapi v0.0.0-20201113171705-d219536bb9fd
 	k8s.io/kubectl v0.20.4

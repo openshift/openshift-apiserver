@@ -1045,6 +1045,14 @@ const (
 type BuildConfigStatus struct {
 	// LastVersion is used to inform about number of last triggered build.
 	LastVersion int64
+
+	// ImageChangeTriggers is used to capture the runtime state of any ImageChangeTrigger specified in the BuildConfigSpec,
+	// including the value reconciled by the OpenShift APIServer for the lastTriggeredImageID.  There will be a single entry
+	// in this array for each entry in the BuildConfigSpec.Triggers array where the BuildTriggerPolicy.ImageChange
+	// pointer is set to a non-nil value.  The logical key for each entry in this array is expressed by the
+	// ImageStreamTagReference type.  That type captures the required elements for identifying the ImageStreamTag referenced by the more
+	// generic ObjectReference BuildTriggerPolicy.ImageChange.From.
+	ImageChangeTriggers []ImageChangeTriggerStatus
 }
 
 // SecretLocalReference contains information that points to the local secret being used
@@ -1084,6 +1092,46 @@ type ImageChangeTrigger struct {
 
 	// Paused is true if this trigger is temporarily disabled. Optional.
 	Paused bool
+}
+
+// ImageStreamTagReference captures the required elements for identifying the ImageStreamTag referenced by the more
+// generic ObjectReference BuildTriggerPolicy.ImageChange.From.  It is used by ImageChangeTriggerStatus, where a
+// specific instance of ImageChangeTriggerStatus in maintained in BuildConfigStatus.ImageChangeTriggers for each entry
+// in the BuildConfigSpec.Triggers array where the BuildTriggerPolicy.ImageChange pointer is set to a non-nil value
+type ImageStreamTagReference struct {
+	// namespace is the namespace where the ImageStreamTag used for an ImageChangeTrigger is located
+	Namespace string
+
+	// name is the name of the ImageStreamTag used for an ImageChangeTrigger
+	Name string
+}
+
+// ImageChangeTriggerStatus tracks the latest resolved status of the associated ImageChangeTrigger policy specified in the BuildConfigSpec.Triggers struct.
+type ImageChangeTriggerStatus struct {
+	// lastTriggeredImageID represents, at the last time a Build for this BuildConfig was instantiated, the sha/id of
+	// the image referenced by the the ImageStreamTag cited in the 'from' of this struct.
+	// The lastTriggeredImageID field will be updated by the OpenShift APIServer on all instantiations of a Build from
+	// the BuildConfig it processes, regardless of what is considered the cause of instantiation.
+	// Specifically, an instantiation of a Build could have been manually requested, or could have resulted from
+	// changes with any of the Triggers defined in BuildConfigSpec.Triggers.
+	// The reason for always updating this field across all ImageChangeTriggerStatus instances is to prevent
+	// multiple builds being instantiated concurrently when multiple ImageChangeTriggers fire concurrently.  The system
+	// compares the the sha/id stored here with the associated ImageStreamTag's sha/id for the image.  If they match,
+	// then this trigger is not a valid reason for instantiating a Build.  So when ImageChangeTriggers fire concurrently,
+	// only one of them can "win", meaning selected as the cause for a Build instantiation request.
+	// Lastly, to clarify exactly what is meant by "Build instantiation", from a REST perspective, it is a HTTP POST of a
+	// BuildRequest object as the HTTP Body that is made to the OpenShift APIServer, where that HTTP POST also specifies
+	// the "buildconfigs" resource,  "instantiate" subresource, as well as the namespace and name of the BuildConfig.
+	LastTriggeredImageID string
+
+	// from is the ImageStreamTag that is used as the source of the trigger.
+	// This can come from an ImageStream tag referenced in this BuildConfig's Spec ImageChange Triggers, or the "from"
+	//  this BuildConfig's build strategy if it happens to be an ImageStreamTag (where the user has specified an
+	// ImageChange Trigger in the spec with a 'nil' for its 'from'.
+	From ImageStreamTagReference
+
+	// LastTriggerTime is the last time the BuildConfig was triggered by a change in the ImageStreamTag associated with this trigger.
+	LastTriggerTime metav1.Time
 }
 
 // BuildTriggerPolicy describes a policy for a single trigger that results in a new Build.

@@ -304,11 +304,13 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 		return triggers
 	}
 	tests := []struct {
-		name          string
-		reqFrom       *corev1.ObjectReference
-		triggerIndex  int // index of trigger that will be updated with the imagev1 id, if -1, no update expected
-		triggers      []buildv1.BuildTriggerPolicy
-		errorExpected bool
+		name    string
+		reqFrom *corev1.ObjectReference
+		//TODO the spec LastTriggeredImageID is deprecated in 4.8 but still maintained; when the field is removed in 4.9, remove this portion of the test
+		specTriggerIndex   int // indes of trigger in spec that will be updated with the imagev1id, if -1, no update expected
+		statusTriggerIndex int // index of trigger in status that will be updated with the imagev1 id, if -1, no update expected
+		triggers           []buildv1.BuildTriggerPolicy
+		errorExpected      bool
 	}{
 		{
 			name: "default trigger",
@@ -316,8 +318,9 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 				Kind: "ImageStreamTag",
 				Name: "image3:tag3",
 			},
-			triggerIndex: 1,
-			triggers:     defaultTriggers(),
+			specTriggerIndex:   1,
+			statusTriggerIndex: 0,
+			triggers:           defaultTriggers(),
 		},
 		{
 			name: "trigger with from",
@@ -325,8 +328,9 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 				Kind: "ImageStreamTag",
 				Name: "image1:tag1",
 			},
-			triggerIndex: 2,
-			triggers:     defaultTriggers(),
+			specTriggerIndex:   2,
+			statusTriggerIndex: 1,
+			triggers:           defaultTriggers(),
 		},
 		{
 			name: "trigger with from and namespace",
@@ -335,8 +339,9 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 				Name:      "image2:tag2",
 				Namespace: "image2ns",
 			},
-			triggerIndex: 3,
-			triggers:     defaultTriggers(),
+			specTriggerIndex:   3,
+			statusTriggerIndex: 2,
+			triggers:           defaultTriggers(),
 		},
 		{
 			name: "existing imagev1 id",
@@ -449,8 +454,10 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 		if tc.errorExpected {
 			continue
 		}
+		//TODO The spec LastTriggeredImageID is deprecated but still maintained in 4.8.  When we remove that field,
+		// presumably in 4.9, we can remove this for loop on bc.Spec.Triggers
 		for i := range bc.Spec.Triggers {
-			if i == tc.triggerIndex {
+			if i == tc.specTriggerIndex {
 				// Verify that the trigger got updated
 				if bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID != imageID {
 					t.Errorf("%s: expected trigger at index %d to contain imageID %s", tc.name, i, imageID)
@@ -467,6 +474,22 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 					t.Errorf("%s: expected LastTriggeredImageID for trigger at %d (%+v) to be %s. Got: %s", tc.name, i, bc.Spec.Triggers[i].ImageChange.From, "ref/"+from.Name, bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID)
 				}
 			}
+
+		}
+		for i := range bc.Status.ImageChangeTriggers {
+			if i == tc.statusTriggerIndex {
+				// Verify that the trigger got updated
+				if bc.Status.ImageChangeTriggers[i].LastTriggeredImageID != imageID {
+					t.Errorf("%s: expected trigger at index %d to contain imageID %s", tc.name, i, imageID)
+				}
+				continue
+			}
+			// Ensure that other triggers are updated with the latest container imagev1 ref
+			from := bc.Status.ImageChangeTriggers[i].From
+			if bc.Status.ImageChangeTriggers[i].LastTriggeredImageID != ("ref/" + from.Name) {
+				t.Errorf("%s: expected LastTriggeredImageID for trigger at %d (%+v) to be %s. Got: %s", tc.name, i, bc.Status.ImageChangeTriggers[i].From, "ref/"+from.Name, bc.Status.ImageChangeTriggers[i].LastTriggeredImageID)
+			}
+
 		}
 	}
 }
@@ -685,8 +708,18 @@ func TestInstantiateWithLabelsAndAnnotations(t *testing.T) {
 
 func TestFindImageTrigger(t *testing.T) {
 	defaultTrigger := &buildv1.ImageChangeTrigger{}
+	defaultTriggerResp := buildv1.ImageChangeTriggerStatus{
+		From: buildv1.ImageStreamTagReference{
+			Name: "image3:tag3",
+		},
+	}
 	image1Trigger := &buildv1.ImageChangeTrigger{
 		From: &corev1.ObjectReference{
+			Name: "image1:tag1",
+		},
+	}
+	image1TriggerResp := buildv1.ImageChangeTriggerStatus{
+		From: buildv1.ImageStreamTagReference{
 			Name: "image1:tag1",
 		},
 	}
@@ -696,13 +729,30 @@ func TestFindImageTrigger(t *testing.T) {
 			Namespace: "image2ns",
 		},
 	}
+	image2TriggerResp := buildv1.ImageChangeTriggerStatus{
+		From: buildv1.ImageStreamTagReference{
+			Name:      "image2:tag2",
+			Namespace: "image2ns",
+		},
+	}
 	image4Trigger := &buildv1.ImageChangeTrigger{
 		From: &corev1.ObjectReference{
 			Name: "image4:tag4",
 		},
 	}
+	image4TriggerResp := buildv1.ImageChangeTriggerStatus{
+		From: buildv1.ImageStreamTagReference{
+			Name: "image4:tag4",
+		},
+	}
 	image5Trigger := &buildv1.ImageChangeTrigger{
 		From: &corev1.ObjectReference{
+			Name:      "image5:tag5",
+			Namespace: "bcnamespace",
+		},
+	}
+	image5TriggerResp := buildv1.ImageChangeTriggerStatus{
+		From: buildv1.ImageStreamTagReference{
 			Name:      "image5:tag5",
 			Namespace: "bcnamespace",
 		},
@@ -749,24 +799,36 @@ func TestFindImageTrigger(t *testing.T) {
 				},
 			},
 		},
+		Status: buildv1.BuildConfigStatus{
+			ImageChangeTriggers: []buildv1.ImageChangeTriggerStatus{
+				defaultTriggerResp,
+				image1TriggerResp,
+				image2TriggerResp,
+				image4TriggerResp,
+				image5TriggerResp,
+			},
+		},
 	}
 
 	tests := []struct {
-		name   string
-		input  *corev1.ObjectReference
-		expect *buildv1.ImageChangeTrigger
+		name      string
+		input     *corev1.ObjectReference
+		expectReq *buildv1.ImageChangeTrigger
+		expectRsp *buildv1.ImageChangeTriggerStatus
 	}{
 		{
-			name:   "nil reference",
-			input:  nil,
-			expect: nil,
+			name:      "nil reference",
+			input:     nil,
+			expectReq: nil,
+			expectRsp: nil,
 		},
 		{
 			name: "match name",
 			input: &corev1.ObjectReference{
 				Name: "image1:tag1",
 			},
-			expect: image1Trigger,
+			expectReq: image1Trigger,
+			expectRsp: &image1TriggerResp,
 		},
 		{
 			name: "mismatched namespace",
@@ -774,7 +836,8 @@ func TestFindImageTrigger(t *testing.T) {
 				Name:      "image1:tag1",
 				Namespace: "otherns",
 			},
-			expect: nil,
+			expectReq: nil,
+			expectRsp: nil,
 		},
 		{
 			name: "match name and namespace",
@@ -782,14 +845,16 @@ func TestFindImageTrigger(t *testing.T) {
 				Name:      "image2:tag2",
 				Namespace: "image2ns",
 			},
-			expect: image2Trigger,
+			expectReq: image2Trigger,
+			expectRsp: &image2TriggerResp,
 		},
 		{
 			name: "match default trigger",
 			input: &corev1.ObjectReference{
 				Name: "image3:tag3",
 			},
-			expect: defaultTrigger,
+			expectReq: defaultTrigger,
+			expectRsp: &defaultTriggerResp,
 		},
 		{
 			name: "input includes bc namespace",
@@ -797,20 +862,48 @@ func TestFindImageTrigger(t *testing.T) {
 				Name:      "image4:tag4",
 				Namespace: "bcnamespace",
 			},
-			expect: image4Trigger,
+			expectReq: image4Trigger,
+			expectRsp: &image4TriggerResp,
 		},
 		{
 			name: "implied namespace in trigger input",
 			input: &corev1.ObjectReference{
 				Name: "image5:tag5",
 			},
-			expect: image5Trigger,
+			expectReq: image5Trigger,
+			expectRsp: &image5TriggerResp,
 		},
 	}
 
 	for _, tc := range tests {
-		result := findImageChangeTrigger(bc, tc.input)
-		if result != tc.expect {
+		result, response := findImageChangeTrigger(bc, tc.input)
+		if result != tc.expectReq {
+			t.Errorf("%s: unexpected trigger for %#v: %#v", tc.name, tc.input, result)
+			continue
+		}
+		if response == nil && tc.expectRsp == nil {
+			continue
+		}
+		if response != nil && tc.expectRsp == nil {
+			t.Errorf("%s: unexpected trigger for %#v: %#v", tc.name, tc.input, result)
+			continue
+		}
+		if response == nil && tc.expectRsp != nil {
+			t.Errorf("%s: unexpected trigger for %#v: %#v", tc.name, tc.input, result)
+			continue
+		}
+		if len(response.From.Name) == 0 && len(tc.expectRsp.From.Name) == 0 {
+			continue
+		}
+		if len(response.From.Name) > 0 && len(tc.expectRsp.From.Name) == 0 {
+			t.Errorf("%s: unexpected trigger for %#v: %#v", tc.name, tc.input, result)
+			continue
+		}
+		if len(response.From.Name) == 0 && len(tc.expectRsp.From.Name) > 0 {
+			t.Errorf("%s: unexpected trigger for %#v: %#v", tc.name, tc.input, result)
+			continue
+		}
+		if response.From.Namespace != tc.expectRsp.From.Namespace || response.From.Name != tc.expectRsp.From.Name {
 			t.Errorf("%s: unexpected trigger for %#v: %#v", tc.name, tc.input, result)
 		}
 	}
@@ -1371,7 +1464,7 @@ func TestGenerateBuildFromBuildWithBuildConfig(t *testing.T) {
 	if !reflect.DeepEqual(nonAnnotatedBuild.ObjectMeta.Labels, newBuild.ObjectMeta.Labels) {
 		t.Errorf("Build labels does not match the original Build labels")
 	}
-	// was incremented by previous test, so expect 7 now.
+	// was incremented by previous test, so expectReq 7 now.
 	if newBuild.Annotations[buildv1.BuildNumberAnnotation] != "7" {
 		t.Errorf("Build number annotation is %s expected %s", newBuild.Annotations[buildv1.BuildNumberAnnotation], "7")
 	}
