@@ -25,7 +25,7 @@ require (
 	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6
 	github.com/openshift/api v0.0.0-20210412200117-f60a0b2883ea
 	github.com/openshift/apiserver-library-go v0.0.0-20210331084747-7da6e575a5ac
-	github.com/openshift/build-machinery-go v0.0.0-20210209125900-0da259a2c359
+	github.com/openshift/build-machinery-go v0.0.0-20210423112049-9415d7ebd33e
 	github.com/openshift/client-go v0.0.0-20201214125552-e615e336eb49
 	github.com/openshift/library-go v0.0.0-20210113192829-cfbb3f4c80c2
 	github.com/spf13/cobra v1.1.1

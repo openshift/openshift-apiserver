@@ -18,6 +18,8 @@ IMAGE_REGISTRY?=registry.svc.ci.openshift.org
 # It will generate target "image-$(1)" for builing the image an binding it as a prerequisite to target "images".
 $(call build-image,ocp-openshift-apiserver,$(IMAGE_REGISTRY)/ocp/4.3:openshift-apiserver,./images/Dockerfile.rhel,.)
 
+$(call verify-golang-versions,images/Dockerfile.rhel)
+
 clean:
 	$(RM) ./openshift-apiserver
 .PHONY: clean
