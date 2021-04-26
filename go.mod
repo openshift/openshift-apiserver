@@ -27,6 +27,7 @@ require (
 	github.com/openshift/build-machinery-go v0.0.0-20210423112049-9415d7ebd33e
 	github.com/openshift/client-go v0.0.0-20210521082421-73d9475a9142
 	github.com/openshift/library-go v0.0.0-20210521084623-7392ea9b02ca
+	github.com/openshift/runtime-utils v0.0.0-20200415173359-c45d4ff3f912
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd v0.5.0-alpha.5.0.20200910180754-dd1b699fc489

@@ -521,11 +521,13 @@ github.com/opencontainers/runc v1.0.0-rc93/go.mod h1:3NOsor4w32B2tC0Zbl8Knk4Wg84
 github.com/opencontainers/runtime-spec v1.0.2/go.mod h1:jwyrGlmzljRJv/Fgzds9SsS/C5hL+LL3ko9hs6T5lQ0=
 github.com/opencontainers/runtime-spec v1.0.3-0.20200929063507-e6143ca7d51d/go.mod h1:jwyrGlmzljRJv/Fgzds9SsS/C5hL+LL3ko9hs6T5lQ0=
 github.com/opencontainers/selinux v1.8.0/go.mod h1:RScLhm78qiWa2gbVCcGkC7tCGdgk3ogry1nUQF8Evvo=
+github.com/openshift/api v0.0.0-20200326160804-ecb9283fe820/go.mod h1:RKMJ5CBnljLfnej+BJ/xnOWc3kZDvJUaIAEq2oKSPtE=
 github.com/openshift/api v0.0.0-20210521075222-e273a339932a/go.mod h1:izBmoXbUu3z5kUa4FjZhvekTsyzIWiOoaIgJiZBBMQs=
 github.com/openshift/api v0.0.0-20210624153211-ae79113891b0 h1:Wbo6MbFHqjoPNV5iSONP3VZV50RR6CS8MYoVHFlKIuQ=
 github.com/openshift/api v0.0.0-20210624153211-ae79113891b0/go.mod h1:izBmoXbUu3z5kUa4FjZhvekTsyzIWiOoaIgJiZBBMQs=
 github.com/openshift/apiserver-library-go v0.0.0-20210702112302-ae0a7354dc50 h1:ck3kWYdy10YmW4aq33pVdgBAWBf7N+YWaQXRfEOYNGk=
 github.com/openshift/apiserver-library-go v0.0.0-20210702112302-ae0a7354dc50/go.mod h1:hmRcqTWiLRXXEnVLhCNoZBfmciZD2N2NrHTEzcRqhK8=
+github.com/openshift/build-machinery-go v0.0.0-20200211121458-5e3d6e570160/go.mod h1:1CkcsT3aVebzRBzVTSbiKSkJMsC/CASqxesfqEMfJEc=
 github.com/openshift/build-machinery-go v0.0.0-20210423112049-9415d7ebd33e h1:F7rBobgSjtYL3/zsgDUjlTVx3Z06hdgpoldpDcn7jzc=
 github.com/openshift/build-machinery-go v0.0.0-20210423112049-9415d7ebd33e/go.mod h1:b1BuldmJlbA/xYtdZvKi+7j5YGB44qJUJDZ9zwiNCfE=
 github.com/openshift/client-go v0.0.0-20210521082421-73d9475a9142 h1:ZHRIMCFIJN1p9LsJt4HQ+akDrys4PrYnXzOWI5LK03I=
@@ -534,10 +536,13 @@ github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d h1:t
 github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d/go.mod h1:XmfFzbwryblvZ29NebonirM7RBuNEO7+yVCOapaouAk=
 github.com/openshift/kubernetes-apiserver v0.0.0-20210527175848-55ee66589915 h1:sFX4VkwXx4bv3YxceFO5PMtRbZxiVi5BiPDCcAN8GxE=
 github.com/openshift/kubernetes-apiserver v0.0.0-20210527175848-55ee66589915/go.mod h1:w2YSn4/WIwYuxG5zJmcqtRdtqgW/J2JRgFAqps3bBpg=
+github.com/openshift/library-go v0.0.0-20191003152030-97c62d8a2901/go.mod h1:NBttNjZpWwup/nthuLbPAPSYC8Qyo+BBK5bCtFoyYjo=
 github.com/openshift/library-go v0.0.0-20210521084623-7392ea9b02ca h1:NtRAdQTnE4B+UESOUaCSX3dw1uc+PpI1h2X7hUmE/5A=
 github.com/openshift/library-go v0.0.0-20210521084623-7392ea9b02ca/go.mod h1:87ZYjEncF0YNUKNzncb8Fiw8yFNevpIWZW83C/etzpw=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d h1:fLITXDjxMSvUDjnXs/zljIWktbST9+Om8XbrmmM7T4I=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d/go.mod h1:LJM49W8fBVSj+rvcopJZu9mgH5Tx6HwLHySIYeGeu4k=
+github.com/openshift/runtime-utils v0.0.0-20200415173359-c45d4ff3f912 h1:zPJYcr+2g68K+pEqw7crr0vLSVsYb3B82LS3y7/kxpc=
+github.com/openshift/runtime-utils v0.0.0-20200415173359-c45d4ff3f912/go.mod h1:0OXNy7VoqFexkxKqyQbHJLPwn1MFp1/CxRJAgKHM+/o=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
@@ -908,6 +913,7 @@ golang.org/x/tools v0.0.0-20191130070609-6e064ea0cf2d/go.mod h1:b+2E5dAYhXwXZwtn
 golang.org/x/tools v0.0.0-20191216052735-49a3e744a425/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=
 golang.org/x/tools v0.0.0-20191216173652-a0e659d51361/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=
 golang.org/x/tools v0.0.0-20191227053925-7b8e75db28f4/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=
+golang.org/x/tools v0.0.0-20200115044656-831fdb1e1868/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=
 golang.org/x/tools v0.0.0-20200117012304-6edc0a871e69/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=
 golang.org/x/tools v0.0.0-20200117161641-43d50277825c/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=
 golang.org/x/tools v0.0.0-20200122220014-bf1340f18c4a/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=
