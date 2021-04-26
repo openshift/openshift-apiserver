@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/containers/image/pkg/sysregistriesv2"
-
 	apioperatorsv1alpha1 "github.com/openshift/api/operator/v1alpha1"
 )
 
