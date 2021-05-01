@@ -1404,7 +1404,8 @@ items:
   kind: ClusterRole
   metadata:
     annotations:
-      openshift.io/description: Grants the right to push and pull images from within a project.
+      openshift.io/description: Grants the right to push and pull images from within
+        a project.
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:image-pusher
@@ -1421,7 +1422,8 @@ items:
   kind: ClusterRole
   metadata:
     annotations:
-      openshift.io/description: Grants the right to build, push and pull images from within a project.  Used primarily with service accounts for builds.
+      openshift.io/description: Grants the right to build, push and pull images from
+        within a project.  Used primarily with service accounts for builds.
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     labels:
@@ -1591,7 +1593,8 @@ items:
   kind: ClusterRole
   metadata:
     annotations:
-      openshift.io/description: Grants the right to deploy within a project.  Used primarily with service accounts for automated deployments.
+      openshift.io/description: Grants the right to deploy within a project.  Used
+        primarily with service accounts for automated deployments.
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
     name: system:deployer

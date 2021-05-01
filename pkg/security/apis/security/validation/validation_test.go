@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
@@ -364,7 +365,7 @@ func validPodSpec() kapi.PodSpec {
 		DNSPolicy:             kapi.DNSClusterFirst,
 		ActiveDeadlineSeconds: &activeDeadlineSeconds,
 		ServiceAccountName:    "acct",
-		SchedulerName:         kapi.DefaultSchedulerName,
+		SchedulerName:         corev1.DefaultSchedulerName,
 	}
 }
 

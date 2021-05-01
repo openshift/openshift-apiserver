@@ -158,7 +158,7 @@ func TestValidationQuota(t *testing.T) {
 		},
 	}
 	for k, v := range tests {
-		errs := validation.ValidateResourceQuota(&v.A)
+		errs := validation.ValidateResourceQuota(&v.A, validation.ResourceQuotaValidationOptions{})
 		if len(errs) != 0 {
 			t.Errorf("%s: %v", k, errs)
 			continue

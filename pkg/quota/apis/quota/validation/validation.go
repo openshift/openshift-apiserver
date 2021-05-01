@@ -3,7 +3,10 @@ package validation
 import (
 	unversionedvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	"k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
+	"k8s.io/kubernetes/pkg/features"
 
 	quotaapi "github.com/openshift/openshift-apiserver/pkg/quota/apis/quota"
 )
@@ -27,7 +30,7 @@ func ValidateClusterResourceQuota(clusterquota *quotaapi.ClusterResourceQuota) f
 		allErrs = append(allErrs, validation.ValidateAnnotations(clusterquota.Spec.Selector.AnnotationSelector, field.NewPath("spec", "selector", "annotations"))...)
 	}
 
-	allErrs = append(allErrs, validation.ValidateResourceQuotaSpec(&clusterquota.Spec.Quota, field.NewPath("spec", "quota"))...)
+	allErrs = append(allErrs, validation.ValidateResourceQuotaSpec(&clusterquota.Spec.Quota, getValidationOptionsFromResourceQuota(&clusterquota.Spec.Quota), field.NewPath("spec", "quota"))...)
 	allErrs = append(allErrs, validation.ValidateResourceQuotaStatus(&clusterquota.Status.Total, field.NewPath("status", "overall"))...)
 
 	for e := clusterquota.Status.Namespaces.OrderedKeys().Front(); e != nil; e = e.Next() {
@@ -60,4 +63,31 @@ func ValidateAppliedClusterResourceQuotaUpdate(clusterquota, oldClusterResourceQ
 	return ValidateClusterResourceQuotaUpdate(
 		quotaapi.ConvertAppliedClusterResourceQuotaToClusterResourceQuota(clusterquota),
 		quotaapi.ConvertAppliedClusterResourceQuotaToClusterResourceQuota(oldClusterResourceQuota))
+}
+
+func getValidationOptionsFromResourceQuota(spec *core.ResourceQuotaSpec) validation.ResourceQuotaValidationOptions {
+	var opts validation.ResourceQuotaValidationOptions
+	opts.AllowPodAffinityNamespaceSelector = utilfeature.DefaultFeatureGate.Enabled(features.PodAffinityNamespaceSelector) || hasCrossNamespacePodAffinityScope(spec)
+	return opts
+}
+
+func hasCrossNamespacePodAffinityScope(spec *core.ResourceQuotaSpec) bool {
+	if spec == nil {
+		return false
+	}
+	for _, scope := range spec.Scopes {
+		if scope == core.ResourceQuotaScopeCrossNamespacePodAffinity {
+			return true
+		}
+	}
+
+	if spec.ScopeSelector == nil {
+		return false
+	}
+	for _, req := range spec.ScopeSelector.MatchExpressions {
+		if req.ScopeName == core.ResourceQuotaScopeCrossNamespacePodAffinity {
+			return true
+		}
+	}
+	return false
 }

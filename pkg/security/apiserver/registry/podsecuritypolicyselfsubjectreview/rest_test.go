@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/authentication/user"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
@@ -64,7 +65,7 @@ func TestPodSecurityPolicySelfSubjectReview(t *testing.T) {
 						SecurityContext:    &coreapi.PodSecurityContext{},
 						DNSPolicy:          coreapi.DNSClusterFirst,
 						ServiceAccountName: "default",
-						SchedulerName:      coreapi.DefaultSchedulerName,
+						SchedulerName:      corev1.DefaultSchedulerName,
 					},
 				},
 			},

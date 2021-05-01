@@ -8,6 +8,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
+	applycorev1 "k8s.io/client-go/applyconfigurations/core/v1"
 	kcoreclient "k8s.io/client-go/kubernetes/typed/core/v1"
 
 	buildv1 "github.com/openshift/api/build/v1"
@@ -54,6 +55,10 @@ func (f *FakeSecretInterface) Watch(_ context.Context, opts metav1.ListOptions) 
 	return nil, nil
 }
 func (f *FakeSecretInterface) Patch(_ context.Context, name string, pt types.PatchType, data []byte, _ metav1.PatchOptions, subresources ...string) (result *corev1.Secret, err error) {
+	return nil, nil
+}
+
+func (f *FakeSecretInterface) Apply(_ context.Context, secret *applycorev1.SecretApplyConfiguration, opts metav1.ApplyOptions) (result *corev1.Secret, err error) {
 	return nil, nil
 }
 
