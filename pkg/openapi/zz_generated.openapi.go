@@ -5272,7 +5272,7 @@ func schema_openshift_api_build_v1_BuildConfigStatus(ref common.ReferenceCallbac
 					},
 					"imageChangeTriggers": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ImageChangeTriggers is used to capture the runtime state of any ImageChangeTrigger specified in the BuildConfigSpec, including the value reconciled by the OpenShift APIServer for the lastTriggeredImageID.  There will be a single entry in this array for each entry in the BuildConfigSpec.Triggers array where the BuildTriggerPolicy.ImageChange pointer is set to a non-nil value.  The logical key for each entry in this array is expressed by the ImageStreamTagReference type.  That type captures the required elements for identifying the ImageStreamTag referenced by the more generic ObjectReference BuildTriggerPolicy.ImageChange.From.",
+							Description: "ImageChangeTriggers captures the runtime state of any ImageChangeTrigger specified in the BuildConfigSpec, including the value reconciled by the OpenShift APIServer for the lastTriggeredImageID. There is a single entry in this array for each image change trigger in spec. Each trigger status references the ImageStreamTag that acts as the source of the trigger.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -7014,21 +7014,21 @@ func schema_openshift_api_build_v1_ImageChangeTriggerStatus(ref common.Reference
 				Properties: map[string]spec.Schema{
 					"lastTriggeredImageID": {
 						SchemaProps: spec.SchemaProps{
-							Description: "lastTriggeredImageID represents, at the last time a Build for this BuildConfig was instantiated, the sha/id of the image referenced by the the ImageStreamTag cited in the 'from' of this struct. The lastTriggeredImageID field will be updated by the OpenShift APIServer on all instantiations of a Build from the BuildConfig it processes, regardless of what is considered the cause of instantiation. Specifically, an instantiation of a Build could have been manually requested, or could have resulted from changes with any of the Triggers defined in BuildConfigSpec.Triggers. The reason for always updating this field across all ImageChangeTriggerStatus instances is to prevent multiple builds being instantiated concurrently when multiple ImageChangeTriggers fire concurrently.  The system compares the the sha/id stored here with the associated ImageStreamTag's sha/id for the image.  If they match, then this trigger is not a valid reason for instantiating a Build.  So when ImageChangeTriggers fire concurrently, only one of them can \"win\", meaning selected as the cause for a Build instantiation request. Lastly, to clarify exactly what is meant by \"Build instantiation\", from a REST perspective, it is a HTTP POST of a BuildRequest object as the HTTP Body that is made to the OpenShift APIServer, where that HTTP POST also specifies the \"buildconfigs\" resource,  \"instantiate\" subresource, as well as the namespace and name of the BuildConfig.",
+							Description: "lastTriggeredImageID represents the sha/id of the ImageStreamTag when a Build for this BuildConfig was started. The lastTriggeredImageID is updated each time a Build for this BuildConfig is started, even if this ImageStreamTag is not the reason the Build is started.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"from": {
 						SchemaProps: spec.SchemaProps{
-							Description: "from is the ImageStreamTag that is used as the source of the trigger. This can come from an ImageStream tag referenced in this BuildConfig's Spec ImageChange Triggers, or the \"from\"\n this BuildConfig's build strategy if it happens to be an ImageStreamTag (where the user has specified an\nImageChange Trigger in the spec with a 'nil' for its 'from'.",
+							Description: "from is the ImageStreamTag that is the source of the trigger.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("github.com/openshift/api/build/v1.ImageStreamTagReference"),
 						},
 					},
 					"lastTriggerTime": {
 						SchemaProps: spec.SchemaProps{
-							Description: "lastTriggerTime is the last time this particular ImageChangeTrigger fired, and that trigger firing was chosen as the cause for the Build being instantiated from this BuildConfig.  So on each Build instantiation, while lastTriggeredImageID will be updated regardless of whether this ImageChangeTrigger fired and deemed the cause for the Build Instantiation, this field is only updated when this trigger was in fact deemed the cause.  As such, it is valid that this field may not be set across all the ImageChangeTriggers, as they may have not yet been deemed to be the cause of a Build instantiation.  It is also valid that the times stored in lastTriggerTime will vary across all the ImageChangeTriggers, as the system explicitly picks only one trigger cause for a given Build.",
+							Description: "lastTriggerTime is the last time this particular ImageStreamTag triggered a Build to start. This field is only updated when this trigger specifically started a Build.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
 						},
@@ -7162,19 +7162,19 @@ func schema_openshift_api_build_v1_ImageStreamTagReference(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageStreamTagReference captures the required elements for identifying the ImageStreamTag referenced by the more generic ObjectReference BuildTriggerPolicy.ImageChange.From.  It is used by ImageChangeTriggerStatus, where a specific instance of ImageChangeTriggerStatus in maintained in BuildConfigStatus.ImageChangeTriggers for each entry in the BuildConfigSpec.Triggers array where the BuildTriggerPolicy.ImageChange pointer is set to a non-nil value",
+				Description: "ImageStreamTagReference references the ImageStreamTag in an image change trigger by namespace and name.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"namespace": {
 						SchemaProps: spec.SchemaProps{
-							Description: "namespace is the namespace where the ImageStreamTag used for an ImageChangeTrigger is located",
+							Description: "namespace is the namespace where the ImageStreamTag for an ImageChangeTrigger is located",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "name is the name of the ImageStreamTag used for an ImageChangeTrigger",
+							Description: "name is the name of the ImageStreamTag for an ImageChangeTrigger",
 							Type:        []string{"string"},
 							Format:      "",
 						},
