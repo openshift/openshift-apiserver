@@ -18,6 +18,14 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
+		"github.com/openshift/api/apiserver/v1.APIRequestCount":                                           schema_openshift_api_apiserver_v1_APIRequestCount(ref),
+		"github.com/openshift/api/apiserver/v1.APIRequestCountList":                                       schema_openshift_api_apiserver_v1_APIRequestCountList(ref),
+		"github.com/openshift/api/apiserver/v1.APIRequestCountSpec":                                       schema_openshift_api_apiserver_v1_APIRequestCountSpec(ref),
+		"github.com/openshift/api/apiserver/v1.APIRequestCountStatus":                                     schema_openshift_api_apiserver_v1_APIRequestCountStatus(ref),
+		"github.com/openshift/api/apiserver/v1.PerNodeAPIRequestLog":                                      schema_openshift_api_apiserver_v1_PerNodeAPIRequestLog(ref),
+		"github.com/openshift/api/apiserver/v1.PerResourceAPIRequestLog":                                  schema_openshift_api_apiserver_v1_PerResourceAPIRequestLog(ref),
+		"github.com/openshift/api/apiserver/v1.PerUserAPIRequestCount":                                    schema_openshift_api_apiserver_v1_PerUserAPIRequestCount(ref),
+		"github.com/openshift/api/apiserver/v1.PerVerbAPIRequestCount":                                    schema_openshift_api_apiserver_v1_PerVerbAPIRequestCount(ref),
 		"github.com/openshift/api/apps/v1.CustomDeploymentStrategyParams":                                 schema_openshift_api_apps_v1_CustomDeploymentStrategyParams(ref),
 		"github.com/openshift/api/apps/v1.DeploymentCause":                                                schema_openshift_api_apps_v1_DeploymentCause(ref),
 		"github.com/openshift/api/apps/v1.DeploymentCauseImageTrigger":                                    schema_openshift_api_apps_v1_DeploymentCauseImageTrigger(ref),
@@ -129,6 +137,9 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/build/v1.StageInfo":                                                     schema_openshift_api_build_v1_StageInfo(ref),
 		"github.com/openshift/api/build/v1.StepInfo":                                                      schema_openshift_api_build_v1_StepInfo(ref),
 		"github.com/openshift/api/build/v1.WebHookTrigger":                                                schema_openshift_api_build_v1_WebHookTrigger(ref),
+		"github.com/openshift/api/cloudnetwork/v1.CloudPrivateIPConfig":                                   schema_openshift_api_cloudnetwork_v1_CloudPrivateIPConfig(ref),
+		"github.com/openshift/api/cloudnetwork/v1.CloudPrivateIPConfigSpec":                               schema_openshift_api_cloudnetwork_v1_CloudPrivateIPConfigSpec(ref),
+		"github.com/openshift/api/cloudnetwork/v1.CloudPrivateIPConfigStatus":                             schema_openshift_api_cloudnetwork_v1_CloudPrivateIPConfigStatus(ref),
 		"github.com/openshift/api/config/v1.APIServer":                                                    schema_openshift_api_config_v1_APIServer(ref),
 		"github.com/openshift/api/config/v1.APIServerEncryption":                                          schema_openshift_api_config_v1_APIServerEncryption(ref),
 		"github.com/openshift/api/config/v1.APIServerList":                                                schema_openshift_api_config_v1_APIServerList(ref),
@@ -138,6 +149,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.APIServerStatus":                                              schema_openshift_api_config_v1_APIServerStatus(ref),
 		"github.com/openshift/api/config/v1.AWSPlatformSpec":                                              schema_openshift_api_config_v1_AWSPlatformSpec(ref),
 		"github.com/openshift/api/config/v1.AWSPlatformStatus":                                            schema_openshift_api_config_v1_AWSPlatformStatus(ref),
+		"github.com/openshift/api/config/v1.AWSResourceTag":                                               schema_openshift_api_config_v1_AWSResourceTag(ref),
 		"github.com/openshift/api/config/v1.AWSServiceEndpoint":                                           schema_openshift_api_config_v1_AWSServiceEndpoint(ref),
 		"github.com/openshift/api/config/v1.AdmissionConfig":                                              schema_openshift_api_config_v1_AdmissionConfig(ref),
 		"github.com/openshift/api/config/v1.AdmissionPluginConfig":                                        schema_openshift_api_config_v1_AdmissionPluginConfig(ref),
@@ -241,6 +253,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.NamedCertificate":                                             schema_openshift_api_config_v1_NamedCertificate(ref),
 		"github.com/openshift/api/config/v1.Network":                                                      schema_openshift_api_config_v1_Network(ref),
 		"github.com/openshift/api/config/v1.NetworkList":                                                  schema_openshift_api_config_v1_NetworkList(ref),
+		"github.com/openshift/api/config/v1.NetworkMigration":                                             schema_openshift_api_config_v1_NetworkMigration(ref),
 		"github.com/openshift/api/config/v1.NetworkSpec":                                                  schema_openshift_api_config_v1_NetworkSpec(ref),
 		"github.com/openshift/api/config/v1.NetworkStatus":                                                schema_openshift_api_config_v1_NetworkStatus(ref),
 		"github.com/openshift/api/config/v1.OAuth":                                                        schema_openshift_api_config_v1_OAuth(ref),
@@ -486,6 +499,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.AWSLoadBalancerParameters":                                  schema_openshift_api_operator_v1_AWSLoadBalancerParameters(ref),
 		"github.com/openshift/api/operator/v1.AWSNetworkLoadBalancerParameters":                           schema_openshift_api_operator_v1_AWSNetworkLoadBalancerParameters(ref),
 		"github.com/openshift/api/operator/v1.AccessLogging":                                              schema_openshift_api_operator_v1_AccessLogging(ref),
+		"github.com/openshift/api/operator/v1.AddPage":                                                    schema_openshift_api_operator_v1_AddPage(ref),
 		"github.com/openshift/api/operator/v1.AdditionalNetworkDefinition":                                schema_openshift_api_operator_v1_AdditionalNetworkDefinition(ref),
 		"github.com/openshift/api/operator/v1.Authentication":                                             schema_openshift_api_operator_v1_Authentication(ref),
 		"github.com/openshift/api/operator/v1.AuthenticationList":                                         schema_openshift_api_operator_v1_AuthenticationList(ref),
@@ -576,6 +590,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.NetFlowConfig":                                              schema_openshift_api_operator_v1_NetFlowConfig(ref),
 		"github.com/openshift/api/operator/v1.Network":                                                    schema_openshift_api_operator_v1_Network(ref),
 		"github.com/openshift/api/operator/v1.NetworkList":                                                schema_openshift_api_operator_v1_NetworkList(ref),
+		"github.com/openshift/api/operator/v1.NetworkMigration":                                           schema_openshift_api_operator_v1_NetworkMigration(ref),
 		"github.com/openshift/api/operator/v1.NetworkSpec":                                                schema_openshift_api_operator_v1_NetworkSpec(ref),
 		"github.com/openshift/api/operator/v1.NetworkStatus":                                              schema_openshift_api_operator_v1_NetworkStatus(ref),
 		"github.com/openshift/api/operator/v1.NodePlacement":                                              schema_openshift_api_operator_v1_NodePlacement(ref),
@@ -600,6 +615,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.ProjectAccess":                                              schema_openshift_api_operator_v1_ProjectAccess(ref),
 		"github.com/openshift/api/operator/v1.ProviderLoadBalancerParameters":                             schema_openshift_api_operator_v1_ProviderLoadBalancerParameters(ref),
 		"github.com/openshift/api/operator/v1.ProxyConfig":                                                schema_openshift_api_operator_v1_ProxyConfig(ref),
+		"github.com/openshift/api/operator/v1.QuickStarts":                                                schema_openshift_api_operator_v1_QuickStarts(ref),
 		"github.com/openshift/api/operator/v1.RouteAdmissionPolicy":                                       schema_openshift_api_operator_v1_RouteAdmissionPolicy(ref),
 		"github.com/openshift/api/operator/v1.SFlowConfig":                                                schema_openshift_api_operator_v1_SFlowConfig(ref),
 		"github.com/openshift/api/operator/v1.Server":                                                     schema_openshift_api_operator_v1_Server(ref),
@@ -1626,6 +1642,364 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/kube-aggregator/pkg/apis/apiregistration/v1beta1.APIServiceSpec":                          schema_pkg_apis_apiregistration_v1beta1_APIServiceSpec(ref),
 		"k8s.io/kube-aggregator/pkg/apis/apiregistration/v1beta1.APIServiceStatus":                        schema_pkg_apis_apiregistration_v1beta1_APIServiceStatus(ref),
 		"k8s.io/kube-aggregator/pkg/apis/apiregistration/v1beta1.ServiceReference":                        schema_pkg_apis_apiregistration_v1beta1_ServiceReference(ref),
+	}
+}
+
+func schema_openshift_api_apiserver_v1_APIRequestCount(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "APIRequestCount tracks requests made to an API. The instance name must be of the form `resource.version.group`, matching the resource.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "spec defines the characteristics of the resource.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/apiserver/v1.APIRequestCountSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "status contains the observed state of the resource.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/apiserver/v1.APIRequestCountStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/apiserver/v1.APIRequestCountSpec", "github.com/openshift/api/apiserver/v1.APIRequestCountStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_openshift_api_apiserver_v1_APIRequestCountList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "APIRequestCountList is a list of APIRequestCount resources.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/apiserver/v1.APIRequestCount"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"metadata", "items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/apiserver/v1.APIRequestCount", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_openshift_api_apiserver_v1_APIRequestCountSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"numberOfUsersToReport": {
+						SchemaProps: spec.SchemaProps{
+							Description: "numberOfUsersToReport is the number of users to include in the report. If unspecified or zero, the default is ten.  This is default is subject to change.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_openshift_api_apiserver_v1_APIRequestCountStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"conditions": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "type",
+								"x-kubernetes-patch-strategy":  "merge",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "conditions contains details of the current status of this API Resource.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.Condition"),
+									},
+								},
+							},
+						},
+					},
+					"removedInRelease": {
+						SchemaProps: spec.SchemaProps{
+							Description: "removedInRelease is when the API will be removed.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"requestCount": {
+						SchemaProps: spec.SchemaProps{
+							Description: "requestCount is a sum of all requestCounts across all current hours, nodes, and users.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"currentHour": {
+						SchemaProps: spec.SchemaProps{
+							Description: "currentHour contains request history for the current hour. This is porcelain to make the API easier to read by humans seeing if they addressed a problem. This field is reset on the hour.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/apiserver/v1.PerResourceAPIRequestLog"),
+						},
+					},
+					"last24h": {
+						SchemaProps: spec.SchemaProps{
+							Description: "last24h contains request history for the last 24 hours, indexed by the hour, so 12:00AM-12:59 is in index 0, 6am-6:59am is index 6, etc. The index of the current hour is updated live and then duplicated into the requestsLastHour field.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/apiserver/v1.PerResourceAPIRequestLog"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"conditions", "requestCount"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/apiserver/v1.PerResourceAPIRequestLog", "k8s.io/apimachinery/pkg/apis/meta/v1.Condition"},
+	}
+}
+
+func schema_openshift_api_apiserver_v1_PerNodeAPIRequestLog(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PerNodeAPIRequestLog contains logs of requests to a certain node.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"nodeName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "nodeName where the request are being handled.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"requestCount": {
+						SchemaProps: spec.SchemaProps{
+							Description: "requestCount is a sum of all requestCounts across all users, even those outside of the top 10 users.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"byUser": {
+						SchemaProps: spec.SchemaProps{
+							Description: "byUser contains request details by top .spec.numberOfUsersToReport users. Note that because in the case of an apiserver, restart the list of top users is determined on a best-effort basis, the list might be imprecise. In addition, some system users may be explicitly included in the list.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/apiserver/v1.PerUserAPIRequestCount"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"nodeName", "requestCount", "byUser"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/apiserver/v1.PerUserAPIRequestCount"},
+	}
+}
+
+func schema_openshift_api_apiserver_v1_PerResourceAPIRequestLog(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PerResourceAPIRequestLog logs request for various nodes.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"byNode": {
+						SchemaProps: spec.SchemaProps{
+							Description: "byNode contains logs of requests per node.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/apiserver/v1.PerNodeAPIRequestLog"),
+									},
+								},
+							},
+						},
+					},
+					"requestCount": {
+						SchemaProps: spec.SchemaProps{
+							Description: "requestCount is a sum of all requestCounts across nodes.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+				},
+				Required: []string{"requestCount"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/apiserver/v1.PerNodeAPIRequestLog"},
+	}
+}
+
+func schema_openshift_api_apiserver_v1_PerUserAPIRequestCount(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PerUserAPIRequestCount contains logs of a user's requests.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"username": {
+						SchemaProps: spec.SchemaProps{
+							Description: "userName that made the request.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"userAgent": {
+						SchemaProps: spec.SchemaProps{
+							Description: "userAgent that made the request. The same user often has multiple binaries which connect (pods with many containers).  The different binaries will have different userAgents, but the same user.  In addition, we have userAgents with version information embedded and the userName isn't likely to change.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"requestCount": {
+						SchemaProps: spec.SchemaProps{
+							Description: "requestCount of requests by the user across all verbs.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"byVerb": {
+						SchemaProps: spec.SchemaProps{
+							Description: "byVerb details by verb.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/apiserver/v1.PerVerbAPIRequestCount"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"username", "userAgent", "requestCount", "byVerb"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/apiserver/v1.PerVerbAPIRequestCount"},
+	}
+}
+
+func schema_openshift_api_apiserver_v1_PerVerbAPIRequestCount(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PerVerbAPIRequestCount requestCounts requests by API request verb.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"verb": {
+						SchemaProps: spec.SchemaProps{
+							Description: "verb of API request (get, list, create, etc...)",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"requestCount": {
+						SchemaProps: spec.SchemaProps{
+							Description: "requestCount of requests for verb.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+				},
+				Required: []string{"verb", "requestCount"},
+			},
+		},
 	}
 }
 
@@ -7607,6 +7981,115 @@ func schema_openshift_api_build_v1_WebHookTrigger(ref common.ReferenceCallback) 
 	}
 }
 
+func schema_openshift_api_cloudnetwork_v1_CloudPrivateIPConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "CloudPrivateIPConfig performs an assignment of a private IP address to the primary NIC associated with cloud VMs. This is done by specifying the IP and Kubernetes node which the IP should be assigned to. This CRD is intended to be used by the network plugin which manages the cluster network. The spec side represents the desired state requested by the network plugin, and the status side represents the current state that this CRD's controller has executed. No users will have permission to modify it, and if a cluster-admin decides to edit it for some reason, their changes will be overwritten the next time the network plugin reconciles the object. Note: the CR's name must specify the requested private IP address (can be IPv4 or IPv6).",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "spec is the definition of the desired private IP request.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/cloudnetwork/v1.CloudPrivateIPConfigSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "status is the observed status of the desired private IP request. Read-only.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/cloudnetwork/v1.CloudPrivateIPConfigStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/cloudnetwork/v1.CloudPrivateIPConfigSpec", "github.com/openshift/api/cloudnetwork/v1.CloudPrivateIPConfigStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_openshift_api_cloudnetwork_v1_CloudPrivateIPConfigSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "CloudPrivateIPConfigSpec consists of a node name which the private IP should be assigned to.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"node": {
+						SchemaProps: spec.SchemaProps{
+							Description: "node is the node name, as specified by the Kubernetes field: node.metadata.name",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_openshift_api_cloudnetwork_v1_CloudPrivateIPConfigStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "CloudPrivateIPConfigStatus specifies the node assignment together with its assignment condition.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"node": {
+						SchemaProps: spec.SchemaProps{
+							Description: "node is the node name, as specified by the Kubernetes field: node.metadata.name",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"conditions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "condition is the assignment condition of the private IP and its status",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.Condition"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"conditions"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Condition"},
+	}
+}
+
 func schema_openshift_api_config_v1_APIServer(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -7921,12 +8404,56 @@ func schema_openshift_api_config_v1_AWSPlatformStatus(ref common.ReferenceCallba
 							},
 						},
 					},
+					"resourceTags": {
+						SchemaProps: spec.SchemaProps{
+							Description: "resourceTags is a list of additional tags to apply to AWS resources created for the cluster. See https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html for information on tagging AWS resources. AWS supports a maximum of 50 tags per resource. OpenShift reserves 25 tags for its use, leaving 25 tags available for the user.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/config/v1.AWSResourceTag"),
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"region"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.AWSServiceEndpoint"},
+			"github.com/openshift/api/config/v1.AWSResourceTag", "github.com/openshift/api/config/v1.AWSServiceEndpoint"},
+	}
+}
+
+func schema_openshift_api_config_v1_AWSResourceTag(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "AWSResourceTag is a tag to apply to AWS resources created for the cluster.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"key": {
+						SchemaProps: spec.SchemaProps{
+							Description: "key is the key of the tag",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"value": {
+						SchemaProps: spec.SchemaProps{
+							Description: "value is the value of the tag. Some AWS service do not support empty values. Since tags are added to resources in many services, the length of the tag value must meet the requirements of all services.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"key", "value"},
+			},
+		},
 	}
 }
 
@@ -12277,6 +12804,28 @@ func schema_openshift_api_config_v1_NetworkList(ref common.ReferenceCallback) co
 	}
 }
 
+func schema_openshift_api_config_v1_NetworkMigration(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkMigration represents the cluster network configuration.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"networkType": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkType is the target plugin that is to be deployed. Currently supported values are: OpenShiftSDN, OVNKubernetes",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"networkType"},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_config_v1_NetworkSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -12393,11 +12942,17 @@ func schema_openshift_api_config_v1_NetworkStatus(ref common.ReferenceCallback) 
 							Format:      "int32",
 						},
 					},
+					"migration": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Migration contains the cluster network migration configuration.",
+							Ref:         ref("github.com/openshift/api/config/v1.NetworkMigration"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.ClusterNetworkEntry"},
+			"github.com/openshift/api/config/v1.ClusterNetworkEntry", "github.com/openshift/api/config/v1.NetworkMigration"},
 	}
 }
 
@@ -25104,6 +25659,34 @@ func schema_openshift_api_operator_v1_AccessLogging(ref common.ReferenceCallback
 	}
 }
 
+func schema_openshift_api_operator_v1_AddPage(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "AddPage allows customizing actions on the Add page in developer perspective.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"disabledActions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "disabledActions is a list of actions that are not shown to users. Each action in the list is represented by its ID.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_operator_v1_AdditionalNetworkDefinition(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -26400,11 +26983,25 @@ func schema_openshift_api_operator_v1_ConsoleCustomization(ref common.ReferenceC
 							Ref:         ref("github.com/openshift/api/operator/v1.ProjectAccess"),
 						},
 					},
+					"quickStarts": {
+						SchemaProps: spec.SchemaProps{
+							Description: "quickStarts allows customization of available ConsoleQuickStart resources in console.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/operator/v1.QuickStarts"),
+						},
+					},
+					"addPage": {
+						SchemaProps: spec.SchemaProps{
+							Description: "addPage allows customizing actions on the Add page in developer perspective.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/operator/v1.AddPage"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.ConfigMapFileReference", "github.com/openshift/api/operator/v1.DeveloperConsoleCatalogCustomization", "github.com/openshift/api/operator/v1.ProjectAccess"},
+			"github.com/openshift/api/config/v1.ConfigMapFileReference", "github.com/openshift/api/operator/v1.AddPage", "github.com/openshift/api/operator/v1.DeveloperConsoleCatalogCustomization", "github.com/openshift/api/operator/v1.ProjectAccess", "github.com/openshift/api/operator/v1.QuickStarts"},
 	}
 }
 
@@ -26749,7 +27346,7 @@ func schema_openshift_api_operator_v1_DNSNodePlacement(ref common.ReferenceCallb
 				Properties: map[string]spec.Schema{
 					"nodeSelector": {
 						SchemaProps: spec.SchemaProps{
-							Description: "nodeSelector is the node selector applied to DNS pods.\n\nIf empty, the default is used, which is currently the following:\n\n  beta.kubernetes.io/os: linux\n\nThis default is subject to change.\n\nIf set, the specified selector is used and replaces the default.",
+							Description: "nodeSelector is the node selector applied to DNS pods.\n\nIf empty, the default is used, which is currently the following:\n\n  kubernetes.io/os: linux\n\nThis default is subject to change.\n\nIf set, the specified selector is used and replaces the default.",
 							Type:        []string{"object"},
 							AdditionalProperties: &spec.SchemaOrBool{
 								Allows: true,
@@ -27616,7 +28213,7 @@ func schema_openshift_api_operator_v1_IPFIXConfig(ref common.ReferenceCallback) 
 				Properties: map[string]spec.Schema{
 					"collectors": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ipfixCollectors is list of strings formatted as ip:port",
+							Description: "ipfixCollectors is list of strings formatted as ip:port with a maximum of ten items",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -29564,7 +30161,7 @@ func schema_openshift_api_operator_v1_NetFlowConfig(ref common.ReferenceCallback
 				Properties: map[string]spec.Schema{
 					"collectors": {
 						SchemaProps: spec.SchemaProps{
-							Description: "netFlow defines the NetFlow collectors that will consume the flow data exported from OVS. It is a list of strings formatted as ip:port",
+							Description: "netFlow defines the NetFlow collectors that will consume the flow data exported from OVS. It is a list of strings formatted as ip:port with a maximum of ten items",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -29676,6 +30273,28 @@ func schema_openshift_api_operator_v1_NetworkList(ref common.ReferenceCallback) 
 		},
 		Dependencies: []string{
 			"github.com/openshift/api/operator/v1.Network", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_openshift_api_operator_v1_NetworkMigration(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkMigration represents the cluster network configuration.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"networkType": {
+						SchemaProps: spec.SchemaProps{
+							Description: "networkType is the target type of network migration The supported values are OpenShiftSDN, OVNKubernetes",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"networkType"},
+			},
+		},
 	}
 }
 
@@ -29813,12 +30432,18 @@ func schema_openshift_api_operator_v1_NetworkSpec(ref common.ReferenceCallback) 
 							Ref:         ref("github.com/openshift/api/operator/v1.ExportNetworkFlows"),
 						},
 					},
+					"migration": {
+						SchemaProps: spec.SchemaProps{
+							Description: "migration enables and configures the cluster network migration. Setting this to the target network type to allow changing the default network. If unset, the operation of changing cluster default network plugin will be rejected.",
+							Ref:         ref("github.com/openshift/api/operator/v1.NetworkMigration"),
+						},
+					},
 				},
 				Required: []string{"managementState", "clusterNetwork", "serviceNetwork", "defaultNetwork"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/operator/v1.AdditionalNetworkDefinition", "github.com/openshift/api/operator/v1.ClusterNetworkEntry", "github.com/openshift/api/operator/v1.DefaultNetworkDefinition", "github.com/openshift/api/operator/v1.ExportNetworkFlows", "github.com/openshift/api/operator/v1.ProxyConfig", "k8s.io/apimachinery/pkg/runtime.RawExtension"},
+			"github.com/openshift/api/operator/v1.AdditionalNetworkDefinition", "github.com/openshift/api/operator/v1.ClusterNetworkEntry", "github.com/openshift/api/operator/v1.DefaultNetworkDefinition", "github.com/openshift/api/operator/v1.ExportNetworkFlows", "github.com/openshift/api/operator/v1.NetworkMigration", "github.com/openshift/api/operator/v1.ProxyConfig", "k8s.io/apimachinery/pkg/runtime.RawExtension"},
 	}
 }
 
@@ -29897,7 +30522,7 @@ func schema_openshift_api_operator_v1_NodePlacement(ref common.ReferenceCallback
 				Properties: map[string]spec.Schema{
 					"nodeSelector": {
 						SchemaProps: spec.SchemaProps{
-							Description: "nodeSelector is the node selector applied to ingress controller deployments.\n\nIf unset, the default is:\n\n  beta.kubernetes.io/os: linux\n  node-role.kubernetes.io/worker: ''\n\nIf set, the specified selector is used and replaces the default.",
+							Description: "nodeSelector is the node selector applied to ingress controller deployments.\n\nIf unset, the default is:\n\n  kubernetes.io/os: linux\n  node-role.kubernetes.io/worker: ''\n\nIf set, the specified selector is used and replaces the default.",
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
 						},
 					},
@@ -30913,6 +31538,34 @@ func schema_openshift_api_operator_v1_ProxyConfig(ref common.ReferenceCallback) 
 	}
 }
 
+func schema_openshift_api_operator_v1_QuickStarts(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "QuickStarts allow cluster admins to customize available ConsoleQuickStart resources.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"disabled": {
+						SchemaProps: spec.SchemaProps{
+							Description: "disabled is a list of ConsoleQuickStart resource names that are not shown to users.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_openshift_api_operator_v1_RouteAdmissionPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -30948,7 +31601,7 @@ func schema_openshift_api_operator_v1_SFlowConfig(ref common.ReferenceCallback) 
 				Properties: map[string]spec.Schema{
 					"collectors": {
 						SchemaProps: spec.SchemaProps{
-							Description: "sFlowCollectors is list of strings formatted as ip:port",
+							Description: "sFlowCollectors is list of strings formatted as ip:port with a maximum of ten items",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
