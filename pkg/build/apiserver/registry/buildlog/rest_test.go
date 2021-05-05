@@ -2,6 +2,7 @@ package buildlog
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 	"testing"
@@ -10,11 +11,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/watch"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
+	"k8s.io/client-go/informers"
+	informerscorev1 "k8s.io/client-go/informers/core/v1"
 	"k8s.io/client-go/kubernetes/fake"
-	clientgotesting "k8s.io/client-go/testing"
+	"k8s.io/client-go/tools/cache"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 
 	buildv1 "github.com/openshift/api/build/v1"
@@ -40,6 +42,22 @@ func anotherNewPodClient() *fake.Clientset {
 	)
 }
 
+func fakeCoreV1PodInformer(client *fake.Clientset, stopCh <-chan struct{}) informerscorev1.PodInformer {
+	informerFactory := informers.NewSharedInformerFactory(client, 0)
+	podInformer := informerFactory.Core().V1().Pods()
+
+	podInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    func(obj interface{}) {},
+		UpdateFunc: func(oldObj, newObj interface{}) {},
+		DeleteFunc: func(obj interface{}) {},
+	})
+
+	go informerFactory.Start(stopCh)
+	informerFactory.WaitForCacheSync(stopCh)
+
+	return podInformer
+}
+
 // TestRegistryResourceLocation tests if proper resource location URL is returned
 // for different build states.
 // Note: For this test, the mocked pod is set to "Running" phase, so the test
@@ -62,7 +80,7 @@ func TestRegistryResourceLocation(t *testing.T) {
 	ctx := apirequest.NewDefaultContext()
 
 	for buildPhase, expectedLocation := range expectedLocations {
-		actualNamespace, actualPodName, actualContainer, err := resourceLocationHelper(buildPhase, "running", ctx, 1)
+		actualNamespace, actualPodName, actualContainer, err := resourceLocationHelper(ctx, buildPhase, "running", 1)
 		switch buildPhase {
 		case buildv1.BuildPhaseError, buildv1.BuildPhaseCancelled:
 			if err == nil {
@@ -87,7 +105,6 @@ func TestRegistryResourceLocation(t *testing.T) {
 }
 
 func TestWaitForBuild(t *testing.T) {
-	ctx := apirequest.NewDefaultContext()
 	tests := []struct {
 		name        string
 		status      []buildv1.BuildPhase
@@ -130,47 +147,89 @@ func TestWaitForBuild(t *testing.T) {
 		},
 	}
 
+	name := "running"
+	version := 1
+
 	for _, tt := range tests {
-		build := mockBuild(buildv1.BuildPhasePending, "running", 1)
-		buildClient := buildfakeclient.NewSimpleClientset(build)
-		fakeWatcher := watch.NewFake()
-		buildClient.PrependWatchReactor("builds", func(action clientgotesting.Action) (handled bool, ret watch.Interface, err error) {
-			return true, fakeWatcher, nil
-		})
-		storage := REST{
-			BuildClient: buildClient.BuildV1(),
-			PodClient:   newPodClient().CoreV1(),
-			Timeout:     defaultTimeout,
-		}
-		getSimplePodLogsFn := func(_ context.Context, podNamespace, podName string, logOpts *kapi.PodLogOptions) (runtime.Object, error) {
-			return nil, nil
-		}
-		storage.getSimpleLogsFn = getSimplePodLogsFn
+		t.Run(tt.name, func(t *testing.T) {
+			build := mockBuild(buildv1.BuildPhasePending, name, version)
+			buildClient := buildfakeclient.NewSimpleClientset(build)
 
-		go func() {
-			for _, status := range tt.status {
-				fakeWatcher.Modify(mockBuild(status, "running", 1))
+			informersCtx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+
+			client := newPodClient()
+			podInformer := fakeCoreV1PodInformer(client, informersCtx.Done())
+
+			storage := REST{
+				BuildClient: buildClient.BuildV1(),
+				PodClient:   client.CoreV1(),
+				PodLister:   podInformer.Lister(),
+				Timeout:     defaultTimeout,
 			}
-		}()
+			getSimplePodLogsFn := func(_ context.Context, podNamespace, podName string, logOpts *kapi.PodLogOptions) (runtime.Object, error) {
+				return nil, nil
+			}
+			storage.getSimpleLogsFn = getSimplePodLogsFn
 
-		_, err := storage.Get(ctx, build.Name, &buildapi.BuildLogOptions{})
-		if tt.expectError && err == nil {
-			t.Errorf("%s: Expected an error but got nil from waitFromBuild", tt.name)
-		}
-		if !tt.expectError && err != nil {
-			t.Errorf("%s: Unexpected error from watchBuild: %v", tt.name, err)
-		}
+			t.Logf("Updating build named '%s', expectError='%v'", name, tt.expectError)
+			// updating the mocked object status and annotation to simulate an POD going through the
+			// "status" described on each test-case
+			for _, status := range tt.status {
+				updatedBuild := mockBuild(status, name, version)
+
+				_, err := buildClient.BuildV1().
+					Builds(corev1.NamespaceDefault).
+					Update(informersCtx, updatedBuild, metav1.UpdateOptions{})
+				if err != nil {
+					t.Errorf("Error updating build '%s': '%#v'", name, err)
+				}
+			}
+
+			// artificially waiting for informer's cache synchronization
+			if !cache.WaitForCacheSync(informersCtx.Done(), podInformer.Informer().HasSynced) {
+				t.Error("Informer's cache is not updated!")
+			}
+
+			// the object namespace is deducted using the informed context, thus creating a custom
+			// context using "default" namespace, the same mocked objects are using
+			ctx := apirequest.NewDefaultContext()
+
+			_, err := storage.Get(ctx, build.Name, &buildapi.BuildLogOptions{})
+			if err != nil {
+				t.Logf("Storage update error: '%#v'", err.Error())
+			}
+			if tt.expectError && err == nil {
+				t.Errorf("%s: Expected an error but got nil from waitFromBuild", tt.name)
+			}
+			if !tt.expectError && err != nil {
+				t.Errorf("%s: Unexpected error from watchBuild: '%v'", tt.name, err)
+			}
+		})
 	}
 }
 
 func TestWaitForBuildTimeout(t *testing.T) {
+	informersCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	client := newPodClient()
+	podInformer := fakeCoreV1PodInformer(client, informersCtx.Done())
+
 	build := mockBuild(buildv1.BuildPhasePending, "running", 1)
 	buildClient := buildfakeclient.NewSimpleClientset(build)
+
 	ctx := apirequest.NewDefaultContext()
 	storage := REST{
 		BuildClient: buildClient.BuildV1(),
-		PodClient:   newPodClient().CoreV1(),
+		PodClient:   client.CoreV1(),
+		PodLister:   podInformer.Lister(),
 		Timeout:     100 * time.Millisecond,
+	}
+
+	// artificially waiting for informer's cache synchronization
+	if !cache.WaitForCacheSync(informersCtx.Done(), podInformer.Informer().HasSynced) {
+		t.Error("Informer's cache is not updated!")
 	}
 
 	_, err := storage.Get(ctx, build.Name, &buildapi.BuildLogOptions{})
@@ -179,13 +238,20 @@ func TestWaitForBuildTimeout(t *testing.T) {
 	}
 }
 
-func resourceLocationHelper(buildPhase buildv1.BuildPhase, podPhase string, ctx context.Context, version int) (string, string, string, error) {
+func resourceLocationHelper(ctx context.Context, buildPhase buildv1.BuildPhase, podPhase string, version int) (string, string, string, error) {
+	informersCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	client := newPodClient()
+	podInformer := fakeCoreV1PodInformer(client, informersCtx.Done())
+
 	expectedBuild := mockBuild(buildPhase, podPhase, version)
 	buildClient := buildfakeclient.NewSimpleClientset(expectedBuild)
 
 	storage := &REST{
 		BuildClient: buildClient.BuildV1(),
-		PodClient:   newPodClient().CoreV1(),
+		PodClient:   client.CoreV1(),
+		PodLister:   podInformer.Lister(),
 		Timeout:     defaultTimeout,
 	}
 	actualPodNamespace := ""
@@ -199,13 +265,17 @@ func resourceLocationHelper(buildPhase buildv1.BuildPhase, podPhase string, ctx 
 	}
 	storage.getSimpleLogsFn = getSimplePodLogsFn
 
+	// artificially waiting for informer's cache synchronization
+	if !cache.WaitForCacheSync(informersCtx.Done(), podInformer.Informer().HasSynced) {
+		return "", "", "", fmt.Errorf("informers are not updated")
+	}
+
 	getter := rest.GetterWithOptions(storage)
 	_, err := getter.Get(ctx, expectedBuild.Name, &buildapi.BuildLogOptions{NoWait: true})
 	if err != nil {
 		return "", "", "", err
 	}
 	return actualPodNamespace, actualPodName, actualContainer, nil
-
 }
 
 func mockPod(podPhase corev1.PodPhase, podName string) *corev1.Pod {
@@ -247,15 +317,23 @@ func mockBuild(status buildv1.BuildPhase, podName string, version int) *buildv1.
 }
 
 func TestPreviousBuildLogs(t *testing.T) {
+	informersCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	ctx := apirequest.NewDefaultContext()
 	first := mockBuild(buildv1.BuildPhaseComplete, "bc-1", 1)
 	second := mockBuild(buildv1.BuildPhaseComplete, "bc-2", 2)
 	third := mockBuild(buildv1.BuildPhaseComplete, "bc-3", 3)
+
+	client := anotherNewPodClient()
+	podInformer := fakeCoreV1PodInformer(client, informersCtx.Done())
+
 	buildClient := buildfakeclient.NewSimpleClientset(first, second, third)
 
 	storage := &REST{
 		BuildClient: buildClient.BuildV1(),
-		PodClient:   anotherNewPodClient().CoreV1(),
+		PodClient:   client.CoreV1(),
+		PodLister:   podInformer.Lister(),
 		Timeout:     defaultTimeout,
 	}
 	actualPodNamespace := ""
@@ -268,6 +346,11 @@ func TestPreviousBuildLogs(t *testing.T) {
 		return nil, nil
 	}
 	storage.getSimpleLogsFn = getSimplePodLogsFn
+
+	// artificially waiting for informer's cache synchronization
+	if !cache.WaitForCacheSync(informersCtx.Done(), podInformer.Informer().HasSynced) {
+		t.Error("Informer's cache is not updated!")
+	}
 
 	getter := rest.GetterWithOptions(storage)
 	// Will expect the previous from bc-3 aka bc-2
