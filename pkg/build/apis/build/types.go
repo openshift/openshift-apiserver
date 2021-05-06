@@ -1046,12 +1046,9 @@ type BuildConfigStatus struct {
 	// LastVersion is used to inform about number of last triggered build.
 	LastVersion int64
 
-	// ImageChangeTriggers is used to capture the runtime state of any ImageChangeTrigger specified in the BuildConfigSpec,
-	// including the value reconciled by the OpenShift APIServer for the lastTriggeredImageID.  There will be a single entry
-	// in this array for each entry in the BuildConfigSpec.Triggers array where the BuildTriggerPolicy.ImageChange
-	// pointer is set to a non-nil value.  The logical key for each entry in this array is expressed by the
-	// ImageStreamTagReference type.  That type captures the required elements for identifying the ImageStreamTag referenced by the more
-	// generic ObjectReference BuildTriggerPolicy.ImageChange.From.
+	// ImageChangeTriggers captures the runtime state of any ImageChangeTrigger specified in the BuildConfigSpec,
+	// including the value reconciled by the OpenShift APIServer for the lastTriggeredImageID. There is a single entry
+	// in this array for each image change trigger in spec. Each trigger status references the ImageStreamTag that acts as the source of the trigger.
 	ImageChangeTriggers []ImageChangeTriggerStatus
 }
 
@@ -1108,29 +1105,15 @@ type ImageStreamTagReference struct {
 
 // ImageChangeTriggerStatus tracks the latest resolved status of the associated ImageChangeTrigger policy specified in the BuildConfigSpec.Triggers struct.
 type ImageChangeTriggerStatus struct {
-	// lastTriggeredImageID represents, at the last time a Build for this BuildConfig was instantiated, the sha/id of
-	// the image referenced by the the ImageStreamTag cited in the 'from' of this struct.
-	// The lastTriggeredImageID field will be updated by the OpenShift APIServer on all instantiations of a Build from
-	// the BuildConfig it processes, regardless of what is considered the cause of instantiation.
-	// Specifically, an instantiation of a Build could have been manually requested, or could have resulted from
-	// changes with any of the Triggers defined in BuildConfigSpec.Triggers.
-	// The reason for always updating this field across all ImageChangeTriggerStatus instances is to prevent
-	// multiple builds being instantiated concurrently when multiple ImageChangeTriggers fire concurrently.  The system
-	// compares the the sha/id stored here with the associated ImageStreamTag's sha/id for the image.  If they match,
-	// then this trigger is not a valid reason for instantiating a Build.  So when ImageChangeTriggers fire concurrently,
-	// only one of them can "win", meaning selected as the cause for a Build instantiation request.
-	// Lastly, to clarify exactly what is meant by "Build instantiation", from a REST perspective, it is a HTTP POST of a
-	// BuildRequest object as the HTTP Body that is made to the OpenShift APIServer, where that HTTP POST also specifies
-	// the "buildconfigs" resource,  "instantiate" subresource, as well as the namespace and name of the BuildConfig.
+	// lastTriggeredImageID represents the sha/id of the ImageStreamTag when a Build for this BuildConfig was started.
+	// The lastTriggeredImageID is updated each time a Build for this BuildConfig is started, even if this ImageStreamTag is not the reason the Build is started.
 	LastTriggeredImageID string
 
-	// from is the ImageStreamTag that is used as the source of the trigger.
-	// This can come from an ImageStream tag referenced in this BuildConfig's Spec ImageChange Triggers, or the "from"
-	//  this BuildConfig's build strategy if it happens to be an ImageStreamTag (where the user has specified an
-	// ImageChange Trigger in the spec with a 'nil' for its 'from'.
+	// from is the ImageStreamTag that is the source of the trigger.
 	From ImageStreamTagReference
 
-	// LastTriggerTime is the last time the BuildConfig was triggered by a change in the ImageStreamTag associated with this trigger.
+	// lastTriggerTime is the last time this particular ImageStreamTag triggered a Build to start.
+	// This field is only updated when this trigger specifically started a Build.
 	LastTriggerTime metav1.Time
 }
 

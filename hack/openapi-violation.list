@@ -1,3 +1,8 @@
+API rule violation: list_type_missing,github.com/openshift/api/apiserver/v1,APIRequestCountStatus,Conditions
+API rule violation: list_type_missing,github.com/openshift/api/apiserver/v1,APIRequestCountStatus,Last24h
+API rule violation: list_type_missing,github.com/openshift/api/apiserver/v1,PerNodeAPIRequestLog,ByUser
+API rule violation: list_type_missing,github.com/openshift/api/apiserver/v1,PerResourceAPIRequestLog,ByNode
+API rule violation: list_type_missing,github.com/openshift/api/apiserver/v1,PerUserAPIRequestCount,ByVerb
 API rule violation: list_type_missing,github.com/openshift/api/apps/v1,CustomDeploymentStrategyParams,Command
 API rule violation: list_type_missing,github.com/openshift/api/apps/v1,CustomDeploymentStrategyParams,Environment
 API rule violation: list_type_missing,github.com/openshift/api/apps/v1,DeploymentConfigStatus,Conditions
@@ -55,10 +60,12 @@ API rule violation: list_type_missing,github.com/openshift/api/build/v1,ImageSou
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,JenkinsPipelineBuildStrategy,Env
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,SourceBuildStrategy,Env
 API rule violation: list_type_missing,github.com/openshift/api/build/v1,StageInfo,Steps
+API rule violation: list_type_missing,github.com/openshift/api/cloudnetwork/v1,CloudPrivateIPConfigStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,APIServerNamedServingCert,Names
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,APIServerServingCerts,NamedCertificates
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,APIServerSpec,AdditionalCORSAllowedOrigins
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AWSPlatformSpec,ServiceEndpoints
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,AWSPlatformStatus,ResourceTags
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AWSPlatformStatus,ServiceEndpoints
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AdmissionConfig,DisabledAdmissionPlugins
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AdmissionConfig,EnabledAdmissionPlugins
@@ -233,6 +240,7 @@ API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolp
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,OpenShiftControllerManagerConfig,Controllers
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,ServiceAccountControllerConfig,ManagedNames
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,AccessLogging,HTTPCaptureCookies
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,AddPage,DisabledActions
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ConsoleSpec,Plugins
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSNodePlacement,Tolerations
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,DNSSpec,Servers
@@ -256,6 +264,7 @@ API rule violation: list_type_missing,github.com/openshift/api/operator/v1,NodeS
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,OperatorStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,OperatorStatus,Generations
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,ProjectAccess,AvailableClusterRoles
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,QuickStarts,Disabled
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,SFlowConfig,Collectors
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,Server,Zones
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,StaticIPAMConfig,Addresses
@@ -699,6 +708,7 @@ API rule violation: list_type_missing,k8s.io/apiserver/pkg/apis/audit/v1beta1,Po
 API rule violation: list_type_missing,k8s.io/apiserver/pkg/apis/audit/v1beta1,PolicyRule,Verbs
 API rule violation: list_type_missing,k8s.io/controller-manager/config/v1alpha1,GenericControllerManagerConfiguration,Controllers
 API rule violation: list_type_missing,k8s.io/controller-manager/config/v1alpha1,LeaderMigrationConfiguration,ControllerLeaders
+API rule violation: names_match,github.com/openshift/api/apiserver/v1,PerUserAPIRequestCount,UserName
 API rule violation: names_match,github.com/openshift/api/apps/v1,DeploymentLogOptions,NoWait
 API rule violation: names_match,github.com/openshift/api/authorization/v1,Action,Group
 API rule violation: names_match,github.com/openshift/api/authorization/v1,Action,Version
