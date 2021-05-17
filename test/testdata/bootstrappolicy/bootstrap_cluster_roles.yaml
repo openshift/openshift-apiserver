@@ -2518,34 +2518,6 @@ items:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
     creationTimestamp: null
-    name: system:openshift:controller:serviceaccount-controller
-  rules:
-  - apiGroups:
-    - ""
-    resources:
-    - serviceaccounts
-    verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
-  - apiGroups:
-    - ""
-    resources:
-    - events
-    verbs:
-    - create
-    - patch
-    - update
-- apiVersion: rbac.authorization.k8s.io/v1
-  kind: ClusterRole
-  metadata:
-    annotations:
-      rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:serviceaccount-pull-secrets-controller
   rules:
   - apiGroups:
