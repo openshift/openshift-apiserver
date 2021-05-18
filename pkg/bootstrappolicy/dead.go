@@ -93,6 +93,8 @@ func init() {
 	addDeadClusterRole("system:openshift:controller:template-instance-finalizer-controller")
 	addDeadClusterRoleBinding("system:openshift:controller:template-instance-finalizer-controller", "system:openshift:controller:template-instance-finalizer-controller")
 	addDeadClusterRoleBinding("system:openshift:controller:template-instance-finalizer-controller-admin", "admin")
+	addDeadClusterRole("system:openshift:controller:origin-namespace")
+	addDeadClusterRoleBinding("system:openshift:controller:origin-namespace", "system:openshift:controller:origin-namespace")
 
 	// this was replaced by the node authorizer
 	addDeadClusterRoleBinding("system:nodes", "system:node")

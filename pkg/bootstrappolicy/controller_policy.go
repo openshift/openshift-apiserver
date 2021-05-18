@@ -13,7 +13,6 @@ import (
 const saRolePrefix = "system:openshift:controller:"
 
 const (
-	InfraOriginNamespaceServiceAccountName                      = "origin-namespace-controller"
 	InfraServiceAccountPullSecretsControllerServiceAccountName  = "serviceaccount-pull-secrets-controller"
 	InfraServiceServingCertServiceAccountName                   = "service-serving-cert-controller"
 	InfraImageTriggerControllerServiceAccountName               = "image-trigger-controller"
@@ -79,16 +78,6 @@ func eventsRule() rbacv1.PolicyRule {
 }
 
 func init() {
-
-	// origin-namespace-controller
-	addControllerRole(rbacv1.ClusterRole{
-		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraOriginNamespaceServiceAccountName},
-		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("get", "list", "watch").Groups(kapiGroup).Resources("namespaces").RuleOrDie(),
-			rbacv1helpers.NewRule("update").Groups(kapiGroup).Resources("namespaces/finalize", "namespaces/status").RuleOrDie(),
-			eventsRule(),
-		},
-	})
 
 	// serviceaccount-pull-secrets-controller
 	addControllerRole(rbacv1.ClusterRole{
