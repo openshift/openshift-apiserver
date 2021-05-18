@@ -16,7 +16,6 @@ const (
 	InfraOriginNamespaceServiceAccountName                      = "origin-namespace-controller"
 	InfraServiceAccountPullSecretsControllerServiceAccountName  = "serviceaccount-pull-secrets-controller"
 	InfraServiceServingCertServiceAccountName                   = "service-serving-cert-controller"
-	InfraDeploymentConfigControllerServiceAccountName           = "deploymentconfig-controller"
 	InfraImageTriggerControllerServiceAccountName               = "image-trigger-controller"
 	InfraImageImportControllerServiceAccountName                = "image-import-controller"
 	InfraClusterQuotaReconciliationControllerServiceAccountName = "cluster-quota-reconciliation-controller"
@@ -85,19 +84,6 @@ func eventsRule() rbacv1.PolicyRule {
 }
 
 func init() {
-
-	// deploymentconfig-controller
-	addControllerRole(rbacv1.ClusterRole{
-		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraDeploymentConfigControllerServiceAccountName},
-		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("create", "get", "list", "watch", "update", "patch", "delete").Groups(kapiGroup).Resources("replicationcontrollers").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update").Groups(kapiGroup).Resources("replicationcontrollers/scale").RuleOrDie(),
-			rbacv1helpers.NewRule("update").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs/status").RuleOrDie(),
-			rbacv1helpers.NewRule("update").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs/finalizers").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "list", "watch").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs").RuleOrDie(),
-			eventsRule(),
-		},
-	})
 
 	// template-instance-controller
 	addControllerRole(rbacv1.ClusterRole{
