@@ -16,7 +16,6 @@ const (
 	InfraOriginNamespaceServiceAccountName                      = "origin-namespace-controller"
 	InfraServiceAccountPullSecretsControllerServiceAccountName  = "serviceaccount-pull-secrets-controller"
 	InfraServiceServingCertServiceAccountName                   = "service-serving-cert-controller"
-	InfraBuildConfigChangeControllerServiceAccountName          = "build-config-change-controller"
 	InfraDeploymentConfigControllerServiceAccountName           = "deploymentconfig-controller"
 	InfraDeployerControllerServiceAccountName                   = "deployer-controller"
 	InfraImageTriggerControllerServiceAccountName               = "image-trigger-controller"
@@ -87,16 +86,6 @@ func eventsRule() rbacv1.PolicyRule {
 }
 
 func init() {
-	// build-config-change-controller
-	addControllerRole(rbacv1.ClusterRole{
-		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraBuildConfigChangeControllerServiceAccountName},
-		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("get", "list", "watch").Groups(buildGroup, legacyBuildGroup).Resources("buildconfigs").RuleOrDie(),
-			rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources("buildconfigs/instantiate").RuleOrDie(),
-			rbacv1helpers.NewRule("delete").Groups(buildGroup, legacyBuildGroup).Resources("builds").RuleOrDie(),
-			eventsRule(),
-		},
-	})
 
 	// deployer-controller
 	addControllerRole(rbacv1.ClusterRole{
