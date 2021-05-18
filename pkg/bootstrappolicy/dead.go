@@ -87,6 +87,9 @@ func init() {
 	addDeadClusterRoleBinding("system:openshift:controller:deployer-controller", "system:openshift:controller:deployer-controller")
 	addDeadClusterRole("system:openshift:controller:deploymentconfig-controller")
 	addDeadClusterRoleBinding("system:openshift:controller:deploymentconfig-controller", "system:openshift:controller:deploymentconfig-controller")
+	addDeadClusterRole("system:openshift:controller:template-instance-controller")
+	addDeadClusterRoleBinding("system:openshift:controller:template-instance-controller", "system:openshift:controller:template-instance-controller")
+	addDeadClusterRoleBinding("system:openshift:controller:template-instance-controller-admin", "admin")
 
 	// this was replaced by the node authorizer
 	addDeadClusterRoleBinding("system:nodes", "system:node")
