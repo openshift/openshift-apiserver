@@ -25,10 +25,6 @@ const (
 	InfraResourceQuotaControllerServiceAccountName              = "resourcequota-controller"
 	InfraDefaultRoleBindingsControllerServiceAccountName        = "default-rolebindings-controller"
 
-	// template instance controller watches for TemplateInstance object creation
-	// and instantiates templates as a result.
-	InfraTemplateInstanceFinalizerControllerServiceAccountName = "template-instance-finalizer-controller"
-
 	// template service broker is an open service broker-compliant API
 	// implementation which serves up OpenShift templates.  It uses the
 	// TemplateInstance backend for most of the heavy lifting.
@@ -83,20 +79,6 @@ func eventsRule() rbacv1.PolicyRule {
 }
 
 func init() {
-
-	// template-instance-finalizer-controller
-	addControllerRole(rbacv1.ClusterRole{
-		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraTemplateInstanceFinalizerControllerServiceAccountName},
-		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("update").Groups(templateGroup).Resources("templateinstances/status").RuleOrDie(),
-		},
-	})
-
-	// template-instance-finalizer-controller
-	templateInstanceFinalizerController := rbacv1helpers.NewClusterBinding(AdminRoleName).SAs(DefaultOpenShiftInfraNamespace, InfraTemplateInstanceFinalizerControllerServiceAccountName).BindingOrDie()
-	templateInstanceFinalizerController.Name = "system:openshift:controller:" + InfraTemplateInstanceFinalizerControllerServiceAccountName + ":admin"
-	addDefaultMetadata(&templateInstanceFinalizerController)
-	controllerRoleBindings = append(controllerRoleBindings, templateInstanceFinalizerController)
 
 	// origin-namespace-controller
 	addControllerRole(rbacv1.ClusterRole{
