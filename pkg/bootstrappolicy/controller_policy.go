@@ -15,7 +15,6 @@ const saRolePrefix = "system:openshift:controller:"
 const (
 	InfraServiceServingCertServiceAccountName                   = "service-serving-cert-controller"
 	InfraClusterQuotaReconciliationControllerServiceAccountName = "cluster-quota-reconciliation-controller"
-	InfraUnidlingControllerServiceAccountName                   = "unidling-controller"
 	InfraServiceIngressIPControllerServiceAccountName           = "service-ingress-ip-controller"
 	InfraPersistentVolumeRecyclerControllerServiceAccountName   = "pv-recycler-controller"
 	InfraResourceQuotaControllerServiceAccountName              = "resourcequota-controller"
@@ -97,20 +96,6 @@ func init() {
 		},
 	})
 
-	// unidling-controller
-	addControllerRole(rbacv1.ClusterRole{
-		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraUnidlingControllerServiceAccountName},
-		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("get", "update").Groups(kapiGroup).Resources("replicationcontrollers/scale", "endpoints", "services").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update", "patch").Groups(kapiGroup).Resources("replicationcontrollers").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update", "patch").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update").Groups(extensionsGroup, appsGroup).Resources("replicasets/scale", "deployments/scale").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs/scale").RuleOrDie(),
-			rbacv1helpers.NewRule("watch", "list").Groups(kapiGroup).Resources("events").RuleOrDie(),
-			eventsRule(),
-		},
-	})
-
 	// ingress-ip-controller
 	addControllerRole(rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraServiceIngressIPControllerServiceAccountName},
@@ -158,6 +143,7 @@ func init() {
 
 	bindControllerRole(InfraHorizontalPodAutoscalerControllerServiceAccountName, "system:controller:horizontal-pod-autoscaler")
 
+	// template-service-broker
 	addControllerRole(rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraTemplateServiceBrokerServiceAccountName},
 		Rules: []rbacv1.PolicyRule{
@@ -175,6 +161,7 @@ func init() {
 		},
 	})
 
+	// default-rolebindings-controller
 	// the controller needs to be bound to the roles it is going to try to create
 	bindControllerRole(InfraDefaultRoleBindingsControllerServiceAccountName, ImagePullerRoleName)
 	bindControllerRole(InfraDefaultRoleBindingsControllerServiceAccountName, ImageBuilderRoleName)

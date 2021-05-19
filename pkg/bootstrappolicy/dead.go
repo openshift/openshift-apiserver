@@ -101,6 +101,8 @@ func init() {
 	addDeadClusterRoleBinding("system:openshift:controller:image-trigger-controller", "system:openshift:controller:image-trigger-controller")
 	addDeadClusterRole("system:openshift:controller:image-import-controller")
 	addDeadClusterRoleBinding("system:openshift:controller:image-import-controller", "system:openshift:controller:image-import-controller")
+	addDeadClusterRole("system:openshift:controller:unidling-controller")
+	addDeadClusterRoleBinding("system:openshift:controller:unidling-controller", "system:openshift:controller:unidling-controller")
 
 	// this was replaced by the node authorizer
 	addDeadClusterRoleBinding("system:nodes", "system:node")
