@@ -14,7 +14,6 @@ const saRolePrefix = "system:openshift:controller:"
 
 const (
 	InfraServiceServingCertServiceAccountName                   = "service-serving-cert-controller"
-	InfraImageImportControllerServiceAccountName                = "image-import-controller"
 	InfraClusterQuotaReconciliationControllerServiceAccountName = "cluster-quota-reconciliation-controller"
 	InfraUnidlingControllerServiceAccountName                   = "unidling-controller"
 	InfraServiceIngressIPControllerServiceAccountName           = "service-ingress-ip-controller"
@@ -83,17 +82,6 @@ func init() {
 		Rules: []rbacv1.PolicyRule{
 			rbacv1helpers.NewRule("list", "watch", "update").Groups(kapiGroup).Resources("services").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "list", "watch", "create", "update", "delete").Groups(kapiGroup).Resources("secrets").RuleOrDie(),
-			eventsRule(),
-		},
-	})
-
-	// image-import-controller
-	addControllerRole(rbacv1.ClusterRole{
-		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraImageImportControllerServiceAccountName},
-		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("get", "list", "watch", "create", "update").Groups(imageGroup, legacyImageGroup).Resources("imagestreams").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "list", "watch", "create", "update", "patch", "delete").Groups(imageGroup, legacyImageGroup).Resources("images").RuleOrDie(),
-			rbacv1helpers.NewRule("create").Groups(imageGroup, legacyImageGroup).Resources("imagestreamimports").RuleOrDie(),
 			eventsRule(),
 		},
 	})
