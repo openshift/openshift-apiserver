@@ -15,7 +15,6 @@ const saRolePrefix = "system:openshift:controller:"
 const (
 	InfraServiceServingCertServiceAccountName                   = "service-serving-cert-controller"
 	InfraClusterQuotaReconciliationControllerServiceAccountName = "cluster-quota-reconciliation-controller"
-	InfraServiceIngressIPControllerServiceAccountName           = "service-ingress-ip-controller"
 	InfraPersistentVolumeRecyclerControllerServiceAccountName   = "pv-recycler-controller"
 	InfraResourceQuotaControllerServiceAccountName              = "resourcequota-controller"
 	InfraDefaultRoleBindingsControllerServiceAccountName        = "default-rolebindings-controller"
@@ -92,16 +91,6 @@ func init() {
 			rbacv1helpers.NewRule("get", "list").Groups(kapiGroup).Resources("configmaps").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "list").Groups(kapiGroup).Resources("secrets").RuleOrDie(),
 			rbacv1helpers.NewRule("update").Groups(quotaGroup, legacyQuotaGroup).Resources("clusterresourcequotas/status").RuleOrDie(),
-			eventsRule(),
-		},
-	})
-
-	// ingress-ip-controller
-	addControllerRole(rbacv1.ClusterRole{
-		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraServiceIngressIPControllerServiceAccountName},
-		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("list", "watch", "update").Groups(kapiGroup).Resources("services").RuleOrDie(),
-			rbacv1helpers.NewRule("update").Groups(kapiGroup).Resources("services/status").RuleOrDie(),
 			eventsRule(),
 		},
 	})
