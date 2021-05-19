@@ -149,21 +149,6 @@ func init() {
 			eventsRule(),
 		},
 	})
-
-	// default-rolebindings-controller
-	// the controller needs to be bound to the roles it is going to try to create
-	bindControllerRole(InfraDefaultRoleBindingsControllerServiceAccountName, ImagePullerRoleName)
-	bindControllerRole(InfraDefaultRoleBindingsControllerServiceAccountName, ImageBuilderRoleName)
-	bindControllerRole(InfraDefaultRoleBindingsControllerServiceAccountName, DeployerRoleName)
-	addControllerRole(rbacv1.ClusterRole{
-		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraDefaultRoleBindingsControllerServiceAccountName},
-		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("create").Groups(rbacGroup).Resources("rolebindings").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "list", "watch").Groups(kapiGroup).Resources("namespaces").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "list", "watch").Groups(rbacGroup).Resources("rolebindings").RuleOrDie(),
-			eventsRule(),
-		},
-	})
 }
 
 // ControllerRoles returns the cluster roles used by controllers
