@@ -14,7 +14,6 @@ const saRolePrefix = "system:openshift:controller:"
 
 const (
 	InfraServiceServingCertServiceAccountName                   = "service-serving-cert-controller"
-	InfraImageTriggerControllerServiceAccountName               = "image-trigger-controller"
 	InfraImageImportControllerServiceAccountName                = "image-import-controller"
 	InfraClusterQuotaReconciliationControllerServiceAccountName = "cluster-quota-reconciliation-controller"
 	InfraUnidlingControllerServiceAccountName                   = "unidling-controller"
@@ -77,31 +76,6 @@ func eventsRule() rbacv1.PolicyRule {
 }
 
 func init() {
-
-	// imagetrigger-controller
-	addControllerRole(rbacv1.ClusterRole{
-		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraImageTriggerControllerServiceAccountName},
-		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("list", "watch").Groups(imageGroup, legacyImageGroup).Resources("imagestreams").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update").Groups(extensionsGroup).Resources("daemonsets").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update").Groups(extensionsGroup, appsGroup).Resources("deployments").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update").Groups(appsGroup).Resources("statefulsets").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update").Groups(batchGroup).Resources("cronjobs").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "update").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs").RuleOrDie(),
-			rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources("buildconfigs/instantiate").RuleOrDie(),
-			// trigger controller must be able to modify these build types
-			// TODO: move to a new custom binding that can be removed separately from end user access?
-			rbacv1helpers.NewRule("create").Groups(buildGroup, legacyBuildGroup).Resources(
-				SourceBuildResource,
-				DockerBuildResource,
-				CustomBuildResource,
-				OptimizedDockerBuildResource,
-				JenkinsPipelineBuildResource,
-			).RuleOrDie(),
-
-			eventsRule(),
-		},
-	})
 
 	// service-serving-cert-controller
 	addControllerRole(rbacv1.ClusterRole{
