@@ -77,6 +77,9 @@ func init() {
 	// these were moved under system:openshift:openshift-controller-manager:*
 	addDeadClusterRole("system:openshift:controller:ingress-to-route-controller")
 	addDeadClusterRoleBinding("system:openshift:controller:ingress-to-route-controller", "system:openshift:controller:ingress-to-route-controller")
+
+	// these were removed from the apiserver's bootstrap policy, but retain the same names
+	// role rules and role bindings are now managed by openshift/cluster-openshift-controller-manager-operator
 	addDeadClusterRole("system:openshift:controller:serviceaccount-controller")
 	addDeadClusterRoleBinding("system:openshift:controller:serviceaccount-controller", "system:openshift:controller:serviceaccount-controller")
 	addDeadClusterRole("system:openshift:controller:build-controller")
