@@ -6,7 +6,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	routev1 "github.com/openshift/api/route/v1"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 )
 
@@ -39,7 +38,7 @@ func createRouteSpecTo(name string, kind string) routeapi.RouteTargetReference {
 	return svc
 }
 
-// TestValidateRoute ensures not specifying a required field results in error and a fully specified
+// TestValidateRouteBad ensures not specifying a required field results in error and a fully specified
 // route passes successfully
 func TestValidateRoute(t *testing.T) {
 	tests := []struct {
@@ -54,7 +53,7 @@ func TestValidateRoute(t *testing.T) {
 					Namespace: "foo",
 				},
 				Spec: routeapi.RouteSpec{
-					Host: "host.com",
+					Host: "host",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
 			},
@@ -67,88 +66,8 @@ func TestValidateRoute(t *testing.T) {
 					Name: "name",
 				},
 				Spec: routeapi.RouteSpec{
-					Host: "host.com",
-					To:   createRouteSpecTo("serviceName", "Service"),
-				},
-			},
-			expectedErrors: 1,
-		},
-		{
-			name: "Non-DNS-compliant host with override annotation",
-			route: &routeapi.Route{
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: "foo",
-					Name:      "bar",
-					Annotations: map[string]string{
-						routev1.AllowNonDNSCompliantHostAnnotation: "true",
-					},
-				},
-				Spec: routeapi.RouteSpec{
 					Host: "host",
 					To:   createRouteSpecTo("serviceName", "Service"),
-				},
-			},
-			expectedErrors: 0,
-		},
-		{
-			name: "Non-DNS-compliant host with blank override annotation",
-			route: &routeapi.Route{
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: "foo",
-					Name:      "bar",
-					Annotations: map[string]string{
-						routev1.AllowNonDNSCompliantHostAnnotation: "",
-					},
-				},
-				Spec: routeapi.RouteSpec{
-					Host: "host",
-					To:   createRouteSpecTo("serviceName", "Service"),
-				},
-			},
-			expectedErrors: 1,
-		},
-		{
-			name: "Non-DNS-compliant host without override annotation",
-			route: &routeapi.Route{
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: "foo",
-					Name:      "bar",
-				},
-				Spec: routeapi.RouteSpec{
-					Host: "host",
-					To:   createRouteSpecTo("serviceName", "Service"),
-				},
-			},
-			expectedErrors: 1,
-		},
-		{
-			name: "Specified subdomain too long",
-			route: &routeapi.Route{
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: "foo-1234567890-1234567890-123456",
-					Name:      "bar-1234567890-1234567890-123456",
-				},
-				Spec: routeapi.RouteSpec{
-					Host: "foo-1234567890-1234567890-123456-bar-1234567890-1234567890-123456.host.com",
-					To:   createRouteSpecTo("serviceName", "Service"),
-				},
-			},
-			expectedErrors: 1,
-		},
-		{
-			name: "Specified host name too long",
-			route: &routeapi.Route{
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: "foo",
-					Name:      "bar",
-				},
-				Spec: routeapi.RouteSpec{
-					Host: "1234567-1234567890-1234567890-1234567890-1234567890-1234567890." +
-						"1234567-1234567890-1234567890-1234567890-1234567890-1234567890." +
-						"1234567-1234567890-1234567890-1234567890-1234567890-1234567890." +
-						"1234567-1234567890-1234567890-1234567890-1234567890-1234567890." +
-						"12345678",
-					To: createRouteSpecTo("serviceName", "Service"),
 				},
 			},
 			expectedErrors: 1,
@@ -188,7 +107,7 @@ func TestValidateRoute(t *testing.T) {
 					Namespace: "foo",
 				},
 				Spec: routeapi.RouteSpec{
-					Host: "host.com",
+					Host: "host",
 					To:   createRouteSpecTo("", "Service"),
 				},
 			},
@@ -202,7 +121,7 @@ func TestValidateRoute(t *testing.T) {
 					Namespace: "foo",
 				},
 				Spec: routeapi.RouteSpec{
-					Host: "host.com",
+					Host: "host",
 					To:   createRouteSpecTo("serviceName", ""),
 				},
 			},
@@ -396,6 +315,7 @@ func TestValidateRoute(t *testing.T) {
 
 	for _, tc := range tests {
 		errs := ValidateRoute(tc.route)
+
 		if len(errs) != tc.expectedErrors {
 			t.Errorf("Test case %s expected %d error(s), got %d. %v", tc.name, tc.expectedErrors, len(errs), errs)
 		}
@@ -598,7 +518,7 @@ func TestValidatePassthroughInsecureEdgeTerminationPolicy(t *testing.T) {
 	}
 }
 
-// TestValidateRouteUpdate ensures not specifying a required field results in error and a fully specified
+// TestValidateRouteBad ensures not specifying a required field results in error and a fully specified
 // route passes successfully
 func TestValidateRouteUpdate(t *testing.T) {
 	tests := []struct {
@@ -615,7 +535,7 @@ func TestValidateRouteUpdate(t *testing.T) {
 					ResourceVersion: "1",
 				},
 				Spec: routeapi.RouteSpec{
-					Host: "host.com",
+					Host: "host",
 					To: routeapi.RouteTargetReference{
 						Name: "serviceName",
 						Kind: "Service",
@@ -633,14 +553,14 @@ func TestValidateRouteUpdate(t *testing.T) {
 					ResourceVersion: "1",
 				},
 				Spec: routeapi.RouteSpec{
-					Host: "host.com",
+					Host: "host",
 					To: routeapi.RouteTargetReference{
 						Name: "serviceName",
 						Kind: "Service",
 					},
 				},
 			},
-			change:         func(route *routeapi.Route) { route.Spec.Host = "other.com" },
+			change:         func(route *routeapi.Route) { route.Spec.Host = "other" },
 			expectedErrors: 0, // now controlled by rbac
 		},
 		{
@@ -652,82 +572,6 @@ func TestValidateRouteUpdate(t *testing.T) {
 				},
 				Spec: routeapi.RouteSpec{
 					Host: "host",
-					To: routeapi.RouteTargetReference{
-						Name: "serviceName",
-						Kind: "Service",
-					},
-				},
-			},
-			change:         func(route *routeapi.Route) { route.Spec.Host = "host" },
-			expectedErrors: 0,
-			// the host name is no longer acceptable, but we don't check for an update where the host name did not change
-		},
-		{
-			route: &routeapi.Route{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:            "bar",
-					Namespace:       "foo",
-					ResourceVersion: "1",
-				},
-				Spec: routeapi.RouteSpec{
-					Host: "host",
-					To: routeapi.RouteTargetReference{
-						Name: "serviceName",
-						Kind: "Service",
-					},
-				},
-			},
-			change:         func(route *routeapi.Route) { route.Spec.Host = "hostess" },
-			expectedErrors: 1, // the new host name is not acceptable, and changed during an update, so we check
-		},
-		{
-			route: &routeapi.Route{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:            "bar",
-					Namespace:       "foo",
-					ResourceVersion: "1",
-				},
-				Spec: routeapi.RouteSpec{
-					Host: "host.com",
-					To: routeapi.RouteTargetReference{
-						Name: "serviceName",
-						Kind: "Service",
-					},
-				},
-			},
-			change:         func(route *routeapi.Route) { route.Spec.Host = "host" },
-			expectedErrors: 1, // the new host name is unacceptable
-		},
-		{
-			route: &routeapi.Route{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:            "bar",
-					Namespace:       "foo",
-					ResourceVersion: "1",
-				},
-				Spec: routeapi.RouteSpec{
-					Host: "host.com",
-					To: routeapi.RouteTargetReference{
-						Name: "serviceName",
-						Kind: "Service",
-					},
-				},
-			},
-			change: func(route *routeapi.Route) {
-				route.Spec.Host = "host"
-				route.ObjectMeta.Annotations = map[string]string{routev1.AllowNonDNSCompliantHostAnnotation: "true"}
-			},
-			expectedErrors: 0, // the new host name is unacceptable but the annotation allows it
-		},
-		{
-			route: &routeapi.Route{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:            "bar",
-					Namespace:       "foo",
-					ResourceVersion: "1",
-				},
-				Spec: routeapi.RouteSpec{
-					Host: "host.com",
 					To: routeapi.RouteTargetReference{
 						Name: "serviceName",
 						Kind: "Service",
