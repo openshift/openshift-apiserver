@@ -930,7 +930,7 @@ k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v0.21.0 => github.com/openshift/kubernetes-apiserver v0.0.0-20210429124958-bfe0e9ebee8f
+# k8s.io/apiserver v0.21.0 => github.com/openshift/kubernetes-apiserver v0.0.0-20210527175848-55ee66589915
 ## explicit
 k8s.io/apiserver/pkg/admission
 k8s.io/apiserver/pkg/admission/configuration
@@ -1760,7 +1760,7 @@ sigs.k8s.io/yaml
 # k8s.io/api => k8s.io/api v0.21.0
 # k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.21.0
 # k8s.io/apimachinery => k8s.io/apimachinery v0.21.0
-# k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20210429124958-bfe0e9ebee8f
+# k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20210527175848-55ee66589915
 # k8s.io/cli-runtime => k8s.io/cli-runtime v0.21.0
 # k8s.io/client-go => k8s.io/client-go v0.21.0
 # k8s.io/cloud-provider => k8s.io/cloud-provider v0.21.0
