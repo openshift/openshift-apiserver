@@ -24,6 +24,7 @@ const (
 	InfraImageTriggerControllerServiceAccountName               = "image-trigger-controller"
 	InfraImageImportControllerServiceAccountName                = "image-import-controller"
 	InfraClusterQuotaReconciliationControllerServiceAccountName = "cluster-quota-reconciliation-controller"
+	InfraClusterCSRApproverControllerServiceAccountName			= "cluster-csr-approver-controller"
 	InfraUnidlingControllerServiceAccountName                   = "unidling-controller"
 	InfraServiceIngressIPControllerServiceAccountName           = "service-ingress-ip-controller"
 	InfraPersistentVolumeRecyclerControllerServiceAccountName   = "pv-recycler-controller"
@@ -261,6 +262,15 @@ func init() {
 			rbacv1helpers.NewRule("get", "list").Groups(kapiGroup).Resources("configmaps").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "list").Groups(kapiGroup).Resources("secrets").RuleOrDie(),
 			rbacv1helpers.NewRule("update").Groups(quotaGroup, legacyQuotaGroup).Resources("clusterresourcequotas/status").RuleOrDie(),
+			eventsRule(),
+		},
+	})
+
+	// cluster-quota-reconciliation
+	addControllerRole(rbacv1.ClusterRole{
+		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraClusterCSRApproverControllerServiceAccountName},
+		Rules: []rbacv1.PolicyRule{
+			rbacv1helpers.NewRule("get", "update", "patch", "list", "watch").Groups(certificatesGroup).Resources("certificatesigningrequests").RuleOrDie(),
 			eventsRule(),
 		},
 	})
