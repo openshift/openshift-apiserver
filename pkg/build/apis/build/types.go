@@ -808,6 +808,8 @@ type DockerBuildStrategy struct {
 
 	// Args contains any build arguments that are to be passed to Docker.  See
 	// https://docs.docker.com/engine/reference/builder/#/arg for more details
+	// NOTE: Only the 'name' and 'value' fields are supported. Any settings on the 'valueFrom' field
+	// are ignored.
 	BuildArgs []kapi.EnvVar
 
 	// ForcePull describes if the builder should pull the images from registry prior to building.

@@ -248,7 +248,7 @@ github.com/opencontainers/image-spec/specs-go/v1
 # github.com/opencontainers/runc v1.0.0-rc93
 github.com/opencontainers/runc/libcontainer/system
 github.com/opencontainers/runc/libcontainer/user
-# github.com/openshift/api v0.0.0-20210505134316-28a3e7f66e4c
+# github.com/openshift/api v0.0.0-20210603185846-379093ab5d80
 ## explicit
 github.com/openshift/api
 github.com/openshift/api/annotations
@@ -780,7 +780,7 @@ gopkg.in/natefinch/lumberjack.v2
 gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 gopkg.in/yaml.v3
-# k8s.io/api v0.21.0 => k8s.io/api v0.21.0
+# k8s.io/api v0.21.1 => k8s.io/api v0.21.0
 ## explicit
 k8s.io/api/admission/v1
 k8s.io/api/admission/v1beta1
@@ -868,7 +868,7 @@ k8s.io/apiextensions-apiserver/pkg/generated/openapi
 k8s.io/apiextensions-apiserver/pkg/registry/customresource
 k8s.io/apiextensions-apiserver/pkg/registry/customresource/tableconvertor
 k8s.io/apiextensions-apiserver/pkg/registry/customresourcedefinition
-# k8s.io/apimachinery v0.21.0 => k8s.io/apimachinery v0.21.0
+# k8s.io/apimachinery v0.21.1 => k8s.io/apimachinery v0.21.0
 ## explicit
 k8s.io/apimachinery/pkg/api/apitesting
 k8s.io/apimachinery/pkg/api/apitesting/fuzzer
@@ -1370,7 +1370,7 @@ k8s.io/cloud-provider/config/install
 k8s.io/cloud-provider/config/v1alpha1
 k8s.io/cloud-provider/controllers/service/config
 k8s.io/cloud-provider/controllers/service/config/v1alpha1
-# k8s.io/code-generator v0.21.0 => k8s.io/code-generator v0.21.0
+# k8s.io/code-generator v0.21.1 => k8s.io/code-generator v0.21.0
 ## explicit
 k8s.io/code-generator
 k8s.io/code-generator/cmd/client-gen
