@@ -23,19 +23,14 @@ func TestWaitForRunningDeploymentSuccess(t *testing.T) {
 	kubeclient := fake.NewSimpleClientset([]runtime.Object{fakeController}...)
 	fakeWatch := watch.NewFake()
 	kubeclient.PrependWatchReactor("replicationcontrollers", clientgotesting.DefaultWatchReactor(fakeWatch, nil))
-	stopChan := make(chan struct{})
 
-	go func() {
-		defer close(stopChan)
-		rc, err := WaitForRunningDeployment(context.TODO(), kubeclient.CoreV1(), fakeController, 10*time.Second)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if rc == nil {
-			t.Errorf("expected returned replication controller to not be nil")
-		}
-	}()
+	go fakeWatch.Modify(fakeController)
 
-	fakeWatch.Modify(fakeController)
-	<-stopChan
+	rc, err := WaitForRunningDeployment(context.TODO(), kubeclient.CoreV1(), fakeController, 10*time.Second)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if rc == nil {
+		t.Errorf("expected returned replication controller to not be nil")
+	}
 }
