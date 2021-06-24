@@ -45,6 +45,7 @@ spec:
                 - manila.csi.openstack.org
                 - csi.ovirt.org
                 - csi.kubevirt.io
+                - csi.projected.shared.resources.openshift.io
                 type: string
             type: object
           spec:
