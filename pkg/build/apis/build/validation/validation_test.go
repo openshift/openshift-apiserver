@@ -3377,3 +3377,267 @@ func TestValidateBuildUpdateImageReferences(t *testing.T) {
 		}
 	}
 }
+
+func TestValidateBuildVolumes(t *testing.T) {
+	tests := []struct {
+		name   string
+		volume buildapi.BuildVolume
+		errors []string
+	}{
+		{
+			name: "empty name should fail",
+			volume: buildapi.BuildVolume{
+				Name: "",
+				Source: buildapi.BuildVolumeSource{
+					Type:   buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{
+				"Required value",
+			},
+		},
+		{
+			name: "uppercase should fail",
+			volume: buildapi.BuildVolume{
+				Name: "MyBuildVolume",
+				Source: buildapi.BuildVolumeSource{
+					Type:   buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{
+				"a lowercase RFC 1123 label must consist of lower case alphanumeric characters",
+			},
+		},
+		{
+			name: "name too long should fail",
+			volume: buildapi.BuildVolume{
+				Name: "this-volume-name-is-way-too-long-and-should-cause-an-error-since-it-is-longer-than-63-characters-long",
+				Source: buildapi.BuildVolumeSource{
+					Type:   buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{
+				"must be no more than 63 characters",
+			},
+		},
+		{
+			name: "missing source type should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Secret: &kapi.SecretVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{
+				"Required value: must not be blank",
+				"source type and specified type must match",
+			},
+		},
+		{
+			name: "missing source secret should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeSecret,
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"must specify one volume source"},
+		},
+		{
+			name: "missing source config map should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeConfigMap,
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"must specify one volume source"},
+		},
+		{
+			name: "multiple sources should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type:      buildapi.BuildVolumeSourceTypeConfigMap,
+					Secret:    &kapi.SecretVolumeSource{},
+					ConfigMap: &kapi.ConfigMapVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{
+				"source type and specified type must match",
+				"only one volume source is allowed",
+			},
+		},
+		{
+			name: "empty mounts should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type:   buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{},
+			},
+			errors: []string{"must supply at least one mount"},
+		},
+		{
+			name: "empty destination path should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type:   buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "",
+					},
+				},
+			},
+			errors: []string{
+				"must not be blank",
+			},
+		},
+		{
+			name: "relative path should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type:   buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "some/path",
+					},
+				},
+			},
+			errors: []string{"must be an absolute path"},
+		},
+		{
+			name: "path starts with '..' should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type:   buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "../some/path",
+					},
+				},
+			},
+			errors: []string{
+				"must be an absolute path",
+				"must not start with '..'",
+			},
+		},
+		{
+			name: "path contains ':' should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type:   buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path:",
+					},
+				},
+			},
+			errors: []string{"must not contain ':'"},
+		},
+		{
+			name: "compliant secret volume should pass",
+			volume: buildapi.BuildVolume{
+				Name: "this-name-should-pass",
+				Source: buildapi.BuildVolumeSource{
+					Type:   buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{},
+		},
+		{
+			name: "compliant config map volume should pass",
+			volume: buildapi.BuildVolume{
+				Name: "this-name-should-pass",
+				Source: buildapi.BuildVolumeSource{
+					Type:      buildapi.BuildVolumeSourceTypeConfigMap,
+					ConfigMap: &kapi.ConfigMapVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			errs := validateBuildVolume(tt.volume, field.NewPath(""))
+			if len(tt.errors) != len(errs) {
+				t.Errorf("wanted and actual errors do not match, wanted: %v, got: %v", tt.errors, errs)
+			}
+			for _, wantError := range tt.errors {
+				foundError := false
+				for _, err := range errs {
+					if strings.Contains(err.Error(), wantError) {
+						foundError = true
+					}
+				}
+				if !foundError {
+					t.Errorf("did not produce expected error, wanted: %q got: %q", wantError, errs)
+				}
+			}
+		})
+	}
+}

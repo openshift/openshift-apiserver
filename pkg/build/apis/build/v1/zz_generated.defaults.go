@@ -43,6 +43,15 @@ func SetObjectDefaults_Build(in *v1.Build) {
 				}
 			}
 		}
+		for i := range in.Spec.CommonSpec.Strategy.DockerStrategy.Volumes {
+			a := &in.Spec.CommonSpec.Strategy.DockerStrategy.Volumes[i]
+			if a.Source.Secret != nil {
+				corev1.SetDefaults_SecretVolumeSource(a.Source.Secret)
+			}
+			if a.Source.ConfigMap != nil {
+				corev1.SetDefaults_ConfigMapVolumeSource(a.Source.ConfigMap)
+			}
+		}
 	}
 	if in.Spec.CommonSpec.Strategy.SourceStrategy != nil {
 		SetDefaults_SourceBuildStrategy(in.Spec.CommonSpec.Strategy.SourceStrategy)
@@ -52,6 +61,15 @@ func SetObjectDefaults_Build(in *v1.Build) {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 				}
+			}
+		}
+		for i := range in.Spec.CommonSpec.Strategy.SourceStrategy.Volumes {
+			a := &in.Spec.CommonSpec.Strategy.SourceStrategy.Volumes[i]
+			if a.Source.Secret != nil {
+				corev1.SetDefaults_SecretVolumeSource(a.Source.Secret)
+			}
+			if a.Source.ConfigMap != nil {
+				corev1.SetDefaults_ConfigMapVolumeSource(a.Source.ConfigMap)
 			}
 		}
 	}
@@ -106,6 +124,15 @@ func SetObjectDefaults_BuildConfig(in *v1.BuildConfig) {
 				}
 			}
 		}
+		for i := range in.Spec.CommonSpec.Strategy.DockerStrategy.Volumes {
+			a := &in.Spec.CommonSpec.Strategy.DockerStrategy.Volumes[i]
+			if a.Source.Secret != nil {
+				corev1.SetDefaults_SecretVolumeSource(a.Source.Secret)
+			}
+			if a.Source.ConfigMap != nil {
+				corev1.SetDefaults_ConfigMapVolumeSource(a.Source.ConfigMap)
+			}
+		}
 	}
 	if in.Spec.CommonSpec.Strategy.SourceStrategy != nil {
 		SetDefaults_SourceBuildStrategy(in.Spec.CommonSpec.Strategy.SourceStrategy)
@@ -115,6 +142,15 @@ func SetObjectDefaults_BuildConfig(in *v1.BuildConfig) {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 				}
+			}
+		}
+		for i := range in.Spec.CommonSpec.Strategy.SourceStrategy.Volumes {
+			a := &in.Spec.CommonSpec.Strategy.SourceStrategy.Volumes[i]
+			if a.Source.Secret != nil {
+				corev1.SetDefaults_SecretVolumeSource(a.Source.Secret)
+			}
+			if a.Source.ConfigMap != nil {
+				corev1.SetDefaults_ConfigMapVolumeSource(a.Source.ConfigMap)
 			}
 		}
 	}
