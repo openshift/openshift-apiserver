@@ -39,6 +39,7 @@ require (
 	k8s.io/code-generator v0.21.1
 	k8s.io/component-base v0.21.1
 	k8s.io/component-helpers v0.21.1
+	k8s.io/klog v1.0.0
 	k8s.io/klog/v2 v2.8.0
 	k8s.io/kube-aggregator v0.21.1
 	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7
@@ -77,3 +78,5 @@ replace (
 	k8s.io/mount-utils => k8s.io/mount-utils v0.21.1
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.21.1
 )
+
+replace github.com/openshift/api => github.com/candita/api v0.0.0-20210714181731-e3fbcd4feecd
