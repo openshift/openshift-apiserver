@@ -49,7 +49,7 @@ func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeCl
 	if err != nil {
 		return nil, err
 	}
-	configClient, err := configv1client.NewForConfig(loopbackClientConfig)
+	configClient, err := configv1client.NewForConfig(nonProtobufConfig(kubeClientConfig))
 	if err != nil {
 		return nil, err
 	}
