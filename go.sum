@@ -140,8 +140,6 @@ github.com/coreos/go-systemd/v22 v22.1.0/go.mod h1:xO0FLkIi5MaZafQlIrOotqXZ90ih+
 github.com/coreos/pkg v0.0.0-20160727233714-3ac0863d7acf/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
 github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f h1:lBNOc5arjvs8E5mO2tbpBpLoyyu8B6e44T7hJy6potg=
 github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
-github.com/coreydaley/api v0.0.0-20210611190050-d0f48cbf0ba3 h1:baI2LyZ7k/5h2GhUUqsbkNb3a/cz1yPa1lebaVugobA=
-github.com/coreydaley/api v0.0.0-20210611190050-d0f48cbf0ba3/go.mod h1:izBmoXbUu3z5kUa4FjZhvekTsyzIWiOoaIgJiZBBMQs=
 github.com/cpuguy83/go-md2man v1.0.10/go.mod h1:SmD6nW6nTyfqj6ABTjUi3V3JVMnlJmwcJI5acqYI6dE=
 github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
 github.com/cpuguy83/go-md2man/v2 v2.0.0/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
@@ -528,12 +526,6 @@ github.com/opencontainers/runtime-spec v1.0.3-0.20200929063507-e6143ca7d51d/go.m
 github.com/opencontainers/selinux v1.8.0/go.mod h1:RScLhm78qiWa2gbVCcGkC7tCGdgk3ogry1nUQF8Evvo=
 github.com/openshift/api v0.0.0-20210331162552-3e31249e6a55/go.mod h1:dZ4kytOo3svxJHNYd0J55hwe/6IQG5gAUHUE0F3Jkio=
 github.com/openshift/api v0.0.0-20210331193751-3acddb19d360/go.mod h1:dZ4kytOo3svxJHNYd0J55hwe/6IQG5gAUHUE0F3Jkio=
-github.com/openshift/api v0.0.0-20210603185846-379093ab5d80 h1:CSaMNuLE1JbHMLbPilrrEIutoYXdFJFw452s9Jfe+hc=
-github.com/openshift/api v0.0.0-20210603185846-379093ab5d80/go.mod h1:izBmoXbUu3z5kUa4FjZhvekTsyzIWiOoaIgJiZBBMQs=
-github.com/openshift/api v0.0.0-20210617200138-9f677aa140c1 h1:qwYANvePJZhyBTFPn6kMPqyuPq4Zh8fmgWRtfOPLHgM=
-github.com/openshift/api v0.0.0-20210617200138-9f677aa140c1/go.mod h1:izBmoXbUu3z5kUa4FjZhvekTsyzIWiOoaIgJiZBBMQs=
-github.com/openshift/api v0.0.0-20210621070332-ea13be50ba2d h1:8+4jIjWRI2FUVq2REmv4XW3bD/Ty2pKIxbC6nGKo4ic=
-github.com/openshift/api v0.0.0-20210621070332-ea13be50ba2d/go.mod h1:izBmoXbUu3z5kUa4FjZhvekTsyzIWiOoaIgJiZBBMQs=
 github.com/openshift/api v0.0.0-20210624153211-ae79113891b0 h1:Wbo6MbFHqjoPNV5iSONP3VZV50RR6CS8MYoVHFlKIuQ=
 github.com/openshift/api v0.0.0-20210624153211-ae79113891b0/go.mod h1:izBmoXbUu3z5kUa4FjZhvekTsyzIWiOoaIgJiZBBMQs=
 github.com/openshift/apiserver-library-go v0.0.0-20210426120049-59b0e972bfb7 h1:eJDIx4xV8J+9Zg1W8UJPv5SME0pGNmXttWIUU5Fg6O4=
