@@ -16,7 +16,6 @@ import (
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer"
-	dockerregistry "github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
 )
 
 const (
@@ -242,7 +241,7 @@ func TestImageStreamImportRedHatRegistry(t *testing.T) {
 			},
 		},
 	}
-	context := context.WithValue(context.Background(), importer.ContextKeyV1RegistryClient, dockerregistry.NewClient(20*time.Second, false))
+	context := context.Background()
 	importCtx = importer.NewStaticCredentialsContext(rt, nil, nil)
 	err := retryWhenUnreachable(t, func() error {
 		i = importer.NewImageStreamImporter(importCtx, nil, 3, nil, nil)
