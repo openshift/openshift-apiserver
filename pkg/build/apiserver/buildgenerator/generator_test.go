@@ -298,19 +298,29 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 			},
 		}
 	}
-	triggersWithImageID := func() []buildv1.BuildTriggerPolicy {
-		triggers := defaultTriggers()
-		triggers[2].ImageChange.LastTriggeredImageID = imageID
-		return triggers
+	pre48Trigger := func() []buildv1.BuildTriggerPolicy {
+		return []buildv1.BuildTriggerPolicy{
+			{
+				Type: buildv1.ImageChangeBuildTriggerType,
+				ImageChange: &buildv1.ImageChangeTrigger{
+					From: &corev1.ObjectReference{
+						Name: "image1:tag1",
+						Kind: "ImageStreamTag",
+					},
+					LastTriggeredImageID: "ref/image1:tag1",
+				},
+			},
+		}
 	}
 	tests := []struct {
 		name    string
 		reqFrom *corev1.ObjectReference
-		//TODO the spec LastTriggeredImageID is deprecated in 4.8 but still maintained; when the field is removed in 4.9, remove this portion of the test
-		specTriggerIndex   int // indes of trigger in spec that will be updated with the imagev1id, if -1, no update expected
-		statusTriggerIndex int // index of trigger in status that will be updated with the imagev1 id, if -1, no update expected
-		triggers           []buildv1.BuildTriggerPolicy
-		errorExpected      bool
+		// the spec LastTriggeredImageID is deprecated in 4.8 but still populated; in 4.9 it is not longer populated
+		specTriggerIndex      int // indes of trigger in spec that will be updated with the imagev1id, if -1, no update expected
+		statusTriggerIndex    int // index of trigger in status that will be updated with the imagev1 id, if -1, no update expected
+		triggers              []buildv1.BuildTriggerPolicy
+		errorExpected         bool
+		lastTriggeredIDInSpec bool
 	}{
 		{
 			name: "default trigger",
@@ -344,13 +354,15 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 			triggers:           defaultTriggers(),
 		},
 		{
-			name: "existing imagev1 id",
+			name: "pre 4.7 trigger",
 			reqFrom: &corev1.ObjectReference{
 				Kind: "ImageStreamTag",
 				Name: "image1:tag1",
 			},
-			triggers:      triggersWithImageID(),
-			errorExpected: true,
+			specTriggerIndex:      0,
+			statusTriggerIndex:    0,
+			triggers:              pre48Trigger(),
+			lastTriggeredIDInSpec: true,
 		},
 	}
 
@@ -454,28 +466,31 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 		if tc.errorExpected {
 			continue
 		}
-		//TODO The spec LastTriggeredImageID is deprecated but still maintained in 4.8.  When we remove that field,
-		// presumably in 4.9, we can remove this for loop on bc.Spec.Triggers
-		for i := range bc.Spec.Triggers {
-			if i == tc.specTriggerIndex {
-				// Verify that the trigger got updated
-				if bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID != imageID {
-					t.Errorf("%s: expected trigger at index %d to contain imageID %s", tc.name, i, imageID)
+		// In 4.9 LastTriggeredImageID is no longer populated in spec.  However, BuildConfigs from clusters prior to 4.9
+		// may have this field populated.
+		if !tc.lastTriggeredIDInSpec {
+			for i := range bc.Spec.Triggers {
+				if i == tc.specTriggerIndex {
+					// Verify that the trigger in spec is empty
+					if bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID != "" {
+						t.Errorf("%s: expected trigger at index %d to NOT contain imageID %s", tc.name, i, imageID)
+					}
+					continue
 				}
-				continue
-			}
-			// Ensure that other triggers are updated with the latest container imagev1 ref
-			if bc.Spec.Triggers[i].Type == buildv1.ImageChangeBuildTriggerType {
-				from := bc.Spec.Triggers[i].ImageChange.From
-				if from == nil {
-					from = buildutil.GetInputReference(bc.Spec.Strategy)
+				// Ensure that other triggers are NOT updated with the latest container imagev1 ref
+				if bc.Spec.Triggers[i].Type == buildv1.ImageChangeBuildTriggerType {
+					from := bc.Spec.Triggers[i].ImageChange.From
+					if from == nil {
+						from = buildutil.GetInputReference(bc.Spec.Strategy)
+					}
+					if bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID != "" {
+						t.Errorf("%s: expected LastTriggeredImageID for trigger at %d (%+v) to be %s. Got: %s", tc.name, i, bc.Spec.Triggers[i].ImageChange.From, "ref/"+from.Name, bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID)
+					}
 				}
-				if bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID != ("ref/" + from.Name) {
-					t.Errorf("%s: expected LastTriggeredImageID for trigger at %d (%+v) to be %s. Got: %s", tc.name, i, bc.Spec.Triggers[i].ImageChange.From, "ref/"+from.Name, bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID)
-				}
-			}
 
+			}
 		}
+
 		for i := range bc.Status.ImageChangeTriggers {
 			if i == tc.statusTriggerIndex {
 				// Verify that the trigger got updated

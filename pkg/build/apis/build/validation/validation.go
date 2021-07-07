@@ -810,9 +810,23 @@ func validateBuildVolume(volume buildapi.BuildVolume, fldPath *field.Path) field
 	var foundVolumeSources []string
 
 	if volume.Source.Secret != nil {
+		if len(volume.Source.Secret.SecretName) == 0 {
+			allErrs = append(allErrs, field.Required(fldPath.Child("source").Child("secret").Child("secretName"), ""))
+		} else if reasons := validation.ValidateSecretName(volume.Source.Secret.SecretName, false); len(reasons) != 0 {
+			for _, r := range reasons {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("source").Child("secret").Child("secretName"), volume.Source.Secret, r))
+			}
+		}
 		foundVolumeSources = append(foundVolumeSources, string(buildapi.BuildVolumeSourceTypeSecret))
 	}
 	if volume.Source.ConfigMap != nil {
+		if len(volume.Source.ConfigMap.Name) == 0 {
+			allErrs = append(allErrs, field.Required(fldPath.Child("source").Child("configMap").Child("name"), ""))
+		} else if reasons := validation.ValidateConfigMapName(volume.Source.ConfigMap.Name, false); len(reasons) != 0 {
+			for _, r := range reasons {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("source").Child("configMap").Child("name"), volume.Source.ConfigMap, r))
+			}
+		}
 		foundVolumeSources = append(foundVolumeSources, string(buildapi.BuildVolumeSourceTypeConfigMap))
 	}
 	if len(foundVolumeSources) == 0 {

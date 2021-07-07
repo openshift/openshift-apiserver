@@ -16,7 +16,6 @@ import (
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer"
-	dockerregistry "github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
 )
 
 const (
@@ -88,67 +87,6 @@ func retryOnErrors(t *testing.T, errorPatterns []string, f func() error) error {
 // follow.
 func retryWhenUnreachable(t *testing.T, f func() error, errorPatterns ...string) error {
 	return retryOnErrors(t, append(errorPatterns, unreachableErrorPatterns...), f)
-}
-
-func TestImageStreamImportDockerHub(t *testing.T) {
-	rt, _ := restclient.TransportFor(&restclient.Config{})
-	importCtx := importer.NewStaticCredentialsContext(rt, nil, nil)
-
-	imports := &imageapi.ImageStreamImport{
-		Spec: imageapi.ImageStreamImportSpec{
-			Repository: &imageapi.RepositoryImportSpec{
-				From: kapi.ObjectReference{Kind: "DockerImage", Name: "mongo"},
-			},
-			Images: []imageapi.ImageImportSpec{
-				{From: kapi.ObjectReference{Kind: "DockerImage", Name: "redis"}},
-				{From: kapi.ObjectReference{Kind: "DockerImage", Name: "mysql"}},
-				{From: kapi.ObjectReference{Kind: "DockerImage", Name: "redis:latest"}},
-				{From: kapi.ObjectReference{Kind: "DockerImage", Name: "mysql/doesnotexistinanyform"}},
-			},
-		},
-	}
-
-	err := retryWhenUnreachable(t, func() error {
-		i := importer.NewImageStreamImporter(importCtx, nil, 3, nil, nil)
-		if err := i.Import(context.Background(), imports, &imageapi.ImageStream{}); err != nil {
-			return err
-		}
-
-		errs := []error{}
-		for i, d := range imports.Status.Images {
-			fromName := imports.Spec.Images[i].From.Name
-			if d.Status.Status != metav1.StatusSuccess && fromName != "mysql/doesnotexistinanyform" {
-				errs = append(errs, fmt.Errorf("failed to import an image %s: %v", fromName, d.Status.Message))
-			}
-		}
-		return kerrors.NewAggregate(errs)
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if imports.Status.Repository.Status.Status != metav1.StatusSuccess || len(imports.Status.Repository.Images) != 3 || len(imports.Status.Repository.AdditionalTags) < 1 {
-		t.Errorf("unexpected repository: %#v", imports.Status.Repository)
-	}
-	if len(imports.Status.Images) != 4 {
-		t.Fatalf("unexpected response: %#v", imports.Status.Images)
-	}
-	d := imports.Status.Images[0]
-	if d.Image == nil || len(d.Image.DockerImageManifest) == 0 || !strings.HasPrefix(d.Image.DockerImageReference, "redis@") || len(d.Image.DockerImageMetadata.ID) == 0 || len(d.Image.DockerImageLayers) == 0 {
-		t.Errorf("unexpected object: %#v", d.Image)
-	}
-	d = imports.Status.Images[1]
-	if d.Image == nil || len(d.Image.DockerImageManifest) == 0 || !strings.HasPrefix(d.Image.DockerImageReference, "mysql@") || len(d.Image.DockerImageMetadata.ID) == 0 || len(d.Image.DockerImageLayers) == 0 {
-		t.Errorf("unexpected object: %#v", d.Image)
-	}
-	d = imports.Status.Images[2]
-	if d.Image == nil || len(d.Image.DockerImageManifest) == 0 || !strings.HasPrefix(d.Image.DockerImageReference, "redis@") || len(d.Image.DockerImageMetadata.ID) == 0 || len(d.Image.DockerImageLayers) == 0 {
-		t.Errorf("unexpected object: %#v", d.Image)
-	}
-	d = imports.Status.Images[3]
-	if d.Image != nil || d.Status.Status != metav1.StatusFailure || d.Status.Reason != "Unauthorized" {
-		t.Errorf("unexpected object: %#v", d)
-	}
 }
 
 func TestImageStreamImportQuayIO(t *testing.T) {
@@ -242,7 +180,7 @@ func TestImageStreamImportRedHatRegistry(t *testing.T) {
 			},
 		},
 	}
-	context := context.WithValue(context.Background(), importer.ContextKeyV1RegistryClient, dockerregistry.NewClient(20*time.Second, false))
+	context := context.Background()
 	importCtx = importer.NewStaticCredentialsContext(rt, nil, nil)
 	err := retryWhenUnreachable(t, func() error {
 		i = importer.NewImageStreamImporter(importCtx, nil, 3, nil, nil)

@@ -258,7 +258,7 @@ func TestBuildValidationFailure(t *testing.T) {
 	}
 }
 
-func TestBuildValidationWithSCPStyledURL(t *testing.T) {
+func TestBuildValidationWithSSHSCPStyledURL(t *testing.T) {
 	build := &buildapi.Build{
 		ObjectMeta: metav1.ObjectMeta{Name: "", Namespace: ""},
 		Spec: buildapi.BuildSpec{
@@ -283,8 +283,82 @@ func TestBuildValidationWithSCPStyledURL(t *testing.T) {
 			Phase: buildapi.BuildPhaseNew,
 		},
 	}
-	if result := ValidateBuild(build); len(result) != 2 {
-		t.Errorf("Unexpected validation result: %v", result)
+	result := ValidateBuild(build)
+	foundError := false
+	for _, r := range result {
+		if r.Type == field.ErrorTypeInvalid && r.Field == "spec.source.git.uri" {
+			foundError = true
+			break
+		}
+	}
+	if !foundError {
+		t.Errorf("did not find expected error")
+	}
+}
+
+func TestBuildValidationWithSSHStyledURL(t *testing.T) {
+	build := &buildapi.Build{
+		ObjectMeta: metav1.ObjectMeta{Name: "", Namespace: ""},
+		Spec: buildapi.BuildSpec{
+			CommonSpec: buildapi.CommonSpec{
+				Source: buildapi.BuildSource{
+					Git: &buildapi.GitBuildSource{
+						URI: "ssh://git@github.com:22/user/repo.git",
+					},
+				},
+				Strategy: buildapi.BuildStrategy{
+					DockerStrategy: &buildapi.DockerBuildStrategy{},
+				},
+				Output: buildapi.BuildOutput{
+					To: &kapi.ObjectReference{
+						Kind: "DockerImage",
+						Name: "repository/data",
+					},
+				},
+			},
+		},
+		Status: buildapi.BuildStatus{
+			Phase: buildapi.BuildPhaseNew,
+		},
+	}
+	result := ValidateBuild(build)
+	for _, r := range result {
+		if r.Field == "spec.source.git.uri" {
+			t.Errorf("Unexpected error with uri: %s", r.Detail)
+		}
+	}
+}
+
+func TestBuildValidationWithSCPStyledURL(t *testing.T) {
+	build := &buildapi.Build{
+		ObjectMeta: metav1.ObjectMeta{Name: "", Namespace: ""},
+		Spec: buildapi.BuildSpec{
+			CommonSpec: buildapi.CommonSpec{
+				Source: buildapi.BuildSource{
+					Git: &buildapi.GitBuildSource{
+						URI: "git@github.com:sclorg/nodejs-ex",
+					},
+				},
+				Strategy: buildapi.BuildStrategy{
+					DockerStrategy: &buildapi.DockerBuildStrategy{},
+				},
+				Output: buildapi.BuildOutput{
+					To: &kapi.ObjectReference{
+						Kind: "DockerImage",
+						Name: "repository/data",
+					},
+				},
+			},
+		},
+		Status: buildapi.BuildStatus{
+			Phase: buildapi.BuildPhaseNew,
+		},
+	}
+	result := ValidateBuild(build)
+	for _, r := range result {
+		if r.Field == "spec.source.git.uri" {
+			t.Errorf("Unexpected error with uri: %s", r.Detail)
+		}
 	}
 }
 
@@ -2818,7 +2892,7 @@ func TestValidateTrigger(t *testing.T) {
 			trigger: buildapi.BuildTriggerPolicy{
 				Type: buildapi.ImageChangeBuildTriggerType,
 				ImageChange: &buildapi.ImageChangeTrigger{
-					LastTriggeredImageID: "asdf1234",
+					LastTriggeredImageID: "",
 				},
 			},
 		},
@@ -3389,8 +3463,10 @@ func TestValidateBuildVolumes(t *testing.T) {
 			volume: buildapi.BuildVolume{
 				Name: "",
 				Source: buildapi.BuildVolumeSource{
-					Type:   buildapi.BuildVolumeSourceTypeSecret,
-					Secret: &kapi.SecretVolumeSource{},
+					Type: buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "my-secret",
+					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{
 					{
@@ -3407,8 +3483,10 @@ func TestValidateBuildVolumes(t *testing.T) {
 			volume: buildapi.BuildVolume{
 				Name: "MyBuildVolume",
 				Source: buildapi.BuildVolumeSource{
-					Type:   buildapi.BuildVolumeSourceTypeSecret,
-					Secret: &kapi.SecretVolumeSource{},
+					Type: buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "my-secret",
+					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{
 					{
@@ -3425,8 +3503,10 @@ func TestValidateBuildVolumes(t *testing.T) {
 			volume: buildapi.BuildVolume{
 				Name: "this-volume-name-is-way-too-long-and-should-cause-an-error-since-it-is-longer-than-63-characters-long",
 				Source: buildapi.BuildVolumeSource{
-					Type:   buildapi.BuildVolumeSourceTypeSecret,
-					Secret: &kapi.SecretVolumeSource{},
+					Type: buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "my-secret",
+					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{
 					{
@@ -3443,7 +3523,9 @@ func TestValidateBuildVolumes(t *testing.T) {
 			volume: buildapi.BuildVolume{
 				Name: "some-volume",
 				Source: buildapi.BuildVolumeSource{
-					Secret: &kapi.SecretVolumeSource{},
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "my-secret",
+					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{
 					{
@@ -3491,9 +3573,15 @@ func TestValidateBuildVolumes(t *testing.T) {
 			volume: buildapi.BuildVolume{
 				Name: "some-volume",
 				Source: buildapi.BuildVolumeSource{
-					Type:      buildapi.BuildVolumeSourceTypeConfigMap,
-					Secret:    &kapi.SecretVolumeSource{},
-					ConfigMap: &kapi.ConfigMapVolumeSource{},
+					Type: buildapi.BuildVolumeSourceTypeConfigMap,
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "my-secret",
+					},
+					ConfigMap: &kapi.ConfigMapVolumeSource{
+						LocalObjectReference: kapi.LocalObjectReference{
+							Name: "my-configmap",
+						},
+					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{
 					{
@@ -3511,8 +3599,10 @@ func TestValidateBuildVolumes(t *testing.T) {
 			volume: buildapi.BuildVolume{
 				Name: "some-volume",
 				Source: buildapi.BuildVolumeSource{
-					Type:   buildapi.BuildVolumeSourceTypeSecret,
-					Secret: &kapi.SecretVolumeSource{},
+					Type: buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "my-secret",
+					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{},
 			},
@@ -3523,8 +3613,10 @@ func TestValidateBuildVolumes(t *testing.T) {
 			volume: buildapi.BuildVolume{
 				Name: "some-volume",
 				Source: buildapi.BuildVolumeSource{
-					Type:   buildapi.BuildVolumeSourceTypeSecret,
-					Secret: &kapi.SecretVolumeSource{},
+					Type: buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "my-secret",
+					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{
 					{
@@ -3541,8 +3633,10 @@ func TestValidateBuildVolumes(t *testing.T) {
 			volume: buildapi.BuildVolume{
 				Name: "some-volume",
 				Source: buildapi.BuildVolumeSource{
-					Type:   buildapi.BuildVolumeSourceTypeSecret,
-					Secret: &kapi.SecretVolumeSource{},
+					Type: buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "my-secret",
+					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{
 					{
@@ -3557,8 +3651,10 @@ func TestValidateBuildVolumes(t *testing.T) {
 			volume: buildapi.BuildVolume{
 				Name: "some-volume",
 				Source: buildapi.BuildVolumeSource{
-					Type:   buildapi.BuildVolumeSourceTypeSecret,
-					Secret: &kapi.SecretVolumeSource{},
+					Type: buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "my-secret",
+					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{
 					{
@@ -3576,8 +3672,10 @@ func TestValidateBuildVolumes(t *testing.T) {
 			volume: buildapi.BuildVolume{
 				Name: "some-volume",
 				Source: buildapi.BuildVolumeSource{
-					Type:   buildapi.BuildVolumeSourceTypeSecret,
-					Secret: &kapi.SecretVolumeSource{},
+					Type: buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "my-secret",
+					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{
 					{
@@ -3588,12 +3686,122 @@ func TestValidateBuildVolumes(t *testing.T) {
 			errors: []string{"must not contain ':'"},
 		},
 		{
+			name: "secret name too long should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "testsourceddssssssssaffffffffffffffffffffdagagddagagerqgeqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtestsourceddssssssssaffffffffffffffffffffdagagddagagerqgeqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtestsourceddssssssssaffffffffffffffffffffdagagddagagerqgeqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
+					},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"must be no more than 253 characters"},
+		},
+		{
+			name: "secret name invalid characters should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "my-secret-@",
+					},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters"},
+		},
+		{
+			name: "empty secret name should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type:   buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"Required value"},
+		},
+		{
+			name: "configmap name too long should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeConfigMap,
+					ConfigMap: &kapi.ConfigMapVolumeSource{
+						LocalObjectReference: kapi.LocalObjectReference{
+							Name: "testsourceddssssssssaffffffffffffffffffffdagagddagagerqgeqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtestsourceddssssssssaffffffffffffffffffffdagagddagagerqgeqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtestsourceddssssssssaffffffffffffffffffffdagagddagagerqgeqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
+						},
+					},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"must be no more than 253 characters"},
+		},
+		{
+			name: "configMap name invalid characters should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeConfigMap,
+					ConfigMap: &kapi.ConfigMapVolumeSource{
+						LocalObjectReference: kapi.LocalObjectReference{
+							Name: "my-secret-@",
+						},
+					},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters"},
+		},
+		{
+			name: "empty configMap name should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type:      buildapi.BuildVolumeSourceTypeConfigMap,
+					ConfigMap: &kapi.ConfigMapVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"Required value"},
+		},
+		{
 			name: "compliant secret volume should pass",
 			volume: buildapi.BuildVolume{
 				Name: "this-name-should-pass",
 				Source: buildapi.BuildVolumeSource{
-					Type:   buildapi.BuildVolumeSourceTypeSecret,
-					Secret: &kapi.SecretVolumeSource{},
+					Type: buildapi.BuildVolumeSourceTypeSecret,
+					Secret: &kapi.SecretVolumeSource{
+						SecretName: "my-secret",
+					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{
 					{
@@ -3608,8 +3816,12 @@ func TestValidateBuildVolumes(t *testing.T) {
 			volume: buildapi.BuildVolume{
 				Name: "this-name-should-pass",
 				Source: buildapi.BuildVolumeSource{
-					Type:      buildapi.BuildVolumeSourceTypeConfigMap,
-					ConfigMap: &kapi.ConfigMapVolumeSource{},
+					Type: buildapi.BuildVolumeSourceTypeConfigMap,
+					ConfigMap: &kapi.ConfigMapVolumeSource{
+						LocalObjectReference: kapi.LocalObjectReference{
+							Name: "my-configmap",
+						},
+					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{
 					{
@@ -3625,7 +3837,7 @@ func TestValidateBuildVolumes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			errs := validateBuildVolume(tt.volume, field.NewPath(""))
 			if len(tt.errors) != len(errs) {
-				t.Errorf("wanted and actual errors do not match, wanted: %v, got: %v", tt.errors, errs)
+				t.Errorf("wanted and actual errors do not match, wanted %d errors: %#v, got %d errors: %v", len(tt.errors), tt.errors, len(errs), errs)
 			}
 			for _, wantError := range tt.errors {
 				foundError := false
@@ -3635,7 +3847,7 @@ func TestValidateBuildVolumes(t *testing.T) {
 					}
 				}
 				if !foundError {
-					t.Errorf("did not produce expected error, wanted: %q got: %q", wantError, errs)
+					t.Errorf("did not produce expected error, wanted: %#v got: %v", wantError, errs)
 				}
 			}
 		})
