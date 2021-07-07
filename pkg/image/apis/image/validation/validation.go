@@ -31,7 +31,7 @@ import (
 // start with at least one letter or number, with following parts able to
 // be separated by one period, dash or underscore.
 // Copied from github.com/docker/distribution/registry/api/v2/names.go v2.1.1
-var RepositoryNameComponentRegexp = regexp.MustCompile(`[a-z0-9]+(?:[._-][a-z0-9]+)*`)
+var RepositoryNameComponentRegexp = regexp.MustCompile(`[a-z0-9\/]+(?:[._-][a-z0-9\/]+)*`)
 
 // RepositoryNameComponentAnchoredRegexp is the version of
 // RepositoryNameComponentRegexp which must completely match the content
@@ -44,8 +44,8 @@ var RepositoryNameComponentAnchoredRegexp = regexp.MustCompile(`^` + RepositoryN
 var RepositoryNameRegexp = regexp.MustCompile(`(?:` + RepositoryNameComponentRegexp.String() + `/)*` + RepositoryNameComponentRegexp.String())
 
 func ValidateImageStreamName(name string, prefix bool) []string {
-	if reasons := path.ValidatePathSegmentName(name, prefix); len(reasons) != 0 {
-		return reasons
+	if !RepositoryNameRegexp.MatchString(name) {
+		return []string{fmt.Sprintf("must match %q", RepositoryNameRegexp.String())}
 	}
 
 	if !RepositoryNameComponentAnchoredRegexp.MatchString(name) {

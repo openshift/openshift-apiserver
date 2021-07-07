@@ -382,25 +382,23 @@ func TestValidateImageStream(t *testing.T) {
 			name:      "",
 			expected:  field.ErrorList{missingNameErr},
 		},
-		"no slash in Name": {
+		"allow slash in Name": {
 			namespace: "foo",
 			name:      "foo/bar",
-			expected: field.ErrorList{
-				field.Invalid(field.NewPath("metadata", "name"), "foo/bar", `may not contain '/'`),
-			},
+			expected:  field.ErrorList{},
 		},
 		"no percent in Name": {
 			namespace: "foo",
 			name:      "foo%%bar",
 			expected: field.ErrorList{
-				field.Invalid(field.NewPath("metadata", "name"), "foo%%bar", `may not contain '%'`),
+				field.Invalid(field.NewPath("metadata", "name"), "foo%%bar", `must match "[a-z0-9\\/]+(?:[._-][a-z0-9\\/]+)*"`),
 			},
 		},
 		"other invalid name": {
 			namespace: "foo",
 			name:      "foo bar",
 			expected: field.ErrorList{
-				field.Invalid(field.NewPath("metadata", "name"), "foo bar", `must match "[a-z0-9]+(?:[._-][a-z0-9]+)*"`),
+				field.Invalid(field.NewPath("metadata", "name"), "foo bar", `must match "[a-z0-9\\/]+(?:[._-][a-z0-9\\/]+)*"`),
 			},
 		},
 		"missing namespace": {
