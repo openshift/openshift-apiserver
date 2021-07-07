@@ -15,6 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 
+	routev1 "github.com/openshift/api/route/v1"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 )
 
@@ -31,6 +32,19 @@ func ValidateRoute(route *routeapi.Route) field.ErrorList {
 	if len(route.Spec.Host) > 0 {
 		if len(kvalidation.IsDNS1123Subdomain(route.Spec.Host)) != 0 {
 			result = append(result, field.Invalid(specPath.Child("host"), route.Spec.Host, "host must conform to DNS 952 subdomain conventions"))
+		}
+
+		// annotations used to override the compliance
+		// setting the routev1.AllowNonDNSCompliantHostAnnotation to false
+		// will align these checks with the openshift router
+		if route.Annotations[routev1.AllowNonDNSCompliantHostAnnotation] != "true" {
+			segments := strings.Split(route.Spec.Host, ".")
+			for _, s := range segments {
+				errs := kvalidation.IsDNS1123Label(s)
+				for _, e := range errs {
+					result = append(result, field.Invalid(specPath.Child("host"), route.Spec.Host, "host (label) must conform to DNS 1123 label conventions "+e))
+				}
+			}
 		}
 	}
 
