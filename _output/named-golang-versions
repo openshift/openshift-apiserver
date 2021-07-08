@@ -1,0 +1,3 @@
+images/Dockerfile.rhel: 1.16
+.ci-operator.yaml: 1.16
+go.mod: 1.16
