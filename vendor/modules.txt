@@ -77,20 +77,11 @@ github.com/docker/docker/api/types/swarm
 github.com/docker/docker/api/types/swarm/runtime
 github.com/docker/docker/api/types/versions
 github.com/docker/docker/opts
-github.com/docker/docker/pkg/archive
-github.com/docker/docker/pkg/fileutils
-github.com/docker/docker/pkg/homedir
-github.com/docker/docker/pkg/idtools
 github.com/docker/docker/pkg/ioutils
 github.com/docker/docker/pkg/jsonlog
 github.com/docker/docker/pkg/jsonmessage
 github.com/docker/docker/pkg/longpath
-github.com/docker/docker/pkg/mount
-github.com/docker/docker/pkg/pools
-github.com/docker/docker/pkg/promise
-github.com/docker/docker/pkg/stdcopy
 github.com/docker/docker/pkg/stringid
-github.com/docker/docker/pkg/system
 github.com/docker/docker/pkg/tarsum
 github.com/docker/docker/pkg/term
 github.com/docker/docker/pkg/term/windows
@@ -117,9 +108,6 @@ github.com/emicklei/go-restful/log
 github.com/evanphx/json-patch
 # github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d
 github.com/exponent-io/jsonpath
-# github.com/fsouza/go-dockerclient v0.0.0-20171004212419-da3951ba2e9e
-## explicit
-github.com/fsouza/go-dockerclient
 # github.com/ghodss/yaml v1.0.0
 ## explicit
 github.com/ghodss/yaml
@@ -245,9 +233,6 @@ github.com/opencontainers/go-digest
 ## explicit
 github.com/opencontainers/image-spec/specs-go
 github.com/opencontainers/image-spec/specs-go/v1
-# github.com/opencontainers/runc v1.0.0-rc93
-github.com/opencontainers/runc/libcontainer/system
-github.com/opencontainers/runc/libcontainer/user
 # github.com/openshift/api v0.0.0-20210624153211-ae79113891b0
 ## explicit
 github.com/openshift/api
@@ -307,7 +292,7 @@ github.com/openshift/api/template
 github.com/openshift/api/template/v1
 github.com/openshift/api/user
 github.com/openshift/api/user/v1
-# github.com/openshift/apiserver-library-go v0.0.0-20210426120049-59b0e972bfb7
+# github.com/openshift/apiserver-library-go v0.0.0-20210702112302-ae0a7354dc50
 ## explicit
 github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy
 github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy/apis/imagepolicy/v1
@@ -338,7 +323,7 @@ github.com/openshift/build-machinery-go/make/targets/golang
 github.com/openshift/build-machinery-go/make/targets/openshift
 github.com/openshift/build-machinery-go/make/targets/openshift/operator
 github.com/openshift/build-machinery-go/scripts
-# github.com/openshift/client-go v0.0.0-20210331195552-cf6c2669e01f
+# github.com/openshift/client-go v0.0.0-20210521082421-73d9475a9142
 ## explicit
 github.com/openshift/client-go/apps/clientset/versioned
 github.com/openshift/client-go/apps/clientset/versioned/fake
@@ -430,7 +415,7 @@ github.com/openshift/client-go/user/informers/externalversions/internalinterface
 github.com/openshift/client-go/user/informers/externalversions/user
 github.com/openshift/client-go/user/informers/externalversions/user/v1
 github.com/openshift/client-go/user/listers/user/v1
-# github.com/openshift/library-go v0.0.0-20210331235027-66936e2fcc52
+# github.com/openshift/library-go v0.0.0-20210521084623-7392ea9b02ca
 ## explicit
 github.com/openshift/library-go/pkg/apiserver/admission/admissionregistrationtesting
 github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig
@@ -775,7 +760,7 @@ gopkg.in/natefinch/lumberjack.v2
 gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 gopkg.in/yaml.v3
-# k8s.io/api v0.21.1 => k8s.io/api v0.21.0
+# k8s.io/api v0.21.1 => k8s.io/api v0.21.1
 ## explicit
 k8s.io/api/admission/v1
 k8s.io/api/admission/v1beta1
@@ -823,7 +808,7 @@ k8s.io/api/scheduling/v1beta1
 k8s.io/api/storage/v1
 k8s.io/api/storage/v1alpha1
 k8s.io/api/storage/v1beta1
-# k8s.io/apiextensions-apiserver v0.21.0 => k8s.io/apiextensions-apiserver v0.21.0
+# k8s.io/apiextensions-apiserver v0.21.1 => k8s.io/apiextensions-apiserver v0.21.1
 ## explicit
 k8s.io/apiextensions-apiserver/pkg/apihelpers
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions
@@ -863,7 +848,7 @@ k8s.io/apiextensions-apiserver/pkg/generated/openapi
 k8s.io/apiextensions-apiserver/pkg/registry/customresource
 k8s.io/apiextensions-apiserver/pkg/registry/customresource/tableconvertor
 k8s.io/apiextensions-apiserver/pkg/registry/customresourcedefinition
-# k8s.io/apimachinery v0.21.1 => k8s.io/apimachinery v0.21.0
+# k8s.io/apimachinery v0.21.1 => k8s.io/apimachinery v0.21.1
 ## explicit
 k8s.io/apimachinery/pkg/api/apitesting
 k8s.io/apimachinery/pkg/api/apitesting/fuzzer
@@ -930,7 +915,7 @@ k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v0.21.0 => github.com/openshift/kubernetes-apiserver v0.0.0-20210527175848-55ee66589915
+# k8s.io/apiserver v0.21.1 => github.com/openshift/kubernetes-apiserver v0.0.0-20210527175848-55ee66589915
 ## explicit
 k8s.io/apiserver/pkg/admission
 k8s.io/apiserver/pkg/admission/configuration
@@ -1072,11 +1057,11 @@ k8s.io/apiserver/plugin/pkg/audit/truncate
 k8s.io/apiserver/plugin/pkg/audit/webhook
 k8s.io/apiserver/plugin/pkg/authenticator/token/webhook
 k8s.io/apiserver/plugin/pkg/authorizer/webhook
-# k8s.io/cli-runtime v0.21.0 => k8s.io/cli-runtime v0.21.0
+# k8s.io/cli-runtime v0.21.1 => k8s.io/cli-runtime v0.21.1
 k8s.io/cli-runtime/pkg/genericclioptions
 k8s.io/cli-runtime/pkg/printers
 k8s.io/cli-runtime/pkg/resource
-# k8s.io/client-go v0.21.0 => k8s.io/client-go v0.21.0
+# k8s.io/client-go v0.21.1 => k8s.io/client-go v0.21.1
 ## explicit
 k8s.io/client-go/applyconfigurations/admissionregistration/v1
 k8s.io/client-go/applyconfigurations/admissionregistration/v1beta1
@@ -1358,14 +1343,14 @@ k8s.io/client-go/util/jsonpath
 k8s.io/client-go/util/keyutil
 k8s.io/client-go/util/retry
 k8s.io/client-go/util/workqueue
-# k8s.io/cloud-provider v0.21.0 => k8s.io/cloud-provider v0.21.0
+# k8s.io/cloud-provider v0.21.1 => k8s.io/cloud-provider v0.21.1
 ## explicit
 k8s.io/cloud-provider/config
 k8s.io/cloud-provider/config/install
 k8s.io/cloud-provider/config/v1alpha1
 k8s.io/cloud-provider/controllers/service/config
 k8s.io/cloud-provider/controllers/service/config/v1alpha1
-# k8s.io/code-generator v0.21.1 => k8s.io/code-generator v0.21.0
+# k8s.io/code-generator v0.21.1 => k8s.io/code-generator v0.21.1
 ## explicit
 k8s.io/code-generator
 k8s.io/code-generator/cmd/client-gen
@@ -1400,7 +1385,7 @@ k8s.io/code-generator/cmd/set-gen
 k8s.io/code-generator/pkg/namer
 k8s.io/code-generator/pkg/util
 k8s.io/code-generator/third_party/forked/golang/reflect
-# k8s.io/component-base v0.21.0 => k8s.io/component-base v0.21.0
+# k8s.io/component-base v0.21.1 => k8s.io/component-base v0.21.1
 ## explicit
 k8s.io/component-base/cli/flag
 k8s.io/component-base/config
@@ -1418,14 +1403,14 @@ k8s.io/component-base/metrics/prometheus/restclient
 k8s.io/component-base/metrics/prometheus/workqueue
 k8s.io/component-base/metrics/testutil
 k8s.io/component-base/version
-# k8s.io/component-helpers v0.21.0 => k8s.io/component-helpers v0.21.0
+# k8s.io/component-helpers v0.21.1 => k8s.io/component-helpers v0.21.1
 ## explicit
 k8s.io/component-helpers/auth/rbac/reconciliation
 k8s.io/component-helpers/auth/rbac/validation
 k8s.io/component-helpers/scheduling/corev1
 k8s.io/component-helpers/scheduling/corev1/nodeaffinity
 k8s.io/component-helpers/storage/volume
-# k8s.io/controller-manager v0.21.0 => k8s.io/controller-manager v0.21.0
+# k8s.io/controller-manager v0.21.1 => k8s.io/controller-manager v0.21.1
 k8s.io/controller-manager/config
 k8s.io/controller-manager/config/v1alpha1
 # k8s.io/gengo v0.0.0-20201214224949-b6c5ce23f027
@@ -1442,7 +1427,7 @@ k8s.io/gengo/types
 # k8s.io/klog/v2 v2.8.0
 ## explicit
 k8s.io/klog/v2
-# k8s.io/kube-aggregator v0.21.0 => k8s.io/kube-aggregator v0.21.0
+# k8s.io/kube-aggregator v0.21.1 => k8s.io/kube-aggregator v0.21.1
 ## explicit
 k8s.io/kube-aggregator/pkg/apis/apiregistration
 k8s.io/kube-aggregator/pkg/apis/apiregistration/install
@@ -1490,7 +1475,7 @@ k8s.io/kube-openapi/pkg/validation/spec
 k8s.io/kube-openapi/pkg/validation/strfmt
 k8s.io/kube-openapi/pkg/validation/strfmt/bson
 k8s.io/kube-openapi/pkg/validation/validate
-# k8s.io/kubectl v0.21.0 => k8s.io/kubectl v0.21.0
+# k8s.io/kubectl v0.21.1 => k8s.io/kubectl v0.21.1
 ## explicit
 k8s.io/kubectl/pkg/cmd/util
 k8s.io/kubectl/pkg/scheme
@@ -1500,7 +1485,7 @@ k8s.io/kubectl/pkg/util/openapi/validation
 k8s.io/kubectl/pkg/util/templates
 k8s.io/kubectl/pkg/util/term
 k8s.io/kubectl/pkg/validation
-# k8s.io/kubernetes v1.21.0 => k8s.io/kubernetes v1.21.0
+# k8s.io/kubernetes v1.21.1 => k8s.io/kubernetes v1.21.0
 ## explicit
 k8s.io/kubernetes/pkg/api/legacyscheme
 k8s.io/kubernetes/pkg/api/service
@@ -1669,7 +1654,7 @@ k8s.io/utils/trace
 # sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.15
 sigs.k8s.io/apiserver-network-proxy/konnectivity-client/pkg/client
 sigs.k8s.io/apiserver-network-proxy/konnectivity-client/proto/client
-# sigs.k8s.io/kustomize/api v0.8.5
+# sigs.k8s.io/kustomize/api v0.8.8
 sigs.k8s.io/kustomize/api/builtins
 sigs.k8s.io/kustomize/api/filesys
 sigs.k8s.io/kustomize/api/filters/annotations
@@ -1690,7 +1675,6 @@ sigs.k8s.io/kustomize/api/hasher
 sigs.k8s.io/kustomize/api/ifc
 sigs.k8s.io/kustomize/api/image
 sigs.k8s.io/kustomize/api/internal/accumulator
-sigs.k8s.io/kustomize/api/internal/conflict
 sigs.k8s.io/kustomize/api/internal/generators
 sigs.k8s.io/kustomize/api/internal/git
 sigs.k8s.io/kustomize/api/internal/kusterr
@@ -1703,7 +1687,6 @@ sigs.k8s.io/kustomize/api/internal/plugins/utils
 sigs.k8s.io/kustomize/api/internal/target
 sigs.k8s.io/kustomize/api/internal/utils
 sigs.k8s.io/kustomize/api/internal/validate
-sigs.k8s.io/kustomize/api/internal/wrappy
 sigs.k8s.io/kustomize/api/konfig
 sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts
 sigs.k8s.io/kustomize/api/krusty
@@ -1715,12 +1698,11 @@ sigs.k8s.io/kustomize/api/resid
 sigs.k8s.io/kustomize/api/resmap
 sigs.k8s.io/kustomize/api/resource
 sigs.k8s.io/kustomize/api/types
-# sigs.k8s.io/kustomize/kyaml v0.10.15
+# sigs.k8s.io/kustomize/kyaml v0.10.17
 sigs.k8s.io/kustomize/kyaml/comments
 sigs.k8s.io/kustomize/kyaml/errors
 sigs.k8s.io/kustomize/kyaml/ext
 sigs.k8s.io/kustomize/kyaml/fieldmeta
-sigs.k8s.io/kustomize/kyaml/filtersutil
 sigs.k8s.io/kustomize/kyaml/fn/runtime/container
 sigs.k8s.io/kustomize/kyaml/fn/runtime/exec
 sigs.k8s.io/kustomize/kyaml/fn/runtime/runtimeutil
@@ -1757,29 +1739,29 @@ sigs.k8s.io/yaml
 # github.com/docker/distribution => github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d
 # github.com/docker/docker => github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d
 # github.com/moby/buildkit => github.com/dmcgowan/buildkit v0.0.0-20170731200553-da2b9dc7dab9
-# k8s.io/api => k8s.io/api v0.21.0
-# k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.21.0
-# k8s.io/apimachinery => k8s.io/apimachinery v0.21.0
+# k8s.io/api => k8s.io/api v0.21.1
+# k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.21.1
+# k8s.io/apimachinery => k8s.io/apimachinery v0.21.1
 # k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20210527175848-55ee66589915
-# k8s.io/cli-runtime => k8s.io/cli-runtime v0.21.0
-# k8s.io/client-go => k8s.io/client-go v0.21.0
-# k8s.io/cloud-provider => k8s.io/cloud-provider v0.21.0
-# k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.21.0
-# k8s.io/code-generator => k8s.io/code-generator v0.21.0
-# k8s.io/component-base => k8s.io/component-base v0.21.0
-# k8s.io/component-helpers => k8s.io/component-helpers v0.21.0
-# k8s.io/controller-manager => k8s.io/controller-manager v0.21.0
-# k8s.io/cri-api => k8s.io/cri-api v0.21.0
-# k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.21.0
-# k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.21.0
-# k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.21.0
+# k8s.io/cli-runtime => k8s.io/cli-runtime v0.21.1
+# k8s.io/client-go => k8s.io/client-go v0.21.1
+# k8s.io/cloud-provider => k8s.io/cloud-provider v0.21.1
+# k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.21.1
+# k8s.io/code-generator => k8s.io/code-generator v0.21.1
+# k8s.io/component-base => k8s.io/component-base v0.21.1
+# k8s.io/component-helpers => k8s.io/component-helpers v0.21.1
+# k8s.io/controller-manager => k8s.io/controller-manager v0.21.1
+# k8s.io/cri-api => k8s.io/cri-api v0.21.1
+# k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.21.1
+# k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.21.1
+# k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.21.1
 # k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7
-# k8s.io/kube-proxy => k8s.io/kube-proxy v0.21.0
-# k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.21.0
-# k8s.io/kubectl => k8s.io/kubectl v0.21.0
-# k8s.io/kubelet => k8s.io/kubelet v0.21.0
+# k8s.io/kube-proxy => k8s.io/kube-proxy v0.21.1
+# k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.21.1
+# k8s.io/kubectl => k8s.io/kubectl v0.21.1
+# k8s.io/kubelet => k8s.io/kubelet v0.21.1
 # k8s.io/kubernetes => k8s.io/kubernetes v1.21.0
-# k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.21.0
-# k8s.io/metrics => k8s.io/metrics v0.21.0
-# k8s.io/mount-utils => k8s.io/mount-utils v0.21.0
-# k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.21.0
+# k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.21.1
+# k8s.io/metrics => k8s.io/metrics v0.21.1
+# k8s.io/mount-utils => k8s.io/mount-utils v0.21.1
+# k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.21.1

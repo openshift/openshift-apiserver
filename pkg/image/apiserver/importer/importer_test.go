@@ -5,12 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"reflect"
-	"strings"
 	"testing"
-	"time"
 
 	"github.com/containers/image/pkg/sysregistriesv2"
 	"github.com/docker/distribution"
@@ -28,7 +25,6 @@ import (
 	userapi "github.com/openshift/api/user/v1"
 	imageref "github.com/openshift/library-go/pkg/image/reference"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	dockerregistry "github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer/dockerv1client"
 )
 
 func init() {
@@ -181,54 +177,6 @@ func TestSchema1ToImage(t *testing.T) {
 	}
 	if image.DockerImageMetadata.ID != "sha256:958608f8ecc1dc62c93b6c610f3a834dae4220c9642e6e8b4e0f2b3ad7cbd238" {
 		t.Errorf("unexpected image: %#v", image.DockerImageMetadata.ID)
-	}
-}
-
-func TestDockerV1Fallback(t *testing.T) {
-	var uri *url.URL
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("X-Docker-Endpoints", uri.Host)
-
-		// get all tags
-		if strings.HasSuffix(r.URL.Path, "/tags") {
-			fmt.Fprintln(w, `{"tag1":"image1", "test":"image2"}`)
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		if strings.HasSuffix(r.URL.Path, "/images") {
-			fmt.Fprintln(w, `{"tag1":"image1", "test":"image2"}`)
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		if strings.HasSuffix(r.URL.Path, "/json") {
-			fmt.Fprintln(w, `{"ID":"image2"}`)
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		t.Logf("tried to access %s", r.URL.Path)
-		w.WriteHeader(http.StatusNotFound)
-	}))
-
-	client := dockerregistry.NewClient(10*time.Second, false)
-	ctx := context.WithValue(context.Background(), ContextKeyV1RegistryClient, client)
-
-	uri, _ = url.Parse(server.URL)
-	isi := &imageapi.ImageStreamImport{
-		Spec: imageapi.ImageStreamImportSpec{
-			Repository: &imageapi.RepositoryImportSpec{
-				From:         kapi.ObjectReference{Kind: "DockerImage", Name: uri.Host + "/test:test"},
-				ImportPolicy: imageapi.TagImportPolicy{Insecure: true},
-			},
-		},
-	}
-
-	retriever := &mockRetriever{err: fmt.Errorf("does not support v2 API")}
-	im := NewImageStreamImporter(retriever, nil, 5, nil, nil)
-	if err := im.Import(ctx, isi, nil); err != nil {
-		t.Fatal(err)
-	}
-	if images := isi.Status.Repository.Images; len(images) != 2 || images[0].Tag != "tag1" || images[1].Tag != "test" {
-		t.Errorf("unexpected images: %#v", images)
 	}
 }
 
