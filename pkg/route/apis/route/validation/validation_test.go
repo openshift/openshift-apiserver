@@ -6,6 +6,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
+	routev1 "github.com/openshift/api/route/v1"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 )
 
@@ -38,7 +39,7 @@ func createRouteSpecTo(name string, kind string) routeapi.RouteTargetReference {
 	return svc
 }
 
-// TestValidateRouteBad ensures not specifying a required field results in error and a fully specified
+// TestValidateRoute ensures not specifying a required field results in error and a fully specified
 // route passes successfully
 func TestValidateRoute(t *testing.T) {
 	tests := []struct {
@@ -86,14 +87,436 @@ func TestValidateRoute(t *testing.T) {
 			expectedErrors: 0,
 		},
 		{
-			name: "Invalid DNS 952 host",
+			name: "Valid single label DNS 952 host",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "true",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "test",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Valid DNS 952 host (start & end alpha)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "true",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "abc.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Valid DNS 952 host (start & end numeric)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "true",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "1.test.com.2",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Invalid DNS 952 host (trailing '.')",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "true",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "abc.test.com.",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 1,
+		},
+		{
+			name: "Invalid DNS 952 host ('*' not allowed)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "true",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "abc.*.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 1,
+		},
+		{
+			name: "Invalid DNS 952 host ('%!&#@$^' not allowed)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "true",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "abc.%!&#@$^.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 1,
+		},
+		{
+			name: "Invalid DNS 952 host ('A-Z' not allowed)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "true",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "A.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 1,
+		},
+		{
+			name: "Invalid DNS 952 host (trailing '-' not allowed)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "true",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "abc.test.com.-",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 1,
+		},
+		{
+			name: "Valid DNS 952 host (many segements/labels allowed)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "true",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "x.abc.y.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Valid DNS 952 host 63 chars label",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "true",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-1234.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Valid DNS 952 host (64 chars label)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "true",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-12345.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Valid DNS 952 host (253 chars)",
 			route: &routeapi.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
 				Spec: routeapi.RouteSpec{
-					Host: "**",
+					Host: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s12345678.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Invalid DNS host 952 (279 chars)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s1234567890.t1234567890.u1234567890.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 1,
+		},
+		{
+			name: "Valid single label DNS 952 host (conform DNS host name)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "test",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Valid DNS 952 host (conform DNS host name start & end alpha)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "abc.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Valid DNS 952 host (conform DNS host name - start & end numeric)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "1.abc.test.com.2",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Invalid DNS 952 host (conform DNS host name - trailing '.')",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "abc.test.com.",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 2,
+		},
+		{
+			name: "Invalid DNS 952 host (conform DNS host name - '*' not allowed)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "abc.*.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 2,
+		},
+		{
+			name: "Invalid DNS 952 host (conform DNS host name - '%!&#@$^' not allowed)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "abc.%!&#@$^.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 2,
+		},
+		{
+			name: "Invalid DNS 952 host (conform DNS host name - 'A-Z' not allowed)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "A.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 2,
+		},
+		{
+			name: "Invalid DNS 952 host (conform DNS host name - trailing '-' not allowed)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "abc.test.com.-",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 2,
+		},
+		{
+			name: "Valid DNS 952 host (conform DNS host name - many segments/labels allowed)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "x.abc.y.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Valid DNS 952 host (conform DNS host name - 63 chars label)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-1234.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Invalid DNS 952 host (conform DNS host name - 64 chars label)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-12345.test.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 1,
+		},
+		{
+			name: "Valid DNS 952 host (conform DNS host name - 253 chars)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s12345678.testi.com",
+					To:   createRouteSpecTo("serviceName", "Service"),
+				},
+			},
+			expectedErrors: 0,
+		},
+		{
+			name: "Invalid DNS 952 host (conform DNS host name - 279 chars)",
+			route: &routeapi.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "name",
+					Namespace: "foo",
+					Annotations: map[string]string{
+						routev1.AllowNonDNSCompliantHostAnnotation: "false",
+					},
+				},
+				Spec: routeapi.RouteSpec{
+					Host: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s1234567890.t1234567890.u1234567890.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
 			},
