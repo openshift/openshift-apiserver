@@ -446,6 +446,9 @@ github.com/openshift/library-go/pkg/serviceability
 github.com/openshift/library-go/pkg/template/generator
 github.com/openshift/library-go/pkg/template/templateprocessing
 github.com/openshift/library-go/pkg/template/templateprocessingclient
+# github.com/openshift/runtime-utils v0.0.0-20200415173359-c45d4ff3f912
+## explicit
+github.com/openshift/runtime-utils/pkg/registries
 # github.com/peterbourgon/diskv v2.0.1+incompatible
 github.com/peterbourgon/diskv
 # github.com/pkg/errors v0.9.1
