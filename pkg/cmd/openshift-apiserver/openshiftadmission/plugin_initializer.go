@@ -22,9 +22,11 @@ import (
 
 	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy"
 	"github.com/openshift/apiserver-library-go/pkg/admission/quota/clusterresourcequota"
+	configv1informer "github.com/openshift/client-go/config/informers/externalversions"
 	imagev1client "github.com/openshift/client-go/image/clientset/versioned"
 	imagev1informer "github.com/openshift/client-go/image/informers/externalversions"
 	quotainformer "github.com/openshift/client-go/quota/informers/externalversions"
+	routev1informer "github.com/openshift/client-go/route/informers/externalversions"
 	securityv1informer "github.com/openshift/client-go/security/informers/externalversions"
 	userv1informer "github.com/openshift/client-go/user/informers/externalversions"
 	"github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig"
@@ -35,8 +37,10 @@ import (
 
 type InformerAccess interface {
 	GetKubernetesInformers() kexternalinformers.SharedInformerFactory
+	GetOpenshiftConfigInformers() configv1informer.SharedInformerFactory
 	GetOpenshiftImageInformers() imagev1informer.SharedInformerFactory
 	GetOpenshiftQuotaInformers() quotainformer.SharedInformerFactory
+	GetOpenshiftRouteInformers() routev1informer.SharedInformerFactory
 	GetOpenshiftSecurityInformers() securityv1informer.SharedInformerFactory
 	GetOpenshiftUserInformers() userv1informer.SharedInformerFactory
 }
