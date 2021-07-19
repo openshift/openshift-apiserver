@@ -91,6 +91,8 @@ func NewPluginInitializer(
 		restMapper,
 		generic.NewConfiguration(quotaRegistry.List(), map[schema.GroupResource]struct{}{}))
 
+	openshiftPluginInitializer := NewOpenShiftInformersInitializer(informers)
+
 	webhookAuthResolverWrapper := func(delegate webhook.AuthenticationInfoResolver) webhook.AuthenticationInfoResolver {
 		return &webhook.AuthenticationInfoResolverDelegator{
 			ClientConfigForFunc: func(server string) (*rest.Config, error) {
@@ -117,6 +119,7 @@ func NewPluginInitializer(
 		genericInitializer,
 		webhookInitializer,
 		kubePluginInitializer,
+		openshiftPluginInitializer,
 		imagepolicy.NewInitializer(originimagereferencemutators.OriginImageMutators{}, internalImageRegistryHostname),
 		clusterresourcequota.NewInitializer(
 			informers.GetOpenshiftQuotaInformers().Quota().V1().ClusterResourceQuotas(),
