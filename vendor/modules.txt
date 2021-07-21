@@ -233,7 +233,7 @@ github.com/opencontainers/go-digest
 ## explicit
 github.com/opencontainers/image-spec/specs-go
 github.com/opencontainers/image-spec/specs-go/v1
-# github.com/openshift/api v0.0.0-20210624153211-ae79113891b0
+# github.com/openshift/api v0.0.0-20210720160326-96bb0f993a66
 ## explicit
 github.com/openshift/api
 github.com/openshift/api/annotations
@@ -313,7 +313,7 @@ github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/selinux
 github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/user
 github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/util
 github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/util/sort
-# github.com/openshift/build-machinery-go v0.0.0-20210423112049-9415d7ebd33e
+# github.com/openshift/build-machinery-go v0.0.0-20210712174854-1bb7fd1518d3
 ## explicit
 github.com/openshift/build-machinery-go
 github.com/openshift/build-machinery-go/make
@@ -446,6 +446,7 @@ github.com/openshift/library-go/pkg/legacyapi/legacygroupification
 github.com/openshift/library-go/pkg/network
 github.com/openshift/library-go/pkg/quota/clusterquotamapping
 github.com/openshift/library-go/pkg/quota/quotautil
+github.com/openshift/library-go/pkg/route/routeapihelpers
 github.com/openshift/library-go/pkg/security/uid
 github.com/openshift/library-go/pkg/serviceability
 github.com/openshift/library-go/pkg/template/generator
@@ -1429,6 +1430,10 @@ k8s.io/gengo/generator
 k8s.io/gengo/namer
 k8s.io/gengo/parser
 k8s.io/gengo/types
+# k8s.io/klog v1.0.0
+## explicit
+k8s.io/klog
+k8s.io/klog/klogr
 # k8s.io/klog/v2 v2.8.0
 ## explicit
 k8s.io/klog/v2
