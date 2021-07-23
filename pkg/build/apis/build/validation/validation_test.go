@@ -258,7 +258,7 @@ func TestBuildValidationFailure(t *testing.T) {
 	}
 }
 
-func TestBuildValidationWithSCPStyledURL(t *testing.T) {
+func TestBuildValidationWithSSHSCPStyledURL(t *testing.T) {
 	build := &buildapi.Build{
 		ObjectMeta: metav1.ObjectMeta{Name: "", Namespace: ""},
 		Spec: buildapi.BuildSpec{
@@ -283,8 +283,82 @@ func TestBuildValidationWithSCPStyledURL(t *testing.T) {
 			Phase: buildapi.BuildPhaseNew,
 		},
 	}
-	if result := ValidateBuild(build); len(result) != 2 {
-		t.Errorf("Unexpected validation result: %v", result)
+	result := ValidateBuild(build)
+	foundError := false
+	for _, r := range result {
+		if r.Type == field.ErrorTypeInvalid && r.Field == "spec.source.git.uri" {
+			foundError = true
+			break
+		}
+	}
+	if !foundError {
+		t.Errorf("did not find expected error")
+	}
+}
+
+func TestBuildValidationWithSSHStyledURL(t *testing.T) {
+	build := &buildapi.Build{
+		ObjectMeta: metav1.ObjectMeta{Name: "", Namespace: ""},
+		Spec: buildapi.BuildSpec{
+			CommonSpec: buildapi.CommonSpec{
+				Source: buildapi.BuildSource{
+					Git: &buildapi.GitBuildSource{
+						URI: "ssh://git@github.com:22/user/repo.git",
+					},
+				},
+				Strategy: buildapi.BuildStrategy{
+					DockerStrategy: &buildapi.DockerBuildStrategy{},
+				},
+				Output: buildapi.BuildOutput{
+					To: &kapi.ObjectReference{
+						Kind: "DockerImage",
+						Name: "repository/data",
+					},
+				},
+			},
+		},
+		Status: buildapi.BuildStatus{
+			Phase: buildapi.BuildPhaseNew,
+		},
+	}
+	result := ValidateBuild(build)
+	for _, r := range result {
+		if r.Field == "spec.source.git.uri" {
+			t.Errorf("Unexpected error with uri: %s", r.Detail)
+		}
+	}
+}
+
+func TestBuildValidationWithSCPStyledURL(t *testing.T) {
+	build := &buildapi.Build{
+		ObjectMeta: metav1.ObjectMeta{Name: "", Namespace: ""},
+		Spec: buildapi.BuildSpec{
+			CommonSpec: buildapi.CommonSpec{
+				Source: buildapi.BuildSource{
+					Git: &buildapi.GitBuildSource{
+						URI: "git@github.com:sclorg/nodejs-ex",
+					},
+				},
+				Strategy: buildapi.BuildStrategy{
+					DockerStrategy: &buildapi.DockerBuildStrategy{},
+				},
+				Output: buildapi.BuildOutput{
+					To: &kapi.ObjectReference{
+						Kind: "DockerImage",
+						Name: "repository/data",
+					},
+				},
+			},
+		},
+		Status: buildapi.BuildStatus{
+			Phase: buildapi.BuildPhaseNew,
+		},
+	}
+	result := ValidateBuild(build)
+	for _, r := range result {
+		if r.Field == "spec.source.git.uri" {
+			t.Errorf("Unexpected error with uri: %s", r.Detail)
+		}
 	}
 }
 
