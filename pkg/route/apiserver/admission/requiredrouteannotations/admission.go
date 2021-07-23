@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -39,16 +40,18 @@ const (
 func Register(plugins *admission.Plugins) {
 	plugins.Register(pluginName,
 		func(_ io.Reader) (admission.Interface, error) {
+			klog.Infof("%s registered", pluginName)
 			return NewRequiredRouteAnnotations()
 		})
 }
 
 type requiredRouteAnnotations struct {
 	*admission.Handler
-	routeLister   routev1listers.RouteLister
-	nsLister      corev1listers.NamespaceLister
-	ingressLister configv1listers.IngressLister
-	cachesToSync  []cache.InformerSynced
+	routeLister       routev1listers.RouteLister
+	nsLister          corev1listers.NamespaceLister
+	ingressLister     configv1listers.IngressLister
+	cachesToSync      []cache.InformerSynced
+	cachesToSyncNames []string
 }
 
 // Ensure that the required OpenShift admission interfaces are implemented.
@@ -73,6 +76,7 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 	switch a.GetOperation() {
 	case admission.Update, admission.Create:
 	default:
+		klog.Infof("ignoring %v on %s/%s", a.GetOperation(), a.GetNamespace(), a.GetName())
 		return nil
 	}
 
@@ -104,13 +108,18 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 
 		// Skip the validation if we're not making a change to HSTS  this  update
 		if wants == has && newhsts == oldhsts {
+			klog.Infof("ignoring %v on %s/%s that doesn't change HSTS policy (old=%v, new=%v)", a.GetOperation(), a.GetNamespace(), a.GetName(), oldhsts, newhsts)
 			return nil
 		}
 	}
 
 	// Since we are modifying route HSTS, wait for all caches to sync
 	if !o.waitForSyncedStore(ctx) {
-		return admission.NewForbidden(a, errors.New(pluginName+": caches not synchronized"))
+		synced := []string{}
+		for i := range o.cachesToSync {
+			synced = append(synced, fmt.Sprintf("%v=%v", o.cachesToSyncNames[i], o.cachesToSync[i]()))
+		}
+		return admission.NewForbidden(a, errors.New(pluginName+": caches not synchronized: "+strings.Join(synced, ", ")))
 	}
 
 	ingress, err := o.ingressLister.Get("cluster")
@@ -127,18 +136,25 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 	if err = isRouteHSTSAllowed(ingress, newRoute, namespace); err != nil {
 		return admission.NewForbidden(a, err)
 	}
+	klog.Infof("allowing %v on %s/%s: %v", a.GetOperation(), a.GetNamespace(), a.GetName(), newRoute)
 	return nil
 }
 
+var setExternalKubeInformerFactoryOnce sync.Once
+
 func (o *requiredRouteAnnotations) SetExternalKubeInformerFactory(kubeInformers informers.SharedInformerFactory) {
-	o.nsLister = kubeInformers.Core().V1().Namespaces().Lister()
-	o.cachesToSync = append(o.cachesToSync, kubeInformers.Core().V1().Namespaces().Informer().HasSynced)
+	setExternalKubeInformerFactoryOnce.Do(func() {
+		klog.Info("SetExternalKubeInformerFactory was called")
+		o.nsLister = kubeInformers.Core().V1().Namespaces().Lister()
+		o.cachesToSync = append(o.cachesToSync, kubeInformers.Core().V1().Namespaces().Informer().HasSynced)
+		o.cachesToSyncNames = append(o.cachesToSyncNames, "namespace")
+	})
 }
 
 func (o *requiredRouteAnnotations) waitForSyncedStore(ctx context.Context) bool {
 	syncCtx, cancelFn := context.WithTimeout(ctx, timeToWaitForCacheSync)
 	defer cancelFn()
-	return cache.WaitForNamedCacheSync("RequiredRouteAnnotationsAdmissionPlugin", syncCtx.Done(), o.cachesToSync...)
+	return cache.WaitForNamedCacheSync(pluginName, syncCtx.Done(), o.cachesToSync...)
 }
 
 func (o *requiredRouteAnnotations) ValidateInitialization() error {
@@ -158,18 +174,23 @@ func (o *requiredRouteAnnotations) ValidateInitialization() error {
 }
 
 func NewRequiredRouteAnnotations() (*requiredRouteAnnotations, error) {
+	klog.Info("NewRequiredRouteAnnotations was called")
 	return &requiredRouteAnnotations{
 		Handler: admission.NewHandler(admission.Create, admission.Update),
 	}, nil
 }
 
 func (o *requiredRouteAnnotations) SetOpenShiftRouteInformers(informers routeinformers.SharedInformerFactory) {
+	klog.Info("SetOpenShiftRouteInformers was called")
 	o.cachesToSync = append(o.cachesToSync, informers.Route().V1().Routes().Informer().HasSynced)
+	o.cachesToSyncNames = append(o.cachesToSyncNames, "route")
 	o.routeLister = informers.Route().V1().Routes().Lister()
 }
 
 func (o *requiredRouteAnnotations) SetOpenShiftConfigInformers(informers configinformers.SharedInformerFactory) {
+	klog.Info("SetOpenShiftConfigInformers was called")
 	o.cachesToSync = append(o.cachesToSync, informers.Config().V1().Ingresses().Informer().HasSynced)
+	o.cachesToSyncNames = append(o.cachesToSyncNames, "config")
 	o.ingressLister = informers.Config().V1().Ingresses().Lister()
 }
 
