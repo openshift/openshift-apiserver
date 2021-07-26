@@ -5,14 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"k8s.io/apimachinery/pkg/api/meta"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apiserver/pkg/admission"
@@ -23,7 +23,7 @@ import (
 	"k8s.io/klog/v2"
 
 	configv1 "github.com/openshift/api/config/v1"
-	routev1 "github.com/openshift/api/route/v1"
+	grouproute "github.com/openshift/api/route"
 	configinformers "github.com/openshift/client-go/config/informers/externalversions"
 	configv1listers "github.com/openshift/client-go/config/listers/config/v1"
 	routeinformers "github.com/openshift/client-go/route/informers/externalversions"
@@ -33,25 +33,26 @@ import (
 )
 
 const (
-	pluginName             = "route.openshift.io/RequiredRouteAnnotations"
-	timeToWaitForCacheSync = 10 * time.Second
+	pluginName = "route.openshift.io/RequiredRouteAnnotations"
+	// To cover scenarios with 10,000 routes, need to wait up to 30 seconds for caches to sync
+	timeToWaitForCacheSync = 30 * time.Second
+	hstsAnnotation         = "haproxy.router.openshift.io/hsts_header"
 )
 
 func Register(plugins *admission.Plugins) {
 	plugins.Register(pluginName,
 		func(_ io.Reader) (admission.Interface, error) {
-			klog.Infof("%s registered", pluginName)
-			return NewRequiredRouteAnnotations()
+			return NewRequiredRouteAnnotations(), nil
 		})
 }
 
 type requiredRouteAnnotations struct {
 	*admission.Handler
-	routeLister       routev1listers.RouteLister
-	nsLister          corev1listers.NamespaceLister
-	ingressLister     configv1listers.IngressLister
-	cachesToSync      []cache.InformerSynced
-	cachesToSyncNames []string
+	routeLister   routev1listers.RouteLister
+	nsLister      corev1listers.NamespaceLister
+	ingressLister configv1listers.IngressLister
+	cachesSynced  bool
+	cachesToSync  []cache.InformerSynced
 }
 
 // Ensure that the required OpenShift admission interfaces are implemented.
@@ -60,14 +61,14 @@ var _ = admission.ValidationInterface(&requiredRouteAnnotations{})
 var _ = openshiftapiserveradmission.WantsOpenShiftConfigInformers(&requiredRouteAnnotations{})
 var _ = openshiftapiserveradmission.WantsOpenShiftRouteInformers(&requiredRouteAnnotations{})
 
-const hstsAnnotation = "haproxy.router.openshift.io/hsts_header"
+var maxAgeRegExp = regexp.MustCompile(`max-age=(\d+)`)
 
 // Validate ensures that routes specify required annotations, and returns nil if valid.
 func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Attributes, _ admission.ObjectInterfaces) (err error) {
-	if a.GetResource().GroupResource() != routev1.Resource("routes") {
+	if a.GetResource().GroupResource() != grouproute.Resource("routes") {
 		return nil
 	}
-	newobject, isRoute := a.GetObject().(*routeapi.Route)
+	newObject, isRoute := a.GetObject().(*routeapi.Route)
 	if !isRoute {
 		return nil
 	}
@@ -76,50 +77,45 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 	switch a.GetOperation() {
 	case admission.Update, admission.Create:
 	default:
-		klog.Infof("ignoring %v on %s/%s", a.GetOperation(), a.GetNamespace(), a.GetName())
 		return nil
 	}
 
 	// Determine if there are HSTS changes in this update
 	if a.GetOperation() == admission.Update {
 		wants, has := false, false
-		var oldhsts, newhsts string
+		var oldHSTS, newHSTS string
 
-		newmetadata, err := meta.Accessor(newobject)
+		newMetaData, err := meta.Accessor(newObject)
 		if err != nil {
 			return err
 		}
-		newannotations := newmetadata.GetAnnotations()
-		if newannotations != nil {
-			newhsts, wants = newannotations[hstsAnnotation]
-		}
+		newAnnotations := newMetaData.GetAnnotations()
+		newHSTS, wants = newAnnotations[hstsAnnotation]
 
 		oldObject := a.GetOldObject()
 		if oldObject != nil {
-			oldmetadata, err := meta.Accessor(oldObject)
+			oldMetaData, err := meta.Accessor(oldObject)
 			if err != nil {
 				return err
 			}
-			oldannotations := oldmetadata.GetAnnotations()
-			if oldannotations != nil {
-				oldhsts, has = oldannotations[hstsAnnotation]
+			oldAnnotations := oldMetaData.GetAnnotations()
+			if oldAnnotations != nil {
+				oldHSTS, has = oldAnnotations[hstsAnnotation]
 			}
 		}
 
-		// Skip the validation if we're not making a change to HSTS  this  update
-		if wants == has && newhsts == oldhsts {
-			klog.Infof("ignoring %v on %s/%s that doesn't change HSTS policy (old=%v, new=%v)", a.GetOperation(), a.GetNamespace(), a.GetName(), oldhsts, newhsts)
+		// Skip the validation if we're not making a change to HSTS at this time
+		if wants == has && newHSTS == oldHSTS {
 			return nil
 		}
 	}
 
-	// Since we are modifying route HSTS, wait for all caches to sync
-	if !o.waitForSyncedStore(ctx) {
-		synced := []string{}
-		for i := range o.cachesToSync {
-			synced = append(synced, fmt.Sprintf("%v=%v", o.cachesToSyncNames[i], o.cachesToSync[i]()))
+	// Wait up to 30 seconds for all caches to sync.  This is needed only once.
+	if !o.cachesSynced {
+		if synced := o.waitForSyncedStore(ctx); !synced {
+			return admission.NewForbidden(a, errors.New(pluginName+": caches not synchronized"))
 		}
-		return admission.NewForbidden(a, errors.New(pluginName+": caches not synchronized: "+strings.Join(synced, ", ")))
+		o.cachesSynced = true
 	}
 
 	ingress, err := o.ingressLister.Get("cluster")
@@ -136,20 +132,12 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 	if err = isRouteHSTSAllowed(ingress, newRoute, namespace); err != nil {
 		return admission.NewForbidden(a, err)
 	}
-	klog.Infof("allowing %v on %s/%s: %v", a.GetOperation(), a.GetNamespace(), a.GetName(), newRoute)
 	return nil
 }
 
-var setExternalKubeInformerFactoryOnce sync.Once
-
 func (o *requiredRouteAnnotations) SetExternalKubeInformerFactory(kubeInformers informers.SharedInformerFactory) {
-	klog.Info("SetExternalKubeInformerFactory was called")
-	setExternalKubeInformerFactoryOnce.Do(func() {
-		klog.Info("SetExternalKubeInformerFactory was called (once)")
-		o.nsLister = kubeInformers.Core().V1().Namespaces().Lister()
-		o.cachesToSync = append(o.cachesToSync, kubeInformers.Core().V1().Namespaces().Informer().HasSynced)
-		o.cachesToSyncNames = append(o.cachesToSyncNames, "namespace")
-	})
+	o.nsLister = kubeInformers.Core().V1().Namespaces().Lister()
+	o.cachesToSync = append(o.cachesToSync, kubeInformers.Core().V1().Namespaces().Informer().HasSynced)
 }
 
 func (o *requiredRouteAnnotations) waitForSyncedStore(ctx context.Context) bool {
@@ -174,24 +162,19 @@ func (o *requiredRouteAnnotations) ValidateInitialization() error {
 	return nil
 }
 
-func NewRequiredRouteAnnotations() (*requiredRouteAnnotations, error) {
-	klog.Info("NewRequiredRouteAnnotations was called")
+func NewRequiredRouteAnnotations() *requiredRouteAnnotations {
 	return &requiredRouteAnnotations{
 		Handler: admission.NewHandler(admission.Create, admission.Update),
-	}, nil
+	}
 }
 
 func (o *requiredRouteAnnotations) SetOpenShiftRouteInformers(informers routeinformers.SharedInformerFactory) {
-	klog.Info("SetOpenShiftRouteInformers was called")
 	o.cachesToSync = append(o.cachesToSync, informers.Route().V1().Routes().Informer().HasSynced)
-	o.cachesToSyncNames = append(o.cachesToSyncNames, "route")
 	o.routeLister = informers.Route().V1().Routes().Lister()
 }
 
 func (o *requiredRouteAnnotations) SetOpenShiftConfigInformers(informers configinformers.SharedInformerFactory) {
-	klog.Info("SetOpenShiftConfigInformers was called")
 	o.cachesToSync = append(o.cachesToSync, informers.Config().V1().Ingresses().Informer().HasSynced)
-	o.cachesToSyncNames = append(o.cachesToSyncNames, "config")
 	o.ingressLister = informers.Config().V1().Ingresses().Lister()
 }
 
@@ -212,9 +195,9 @@ func isRouteHSTSAllowed(ingress *configv1.Ingress, newRoute *routeapi.Route, nam
 	requirements := ingress.Spec.RequiredHSTSPolicies
 	for _, requirement := range requirements {
 		// Check if the required namespaceSelector (if any) and the domainPattern match
-		if matchesReqNamespace, matchesReqDomain, err := requiredNamespaceDomainMatchesRoute(requirement, newRoute, namespace); err != nil {
+		if matches, err := requiredNamespaceDomainMatchesRoute(requirement, newRoute, namespace); err != nil {
 			return err
-		} else if !(matchesReqNamespace && matchesReqDomain) {
+		} else if !matches {
 			// If one of either the namespaceSelector or domain didn't match, we will continue to look
 			continue
 		}
@@ -262,8 +245,7 @@ func hstsConfigFromRoute(route *routeapi.Route) (*hstsConfig, error) {
 		// unrecognized tokens are ignored
 	}
 
-	reg := regexp.MustCompile(`max-age=(\d+)`)
-	if match := reg.FindStringSubmatch(trimmed); match != nil && len(match) > 1 {
+	if match := maxAgeRegExp.FindStringSubmatch(trimmed); match != nil && len(match) > 1 {
 		age, err := strconv.ParseInt(match[1], 10, 32)
 		if err != nil {
 			return nil, err
@@ -318,10 +300,10 @@ func (c *hstsConfig) meetsRequirements(requirement configv1.RequiredHSTSPolicy) 
 }
 
 // Check if the route matches the required domain/namespace in the HSTS Policy
-func requiredNamespaceDomainMatchesRoute(requirement configv1.RequiredHSTSPolicy, route *routeapi.Route, namespace *corev1.Namespace) (bool, bool, error) {
+func requiredNamespaceDomainMatchesRoute(requirement configv1.RequiredHSTSPolicy, route *routeapi.Route, namespace *corev1.Namespace) (bool, error) {
 	matchesNamespace, err := matchesNamespaceSelector(requirement.NamespaceSelector, namespace)
 	if err != nil {
-		return false, false, err
+		return false, err
 	}
 
 	routeDomains := []string{route.Spec.Host}
@@ -330,16 +312,20 @@ func requiredNamespaceDomainMatchesRoute(requirement configv1.RequiredHSTSPolicy
 	}
 	matchesDom := matchesDomain(requirement.DomainPatterns, routeDomains)
 
-	return matchesNamespace, matchesDom, nil
+	return matchesNamespace && matchesDom, nil
 }
 
 // Check all of the required domainMatcher patterns against all provided domains,
 // first match returns true.  If none match, return false.
 func matchesDomain(domainMatchers []string, domains []string) bool {
-	for _, matcher := range domainMatchers {
-		match := regexp.MustCompile(fmt.Sprintf("^%s$", matcher))
+	for _, pattern := range domainMatchers {
 		for _, candidate := range domains {
-			if match.MatchString(candidate) {
+			matched, err := filepath.Match(pattern, candidate)
+			if err != nil {
+				klog.Warningf("Ignoring HSTS Policy domain match for %s, error parsing: %v", candidate, err)
+				continue
+			}
+			if matched {
 				return true
 			}
 		}
@@ -354,6 +340,7 @@ func matchesNamespaceSelector(nsSelector *metav1.LabelSelector, namespace *corev
 	}
 	selector, err := getParsedNamespaceSelector(nsSelector)
 	if err != nil {
+		klog.Warningf("Ignoring HSTS Policy namespace match for %s, error parsing: %v", namespace, err)
 		return false, err
 	}
 	return selector.Matches(labels.Set(namespace.Labels)), nil

@@ -23,6 +23,7 @@ import (
 // validates newly created routes' annotations.
 func TestValidate(t *testing.T) {
 	zero := int32(0)
+	one := int32(1)
 	ninetynine := int32(99)
 	fivenines := int32(99999)
 
@@ -41,6 +42,27 @@ func TestValidate(t *testing.T) {
 				MaxAge:                  configv1.MaxAgePolicy{LargestMaxAge: &fivenines, SmallestMaxAge: &zero},
 				PreloadPolicy:           configv1.RequirePreloadPolicy,
 				IncludeSubDomainsPolicy: configv1.RequireIncludeSubDomains,
+			}},
+		},
+	}
+	wildcardDomainConfig := &configv1.Ingress{
+		Spec: configv1.IngressSpec{
+			RequiredHSTSPolicies: []configv1.RequiredHSTSPolicy{{
+				DomainPatterns: []string{
+					"*.foo.com",
+				},
+				MaxAge: configv1.MaxAgePolicy{LargestMaxAge: &fivenines, SmallestMaxAge: &zero},
+			}},
+		},
+	}
+	wildcardDomainConfig2 := &configv1.Ingress{
+		Spec: configv1.IngressSpec{
+			RequiredHSTSPolicies: []configv1.RequiredHSTSPolicy{{
+				DomainPatterns: []string{
+					"*.foo.com",
+					"foo.com",
+				},
+				MaxAge: configv1.MaxAgePolicy{LargestMaxAge: &fivenines, SmallestMaxAge: &zero},
 			}},
 		},
 	}
@@ -98,7 +120,7 @@ func TestValidate(t *testing.T) {
 					DomainPatterns: []string{
 						"abc.foo.com",
 					},
-					MaxAge:                  configv1.MaxAgePolicy{LargestMaxAge: &ninetynine, SmallestMaxAge: &zero},
+					MaxAge:                  configv1.MaxAgePolicy{LargestMaxAge: &ninetynine, SmallestMaxAge: &one},
 					PreloadPolicy:           configv1.RequireNoPreloadPolicy,
 					IncludeSubDomainsPolicy: configv1.RequireNoIncludeSubDomains,
 				},
@@ -312,6 +334,21 @@ func TestValidate(t *testing.T) {
 			expectForbidden:       true,
 		},
 		{
+			description: "route in matching domain, but max-age too small",
+			config:      multipleMatchConfig,
+			routeAnnotations: map[string]string{
+				hstsAnnotation: "   max-age=0 ",
+			},
+			namespace: "unlabeledNamespace",
+			name:      "config7.1",
+			spec: &routeapi.RouteSpec{
+				Host: "abc.foo.com",
+				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
+			},
+			expectForbiddenClause: "is less than minimum age (1)",
+			expectForbidden:       true,
+		},
+		{
 			description: "route in matching domain, but max-age missing",
 			config:      multipleMatchConfig,
 			routeAnnotations: map[string]string{
@@ -326,13 +363,57 @@ func TestValidate(t *testing.T) {
 			expectForbiddenClause: "max-age must be set in HSTS annotation",
 			expectForbidden:       true,
 		},
+		{
+			description: "route in matching domain, by wildcard",
+			config:      wildcardDomainConfig,
+			routeAnnotations: map[string]string{
+				hstsAnnotation: "   max-age= ",
+			},
+			namespace: "unlabeledNamespace",
+			name:      "config9.1",
+			spec: &routeapi.RouteSpec{
+				Host: "abc.foo.com",
+				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
+			},
+			expectForbiddenClause: "max-age must be set in HSTS annotation",
+			expectForbidden:       true,
+		},
+		{
+			description: "route not in matching domain, by wildcard",
+			config:      wildcardDomainConfig,
+			routeAnnotations: map[string]string{
+				hstsAnnotation: "   max-age= ",
+			},
+			name:      "config9.2",
+			namespace: "unlabeledNamespace",
+			spec: &routeapi.RouteSpec{
+				Host: "foo.com", // this doesn't match the configured *.foo.com
+				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
+			},
+			expectForbidden: false,
+		},
+		{
+			description: "route in matching domain, by wildcard 2",
+			config:      wildcardDomainConfig2,
+			routeAnnotations: map[string]string{
+				hstsAnnotation: "   max-age= ",
+			},
+			name:      "config9.3",
+			namespace: "unlabeledNamespace",
+			spec: &routeapi.RouteSpec{
+				Host: "foo.com",
+				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
+			},
+			expectForbiddenClause: "max-age must be set in HSTS annotation",
+			expectForbidden:       true,
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.description, func(t *testing.T) {
-			admitter, err := NewRequiredRouteAnnotations()
-			if err != nil {
-				t.Fatalf("Unexpected error: %v", err)
+			admitter := NewRequiredRouteAnnotations()
+			if admitter == nil {
+				t.Fatal("Unexpected error: admitter is nil")
 			}
 
 			admitter.ingressLister = fakeIngressLister("cluster", *tc.config)
@@ -342,7 +423,7 @@ func TestValidate(t *testing.T) {
 			admitter.cachesToSync = append(admitter.cachesToSync, func() bool { return true })
 			admitter.cachesToSync = append(admitter.cachesToSync, func() bool { return true })
 
-			if err = admitter.ValidateInitialization(); err != nil {
+			if err := admitter.ValidateInitialization(); err != nil {
 				t.Fatalf("validation error: %v", err)
 			}
 			op := admission.Create
@@ -362,7 +443,7 @@ func TestValidate(t *testing.T) {
 				false,
 				&user.DefaultInfo{Name: "test-user"},
 			)
-			err = admitter.Validate(context.TODO(), a, nil)
+			err := admitter.Validate(context.TODO(), a, nil)
 			switch {
 			case !tc.expectForbidden && err != nil:
 				t.Errorf("%q: got unexpected error for: %v", tc.description, err)
@@ -408,14 +489,18 @@ func fakeIngress(name string, config configv1.Ingress) *configv1.Ingress {
 func fakeNamespaceLister(namespacesAndLabels map[string]map[string]string) corev1listers.NamespaceLister {
 	indexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
 	for namespace, labels := range namespacesAndLabels {
-		indexer.Add(fakeNamespace(namespace, labels))
+		if err := indexer.Add(fakeNamespace(namespace, labels)); err != nil {
+			panic(err.Error())
+		}
 	}
 	return corev1listers.NewNamespaceLister(indexer)
 }
 
 func fakeIngressLister(name string, config configv1.Ingress) configv1listers.IngressLister {
 	indexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
-	indexer.Add(fakeIngress(name, config))
+	if err := indexer.Add(fakeIngress(name, config)); err != nil {
+		panic(err.Error())
+	}
 	return configv1listers.NewIngressLister(indexer)
 }
 
@@ -423,25 +508,10 @@ func fakeRouteLister(routeDetails map[string]map[string]string, spec *routeapi.R
 	indexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
 	for rt, namespaceAndLabels := range routeDetails {
 		for ns := range namespaceAndLabels {
-			indexer.Add(fakeRoute(rt, ns, spec, namespaceAndLabels))
+			if err := indexer.Add(fakeRoute(rt, ns, spec, namespaceAndLabels)); err != nil {
+				panic(err.Error())
+			}
 		}
 	}
 	return routev1listers.NewRouteLister(indexer)
 }
-
-/*
-func routeFn(routeAndAnnotations map[string]map[string]string, spec *routeapi.RouteSpec) clientgotesting.ReactionFunc {
-	return func(action clientgotesting.Action) (handled bool, ret runtime.Object, err error) {
-		name := action.(clientgotesting.GetAction).GetName()
-		namespace := action.(clientgotesting.GetAction).GetNamespace()
-
-		return true, fakeRoute(name, namespace, spec, map[string]string(routeAndAnnotations[name])), nil
-	}
-}
-
-func configFn(config *configv1.Ingress) clientgotesting.ReactionFunc {
-	return func(action clientgotesting.Action) (handled bool, ret runtime.Object, err error) {
-		return true, config, nil
-	}
-}
-*/
