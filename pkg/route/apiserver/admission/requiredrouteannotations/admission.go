@@ -73,6 +73,12 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 		return nil
 	}
 
+	if !o.cachesSynced {
+		go func() {
+			o.cachesSynced = o.waitForSyncedStore()
+		}()
+	}
+
 	// Skip the validation if we're not updating/creating
 	switch a.GetOperation() {
 	case admission.Update, admission.Create:
@@ -110,13 +116,17 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 		}
 	}
 
-	// Wait up to 30 seconds for all caches to sync.  This is needed only once.
 	if !o.cachesSynced {
-		if synced := o.waitForSyncedStore(ctx); !synced {
-			return admission.NewForbidden(a, errors.New(pluginName+": caches not synchronized"))
-		}
-		o.cachesSynced = true
+		return admission.NewForbidden(a, errors.New(pluginName+": caches not synchronized"))
 	}
+
+	// Wait up to 30 seconds for all caches to sync.  This is needed only once.
+	//if !o.cachesSynced {
+	//	if synced := o.waitForSyncedStore(ctx); !synced {
+	//		return admission.NewForbidden(a, errors.New(pluginName+": caches not synchronized"))
+	//	}
+	//	o.cachesSynced = true
+	//}
 
 	ingress, err := o.ingressLister.Get("cluster")
 	if err != nil {
@@ -140,8 +150,8 @@ func (o *requiredRouteAnnotations) SetExternalKubeInformerFactory(kubeInformers 
 	o.cachesToSync = append(o.cachesToSync, kubeInformers.Core().V1().Namespaces().Informer().HasSynced)
 }
 
-func (o *requiredRouteAnnotations) waitForSyncedStore(ctx context.Context) bool {
-	syncCtx, cancelFn := context.WithTimeout(ctx, timeToWaitForCacheSync)
+func (o *requiredRouteAnnotations) waitForSyncedStore() bool {
+	syncCtx, cancelFn := context.WithTimeout(context.Background(), timeToWaitForCacheSync)
 	defer cancelFn()
 	return cache.WaitForNamedCacheSync(pluginName, syncCtx.Done(), o.cachesToSync...)
 }
