@@ -100,6 +100,7 @@ API rule violation: list_type_missing,github.com/openshift/api/config/v1,ImageSp
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ImageSpec,ExternalRegistryHostnames
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ImageStatus,ExternalRegistryHostnames
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,IngressSpec,ComponentRoutes
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,IngressSpec,RequiredHSTSPolicies
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,IngressStatus,ComponentRoutes
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,LDAPAttributeMapping,Email
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,LDAPAttributeMapping,ID
@@ -127,6 +128,7 @@ API rule violation: list_type_missing,github.com/openshift/api/config/v1,Request
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,RequestHeaderIdentityProvider,Headers
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,RequestHeaderIdentityProvider,NameHeaders
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,RequestHeaderIdentityProvider,PreferredUsernameHeaders
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,RequiredHSTSPolicy,DomainPatterns
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ServingInfo,CipherSuites
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ServingInfo,NamedCertificates
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,TLSProfileSpec,Ciphers
