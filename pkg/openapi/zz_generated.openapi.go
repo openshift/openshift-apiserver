@@ -158,6 +158,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.AdmissionPluginConfig":                                        schema_openshift_api_config_v1_AdmissionPluginConfig(ref),
 		"github.com/openshift/api/config/v1.Audit":                                                        schema_openshift_api_config_v1_Audit(ref),
 		"github.com/openshift/api/config/v1.AuditConfig":                                                  schema_openshift_api_config_v1_AuditConfig(ref),
+		"github.com/openshift/api/config/v1.AuditCustomRule":                                              schema_openshift_api_config_v1_AuditCustomRule(ref),
 		"github.com/openshift/api/config/v1.Authentication":                                               schema_openshift_api_config_v1_Authentication(ref),
 		"github.com/openshift/api/config/v1.AuthenticationList":                                           schema_openshift_api_config_v1_AuthenticationList(ref),
 		"github.com/openshift/api/config/v1.AuthenticationSpec":                                           schema_openshift_api_config_v1_AuthenticationSpec(ref),
@@ -252,6 +253,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.LDAPAttributeMapping":                                         schema_openshift_api_config_v1_LDAPAttributeMapping(ref),
 		"github.com/openshift/api/config/v1.LDAPIdentityProvider":                                         schema_openshift_api_config_v1_LDAPIdentityProvider(ref),
 		"github.com/openshift/api/config/v1.LeaderElection":                                               schema_openshift_api_config_v1_LeaderElection(ref),
+		"github.com/openshift/api/config/v1.MaxAgePolicy":                                                 schema_openshift_api_config_v1_MaxAgePolicy(ref),
 		"github.com/openshift/api/config/v1.ModernTLSProfile":                                             schema_openshift_api_config_v1_ModernTLSProfile(ref),
 		"github.com/openshift/api/config/v1.NamedCertificate":                                             schema_openshift_api_config_v1_NamedCertificate(ref),
 		"github.com/openshift/api/config/v1.Network":                                                      schema_openshift_api_config_v1_Network(ref),
@@ -293,6 +295,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/config/v1.Release":                                                      schema_openshift_api_config_v1_Release(ref),
 		"github.com/openshift/api/config/v1.RemoteConnectionInfo":                                         schema_openshift_api_config_v1_RemoteConnectionInfo(ref),
 		"github.com/openshift/api/config/v1.RequestHeaderIdentityProvider":                                schema_openshift_api_config_v1_RequestHeaderIdentityProvider(ref),
+		"github.com/openshift/api/config/v1.RequiredHSTSPolicy":                                           schema_openshift_api_config_v1_RequiredHSTSPolicy(ref),
 		"github.com/openshift/api/config/v1.Scheduler":                                                    schema_openshift_api_config_v1_Scheduler(ref),
 		"github.com/openshift/api/config/v1.SchedulerList":                                                schema_openshift_api_config_v1_SchedulerList(ref),
 		"github.com/openshift/api/config/v1.SchedulerSpec":                                                schema_openshift_api_config_v1_SchedulerSpec(ref),
@@ -512,6 +515,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/openshift/api/operator/v1.CSISnapshotControllerList":                                  schema_openshift_api_operator_v1_CSISnapshotControllerList(ref),
 		"github.com/openshift/api/operator/v1.CSISnapshotControllerSpec":                                  schema_openshift_api_operator_v1_CSISnapshotControllerSpec(ref),
 		"github.com/openshift/api/operator/v1.CSISnapshotControllerStatus":                                schema_openshift_api_operator_v1_CSISnapshotControllerStatus(ref),
+		"github.com/openshift/api/operator/v1.ClientTLS":                                                  schema_openshift_api_operator_v1_ClientTLS(ref),
 		"github.com/openshift/api/operator/v1.CloudCredential":                                            schema_openshift_api_operator_v1_CloudCredential(ref),
 		"github.com/openshift/api/operator/v1.CloudCredentialList":                                        schema_openshift_api_operator_v1_CloudCredentialList(ref),
 		"github.com/openshift/api/operator/v1.CloudCredentialSpec":                                        schema_openshift_api_operator_v1_CloudCredentialSpec(ref),
@@ -8748,14 +8752,38 @@ func schema_openshift_api_config_v1_Audit(ref common.ReferenceCallback) common.O
 				Properties: map[string]spec.Schema{
 					"profile": {
 						SchemaProps: spec.SchemaProps{
-							Description: "profile specifies the name of the desired audit policy configuration to be deployed to all OpenShift-provided API servers in the cluster.\n\nThe following profiles are provided: - Default: the existing default policy. - WriteRequestBodies: like 'Default', but logs request and response HTTP payloads for write requests (create, update, patch). - AllRequestBodies: like 'WriteRequestBodies', but also logs request and response HTTP payloads for read requests (get, list).\n\nIf unset, the 'Default' profile is used as the default.",
+							Description: "profile specifies the name of the desired top-level audit profile to be applied to all requests sent to any of the OpenShift-provided API servers in the cluster (kube-apiserver, openshift-apiserver and oauth-apiserver), with the exception of those requests that match one or more of the customRules.\n\nThe following profiles are provided: - Default: default policy which means MetaData level logging with the exception of events\n  (not logged at all), oauthaccesstokens and oauthauthorizetokens (both logged at RequestBody\n  level).\n- WriteRequestBodies: like 'Default', but logs request and response HTTP payloads for write requests (create, update, patch). - AllRequestBodies: like 'WriteRequestBodies', but also logs request and response HTTP payloads for read requests (get, list). - None: no requests are logged at all, not even oauthaccesstokens and oauthauthorizetokens.\n\nWarning: to raise a Red Hat support request, it is required to set this to Default, WriteRequestBodies, or AllRequestBodies to generate audit log events that can be analyzed by support.\n\nIf unset, the 'Default' profile is used as the default.",
 							Type:        []string{"string"},
 							Format:      "",
+						},
+					},
+					"customRules": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"group",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "customRules specify profiles per group. These profile take precedence over the top-level profile field if they apply. They are evaluation from top to bottom and the first one that matches, applies.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/config/v1.AuditCustomRule"),
+									},
+								},
+							},
 						},
 					},
 				},
 			},
 		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.AuditCustomRule"},
 	}
 }
 
@@ -8851,6 +8879,35 @@ func schema_openshift_api_config_v1_AuditConfig(ref common.ReferenceCallback) co
 		},
 		Dependencies: []string{
 			"k8s.io/apimachinery/pkg/runtime.RawExtension"},
+	}
+}
+
+func schema_openshift_api_config_v1_AuditCustomRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "AuditCustomRule describes a custom rule for an audit profile that takes precedence over the top-level profile.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "group is a name of group a request user must be member of in order to this profile to apply.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"profile": {
+						SchemaProps: spec.SchemaProps{
+							Description: "profile specifies the name of the desired audit policy configuration to be deployed to all OpenShift-provided API servers in the cluster.\n\nThe following profiles are provided: - Default: the existing default policy. - WriteRequestBodies: like 'Default', but logs request and response HTTP payloads for write requests (create, update, patch). - AllRequestBodies: like 'WriteRequestBodies', but also logs request and response HTTP payloads for read requests (get, list). - None: no requests are logged at all, not even oauthaccesstokens and oauthauthorizetokens.\n\nIf unset, the 'Default' profile is used as the default.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"group"},
+			},
+		},
 	}
 }
 
@@ -11727,6 +11784,13 @@ func schema_openshift_api_config_v1_IBMCloudPlatformStatus(ref common.ReferenceC
 							Format:      "",
 						},
 					},
+					"cisInstanceCRN": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CISInstanceCRN is the CRN of the Cloud Internet Services instance managing the DNS zone for the cluster's base domain",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 				},
 			},
 		},
@@ -12311,7 +12375,7 @@ func schema_openshift_api_config_v1_InfrastructureStatus(ref common.ReferenceCal
 					},
 					"infrastructureTopology": {
 						SchemaProps: spec.SchemaProps{
-							Description: "infrastructureTopology expresses the expectations for infrastructure services that do not run on control plane nodes, usually indicated by a node selector for a `role` value other than `master`. The default is 'HighlyAvailable', which represents the behavior operators have in a \"normal\" cluster. The 'SingleReplica' mode will be used in single-node deployments and the operators should not configure the operand for highly-available operation",
+							Description: "infrastructureTopology expresses the expectations for infrastructure services that do not run on control plane nodes, usually indicated by a node selector for a `role` value other than `master`. The default is 'HighlyAvailable', which represents the behavior operators have in a \"normal\" cluster. The 'SingleReplica' mode will be used in single-node deployments and the operators should not configure the operand for highly-available operation NOTE: External topology mode is not applicable for this field.",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -12459,12 +12523,26 @@ func schema_openshift_api_config_v1_IngressSpec(ref common.ReferenceCallback) co
 							},
 						},
 					},
+					"requiredHSTSPolicies": {
+						SchemaProps: spec.SchemaProps{
+							Description: "requiredHSTSPolicies specifies HSTS policies that are required to be set on newly created  or updated routes matching the domainPattern/s and namespaceSelector/s that are specified in the policy. Each requiredHSTSPolicy must have at least a domainPattern and a maxAge to validate a route HSTS Policy route annotation, and affect route admission.\n\nA candidate route is checked for HSTS Policies if it has the HSTS Policy route annotation: \"haproxy.router.openshift.io/hsts_header\" E.g. haproxy.router.openshift.io/hsts_header: max-age=31536000;preload;includeSubDomains\n\n- For each candidate route, if it matches a requiredHSTSPolicy domainPattern and optional namespaceSelector, then the maxAge, preloadPolicy, and includeSubdomainsPolicy must be valid to be admitted.  Otherwise, the route is rejected. - The first match, by domainPattern and optional namespaceSelector, in the ordering of the RequiredHSTSPolicies determines the route's admission status. - If the candidate route doesn't match any requiredHSTSPolicy domainPattern and optional namespaceSelector, then it may use any HSTS Policy annotation.\n\nThe HSTS policy configuration may be changed after routes have already been created. An update to a previously admitted route may then fail if the updated route does not conform to the updated HSTS policy configuration. However, changing the HSTS policy configuration will not cause a route that is already admitted to stop working.\n\nNote that if there are no RequiredHSTSPolicies, any HSTS Policy annotation on the route is valid.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/openshift/api/config/v1.RequiredHSTSPolicy"),
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"domain"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.ComponentRouteSpec"},
+			"github.com/openshift/api/config/v1.ComponentRouteSpec", "github.com/openshift/api/config/v1.RequiredHSTSPolicy"},
 	}
 }
 
@@ -12818,6 +12896,33 @@ func schema_openshift_api_config_v1_LeaderElection(ref common.ReferenceCallback)
 		},
 		Dependencies: []string{
 			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
+	}
+}
+
+func schema_openshift_api_config_v1_MaxAgePolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MaxAgePolicy contains a numeric range for specifying a compliant HSTS max-age for the enclosing RequiredHSTSPolicy",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"largestMaxAge": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The largest allowed value (in seconds) of the RequiredHSTSPolicy max-age This value can be left unspecified, in which case no upper limit is enforced. kubebuilder:validation:minimum=0:maximum=2147483647",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"smallestMaxAge": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The smallest allowed value (in seconds) of the RequiredHSTSPolicy max-age Setting max-age=0 allows the deletion of an existing HSTS header from a host.  This is a necessary tool for administrators to quickly correct mistakes. This value can be left unspecified, in which case no lower limit is enforced. kubebuilder:validation:minimum=0:maximum=2147483647",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+			},
+		},
 	}
 }
 
@@ -14662,6 +14767,63 @@ func schema_openshift_api_config_v1_RequestHeaderIdentityProvider(ref common.Ref
 	}
 }
 
+func schema_openshift_api_config_v1_RequiredHSTSPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"namespaceSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "namespaceSelector specifies a label selector such that the policy applies only to those routes that are in namespaces with labels that match the selector, and are in one of the DomainPatterns. Defaults to the empty LabelSelector, which matches everything.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
+						},
+					},
+					"domainPatterns": {
+						SchemaProps: spec.SchemaProps{
+							Description: "domainPatterns is a list of domains for which the desired HSTS annotations are required. If domainPatterns is specified and a route is created with a spec.host matching one of the domains, the route must specify the HSTS Policy components described in the matching RequiredHSTSPolicy.\n\nThe use of wildcards is allowed like this: *.foo.com matches everything under foo.com. foo.com only matches foo.com, so to cover foo.com and everything under it, you must specify *both*. kubebuilder:validation:MinLength=1",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"maxAge": {
+						SchemaProps: spec.SchemaProps{
+							Description: "maxAge is the delta time range in seconds during which hosts are regarded as HSTS hosts. If set to 0, it negates the effect, and hosts are removed as HSTS hosts. If set to 0 and includeSubdomains is specified, all subdomains of the host are also removed as HSTS hosts. maxAge is a time-to-live value, and if this policy is not refreshed on a client, the HSTS policy will eventually expire on that client.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/config/v1.MaxAgePolicy"),
+						},
+					},
+					"preloadPolicy": {
+						SchemaProps: spec.SchemaProps{
+							Description: "preloadPolicy directs the client to include hosts in its host preload list so that it never needs to do an initial load to get the HSTS header (note that this is not defined in RFC 6797 and is therefore client implementation-dependent).",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"includeSubDomainsPolicy": {
+						SchemaProps: spec.SchemaProps{
+							Description: "includeSubDomainsPolicy means the HSTS Policy should apply to any subdomains of the host's domain name.  Thus, for the host bar.foo.com, if includeSubDomainsPolicy was set to RequireIncludeSubDomains: - the host app.bar.foo.com would inherit the HSTS Policy of bar.foo.com - the host bar.foo.com would inherit the HSTS Policy of bar.foo.com - the host foo.com would NOT inherit the HSTS Policy of bar.foo.com - the host def.foo.com would NOT inherit the HSTS Policy of bar.foo.com",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"domainPatterns", "maxAge"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.MaxAgePolicy", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
+	}
+}
+
 func schema_openshift_api_config_v1_Scheduler(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -15199,7 +15361,7 @@ func schema_openshift_api_config_v1_Update(ref common.ReferenceCallback) common.
 					},
 					"force": {
 						SchemaProps: spec.SchemaProps{
-							Description: "force allows an administrator to update to an image that has failed verification, does not appear in the availableUpdates list, or otherwise would be blocked by normal protections on update. This option should only be used when the authenticity of the provided image has been verified out of band because the provided image will run with full administrative access to the cluster. Do not use this flag with images that comes from unknown or potentially malicious sources.\n\nThis flag does not override other forms of consistency checking that are required before a new update is deployed.",
+							Description: "force allows an administrator to update to an image that has failed verification or upgradeable checks. This option should only be used when the authenticity of the provided image has been verified out of band because the provided image will run with full administrative access to the cluster. Do not use this flag with images that comes from unknown or potentially malicious sources.",
 							Default:     false,
 							Type:        []string{"boolean"},
 							Format:      "",
@@ -15257,7 +15419,7 @@ func schema_openshift_api_config_v1_UpdateHistory(ref common.ReferenceCallback) 
 					},
 					"verified": {
 						SchemaProps: spec.SchemaProps{
-							Description: "verified indicates whether the provided update was properly verified before it was installed. If this is false the cluster may not be trusted.",
+							Description: "verified indicates whether the provided update was properly verified before it was installed. If this is false the cluster may not be trusted. Verified does not cover upgradeable checks that depend on the cluster state at the time when the update target was accepted.",
 							Default:     false,
 							Type:        []string{"boolean"},
 							Format:      "",
@@ -26346,6 +26508,57 @@ func schema_openshift_api_operator_v1_CSISnapshotControllerStatus(ref common.Ref
 	}
 }
 
+func schema_openshift_api_operator_v1_ClientTLS(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ClientTLS specifies TLS configuration to enable client-to-server authentication, which can be used for mutual TLS.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"clientCertificatePolicy": {
+						SchemaProps: spec.SchemaProps{
+							Description: "clientCertificatePolicy specifies whether the ingress controller requires clients to provide certificates.  This field accepts the values \"Required\" or \"Optional\".\n\nNote that the ingress controller only checks client certificates for edge-terminated and reencrypt TLS routes; it cannot check certificates for cleartext HTTP or passthrough TLS routes.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"clientCA": {
+						SchemaProps: spec.SchemaProps{
+							Description: "clientCA specifies a configmap containing the PEM-encoded CA certificate bundle that should be used to verify a client's certificate.  The administrator must create this configmap in the openshift-config namespace.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/config/v1.ConfigMapNameReference"),
+						},
+					},
+					"allowedSubjectPatterns": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "allowedSubjectPatterns specifies a list of regular expressions that should be matched against the distinguished name on a valid client certificate to filter requests.  The regular expressions must use PCRE syntax.  If this list is empty, no filtering is performed.  If the list is nonempty, then at least one pattern must match a client certificate's distinguished name or else the ingress controller rejects the certificate and denies the connection.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"clientCertificatePolicy", "clientCA"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/openshift/api/config/v1.ConfigMapNameReference"},
+	}
+}
+
 func schema_openshift_api_operator_v1_CloudCredential(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -27579,6 +27792,13 @@ func schema_openshift_api_operator_v1_DNSSpec(ref common.ReferenceCallback) comm
 							Description: "nodePlacement provides explicit control over the scheduling of DNS pods.\n\nGenerally, it is useful to run a DNS pod on every node so that DNS queries are always handled by a local DNS pod instead of going over the network to a DNS pod on another node.  However, security policies may require restricting the placement of DNS pods to specific nodes. For example, if a security policy prohibits pods on arbitrary nodes from communicating with the API, a node selector can be specified to restrict DNS pods to nodes that are permitted to communicate with the API.  Conversely, if running DNS pods on nodes with a particular taint is desired, a toleration can be specified for that taint.\n\nIf unset, defaults are used. See nodePlacement for more details.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("github.com/openshift/api/operator/v1.DNSNodePlacement"),
+						},
+					},
+					"managementState": {
+						SchemaProps: spec.SchemaProps{
+							Description: "managementState indicates whether the DNS operator should manage cluster DNS",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 				},
@@ -28843,8 +29063,15 @@ func schema_openshift_api_operator_v1_IngressControllerSpec(ref common.Reference
 					},
 					"tlsSecurityProfile": {
 						SchemaProps: spec.SchemaProps{
-							Description: "tlsSecurityProfile specifies settings for TLS connections for ingresscontrollers.\n\nIf unset, the default is based on the apiservers.config.openshift.io/cluster resource.\n\nNote that when using the Old, Intermediate, and Modern profile types, the effective profile configuration is subject to change between releases. For example, given a specification to use the Intermediate profile deployed on release X.Y.Z, an upgrade to release X.Y.Z+1 may cause a new profile configuration to be applied to the ingress controller, resulting in a rollout.\n\nNote that the minimum TLS version for ingress controllers is 1.1, and the maximum TLS version is 1.2.  An implication of this restriction is that the Modern TLS profile type cannot be used because it requires TLS 1.3.",
+							Description: "tlsSecurityProfile specifies settings for TLS connections for ingresscontrollers.\n\nIf unset, the default is based on the apiservers.config.openshift.io/cluster resource.\n\nNote that when using the Old, Intermediate, and Modern profile types, the effective profile configuration is subject to change between releases. For example, given a specification to use the Intermediate profile deployed on release X.Y.Z, an upgrade to release X.Y.Z+1 may cause a new profile configuration to be applied to the ingress controller, resulting in a rollout.",
 							Ref:         ref("github.com/openshift/api/config/v1.TLSSecurityProfile"),
+						},
+					},
+					"clientTLS": {
+						SchemaProps: spec.SchemaProps{
+							Description: "clientTLS specifies settings for requesting and verifying client certificates, which can be used to enable mutual TLS for edge-terminated and reencrypt routes.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/openshift/api/operator/v1.ClientTLS"),
 						},
 					},
 					"routeAdmission": {
@@ -28883,7 +29110,7 @@ func schema_openshift_api_operator_v1_IngressControllerSpec(ref common.Reference
 			},
 		},
 		Dependencies: []string{
-			"github.com/openshift/api/config/v1.ConfigMapNameReference", "github.com/openshift/api/config/v1.TLSSecurityProfile", "github.com/openshift/api/operator/v1.EndpointPublishingStrategy", "github.com/openshift/api/operator/v1.IngressControllerHTTPHeaders", "github.com/openshift/api/operator/v1.IngressControllerLogging", "github.com/openshift/api/operator/v1.IngressControllerTuningOptions", "github.com/openshift/api/operator/v1.NodePlacement", "github.com/openshift/api/operator/v1.RouteAdmissionPolicy", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector", "k8s.io/apimachinery/pkg/runtime.RawExtension"},
+			"github.com/openshift/api/config/v1.ConfigMapNameReference", "github.com/openshift/api/config/v1.TLSSecurityProfile", "github.com/openshift/api/operator/v1.ClientTLS", "github.com/openshift/api/operator/v1.EndpointPublishingStrategy", "github.com/openshift/api/operator/v1.IngressControllerHTTPHeaders", "github.com/openshift/api/operator/v1.IngressControllerLogging", "github.com/openshift/api/operator/v1.IngressControllerTuningOptions", "github.com/openshift/api/operator/v1.NodePlacement", "github.com/openshift/api/operator/v1.RouteAdmissionPolicy", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector", "k8s.io/apimachinery/pkg/runtime.RawExtension"},
 	}
 }
 
@@ -29426,8 +29653,16 @@ func schema_openshift_api_operator_v1_KubeControllerManagerSpec(ref common.Refer
 							Format:      "int32",
 						},
 					},
+					"useMoreSecureServiceCA": {
+						SchemaProps: spec.SchemaProps{
+							Description: "useMoreSecureServiceCA indicates that the service-ca.crt provided in SA token volumes should include only enough certificates to validate service serving certificates. Once set to true, it cannot be set to false. Even if someone finds a way to set it back to false, the service-ca.crt files that previously existed will only have the more secure content.",
+							Default:     false,
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
 				},
-				Required: []string{"managementState", "forceRedeploymentReason"},
+				Required: []string{"managementState", "forceRedeploymentReason", "useMoreSecureServiceCA"},
 			},
 		},
 		Dependencies: []string{
