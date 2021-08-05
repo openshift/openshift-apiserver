@@ -298,11 +298,6 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 			},
 		}
 	}
-	triggersWithImageID := func() []buildv1.BuildTriggerPolicy {
-		triggers := defaultTriggers()
-		triggers[2].ImageChange.LastTriggeredImageID = imageID
-		return triggers
-	}
 	tests := []struct {
 		name    string
 		reqFrom *corev1.ObjectReference
@@ -342,15 +337,6 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 			specTriggerIndex:   3,
 			statusTriggerIndex: 2,
 			triggers:           defaultTriggers(),
-		},
-		{
-			name: "existing imagev1 id",
-			reqFrom: &corev1.ObjectReference{
-				Kind: "ImageStreamTag",
-				Name: "image1:tag1",
-			},
-			triggers:      triggersWithImageID(),
-			errorExpected: true,
 		},
 	}
 
@@ -459,7 +445,7 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 		for i := range bc.Spec.Triggers {
 			if i == tc.specTriggerIndex {
 				// Verify that the trigger got updated
-				if bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID != imageID {
+				if bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID != "" {
 					t.Errorf("%s: expected trigger at index %d to contain imageID %s", tc.name, i, imageID)
 				}
 				continue
@@ -470,7 +456,7 @@ func TestInstantiateWithImageTrigger(t *testing.T) {
 				if from == nil {
 					from = buildutil.GetInputReference(bc.Spec.Strategy)
 				}
-				if bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID != ("ref/" + from.Name) {
+				if bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID != "" {
 					t.Errorf("%s: expected LastTriggeredImageID for trigger at %d (%+v) to be %s. Got: %s", tc.name, i, bc.Spec.Triggers[i].ImageChange.From, "ref/"+from.Name, bc.Spec.Triggers[i].ImageChange.LastTriggeredImageID)
 				}
 			}
