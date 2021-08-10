@@ -87,7 +87,7 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 	if a.GetResource().GroupResource() != grouproute.Resource("routes") {
 		return nil
 	}
-	newObject, isRoute := a.GetObject().(*routeapi.Route)
+	newRoute, isRoute := a.GetObject().(*routeapi.Route)
 	if !isRoute {
 		return nil
 	}
@@ -97,7 +97,7 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 		wants, has := false, false
 		var oldHSTS, newHSTS string
 
-		newHSTS, wants = newObject.Annotations[hstsAnnotation]
+		newHSTS, wants = newRoute.Annotations[hstsAnnotation]
 
 		oldObject := a.GetOldObject().(*routeapi.Route)
 		oldHSTS, has = oldObject.Annotations[hstsAnnotation]
@@ -106,6 +106,13 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 		if wants == has && newHSTS == oldHSTS {
 			return nil
 		}
+	}
+
+	// Cannot apply HSTS if route is not TLS.  Ignore silently to keep backward compatibility.
+	tls := newRoute.Spec.TLS
+	if tls == nil || (tls.Termination != routeapi.TLSTerminationEdge && tls.Termination != routeapi.TLSTerminationReencrypt) {
+		// TODO - will address missing annotations on routes as route status in https://issues.redhat.com/browse/NE-678
+		return nil
 	}
 
 	// Wait just once up to 20 seconds for all caches to sync
@@ -118,7 +125,6 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 		return admission.NewForbidden(a, err)
 	}
 
-	newRoute := a.GetObject().(*routeapi.Route)
 	namespace, err := o.nsLister.Get(newRoute.Namespace)
 	if err != nil {
 		return admission.NewForbidden(a, err)
@@ -183,18 +189,6 @@ func (o *requiredRouteAnnotations) SetOpenShiftConfigInformers(informers configi
 
 // isRouteHSTSAllowed returns nil if the route is allowed.  Otherwise, returns details and a suggestion in the error
 func isRouteHSTSAllowed(ingress *configv1.Ingress, newRoute *routeapi.Route, namespace *corev1.Namespace) error {
-	// Invalid if a HSTS Policy is specified but this route is not TLS.  Just log a warning.
-	if tls := newRoute.Spec.TLS; tls != nil {
-		switch termination := tls.Termination; termination {
-		case routeapi.TLSTerminationEdge, routeapi.TLSTerminationReencrypt:
-		// Valid case
-		default:
-			// Non-tls routes will not get HSTS headers, but can still be valid
-			klog.Warningf("HSTS Policy not added for %s, wrong termination type: %s", newRoute.Name, termination)
-			return nil
-		}
-	}
-
 	requirements := ingress.Spec.RequiredHSTSPolicies
 	for _, requirement := range requirements {
 		// Check if the required namespaceSelector (if any) and the domainPattern match
@@ -231,6 +225,16 @@ type hstsConfig struct {
 	includeSubDomains bool
 }
 
+const (
+	HSTSMaxAgeMissingOrWrongError     = "HSTS max-age must be set correctly in HSTS annotation"
+	HSTSMaxAgeGreaterError            = "HSTS max-age is greater than maximum age %ds"
+	HSTSMaxAgeLessThanError           = "HSTS max-age is less than minimum age %ds"
+	HSTSPreloadMustError              = "HSTS preload must be specified"
+	HSTSPreloadMustNotError           = "HSTS preload must not be specified"
+	HSTSIncludeSubDomainsMustError    = "HSTS includeSubDomains must be specified"
+	HSTSIncludeSubDomainsMustNotError = "HSTS includeSubDomains must not be specified"
+)
+
 // Parse out the hstsConfig fields from the annotation
 // Unrecognized fields are ignored
 func hstsConfigFromRoute(route *routeapi.Route) (*hstsConfig, error) {
@@ -255,7 +259,7 @@ func hstsConfigFromRoute(route *routeapi.Route) (*hstsConfig, error) {
 		}
 		ret.maxAge = int32(age)
 	} else {
-		return nil, fmt.Errorf("max-age must be set in HSTS annotation")
+		return nil, fmt.Errorf(HSTSMaxAgeMissingOrWrongError)
 	}
 
 	return &ret, nil
@@ -267,10 +271,10 @@ func hstsConfigFromRoute(route *routeapi.Route) (*hstsConfig, error) {
 // - includeSubDomainsPolicy
 func (c *hstsConfig) meetsRequirements(requirement configv1.RequiredHSTSPolicy) error {
 	if requirement.MaxAge.LargestMaxAge != nil && c.maxAge > *requirement.MaxAge.LargestMaxAge {
-		return fmt.Errorf("is greater than maximum age (%d)", *requirement.MaxAge.LargestMaxAge)
+		return fmt.Errorf(HSTSMaxAgeGreaterError, *requirement.MaxAge.LargestMaxAge)
 	}
 	if requirement.MaxAge.SmallestMaxAge != nil && c.maxAge < *requirement.MaxAge.SmallestMaxAge {
-		return fmt.Errorf("is less than minimum age (%d)", *requirement.MaxAge.SmallestMaxAge)
+		return fmt.Errorf(HSTSMaxAgeLessThanError, *requirement.MaxAge.SmallestMaxAge)
 	}
 
 	switch requirement.PreloadPolicy {
@@ -278,11 +282,11 @@ func (c *hstsConfig) meetsRequirements(requirement configv1.RequiredHSTSPolicy) 
 	// anything is allowed, do nothing
 	case configv1.RequirePreloadPolicy:
 		if !c.preload {
-			return fmt.Errorf("preload must be specified")
+			return fmt.Errorf(HSTSPreloadMustError)
 		}
 	case configv1.RequireNoPreloadPolicy:
 		if c.preload {
-			return fmt.Errorf("preload must not be specified")
+			return fmt.Errorf(HSTSPreloadMustNotError)
 		}
 	}
 
@@ -291,11 +295,11 @@ func (c *hstsConfig) meetsRequirements(requirement configv1.RequiredHSTSPolicy) 
 	// anything is allowed, do nothing
 	case configv1.RequireIncludeSubDomains:
 		if !c.includeSubDomains {
-			return fmt.Errorf("includeSubDomains must be specified")
+			return fmt.Errorf(HSTSIncludeSubDomainsMustError)
 		}
 	case configv1.RequireNoIncludeSubDomains:
 		if c.includeSubDomains {
-			return fmt.Errorf("includeSubDomains must not be specified")
+			return fmt.Errorf(HSTSIncludeSubDomainsMustNotError)
 		}
 	}
 

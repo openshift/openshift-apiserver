@@ -2,6 +2,7 @@ package requiredrouteannotations
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -167,7 +168,7 @@ func TestValidate(t *testing.T) {
 				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
 			},
 			name:                  "config1.1",
-			expectForbiddenClause: "max-age must be set in HSTS annotation",
+			expectForbiddenClause: HSTSMaxAgeMissingOrWrongError,
 			expectForbidden:       true,
 		},
 		{
@@ -179,7 +180,7 @@ func TestValidate(t *testing.T) {
 				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
 			},
 			name:                  "config1.2",
-			expectForbiddenClause: "max-age must be set in HSTS annotation",
+			expectForbiddenClause: HSTSMaxAgeMissingOrWrongError,
 			expectForbidden:       true,
 		},
 		{
@@ -213,8 +214,29 @@ func TestValidate(t *testing.T) {
 				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
 			},
 			name:                  "config1.4",
-			expectForbiddenClause: "max-age must be set in HSTS annotation",
+			expectForbiddenClause: HSTSMaxAgeMissingOrWrongError,
 			expectForbidden:       true, // Not okay because the old route had HSTS
+		},
+		{
+			description: "unannotated route, non-TLS (nil), matching domain",
+			config:      nonemptyConfig,
+			namespace:   "matchingDomainNamespace",
+			spec: &routeapi.RouteSpec{
+				Host: "abc.foo.com",
+			},
+			name:            "config1.5",
+			expectForbidden: false,
+		},
+		{
+			description: "unannotated route, non-TLS (passthrough), matching domain",
+			config:      nonemptyConfig,
+			namespace:   "matchingDomainNamespace",
+			spec: &routeapi.RouteSpec{
+				Host: "abc.foo.com",
+				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationPassthrough},
+			},
+			name:            "config1.6",
+			expectForbidden: false,
 		},
 		{
 			description: "appropriately annotated route for required annotations in ingress config",
@@ -242,7 +264,7 @@ func TestValidate(t *testing.T) {
 				Host: "abc.foo.com",
 				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
 			},
-			expectForbiddenClause: "preload must be specified",
+			expectForbiddenClause: HSTSPreloadMustError,
 			expectForbidden:       true,
 		},
 		{
@@ -257,7 +279,7 @@ func TestValidate(t *testing.T) {
 				Host: "abc.foo.com",
 				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
 			},
-			expectForbiddenClause: "preload must not be specified",
+			expectForbiddenClause: HSTSPreloadMustNotError,
 			expectForbidden:       true,
 		},
 		{
@@ -272,7 +294,7 @@ func TestValidate(t *testing.T) {
 				Host: "abc.foo.com",
 				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
 			},
-			expectForbiddenClause: "includeSubDomains must not be specified",
+			expectForbiddenClause: HSTSIncludeSubDomainsMustNotError,
 			expectForbidden:       true,
 		},
 		{
@@ -301,7 +323,7 @@ func TestValidate(t *testing.T) {
 				Host: "abc.foo.com",
 				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
 			},
-			expectForbiddenClause: "preload must be specified",
+			expectForbiddenClause: HSTSPreloadMustError,
 			expectForbidden:       true,
 		},
 		{
@@ -330,7 +352,7 @@ func TestValidate(t *testing.T) {
 				Host: "abc.foo.com",
 				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
 			},
-			expectForbiddenClause: "is greater than maximum age (99)",
+			expectForbiddenClause: fmt.Sprintf(HSTSMaxAgeGreaterError, 99),
 			expectForbidden:       true,
 		},
 		{
@@ -345,7 +367,7 @@ func TestValidate(t *testing.T) {
 				Host: "abc.foo.com",
 				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
 			},
-			expectForbiddenClause: "is less than minimum age (1)",
+			expectForbiddenClause: fmt.Sprintf(HSTSMaxAgeLessThanError, 1),
 			expectForbidden:       true,
 		},
 		{
@@ -360,7 +382,7 @@ func TestValidate(t *testing.T) {
 				Host: "abc.foo.com",
 				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
 			},
-			expectForbiddenClause: "max-age must be set in HSTS annotation",
+			expectForbiddenClause: HSTSMaxAgeMissingOrWrongError,
 			expectForbidden:       true,
 		},
 		{
@@ -375,7 +397,7 @@ func TestValidate(t *testing.T) {
 				Host: "abc.foo.com",
 				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
 			},
-			expectForbiddenClause: "max-age must be set in HSTS annotation",
+			expectForbiddenClause: HSTSMaxAgeMissingOrWrongError,
 			expectForbidden:       true,
 		},
 		{
@@ -404,7 +426,7 @@ func TestValidate(t *testing.T) {
 				Host: "foo.com",
 				TLS:  &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
 			},
-			expectForbiddenClause: "max-age must be set in HSTS annotation",
+			expectForbiddenClause: HSTSMaxAgeMissingOrWrongError,
 			expectForbidden:       true,
 		},
 	}
