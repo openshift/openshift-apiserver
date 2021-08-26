@@ -393,8 +393,6 @@ func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.Bu
 		}
 		// Use the requested image id for the trigger that caused the build, otherwise resolve to the latest
 		if triggeredBy != nil && trigger.ImageChange == requestTrigger {
-			//TODO we still update spec until deprecated field (deprecated in 4.8) is ignored (presumably 4.9)
-			trigger.ImageChange.LastTriggeredImageID = triggeredBy.Name
 			imageChangeTriggerStatus.LastTriggeredImageID = triggeredBy.Name
 			// we only update the trigger time for trigger associated with triggeredBy
 			imageChangeTriggerStatus.LastTriggerTime = metav1.Now()
@@ -423,8 +421,6 @@ func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.Bu
 			// Otherwise, warn that an error occurred, but continue
 			klog.Warningf("Could not resolve trigger reference for build config %s/%s: %#v", bc.Namespace, bc.Name, triggerImageRef)
 		}
-		//TODO we still update spec until deprecated field (deprecated in 4.8) is ignored (presumably 4.9)
-		trigger.ImageChange.LastTriggeredImageID = image
 		imageChangeTriggerStatus.LastTriggeredImageID = image
 		// reminder: we do not update the LastTriggeredTime here
 		bc.Status.ImageChangeTriggers = append(bc.Status.ImageChangeTriggers, imageChangeTriggerStatus)

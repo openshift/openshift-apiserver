@@ -2892,7 +2892,7 @@ func TestValidateTrigger(t *testing.T) {
 			trigger: buildapi.BuildTriggerPolicy{
 				Type: buildapi.ImageChangeBuildTriggerType,
 				ImageChange: &buildapi.ImageChangeTrigger{
-					LastTriggeredImageID: "asdf1234",
+					LastTriggeredImageID: "",
 				},
 			},
 		},
