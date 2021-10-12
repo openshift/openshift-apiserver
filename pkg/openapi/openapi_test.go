@@ -21,13 +21,16 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/go-openapi/spec"
 	"k8s.io/apimachinery/pkg/util/diff"
+	"k8s.io/kube-openapi/pkg/common"
 	"k8s.io/kube-openapi/pkg/handler"
+	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
 func TestOpenAPIRoundtrip(t *testing.T) {
-	dummyRef := func(name string) spec.Ref { return spec.MustCreateRef("#/definitions/dummy") }
+	dummyRef := common.ReferenceCallback(func(path string) spec.Ref {
+		return spec.MustCreateRef("#/definitions/dummy")
+	})
 	for name, value := range GetOpenAPIDefinitions(dummyRef) {
 		t.Run(name, func(t *testing.T) {
 			// TODO(kubernetes/gengo#193): We currently round-trip ints to floats.

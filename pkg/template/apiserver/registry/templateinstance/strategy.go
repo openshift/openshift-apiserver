@@ -45,6 +45,14 @@ func (templateInstanceStrategy) PrepareForUpdate(ctx context.Context, obj, old r
 	curr.Status = prev.Status
 }
 
+func (templateInstanceStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (templateInstanceStrategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
+
 // Canonicalize normalizes the object after validation.
 func (templateInstanceStrategy) Canonicalize(obj runtime.Object) {
 }
@@ -172,6 +180,14 @@ func (statusStrategy) NamespaceScoped() bool {
 
 func (statusStrategy) AllowCreateOnUpdate() bool {
 	return false
+}
+
+func (statusStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (statusStrategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
 }
 
 func (statusStrategy) AllowUnconditionalUpdate() bool {

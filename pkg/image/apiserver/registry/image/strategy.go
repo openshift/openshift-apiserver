@@ -69,6 +69,14 @@ func (imageStrategy) AllowCreateOnUpdate() bool {
 	return false
 }
 
+func (imageStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (imageStrategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
+
 func (imageStrategy) AllowUnconditionalUpdate() bool {
 	return false
 }

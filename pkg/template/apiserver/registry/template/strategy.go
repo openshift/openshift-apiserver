@@ -48,6 +48,14 @@ func (templateStrategy) AllowCreateOnUpdate() bool {
 	return false
 }
 
+func (templateStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (templateStrategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
+
 func (templateStrategy) AllowUnconditionalUpdate() bool {
 	return false
 }

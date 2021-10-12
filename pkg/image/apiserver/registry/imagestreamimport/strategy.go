@@ -34,6 +34,14 @@ func (s *strategy) GenerateName(string) string {
 	return ""
 }
 
+func (s *strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (s *strategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
+
 func (s *strategy) Canonicalize(runtime.Object) {
 }
 

@@ -46,6 +46,14 @@ func (strategy) AllowUnconditionalUpdate() bool {
 	return false
 }
 
+func (strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (strategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
+
 func (s strategy) Export(ctx context.Context, obj runtime.Object, exact bool) error {
 	s.PrepareForCreate(ctx, obj)
 	return nil

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	etcd "go.etcd.io/etcd/clientv3"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	authorizationapi "k8s.io/api/authorization/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -40,10 +40,10 @@ func (f *fakeSubjectAccessReviewRegistry) CreateContext(ctx context.Context, sub
 	return f.Create(ctx, subjectAccessReview, metav1.CreateOptions{})
 }
 
-func setup(t *testing.T) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
+func setup(t *testing.T) (clientv3.KV, *etcdtesting.EtcdTestServer, *REST) {
 	server, etcdStorage := etcdtesting.NewUnsecuredEtcd3TestClientServer(t)
 	etcdStorage.Codec = legacyscheme.Codecs.LegacyCodec(schema.GroupVersion{Group: "image.openshift.io", Version: "v1"})
-	etcdClient := etcd.NewKV(server.V3Client)
+	etcdClient := clientv3.NewKV(&clientv3.Client{})
 	imageRESTOptions := generic.RESTOptions{StorageConfig: etcdStorage, Decorator: generic.UndecoratedStorage, DeleteCollectionWorkers: 1, ResourcePrefix: "images"}
 
 	imageStorage, err := imageetcd.NewREST(imageRESTOptions)

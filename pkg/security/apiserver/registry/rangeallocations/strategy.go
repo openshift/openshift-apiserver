@@ -44,6 +44,14 @@ func (strategy) AllowCreateOnUpdate() bool {
 	return false
 }
 
+func (strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (strategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
+
 func (strategy) PrepareForUpdate(ctx context.Context, newObj, oldObj runtime.Object) {
 	_ = oldObj.(*securityapi.RangeAllocation)
 	_ = newObj.(*securityapi.RangeAllocation)

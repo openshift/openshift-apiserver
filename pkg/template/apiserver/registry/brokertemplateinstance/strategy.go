@@ -31,6 +31,14 @@ func (brokerTemplateInstanceStrategy) NamespaceScoped() bool {
 func (brokerTemplateInstanceStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
 }
 
+func (brokerTemplateInstanceStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (brokerTemplateInstanceStrategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
+
 // Canonicalize normalizes the object after validation.
 func (brokerTemplateInstanceStrategy) Canonicalize(obj runtime.Object) {
 }
