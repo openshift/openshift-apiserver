@@ -34,6 +34,14 @@ func (strategy) AllowCreateOnUpdate() bool {
 	return false
 }
 
+func (strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (strategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
+
 func (strategy) AllowUnconditionalUpdate() bool {
 	return false
 }

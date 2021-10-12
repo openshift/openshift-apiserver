@@ -65,6 +65,14 @@ func (projectStrategy) AllowCreateOnUpdate() bool {
 	return false
 }
 
+func (projectStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (projectStrategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
+
 func (projectStrategy) AllowUnconditionalUpdate() bool {
 	return false
 }

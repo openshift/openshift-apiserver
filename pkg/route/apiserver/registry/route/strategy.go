@@ -142,6 +142,14 @@ func (routeStrategy) AllowCreateOnUpdate() bool {
 	return false
 }
 
+func (routeStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (routeStrategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
+
 // Canonicalize normalizes the object after validation.
 func (routeStrategy) Canonicalize(obj runtime.Object) {
 }

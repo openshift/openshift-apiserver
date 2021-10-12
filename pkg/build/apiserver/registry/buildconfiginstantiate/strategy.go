@@ -25,6 +25,14 @@ func (strategy) AllowCreateOnUpdate() bool {
 	return false
 }
 
+func (strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (strategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
+
 func (strategy) GenerateName(base string) string {
 	return base
 }
@@ -54,6 +62,14 @@ func (binaryStrategy) NamespaceScoped() bool {
 
 func (binaryStrategy) AllowCreateOnUpdate() bool {
 	return false
+}
+
+func (binaryStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (binaryStrategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
 }
 
 func (binaryStrategy) GenerateName(base string) string {

@@ -36,6 +36,14 @@ func (s Strategy) NamespaceScoped() bool {
 	return true
 }
 
+func (s Strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (s Strategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
+
 // PrepareForCreate clears fields that are not allowed to be set by end users on creation.
 func (s Strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 	ism := obj.(*imageapi.ImageStreamMapping)

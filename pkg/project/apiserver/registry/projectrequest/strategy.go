@@ -51,3 +51,11 @@ func (strategy) Canonicalize(obj runtime.Object) {
 func (strategy) AllowCreateOnUpdate() bool {
 	return false
 }
+
+func (strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return []string{}
+}
+
+func (strategy) WarningsOnUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) []string {
+	return []string{}
+}
