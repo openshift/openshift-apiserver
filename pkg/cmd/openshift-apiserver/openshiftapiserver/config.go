@@ -24,7 +24,6 @@ import (
 
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	"github.com/openshift/apiserver-library-go/pkg/configflags"
-	"github.com/openshift/library-go/pkg/apiserver/admission/admissiontimeout"
 	"github.com/openshift/library-go/pkg/apiserver/apiserverconfig"
 	"github.com/openshift/library-go/pkg/config/helpers"
 	"github.com/openshift/library-go/pkg/config/serving"
@@ -176,7 +175,6 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	admissionOptions := genericapiserveroptions.NewAdmissionOptions()
 	admissionOptions.Decorators = admission.Decorators{
 		admission.DecoratorFunc(admissionmetrics.WithControllerMetrics),
-		admission.DecoratorFunc(admissiontimeout.AdmissionTimeout{Timeout: 13 * time.Second}.WithTimeout),
 	}
 	admissionOptions.DefaultOffPlugins = sets.String{}
 	admissionOptions.RecommendedPluginOrder = openshiftadmission.OpenShiftAdmissionPlugins

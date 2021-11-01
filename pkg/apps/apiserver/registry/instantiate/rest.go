@@ -3,6 +3,7 @@ package instantiate
 import (
 	"context"
 	"fmt"
+	"time"
 
 	v1 "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -110,10 +111,12 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		attrs := admission.NewAttributesRecord(config, old, apps.Kind("DeploymentConfig").WithVersion("v1"), config.Namespace, config.Name, apps.Resource("DeploymentConfig").WithVersion("v1"), "", admission.Update,
 			options, false, userInfo)
 		objectInterfaces := admission.NewObjectInterfacesFromScheme(legacyscheme.Scheme)
-		if err := s.admit.(admission.MutationInterface).Admit(ctx, attrs, objectInterfaces); err != nil {
+		admissionCtx, cancelFn := context.WithTimeout(ctx, 13*time.Second)
+		defer cancelFn()
+		if err := s.admit.(admission.MutationInterface).Admit(admissionCtx, attrs, objectInterfaces); err != nil {
 			return err
 		}
-		if err := s.admit.(admission.ValidationInterface).Validate(ctx, attrs, objectInterfaces); err != nil {
+		if err := s.admit.(admission.ValidationInterface).Validate(admissionCtx, attrs, objectInterfaces); err != nil {
 			return err
 		}
 
