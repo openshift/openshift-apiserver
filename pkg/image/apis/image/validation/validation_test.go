@@ -91,7 +91,7 @@ func TestValidateImageSignature(t *testing.T) {
 				Type:    "valid",
 				Content: []byte("blob"),
 			},
-			expected: field.ErrorList{},
+			expected: nil,
 		},
 
 		{
@@ -114,7 +114,7 @@ func TestValidateImageSignature(t *testing.T) {
 				},
 				ImageIdentity: "registry.company.ltd/app/core:v1.2",
 			},
-			expected: field.ErrorList{},
+			expected: nil,
 		},
 
 		{
@@ -142,7 +142,7 @@ func TestValidateImageSignature(t *testing.T) {
 				},
 				ImageIdentity: "registry.company.ltd/app/core:v1.2",
 			},
-			expected: field.ErrorList{},
+			expected: nil,
 		},
 
 		{
@@ -559,22 +559,22 @@ func TestValidateImageStream(t *testing.T) {
 					},
 				},
 			},
-			expected: field.ErrorList{},
+			expected: nil,
 		},
 		"shortest name components": {
 			namespace: "f",
 			name:      "g",
-			expected:  field.ErrorList{},
+			expected:  nil,
 		},
 		"all possible characters used": {
 			namespace: "abcdefghijklmnopqrstuvwxyz-1234567890",
 			name:      "abcdefghijklmnopqrstuvwxyz-1234567890.dot_underscore-dash",
-			expected:  field.ErrorList{},
+			expected:  nil,
 		},
 		"max name and namespace length met": {
 			namespace: namespace63Char,
 			name:      name191Char,
-			expected:  field.ErrorList{},
+			expected:  nil,
 		},
 		"max name and namespace length exceeded": {
 			namespace: namespace63Char,
@@ -815,7 +815,7 @@ func TestValidateImageStreamWithWhitelister(t *testing.T) {
 			name:                  "bar",
 			whitelist:             mkAllowed(false, "example.com"),
 			dockerImageRepository: "example.com/openshift/origin",
-			expected:              field.ErrorList{},
+			expected:              nil,
 		},
 
 		"not whitelisted repository": {
