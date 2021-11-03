@@ -7,13 +7,13 @@
 package openapi
 
 import (
-	spec "github.com/go-openapi/spec"
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	v1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	resource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
 	common "k8s.io/kube-openapi/pkg/common"
+	spec "k8s.io/kube-openapi/pkg/validation/spec"
 )
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
@@ -984,6 +984,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/api/batch/v1.JobSpec":                                                                     schema_k8sio_api_batch_v1_JobSpec(ref),
 		"k8s.io/api/batch/v1.JobStatus":                                                                   schema_k8sio_api_batch_v1_JobStatus(ref),
 		"k8s.io/api/batch/v1.JobTemplateSpec":                                                             schema_k8sio_api_batch_v1_JobTemplateSpec(ref),
+		"k8s.io/api/batch/v1.UncountedTerminatedPods":                                                     schema_k8sio_api_batch_v1_UncountedTerminatedPods(ref),
 		"k8s.io/api/batch/v1beta1.CronJob":                                                                schema_k8sio_api_batch_v1beta1_CronJob(ref),
 		"k8s.io/api/batch/v1beta1.CronJobList":                                                            schema_k8sio_api_batch_v1beta1_CronJobList(ref),
 		"k8s.io/api/batch/v1beta1.CronJobSpec":                                                            schema_k8sio_api_batch_v1beta1_CronJobSpec(ref),
@@ -1055,7 +1056,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/api/core/v1.EnvVarSource":                                                                 schema_k8sio_api_core_v1_EnvVarSource(ref),
 		"k8s.io/api/core/v1.EphemeralContainer":                                                           schema_k8sio_api_core_v1_EphemeralContainer(ref),
 		"k8s.io/api/core/v1.EphemeralContainerCommon":                                                     schema_k8sio_api_core_v1_EphemeralContainerCommon(ref),
-		"k8s.io/api/core/v1.EphemeralContainers":                                                          schema_k8sio_api_core_v1_EphemeralContainers(ref),
 		"k8s.io/api/core/v1.EphemeralVolumeSource":                                                        schema_k8sio_api_core_v1_EphemeralVolumeSource(ref),
 		"k8s.io/api/core/v1.Event":                                                                        schema_k8sio_api_core_v1_Event(ref),
 		"k8s.io/api/core/v1.EventList":                                                                    schema_k8sio_api_core_v1_EventList(ref),
@@ -1388,6 +1388,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/api/node/v1beta1.RuntimeClass":                                                            schema_k8sio_api_node_v1beta1_RuntimeClass(ref),
 		"k8s.io/api/node/v1beta1.RuntimeClassList":                                                        schema_k8sio_api_node_v1beta1_RuntimeClassList(ref),
 		"k8s.io/api/node/v1beta1.Scheduling":                                                              schema_k8sio_api_node_v1beta1_Scheduling(ref),
+		"k8s.io/api/policy/v1.Eviction":                                                                   schema_k8sio_api_policy_v1_Eviction(ref),
 		"k8s.io/api/policy/v1.PodDisruptionBudget":                                                        schema_k8sio_api_policy_v1_PodDisruptionBudget(ref),
 		"k8s.io/api/policy/v1.PodDisruptionBudgetList":                                                    schema_k8sio_api_policy_v1_PodDisruptionBudgetList(ref),
 		"k8s.io/api/policy/v1.PodDisruptionBudgetSpec":                                                    schema_k8sio_api_policy_v1_PodDisruptionBudgetSpec(ref),
@@ -1623,6 +1624,10 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/apiserver/pkg/apis/audit/v1beta1.Policy":                                                  schema_pkg_apis_audit_v1beta1_Policy(ref),
 		"k8s.io/apiserver/pkg/apis/audit/v1beta1.PolicyList":                                              schema_pkg_apis_audit_v1beta1_PolicyList(ref),
 		"k8s.io/apiserver/pkg/apis/audit/v1beta1.PolicyRule":                                              schema_pkg_apis_audit_v1beta1_PolicyRule(ref),
+		"k8s.io/client-go/pkg/apis/clientauthentication/v1.Cluster":                                       schema_pkg_apis_clientauthentication_v1_Cluster(ref),
+		"k8s.io/client-go/pkg/apis/clientauthentication/v1.ExecCredential":                                schema_pkg_apis_clientauthentication_v1_ExecCredential(ref),
+		"k8s.io/client-go/pkg/apis/clientauthentication/v1.ExecCredentialSpec":                            schema_pkg_apis_clientauthentication_v1_ExecCredentialSpec(ref),
+		"k8s.io/client-go/pkg/apis/clientauthentication/v1.ExecCredentialStatus":                          schema_pkg_apis_clientauthentication_v1_ExecCredentialStatus(ref),
 		"k8s.io/client-go/pkg/apis/clientauthentication/v1alpha1.ExecCredential":                          schema_pkg_apis_clientauthentication_v1alpha1_ExecCredential(ref),
 		"k8s.io/client-go/pkg/apis/clientauthentication/v1alpha1.ExecCredentialSpec":                      schema_pkg_apis_clientauthentication_v1alpha1_ExecCredentialSpec(ref),
 		"k8s.io/client-go/pkg/apis/clientauthentication/v1alpha1.ExecCredentialStatus":                    schema_pkg_apis_clientauthentication_v1alpha1_ExecCredentialStatus(ref),
@@ -1656,7 +1661,7 @@ func schema_openshift_api_apiserver_v1_APIRequestCount(ref common.ReferenceCallb
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "APIRequestCount tracks requests made to an API. The instance name must be of the form `resource.version.group`, matching the resource.",
+				Description: "APIRequestCount tracks requests made to an API. The instance name must be of the form `resource.version.group`, matching the resource.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -1706,7 +1711,7 @@ func schema_openshift_api_apiserver_v1_APIRequestCountList(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "APIRequestCountList is a list of APIRequestCount resources.",
+				Description: "APIRequestCountList is a list of APIRequestCount resources.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -2178,7 +2183,7 @@ func schema_openshift_api_apps_v1_DeploymentConfig(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Deployment Configs define the template for a pod and manages deploying new images or configuration changes. A single deployment configuration is usually analogous to a single micro-service. Can support many different deployment patterns, including full restart, customizable rolling updates, and  fully custom behaviors, as well as pre- and post- deployment hooks. Each individual deployment is represented as a replication controller.\n\nA deployment is \"triggered\" when its configuration is changed or a tag in an Image Stream is changed. Triggers can be disabled to allow manual control over a deployment. The \"strategy\" determines how the deployment is carried out and may be changed at any time. The `latestVersion` field is updated when a new deployment is triggered by any means.",
+				Description: "Deployment Configs define the template for a pod and manages deploying new images or configuration changes. A single deployment configuration is usually analogous to a single micro-service. Can support many different deployment patterns, including full restart, customizable rolling updates, and  fully custom behaviors, as well as pre- and post- deployment hooks. Each individual deployment is represented as a replication controller.\n\nA deployment is \"triggered\" when its configuration is changed or a tag in an Image Stream is changed. Triggers can be disabled to allow manual control over a deployment. The \"strategy\" determines how the deployment is carried out and may be changed at any time. The `latestVersion` field is updated when a new deployment is triggered by any means.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -2228,7 +2233,7 @@ func schema_openshift_api_apps_v1_DeploymentConfigList(ref common.ReferenceCallb
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "DeploymentConfigList is a collection of deployment configs.",
+				Description: "DeploymentConfigList is a collection of deployment configs.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -2278,7 +2283,7 @@ func schema_openshift_api_apps_v1_DeploymentConfigRollback(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "DeploymentConfigRollback provides the input to rollback generation.",
+				Description: "DeploymentConfigRollback provides the input to rollback generation.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -2630,7 +2635,7 @@ func schema_openshift_api_apps_v1_DeploymentLog(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "DeploymentLog represents the logs for a deployment",
+				Description: "DeploymentLog represents the logs for a deployment\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -2657,7 +2662,7 @@ func schema_openshift_api_apps_v1_DeploymentLogOptions(ref common.ReferenceCallb
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "DeploymentLogOptions is the REST options for a deployment log",
+				Description: "DeploymentLogOptions is the REST options for a deployment log\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -2755,7 +2760,7 @@ func schema_openshift_api_apps_v1_DeploymentRequest(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "DeploymentRequest is a request to a deployment config for a new deployment.",
+				Description: "DeploymentRequest is a request to a deployment config for a new deployment.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -3318,7 +3323,7 @@ func schema_openshift_api_authorization_v1_ClusterRole(ref common.ReferenceCallb
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterRole is a logical grouping of PolicyRules that can be referenced as a unit by ClusterRoleBindings.",
+				Description: "ClusterRole is a logical grouping of PolicyRules that can be referenced as a unit by ClusterRoleBindings.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -3374,7 +3379,7 @@ func schema_openshift_api_authorization_v1_ClusterRoleBinding(ref common.Referen
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference any ClusterRole in the same namespace or in the global namespace. It adds who information via (Users and Groups) OR Subjects and namespace information by which namespace it exists in. ClusterRoleBindings in a given namespace only have effect in that namespace (excepting the master namespace which has power in all namespaces).",
+				Description: "ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference any ClusterRole in the same namespace or in the global namespace. It adds who information via (Users and Groups) OR Subjects and namespace information by which namespace it exists in. ClusterRoleBindings in a given namespace only have effect in that namespace (excepting the master namespace which has power in all namespaces).\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -3461,7 +3466,7 @@ func schema_openshift_api_authorization_v1_ClusterRoleBindingList(ref common.Ref
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterRoleBindingList is a collection of ClusterRoleBindings",
+				Description: "ClusterRoleBindingList is a collection of ClusterRoleBindings\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -3511,7 +3516,7 @@ func schema_openshift_api_authorization_v1_ClusterRoleList(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterRoleList is a collection of ClusterRoles",
+				Description: "ClusterRoleList is a collection of ClusterRoles\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -3606,7 +3611,7 @@ func schema_openshift_api_authorization_v1_IsPersonalSubjectAccessReview(ref com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "IsPersonalSubjectAccessReview is a marker for PolicyRule.AttributeRestrictions that denotes that subjectaccessreviews on self should be allowed",
+				Description: "IsPersonalSubjectAccessReview is a marker for PolicyRule.AttributeRestrictions that denotes that subjectaccessreviews on self should be allowed\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -3633,7 +3638,7 @@ func schema_openshift_api_authorization_v1_LocalResourceAccessReview(ref common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "LocalResourceAccessReview is a means to request a list of which users and groups are authorized to perform the action specified by spec in a particular namespace",
+				Description: "LocalResourceAccessReview is a means to request a list of which users and groups are authorized to perform the action specified by spec in a particular namespace\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -3734,7 +3739,7 @@ func schema_openshift_api_authorization_v1_LocalSubjectAccessReview(ref common.R
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "LocalSubjectAccessReview is an object for requesting information about whether a user or group can perform an action in a particular namespace",
+				Description: "LocalSubjectAccessReview is an object for requesting information about whether a user or group can perform an action in a particular namespace\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -4095,7 +4100,7 @@ func schema_openshift_api_authorization_v1_ResourceAccessReview(ref common.Refer
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ResourceAccessReview is a means to request a list of which users and groups are authorized to perform the action specified by spec",
+				Description: "ResourceAccessReview is a means to request a list of which users and groups are authorized to perform the action specified by spec\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -4196,7 +4201,7 @@ func schema_openshift_api_authorization_v1_ResourceAccessReviewResponse(ref comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ResourceAccessReviewResponse describes who can perform the action",
+				Description: "ResourceAccessReviewResponse describes who can perform the action\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -4269,7 +4274,7 @@ func schema_openshift_api_authorization_v1_Role(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Role is a logical grouping of PolicyRules that can be referenced as a unit by RoleBindings.",
+				Description: "Role is a logical grouping of PolicyRules that can be referenced as a unit by RoleBindings.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -4319,7 +4324,7 @@ func schema_openshift_api_authorization_v1_RoleBinding(ref common.ReferenceCallb
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RoleBinding references a Role, but not contain it.  It can reference any Role in the same namespace or in the global namespace. It adds who information via (Users and Groups) OR Subjects and namespace information by which namespace it exists in. RoleBindings in a given namespace only have effect in that namespace (excepting the master namespace which has power in all namespaces).",
+				Description: "RoleBinding references a Role, but not contain it.  It can reference any Role in the same namespace or in the global namespace. It adds who information via (Users and Groups) OR Subjects and namespace information by which namespace it exists in. RoleBindings in a given namespace only have effect in that namespace (excepting the master namespace which has power in all namespaces).\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -4406,7 +4411,7 @@ func schema_openshift_api_authorization_v1_RoleBindingList(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RoleBindingList is a collection of RoleBindings",
+				Description: "RoleBindingList is a collection of RoleBindings\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -4456,7 +4461,7 @@ func schema_openshift_api_authorization_v1_RoleBindingRestriction(ref common.Ref
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RoleBindingRestriction is an object that can be matched against a subject (user, group, or service account) to determine whether rolebindings on that subject are allowed in the namespace to which the RoleBindingRestriction belongs.  If any one of those RoleBindingRestriction objects matches a subject, rolebindings on that subject in the namespace are allowed.",
+				Description: "RoleBindingRestriction is an object that can be matched against a subject (user, group, or service account) to determine whether rolebindings on that subject are allowed in the namespace to which the RoleBindingRestriction belongs.  If any one of those RoleBindingRestriction objects matches a subject, rolebindings on that subject in the namespace are allowed.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -4499,7 +4504,7 @@ func schema_openshift_api_authorization_v1_RoleBindingRestrictionList(ref common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RoleBindingRestrictionList is a collection of RoleBindingRestriction objects.",
+				Description: "RoleBindingRestrictionList is a collection of RoleBindingRestriction objects.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -4583,7 +4588,7 @@ func schema_openshift_api_authorization_v1_RoleList(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RoleList is a collection of Roles",
+				Description: "RoleList is a collection of Roles\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -4633,7 +4638,7 @@ func schema_openshift_api_authorization_v1_SelfSubjectRulesReview(ref common.Ref
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "SelfSubjectRulesReview is a resource you can create to determine which actions you can perform in a namespace",
+				Description: "SelfSubjectRulesReview is a resource you can create to determine which actions you can perform in a namespace\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -4781,7 +4786,7 @@ func schema_openshift_api_authorization_v1_SubjectAccessReview(ref common.Refere
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "SubjectAccessReview is an object for requesting information about whether a user or group can perform an action",
+				Description: "SubjectAccessReview is an object for requesting information about whether a user or group can perform an action\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -4920,7 +4925,7 @@ func schema_openshift_api_authorization_v1_SubjectAccessReviewResponse(ref commo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "SubjectAccessReviewResponse describes whether or not a user or group can perform an action",
+				Description: "SubjectAccessReviewResponse describes whether or not a user or group can perform an action\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -4977,7 +4982,7 @@ func schema_openshift_api_authorization_v1_SubjectRulesReview(ref common.Referen
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "SubjectRulesReview is a resource you can create to determine which actions another user can perform in a namespace",
+				Description: "SubjectRulesReview is a resource you can create to determine which actions another user can perform in a namespace\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -5170,7 +5175,7 @@ func schema_openshift_api_build_v1_BinaryBuildRequestOptions(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BinaryBuildRequestOptions are the options required to fully speficy a binary build request",
+				Description: "BinaryBuildRequestOptions are the options required to fully speficy a binary build request\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -5302,7 +5307,7 @@ func schema_openshift_api_build_v1_Build(ref common.ReferenceCallback) common.Op
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Build encapsulates the inputs needed to produce a new deployable image, as well as the status of the execution and a reference to the Pod which executed the build.",
+				Description: "Build encapsulates the inputs needed to produce a new deployable image, as well as the status of the execution and a reference to the Pod which executed the build.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -5411,7 +5416,7 @@ func schema_openshift_api_build_v1_BuildConfig(ref common.ReferenceCallback) com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Build configurations define a build process for new container images. There are three types of builds possible - a container image build using a Dockerfile, a Source-to-Image build that uses a specially prepared base image that accepts source code that it can make runnable, and a custom build that can run // arbitrary container images as a base and accept the build parameters. Builds run on the cluster and on completion are pushed to the container image registry specified in the \"output\" section. A build can be triggered via a webhook, when the base image changes, or when a user manually requests a new build be // created.\n\nEach build created by a build configuration is numbered and refers back to its parent configuration. Multiple builds can be triggered at once. Builds that do not have \"output\" set can be used to test code or run a verification build.",
+				Description: "Build configurations define a build process for new container images. There are three types of builds possible - a container image build using a Dockerfile, a Source-to-Image build that uses a specially prepared base image that accepts source code that it can make runnable, and a custom build that can run // arbitrary container images as a base and accept the build parameters. Builds run on the cluster and on completion are pushed to the container image registry specified in the \"output\" section. A build can be triggered via a webhook, when the base image changes, or when a user manually requests a new build be // created.\n\nEach build created by a build configuration is numbered and refers back to its parent configuration. Multiple builds can be triggered at once. Builds that do not have \"output\" set can be used to test code or run a verification build.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -5461,7 +5466,7 @@ func schema_openshift_api_build_v1_BuildConfigList(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BuildConfigList is a collection of BuildConfigs.",
+				Description: "BuildConfigList is a collection of BuildConfigs.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -5678,7 +5683,7 @@ func schema_openshift_api_build_v1_BuildList(ref common.ReferenceCallback) commo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BuildList is a collection of Builds.",
+				Description: "BuildList is a collection of Builds.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -5728,7 +5733,7 @@ func schema_openshift_api_build_v1_BuildLog(ref common.ReferenceCallback) common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BuildLog is the (unused) resource associated with the build log redirector",
+				Description: "BuildLog is the (unused) resource associated with the build log redirector\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -5755,7 +5760,7 @@ func schema_openshift_api_build_v1_BuildLogOptions(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BuildLogOptions is the REST options for a build log",
+				Description: "BuildLogOptions is the REST options for a build log\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -5951,7 +5956,7 @@ func schema_openshift_api_build_v1_BuildRequest(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BuildRequest is the resource used to pass parameters to build generator",
+				Description: "BuildRequest is the resource used to pass parameters to build generator\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -8153,7 +8158,7 @@ func schema_openshift_api_cloudnetwork_v1_CloudPrivateIPConfig(ref common.Refere
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "CloudPrivateIPConfig performs an assignment of a private IP address to the primary NIC associated with cloud VMs. This is done by specifying the IP and Kubernetes node which the IP should be assigned to. This CRD is intended to be used by the network plugin which manages the cluster network. The spec side represents the desired state requested by the network plugin, and the status side represents the current state that this CRD's controller has executed. No users will have permission to modify it, and if a cluster-admin decides to edit it for some reason, their changes will be overwritten the next time the network plugin reconciles the object. Note: the CR's name must specify the requested private IP address (can be IPv4 or IPv6).",
+				Description: "CloudPrivateIPConfig performs an assignment of a private IP address to the primary NIC associated with cloud VMs. This is done by specifying the IP and Kubernetes node which the IP should be assigned to. This CRD is intended to be used by the network plugin which manages the cluster network. The spec side represents the desired state requested by the network plugin, and the status side represents the current state that this CRD's controller has executed. No users will have permission to modify it, and if a cluster-admin decides to edit it for some reason, their changes will be overwritten the next time the network plugin reconciles the object. Note: the CR's name must specify the requested private IP address (can be IPv4 or IPv6).\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -8262,7 +8267,7 @@ func schema_openshift_api_config_v1_APIServer(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "APIServer holds configuration (like serving certificates, client CA and CORS domains) shared by all API servers in the system, among them especially kube-apiserver and openshift-apiserver. The canonical name of an instance is 'cluster'.",
+				Description: "APIServer holds configuration (like serving certificates, client CA and CORS domains) shared by all API servers in the system, among them especially kube-apiserver and openshift-apiserver. The canonical name of an instance is 'cluster'.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -8331,7 +8336,8 @@ func schema_openshift_api_config_v1_APIServerList(ref common.ReferenceCallback) 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -8915,7 +8921,7 @@ func schema_openshift_api_config_v1_Authentication(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Authentication specifies cluster-wide settings for authentication (like OAuth and webhook token authenticators). The canonical name of an instance is `cluster`.",
+				Description: "Authentication specifies cluster-wide settings for authentication (like OAuth and webhook token authenticators). The canonical name of an instance is `cluster`.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -8965,7 +8971,8 @@ func schema_openshift_api_config_v1_AuthenticationList(ref common.ReferenceCallb
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -9236,7 +9243,7 @@ func schema_openshift_api_config_v1_Build(ref common.ReferenceCallback) common.O
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Build configures the behavior of OpenShift builds for the entire cluster. This includes default settings that can be overridden in BuildConfig objects, and overrides which are applied to all builds.\n\nThe canonical name is \"cluster\"",
+				Description: "Build configures the behavior of OpenShift builds for the entire cluster. This includes default settings that can be overridden in BuildConfig objects, and overrides which are applied to all builds.\n\nThe canonical name is \"cluster\"\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -9340,7 +9347,8 @@ func schema_openshift_api_config_v1_BuildList(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -9592,7 +9600,7 @@ func schema_openshift_api_config_v1_ClusterOperator(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterOperator is the Custom Resource object which holds the current state of an operator. This object is used by operators to convey their state to the rest of the cluster.",
+				Description: "ClusterOperator is the Custom Resource object which holds the current state of an operator. This object is used by operators to convey their state to the rest of the cluster.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -9642,7 +9650,7 @@ func schema_openshift_api_config_v1_ClusterOperatorList(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterOperatorList is a list of OperatorStatus resources.",
+				Description: "ClusterOperatorList is a list of OperatorStatus resources.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -9825,7 +9833,7 @@ func schema_openshift_api_config_v1_ClusterVersion(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterVersion is the configuration for the ClusterVersionOperator. This is where parameters related to automatic updates can be set.",
+				Description: "ClusterVersion is the configuration for the ClusterVersionOperator. This is where parameters related to automatic updates can be set.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -9875,7 +9883,7 @@ func schema_openshift_api_config_v1_ClusterVersionList(ref common.ReferenceCallb
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterVersionList is a list of ClusterVersion resources.",
+				Description: "ClusterVersionList is a list of ClusterVersion resources.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -10312,7 +10320,7 @@ func schema_openshift_api_config_v1_Console(ref common.ReferenceCallback) common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Console holds cluster-wide configuration for the web console, including the logout URL, and reports the public URL of the console. The canonical name is `cluster`.",
+				Description: "Console holds cluster-wide configuration for the web console, including the logout URL, and reports the public URL of the console. The canonical name is `cluster`.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -10382,7 +10390,8 @@ func schema_openshift_api_config_v1_ConsoleList(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -10552,7 +10561,7 @@ func schema_openshift_api_config_v1_DNS(ref common.ReferenceCallback) common.Ope
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "DNS holds cluster-wide information about DNS. The canonical name is `cluster`",
+				Description: "DNS holds cluster-wide information about DNS. The canonical name is `cluster`\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -10602,7 +10611,8 @@ func schema_openshift_api_config_v1_DNSList(ref common.ReferenceCallback) common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -11024,7 +11034,7 @@ func schema_openshift_api_config_v1_FeatureGate(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Feature holds cluster-wide information about feature gates.  The canonical name is `cluster`",
+				Description: "Feature holds cluster-wide information about feature gates.  The canonical name is `cluster`\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -11115,7 +11125,8 @@ func schema_openshift_api_config_v1_FeatureGateList(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -11972,7 +11983,7 @@ func schema_openshift_api_config_v1_Image(ref common.ReferenceCallback) common.O
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Image governs policies related to imagestream imports and runtime configuration for external registries. It allows cluster admins to configure which registries OpenShift is allowed to import images from, extra CA trust bundles for external registries, and policies to block or allow registry hostnames. When exposing OpenShift's image registry to the public, this also lets cluster admins specify the external hostname.",
+				Description: "Image governs policies related to imagestream imports and runtime configuration for external registries. It allows cluster admins to configure which registries OpenShift is allowed to import images from, extra CA trust bundles for external registries, and policies to block or allow registry hostnames. When exposing OpenShift's image registry to the public, this also lets cluster admins specify the external hostname.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -12050,7 +12061,8 @@ func schema_openshift_api_config_v1_ImageList(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -12189,7 +12201,7 @@ func schema_openshift_api_config_v1_Infrastructure(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Infrastructure holds cluster-wide information about Infrastructure.  The canonical name is `cluster`",
+				Description: "Infrastructure holds cluster-wide information about Infrastructure.  The canonical name is `cluster`\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -12239,7 +12251,7 @@ func schema_openshift_api_config_v1_InfrastructureList(ref common.ReferenceCallb
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "InfrastructureList is",
+				Description: "InfrastructureList is\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -12394,7 +12406,7 @@ func schema_openshift_api_config_v1_Ingress(ref common.ReferenceCallback) common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Ingress holds cluster-wide information about ingress, including the default ingress domain used for routes. The canonical name is `cluster`.",
+				Description: "Ingress holds cluster-wide information about ingress, including the default ingress domain used for routes. The canonical name is `cluster`.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -12444,7 +12456,8 @@ func schema_openshift_api_config_v1_IngressList(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -12908,14 +12921,14 @@ func schema_openshift_api_config_v1_MaxAgePolicy(ref common.ReferenceCallback) c
 				Properties: map[string]spec.Schema{
 					"largestMaxAge": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The largest allowed value (in seconds) of the RequiredHSTSPolicy max-age This value can be left unspecified, in which case no upper limit is enforced. kubebuilder:validation:minimum=0:maximum=2147483647",
+							Description: "The largest allowed value (in seconds) of the RequiredHSTSPolicy max-age This value can be left unspecified, in which case no upper limit is enforced.",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
 					},
 					"smallestMaxAge": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The smallest allowed value (in seconds) of the RequiredHSTSPolicy max-age Setting max-age=0 allows the deletion of an existing HSTS header from a host.  This is a necessary tool for administrators to quickly correct mistakes. This value can be left unspecified, in which case no lower limit is enforced. kubebuilder:validation:minimum=0:maximum=2147483647",
+							Description: "The smallest allowed value (in seconds) of the RequiredHSTSPolicy max-age Setting max-age=0 allows the deletion of an existing HSTS header from a host.  This is a necessary tool for administrators to quickly correct mistakes. This value can be left unspecified, in which case no lower limit is enforced.",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
@@ -12986,7 +12999,7 @@ func schema_openshift_api_config_v1_Network(ref common.ReferenceCallback) common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Network holds cluster-wide information about Network. The canonical name is `cluster`. It is used to configure the desired network configuration, such as: IP address pools for services/pod IPs, network plugin, etc. Please view network.spec for an explanation on what applies when configuring this resource.",
+				Description: "Network holds cluster-wide information about Network. The canonical name is `cluster`. It is used to configure the desired network configuration, such as: IP address pools for services/pod IPs, network plugin, etc. Please view network.spec for an explanation on what applies when configuring this resource.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -13036,7 +13049,8 @@ func schema_openshift_api_config_v1_NetworkList(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -13236,7 +13250,7 @@ func schema_openshift_api_config_v1_OAuth(ref common.ReferenceCallback) common.O
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OAuth holds cluster-wide information about OAuth.  The canonical name is `cluster`. It is used to configure the integrated OAuth server. This configuration is only honored when the top level Authentication config has type set to IntegratedOAuth.",
+				Description: "OAuth holds cluster-wide information about OAuth.  The canonical name is `cluster`. It is used to configure the integrated OAuth server. This configuration is only honored when the top level Authentication config has type set to IntegratedOAuth.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -13286,7 +13300,8 @@ func schema_openshift_api_config_v1_OAuthList(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -13749,7 +13764,7 @@ func schema_openshift_api_config_v1_OperatorHub(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OperatorHub is the Schema for the operatorhubs API. It can be used to change the state of the default hub sources for OperatorHub on the cluster from enabled to disabled and vice versa.",
+				Description: "OperatorHub is the Schema for the operatorhubs API. It can be used to change the state of the default hub sources for OperatorHub on the cluster from enabled to disabled and vice versa.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -13797,7 +13812,7 @@ func schema_openshift_api_config_v1_OperatorHubList(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OperatorHubList contains a list of OperatorHub",
+				Description: "OperatorHubList contains a list of OperatorHub\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -14124,7 +14139,7 @@ func schema_openshift_api_config_v1_Project(ref common.ReferenceCallback) common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Project holds cluster-wide information about Project.  The canonical name is `cluster`",
+				Description: "Project holds cluster-wide information about Project.  The canonical name is `cluster`\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -14174,7 +14189,8 @@ func schema_openshift_api_config_v1_ProjectList(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -14262,7 +14278,7 @@ func schema_openshift_api_config_v1_Proxy(ref common.ReferenceCallback) common.O
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Proxy holds cluster-wide information on how to configure default proxies for the cluster. The canonical name is `cluster`",
+				Description: "Proxy holds cluster-wide information on how to configure default proxies for the cluster. The canonical name is `cluster`\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -14312,7 +14328,8 @@ func schema_openshift_api_config_v1_ProxyList(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -14781,7 +14798,7 @@ func schema_openshift_api_config_v1_RequiredHSTSPolicy(ref common.ReferenceCallb
 					},
 					"domainPatterns": {
 						SchemaProps: spec.SchemaProps{
-							Description: "domainPatterns is a list of domains for which the desired HSTS annotations are required. If domainPatterns is specified and a route is created with a spec.host matching one of the domains, the route must specify the HSTS Policy components described in the matching RequiredHSTSPolicy.\n\nThe use of wildcards is allowed like this: *.foo.com matches everything under foo.com. foo.com only matches foo.com, so to cover foo.com and everything under it, you must specify *both*. kubebuilder:validation:MinLength=1",
+							Description: "domainPatterns is a list of domains for which the desired HSTS annotations are required. If domainPatterns is specified and a route is created with a spec.host matching one of the domains, the route must specify the HSTS Policy components described in the matching RequiredHSTSPolicy.\n\nThe use of wildcards is allowed like this: *.foo.com matches everything under foo.com. foo.com only matches foo.com, so to cover foo.com and everything under it, you must specify *both*.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -14828,7 +14845,7 @@ func schema_openshift_api_config_v1_Scheduler(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Scheduler holds cluster-wide config information to run the Kubernetes Scheduler and influence its placement decisions. The canonical name for this config is `cluster`.",
+				Description: "Scheduler holds cluster-wide config information to run the Kubernetes Scheduler and influence its placement decisions. The canonical name for this config is `cluster`.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -14878,7 +14895,8 @@ func schema_openshift_api_config_v1_SchedulerList(ref common.ReferenceCallback) 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -15584,7 +15602,7 @@ func schema_openshift_api_helm_v1beta1_HelmChartRepository(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HelmChartRepository holds cluster-wide configuration for proxied Helm chart repository",
+				Description: "HelmChartRepository holds cluster-wide configuration for proxied Helm chart repository\n\nCompatibility level 2: Stable within a major release for a minimum of 9 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -15634,7 +15652,8 @@ func schema_openshift_api_helm_v1beta1_HelmChartRepositoryList(ref common.Refere
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 2: Stable within a major release for a minimum of 9 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -15808,7 +15827,7 @@ func schema_openshift_api_image_v1_Image(ref common.ReferenceCallback) common.Op
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Image is an immutable representation of a container image and metadata at a point in time. Images are named by taking a hash of their contents (metadata and content) and any change in format, content, or metadata results in a new name. The images resource is primarily for use by cluster administrators and integrations like the cluster image registry - end users instead access images via the imagestreamtags or imagestreamimages resources. While image metadata is stored in the API, any integration that implements the container image registry API must provide its own storage for the raw manifest data, image config, and layer contents.",
+				Description: "Image is an immutable representation of a container image and metadata at a point in time. Images are named by taking a hash of their contents (metadata and content) and any change in format, content, or metadata results in a new name. The images resource is primarily for use by cluster administrators and integrations like the cluster image registry - end users instead access images via the imagestreamtags or imagestreamimages resources. While image metadata is stored in the API, any integration that implements the container image registry API must provide its own storage for the raw manifest data, image config, and layer contents.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16135,7 +16154,7 @@ func schema_openshift_api_image_v1_ImageList(ref common.ReferenceCallback) commo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageList is a list of Image objects.",
+				Description: "ImageList is a list of Image objects.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16207,7 +16226,7 @@ func schema_openshift_api_image_v1_ImageSignature(ref common.ReferenceCallback) 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageSignature holds a signature of an image. It allows to verify image identity and possibly other claims as long as the signature is trusted. Based on this information it is possible to restrict runnable images to those matching cluster-wide policy. Mandatory fields should be parsed by clients doing image verification. The others are parsed from signature's content by the server. They serve just an informative purpose.",
+				Description: "ImageSignature holds a signature of an image. It allows to verify image identity and possibly other claims as long as the signature is trusted. Based on this information it is possible to restrict runnable images to those matching cluster-wide policy. Mandatory fields should be parsed by clients doing image verification. The others are parsed from signature's content by the server. They serve just an informative purpose.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16319,7 +16338,7 @@ func schema_openshift_api_image_v1_ImageStream(ref common.ReferenceCallback) com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "An ImageStream stores a mapping of tags to images, metadata overrides that are applied when images are tagged in a stream, and an optional reference to a container image repository on a registry. Users typically update the spec.tags field to point to external images which are imported from container registries using credentials in your namespace with the pull secret type, or to existing image stream tags and images which are immediately accessible for tagging or pulling. The history of images applied to a tag is visible in the status.tags field and any user who can view an image stream is allowed to tag that image into their own image streams. Access to pull images from the integrated registry is granted by having the \"get imagestreams/layers\" permission on a given image stream. Users may remove a tag by deleting the imagestreamtag resource, which causes both spec and status for that tag to be removed. Image stream history is retained until an administrator runs the prune operation, which removes references that are no longer in use. To preserve a historical image, ensure there is a tag in spec pointing to that image by its digest.",
+				Description: "An ImageStream stores a mapping of tags to images, metadata overrides that are applied when images are tagged in a stream, and an optional reference to a container image repository on a registry. Users typically update the spec.tags field to point to external images which are imported from container registries using credentials in your namespace with the pull secret type, or to existing image stream tags and images which are immediately accessible for tagging or pulling. The history of images applied to a tag is visible in the status.tags field and any user who can view an image stream is allowed to tag that image into their own image streams. Access to pull images from the integrated registry is granted by having the \"get imagestreams/layers\" permission on a given image stream. Users may remove a tag by deleting the imagestreamtag resource, which causes both spec and status for that tag to be removed. Image stream history is retained until an administrator runs the prune operation, which removes references that are no longer in use. To preserve a historical image, ensure there is a tag in spec pointing to that image by its digest.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16368,7 +16387,7 @@ func schema_openshift_api_image_v1_ImageStreamImage(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageStreamImage represents an Image that is retrieved by image name from an ImageStream. User interfaces and regular users can use this resource to access the metadata details of a tagged image in the image stream history for viewing, since Image resources are not directly accessible to end users. A not found error will be returned if no such image is referenced by a tag within the ImageStream. Images are created when spec tags are set on an image stream that represent an image in an external registry, when pushing to the integrated registry, or when tagging an existing image from one image stream to another. The name of an image stream image is in the form \"<STREAM>@<DIGEST>\", where the digest is the content addressible identifier for the image (sha256:xxxxx...). You can use ImageStreamImages as the from.kind of an image stream spec tag to reference an image exactly. The only operations supported on the imagestreamimage endpoint are retrieving the image.",
+				Description: "ImageStreamImage represents an Image that is retrieved by image name from an ImageStream. User interfaces and regular users can use this resource to access the metadata details of a tagged image in the image stream history for viewing, since Image resources are not directly accessible to end users. A not found error will be returned if no such image is referenced by a tag within the ImageStream. Images are created when spec tags are set on an image stream that represent an image in an external registry, when pushing to the integrated registry, or when tagging an existing image from one image stream to another. The name of an image stream image is in the form \"<STREAM>@<DIGEST>\", where the digest is the content addressible identifier for the image (sha256:xxxxx...). You can use ImageStreamImages as the from.kind of an image stream spec tag to reference an image exactly. The only operations supported on the imagestreamimage endpoint are retrieving the image.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16411,7 +16430,7 @@ func schema_openshift_api_image_v1_ImageStreamImport(ref common.ReferenceCallbac
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "The image stream import resource provides an easy way for a user to find and import container images from other container image registries into the server. Individual images or an entire image repository may be imported, and users may choose to see the results of the import prior to tagging the resulting images into the specified image stream.\n\nThis API is intended for end-user tools that need to see the metadata of the image prior to import (for instance, to generate an application from it). Clients that know the desired image can continue to create spec.tags directly into their image streams.",
+				Description: "The image stream import resource provides an easy way for a user to find and import container images from other container image registries into the server. Individual images or an entire image repository may be imported, and users may choose to see the results of the import prior to tagging the resulting images into the specified image stream.\n\nThis API is intended for end-user tools that need to see the metadata of the image prior to import (for instance, to generate an application from it). Clients that know the desired image can continue to create spec.tags directly into their image streams.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16546,7 +16565,7 @@ func schema_openshift_api_image_v1_ImageStreamLayers(ref common.ReferenceCallbac
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageStreamLayers describes information about the layers referenced by images in this image stream.",
+				Description: "ImageStreamLayers describes information about the layers referenced by images in this image stream.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16612,7 +16631,7 @@ func schema_openshift_api_image_v1_ImageStreamList(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageStreamList is a list of ImageStream objects.",
+				Description: "ImageStreamList is a list of ImageStream objects.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16662,7 +16681,7 @@ func schema_openshift_api_image_v1_ImageStreamMapping(ref common.ReferenceCallba
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageStreamMapping represents a mapping from a single image stream tag to a container image as well as the reference to the container image stream the image came from. This resource is used by privileged integrators to create an image resource and to associate it with an image stream in the status tags field. Creating an ImageStreamMapping will allow any user who can view the image stream to tag or pull that image, so only create mappings where the user has proven they have access to the image contents directly. The only operation supported for this resource is create and the metadata name and namespace should be set to the image stream containing the tag that should be updated.",
+				Description: "ImageStreamMapping represents a mapping from a single image stream tag to a container image as well as the reference to the container image stream the image came from. This resource is used by privileged integrators to create an image resource and to associate it with an image stream in the status tags field. Creating an ImageStreamMapping will allow any user who can view the image stream to tag or pull that image, so only create mappings where the user has proven they have access to the image contents directly. The only operation supported for this resource is create and the metadata name and namespace should be set to the image stream containing the tag that should be updated.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16813,7 +16832,7 @@ func schema_openshift_api_image_v1_ImageStreamTag(ref common.ReferenceCallback) 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageStreamTag represents an Image that is retrieved by tag name from an ImageStream. Use this resource to interact with the tags and images in an image stream by tag, or to see the image details for a particular tag. The image associated with this resource is the most recently successfully tagged, imported, or pushed image (as described in the image stream status.tags.items list for this tag). If an import is in progress or has failed the previous image will be shown. Deleting an image stream tag clears both the status and spec fields of an image stream. If no image can be retrieved for a given tag, a not found error will be returned.",
+				Description: "ImageStreamTag represents an Image that is retrieved by tag name from an ImageStream. Use this resource to interact with the tags and images in an image stream by tag, or to see the image details for a particular tag. The image associated with this resource is the most recently successfully tagged, imported, or pushed image (as described in the image stream status.tags.items list for this tag). If an import is in progress or has failed the previous image will be shown. Deleting an image stream tag clears both the status and spec fields of an image stream. If no image can be retrieved for a given tag, a not found error will be returned.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16891,7 +16910,7 @@ func schema_openshift_api_image_v1_ImageStreamTagList(ref common.ReferenceCallba
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageStreamTagList is a list of ImageStreamTag objects.",
+				Description: "ImageStreamTagList is a list of ImageStreamTag objects.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16941,7 +16960,7 @@ func schema_openshift_api_image_v1_ImageTag(ref common.ReferenceCallback) common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageTag represents a single tag within an image stream and includes the spec, the status history, and the currently referenced image (if any) of the provided tag. This type replaces the ImageStreamTag by providing a full view of the tag. ImageTags are returned for every spec or status tag present on the image stream. If no tag exists in either form a not found error will be returned by the API. A create operation will succeed if no spec tag has already been defined and the spec field is set. Delete will remove both spec and status elements from the image stream.",
+				Description: "ImageTag represents a single tag within an image stream and includes the spec, the status history, and the currently referenced image (if any) of the provided tag. This type replaces the ImageStreamTag by providing a full view of the tag. ImageTags are returned for every spec or status tag present on the image stream. If no tag exists in either form a not found error will be returned by the API. A create operation will succeed if no spec tag has already been defined and the spec field is set. Delete will remove both spec and status elements from the image stream.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16995,7 +17014,7 @@ func schema_openshift_api_image_v1_ImageTagList(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageTagList is a list of ImageTag objects. When listing image tags, the image field is not populated. Tags are returned in alphabetical order by image stream and then tag.",
+				Description: "ImageTagList is a list of ImageTag objects. When listing image tags, the image field is not populated. Tags are returned in alphabetical order by image stream and then tag.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -17647,7 +17666,8 @@ func schema_openshift_api_kubecontrolplane_v1_KubeAPIServerConfig(ref common.Ref
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -17891,7 +17911,8 @@ func schema_openshift_api_kubecontrolplane_v1_KubeControllerManagerConfig(ref co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -18488,7 +18509,7 @@ func schema_openshift_api_legacyconfig_v1_AllowAllPasswordIdentityProvider(ref c
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "AllowAllPasswordIdentityProvider provides identities for users authenticating using non-empty passwords",
+				Description: "AllowAllPasswordIdentityProvider provides identities for users authenticating using non-empty passwords\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -18693,7 +18714,7 @@ func schema_openshift_api_legacyconfig_v1_BasicAuthPasswordIdentityProvider(ref 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BasicAuthPasswordIdentityProvider provides identities for users authenticating using HTTP basic auth credentials",
+				Description: "BasicAuthPasswordIdentityProvider provides identities for users authenticating using HTTP basic auth credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -18753,7 +18774,7 @@ func schema_openshift_api_legacyconfig_v1_BuildDefaultsConfig(ref common.Referen
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BuildDefaultsConfig controls the default information for Builds",
+				Description: "BuildDefaultsConfig controls the default information for Builds\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -18876,7 +18897,7 @@ func schema_openshift_api_legacyconfig_v1_BuildOverridesConfig(ref common.Refere
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BuildOverridesConfig controls override settings for builds",
+				Description: "BuildOverridesConfig controls override settings for builds\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -19201,7 +19222,7 @@ func schema_openshift_api_legacyconfig_v1_DefaultAdmissionConfig(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "DefaultAdmissionConfig can be used to enable or disable various admission plugins. When this type is present as the `configuration` object under `pluginConfig` and *if* the admission plugin supports it, this will cause an \"off by default\" admission plugin to be enabled",
+				Description: "DefaultAdmissionConfig can be used to enable or disable various admission plugins. When this type is present as the `configuration` object under `pluginConfig` and *if* the admission plugin supports it, this will cause an \"off by default\" admission plugin to be enabled\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -19237,7 +19258,7 @@ func schema_openshift_api_legacyconfig_v1_DenyAllPasswordIdentityProvider(ref co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "DenyAllPasswordIdentityProvider provides no identities for users",
+				Description: "DenyAllPasswordIdentityProvider provides no identities for users\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -19455,7 +19476,7 @@ func schema_openshift_api_legacyconfig_v1_GitHubIdentityProvider(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GitHubIdentityProvider provides identities for users authenticating using GitHub credentials",
+				Description: "GitHubIdentityProvider provides identities for users authenticating using GitHub credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -19546,7 +19567,7 @@ func schema_openshift_api_legacyconfig_v1_GitLabIdentityProvider(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GitLabIdentityProvider provides identities for users authenticating using GitLab credentials",
+				Description: "GitLabIdentityProvider provides identities for users authenticating using GitLab credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -19614,7 +19635,7 @@ func schema_openshift_api_legacyconfig_v1_GoogleIdentityProvider(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GoogleIdentityProvider provides identities for users authenticating using Google credentials",
+				Description: "GoogleIdentityProvider provides identities for users authenticating using Google credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -19727,7 +19748,7 @@ func schema_openshift_api_legacyconfig_v1_HTPasswdPasswordIdentityProvider(ref c
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTPasswdPasswordIdentityProvider provides identities for users authenticating using htpasswd credentials",
+				Description: "HTPasswdPasswordIdentityProvider provides identities for users authenticating using htpasswd credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -20100,7 +20121,7 @@ func schema_openshift_api_legacyconfig_v1_KeystonePasswordIdentityProvider(ref c
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "KeystonePasswordIdentityProvider provides identities for users authenticating using keystone password credentials",
+				Description: "KeystonePasswordIdentityProvider provides identities for users authenticating using keystone password credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -20474,7 +20495,7 @@ func schema_openshift_api_legacyconfig_v1_LDAPPasswordIdentityProvider(ref commo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "LDAPPasswordIdentityProvider provides identities for users authenticating using LDAP credentials",
+				Description: "LDAPPasswordIdentityProvider provides identities for users authenticating using LDAP credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -20612,7 +20633,7 @@ func schema_openshift_api_legacyconfig_v1_LDAPSyncConfig(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "LDAPSyncConfig holds the necessary configuration options to define an LDAP group sync",
+				Description: "LDAPSyncConfig holds the necessary configuration options to define an LDAP group sync\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -20811,7 +20832,7 @@ func schema_openshift_api_legacyconfig_v1_MasterConfig(ref common.ReferenceCallb
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "MasterConfig holds the necessary configuration options for the OpenShift master",
+				Description: "MasterConfig holds the necessary configuration options for the OpenShift master\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -21247,7 +21268,7 @@ func schema_openshift_api_legacyconfig_v1_NodeConfig(ref common.ReferenceCallbac
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "NodeConfig is the fully specified config starting an OpenShift node",
+				Description: "NodeConfig is the fully specified config starting an OpenShift node\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -21746,7 +21767,7 @@ func schema_openshift_api_legacyconfig_v1_OpenIDIdentityProvider(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OpenIDIdentityProvider provides identities for users authenticating using OpenID credentials",
+				Description: "OpenIDIdentityProvider provides identities for users authenticating using OpenID credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -22245,7 +22266,7 @@ func schema_openshift_api_legacyconfig_v1_RequestHeaderIdentityProvider(ref comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RequestHeaderIdentityProvider provides identities for users authenticating using request header credentials",
+				Description: "RequestHeaderIdentityProvider provides identities for users authenticating using request header credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -22682,7 +22703,7 @@ func schema_openshift_api_legacyconfig_v1_SessionSecrets(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "SessionSecrets list the secrets to use to sign/encrypt and authenticate/decrypt created sessions.",
+				Description: "SessionSecrets list the secrets to use to sign/encrypt and authenticate/decrypt created sessions.\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23039,7 +23060,7 @@ func schema_openshift_api_network_v1_ClusterNetwork(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterNetwork describes the cluster network. There is normally only one object of this type, named \"default\", which is created by the SDN network plugin based on the master configuration when the cluster is brought up for the first time.",
+				Description: "ClusterNetwork describes the cluster network. There is normally only one object of this type, named \"default\", which is created by the SDN network plugin based on the master configuration when the cluster is brought up for the first time.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23162,7 +23183,7 @@ func schema_openshift_api_network_v1_ClusterNetworkList(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterNetworkList is a collection of ClusterNetworks",
+				Description: "ClusterNetworkList is a collection of ClusterNetworks\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23212,7 +23233,7 @@ func schema_openshift_api_network_v1_EgressNetworkPolicy(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "EgressNetworkPolicy describes the current egress network policy for a Namespace. When using the 'redhat/openshift-ovs-multitenant' network plugin, traffic from a pod to an IP address outside the cluster will be checked against each EgressNetworkPolicyRule in the pod's namespace's EgressNetworkPolicy, in order. If no rule matches (or no EgressNetworkPolicy is present) then the traffic will be allowed by default.",
+				Description: "EgressNetworkPolicy describes the current egress network policy for a Namespace. When using the 'redhat/openshift-ovs-multitenant' network plugin, traffic from a pod to an IP address outside the cluster will be checked against each EgressNetworkPolicyRule in the pod's namespace's EgressNetworkPolicy, in order. If no rule matches (or no EgressNetworkPolicy is present) then the traffic will be allowed by default.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23255,7 +23276,7 @@ func schema_openshift_api_network_v1_EgressNetworkPolicyList(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "EgressNetworkPolicyList is a collection of EgressNetworkPolicy",
+				Description: "EgressNetworkPolicyList is a collection of EgressNetworkPolicy\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23393,7 +23414,7 @@ func schema_openshift_api_network_v1_HostSubnet(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HostSubnet describes the container subnet network on a node. The HostSubnet object must have the same name as the Node object it corresponds to.",
+				Description: "HostSubnet describes the container subnet network on a node. The HostSubnet object must have the same name as the Node object it corresponds to.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23483,7 +23504,7 @@ func schema_openshift_api_network_v1_HostSubnetList(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HostSubnetList is a collection of HostSubnets",
+				Description: "HostSubnetList is a collection of HostSubnets\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23533,7 +23554,7 @@ func schema_openshift_api_network_v1_NetNamespace(ref common.ReferenceCallback) 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "NetNamespace describes a single isolated network. When using the redhat/openshift-ovs-multitenant plugin, every Namespace will have a corresponding NetNamespace object with the same name. (When using redhat/openshift-ovs-subnet, NetNamespaces are not used.)",
+				Description: "NetNamespace describes a single isolated network. When using the redhat/openshift-ovs-multitenant plugin, every Namespace will have a corresponding NetNamespace object with the same name. (When using redhat/openshift-ovs-subnet, NetNamespaces are not used.)\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23600,7 +23621,7 @@ func schema_openshift_api_network_v1_NetNamespaceList(ref common.ReferenceCallba
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "NetNamespaceList is a collection of NetNamespaces",
+				Description: "NetNamespaceList is a collection of NetNamespaces\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23650,7 +23671,7 @@ func schema_openshift_api_networkoperator_v1_EgressRouter(ref common.ReferenceCa
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "EgressRouter is a feature allowing the user to define an egress router that acts as a bridge between pods and external systems. The egress router runs a service that redirects egress traffic originating from a pod or a group of pods to a remote external system or multiple destinations as per configuration.\n\nIt is consumed by the cluster-network-operator. More specifically, given an EgressRouter CR with <name>, the CNO will create and manage: - A service called <name> - An egress pod called <name> - A NAD called <name>\n\n\nEgressRouter is a single egressrouter pod configuration object.",
+				Description: "EgressRouter is a feature allowing the user to define an egress router that acts as a bridge between pods and external systems. The egress router runs a service that redirects egress traffic originating from a pod or a group of pods to a remote external system or multiple destinations as per configuration.\n\nIt is consumed by the cluster-network-operator. More specifically, given an EgressRouter CR with <name>, the CNO will create and manage: - A service called <name> - An egress pod called <name> - A NAD called <name>\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).\n\nEgressRouter is a single egressrouter pod configuration object.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23803,7 +23824,7 @@ func schema_openshift_api_oauth_v1_OAuthAccessToken(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OAuthAccessToken describes an OAuth access token",
+				Description: "OAuthAccessToken describes an OAuth access token\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23909,7 +23930,7 @@ func schema_openshift_api_oauth_v1_OAuthAccessTokenList(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OAuthAccessTokenList is a collection of OAuth access tokens",
+				Description: "OAuthAccessTokenList is a collection of OAuth access tokens\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -23959,7 +23980,7 @@ func schema_openshift_api_oauth_v1_OAuthAuthorizeToken(ref common.ReferenceCallb
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OAuthAuthorizeToken describes an OAuth authorization token",
+				Description: "OAuthAuthorizeToken describes an OAuth authorization token\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -24065,7 +24086,7 @@ func schema_openshift_api_oauth_v1_OAuthAuthorizeTokenList(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OAuthAuthorizeTokenList is a collection of OAuth authorization tokens",
+				Description: "OAuthAuthorizeTokenList is a collection of OAuth authorization tokens\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -24115,7 +24136,7 @@ func schema_openshift_api_oauth_v1_OAuthClient(ref common.ReferenceCallback) com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OAuthClient describes an OAuth client",
+				Description: "OAuthClient describes an OAuth client\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -24234,7 +24255,7 @@ func schema_openshift_api_oauth_v1_OAuthClientAuthorization(ref common.Reference
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OAuthClientAuthorization describes an authorization created by an OAuth client",
+				Description: "OAuthClientAuthorization describes an authorization created by an OAuth client\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -24305,7 +24326,7 @@ func schema_openshift_api_oauth_v1_OAuthClientAuthorizationList(ref common.Refer
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OAuthClientAuthorizationList is a collection of OAuth client authorizations",
+				Description: "OAuthClientAuthorizationList is a collection of OAuth client authorizations\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -24355,7 +24376,7 @@ func schema_openshift_api_oauth_v1_OAuthClientList(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OAuthClientList is a collection of OAuth clients",
+				Description: "OAuthClientList is a collection of OAuth clients\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -24405,7 +24426,7 @@ func schema_openshift_api_oauth_v1_OAuthRedirectReference(ref common.ReferenceCa
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OAuthRedirectReference is a reference to an OAuth redirect object.",
+				Description: "OAuthRedirectReference is a reference to an OAuth redirect object.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -24627,7 +24648,7 @@ func schema_openshift_api_oauth_v1_UserOAuthAccessTokenList(ref common.Reference
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "UserOAuthAccessTokenList is a collection of access tokens issued on behalf of the requesting user",
+				Description: "UserOAuthAccessTokenList is a collection of access tokens issued on behalf of the requesting user\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -24715,7 +24736,7 @@ func schema_openshift_api_openshiftcontrolplane_v1_BuildDefaultsConfig(ref commo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BuildDefaultsConfig controls the default information for Builds",
+				Description: "BuildDefaultsConfig controls the default information for Builds\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -24838,7 +24859,7 @@ func schema_openshift_api_openshiftcontrolplane_v1_BuildOverridesConfig(ref comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BuildOverridesConfig controls override settings for builds",
+				Description: "BuildOverridesConfig controls override settings for builds\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -25370,7 +25391,8 @@ func schema_openshift_api_openshiftcontrolplane_v1_OpenShiftAPIServerConfig(ref 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -25521,7 +25543,8 @@ func schema_openshift_api_openshiftcontrolplane_v1_OpenShiftControllerManagerCon
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -25983,6 +26006,13 @@ func schema_openshift_api_operator_v1_AccessLogging(ref common.ReferenceCallback
 							},
 						},
 					},
+					"logEmptyRequests": {
+						SchemaProps: spec.SchemaProps{
+							Description: "logEmptyRequests specifies how connections on which no request is received should be logged.  Typically, these empty requests come from load balancers' health probes or Web browsers' speculative connections (\"preconnect\"), in which case logging these requests may be undesirable.  However, these requests may also be caused by network errors, in which case logging empty requests may be useful for diagnosing the errors.  In addition, these requests may be caused by port scans, in which case logging empty requests may aid in detecting intrusion attempts.  Allowed values for this field are \"Log\" and \"Ignore\".  The default value is \"Log\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 				},
 				Required: []string{"destination"},
 			},
@@ -26076,7 +26106,7 @@ func schema_openshift_api_operator_v1_Authentication(ref common.ReferenceCallbac
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Authentication provides information to configure an operator to manage authentication.",
+				Description: "Authentication provides information to configure an operator to manage authentication.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -26123,7 +26153,7 @@ func schema_openshift_api_operator_v1_AuthenticationList(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "AuthenticationList is a collection of items",
+				Description: "AuthenticationList is a collection of items\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -26295,7 +26325,7 @@ func schema_openshift_api_operator_v1_CSISnapshotController(ref common.Reference
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "CSISnapshotController provides a means to configure an operator to manage the CSI snapshots. `cluster` is the canonical name.",
+				Description: "CSISnapshotController provides a means to configure an operator to manage the CSI snapshots. `cluster` is the canonical name.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -26345,7 +26375,7 @@ func schema_openshift_api_operator_v1_CSISnapshotControllerList(ref common.Refer
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "CSISnapshotControllerList contains a list of CSISnapshotControllers.",
+				Description: "CSISnapshotControllerList contains a list of CSISnapshotControllers.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -26563,7 +26593,7 @@ func schema_openshift_api_operator_v1_CloudCredential(ref common.ReferenceCallba
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "CloudCredential provides a means to configure an operator to manage CredentialsRequests.",
+				Description: "CloudCredential provides a means to configure an operator to manage CredentialsRequests.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -26611,7 +26641,8 @@ func schema_openshift_api_operator_v1_CloudCredentialList(ref common.ReferenceCa
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -26784,7 +26815,7 @@ func schema_openshift_api_operator_v1_ClusterCSIDriver(ref common.ReferenceCallb
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterCSIDriver object allows management and configuration of a CSI driver operator installed by default in OpenShift. Name of the object must be name of the CSI driver it operates. See CSIDriverName type for list of allowed values.",
+				Description: "ClusterCSIDriver object allows management and configuration of a CSI driver operator installed by default in OpenShift. Name of the object must be name of the CSI driver it operates. See CSIDriverName type for list of allowed values.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -26834,7 +26865,7 @@ func schema_openshift_api_operator_v1_ClusterCSIDriverList(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterCSIDriverList contains a list of ClusterCSIDriver",
+				Description: "ClusterCSIDriverList contains a list of ClusterCSIDriver\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -27028,7 +27059,7 @@ func schema_openshift_api_operator_v1_Config(ref common.ReferenceCallback) commo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Config provides information to configure the config operator. It handles installation, migration or synchronization of cloud based cluster configurations like AWS or Azure.",
+				Description: "Config provides information to configure the config operator. It handles installation, migration or synchronization of cloud based cluster configurations like AWS or Azure.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -27078,7 +27109,7 @@ func schema_openshift_api_operator_v1_ConfigList(ref common.ReferenceCallback) c
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ConfigList is a collection of items",
+				Description: "ConfigList is a collection of items\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -27244,7 +27275,7 @@ func schema_openshift_api_operator_v1_Console(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Console provides a means to configure an operator to manage the console.",
+				Description: "Console provides a means to configure an operator to manage the console.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -27393,7 +27424,8 @@ func schema_openshift_api_operator_v1_ConsoleList(ref common.ReferenceCallback) 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -27627,7 +27659,7 @@ func schema_openshift_api_operator_v1_DNS(ref common.ReferenceCallback) common.O
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "DNS manages the CoreDNS component to provide a name resolution service for pods and services in the cluster.\n\nThis supports the DNS-based service discovery specification: https://github.com/kubernetes/dns/blob/master/docs/specification.md\n\nMore details: https://kubernetes.io/docs/tasks/administer-cluster/coredns",
+				Description: "DNS manages the CoreDNS component to provide a name resolution service for pods and services in the cluster.\n\nThis supports the DNS-based service discovery specification: https://github.com/kubernetes/dns/blob/master/docs/specification.md\n\nMore details: https://kubernetes.io/docs/tasks/administer-cluster/coredns\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -27676,7 +27708,7 @@ func schema_openshift_api_operator_v1_DNSList(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "DNSList contains a list of DNS",
+				Description: "DNSList contains a list of DNS\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -28105,7 +28137,7 @@ func schema_openshift_api_operator_v1_Etcd(ref common.ReferenceCallback) common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Etcd provides information to configure an operator to manage etcd.",
+				Description: "Etcd provides information to configure an operator to manage etcd.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -28153,7 +28185,7 @@ func schema_openshift_api_operator_v1_EtcdList(ref common.ReferenceCallback) com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "KubeAPISOperatorConfigList is a collection of items",
+				Description: "KubeAPISOperatorConfigList is a collection of items\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -28637,7 +28669,7 @@ func schema_openshift_api_operator_v1_IngressController(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "IngressController describes a managed ingress controller for the cluster. The controller can service OpenShift Route and Kubernetes Ingress resources.\n\nWhen an IngressController is created, a new ingress controller deployment is created to allow external traffic to reach the services that expose Ingress or Route resources. Updating this resource may lead to disruption for public facing network connections as a new ingress controller revision may be rolled out.\n\nhttps://kubernetes.io/docs/concepts/services-networking/ingress-controllers\n\nWhenever possible, sensible defaults for the platform are used. See each field for more details.",
+				Description: "IngressController describes a managed ingress controller for the cluster. The controller can service OpenShift Route and Kubernetes Ingress resources.\n\nWhen an IngressController is created, a new ingress controller deployment is created to allow external traffic to reach the services that expose Ingress or Route resources. Updating this resource may lead to disruption for public facing network connections as a new ingress controller revision may be rolled out.\n\nhttps://kubernetes.io/docs/concepts/services-networking/ingress-controllers\n\nWhenever possible, sensible defaults for the platform are used. See each field for more details.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -28937,7 +28969,7 @@ func schema_openshift_api_operator_v1_IngressControllerList(ref common.Reference
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "IngressControllerList contains a list of IngressControllers.",
+				Description: "IngressControllerList contains a list of IngressControllers.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -29092,6 +29124,13 @@ func schema_openshift_api_operator_v1_IngressControllerSpec(ref common.Reference
 							Ref:         ref("github.com/openshift/api/operator/v1.IngressControllerHTTPHeaders"),
 						},
 					},
+					"httpEmptyRequestsPolicy": {
+						SchemaProps: spec.SchemaProps{
+							Description: "httpEmptyRequestsPolicy describes how HTTP connections should be handled if the connection times out before a request is received. Allowed values for this field are \"Respond\" and \"Ignore\".  If the field is set to \"Respond\", the ingress controller sends an HTTP 400 or 408 response, logs the connection (if access logging is enabled), and counts the connection in the appropriate metrics.  If the field is set to \"Ignore\", the ingress controller closes the connection without sending a response, logging the connection, or incrementing metrics.  The default value is \"Respond\".\n\nTypically, these connections come from load balancers' health probes or Web browsers' speculative connections (\"preconnect\") and can be safely ignored.  However, these requests may also be caused by network errors, and so setting this field to \"Ignore\" may impede detection and diagnosis of problems.  In addition, these requests may be caused by port scans, in which case logging empty requests may aid in detecting intrusion attempts.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"tuningOptions": {
 						SchemaProps: spec.SchemaProps{
 							Description: "tuningOptions defines parameters for adjusting the performance of ingress controller pods. All fields are optional and will use their respective defaults if not set. See specific tuningOptions fields for more details.\n\nSetting fields within tuningOptions is generally not recommended. The default values are suitable for most configurations.",
@@ -29215,9 +29254,47 @@ func schema_openshift_api_operator_v1_IngressControllerTuningOptions(ref common.
 							Format:      "int32",
 						},
 					},
+					"clientTimeout": {
+						SchemaProps: spec.SchemaProps{
+							Description: "clientTimeout defines how long a connection will be held open while waiting for a client response.\n\nIf unset, the default timeout is 30s",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
+						},
+					},
+					"clientFinTimeout": {
+						SchemaProps: spec.SchemaProps{
+							Description: "clientFinTimeout defines how long a connection will be held open while waiting for the client response to the server/backend closing the connection.\n\nIf unset, the default timeout is 1s",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
+						},
+					},
+					"serverTimeout": {
+						SchemaProps: spec.SchemaProps{
+							Description: "serverTimeout defines how long a connection will be held open while waiting for a server/backend response.\n\nIf unset, the default timeout is 30s",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
+						},
+					},
+					"serverFinTimeout": {
+						SchemaProps: spec.SchemaProps{
+							Description: "serverFinTimeout defines how long a connection will be held open while waiting for the server/backend response to the client closing the connection.\n\nIf unset, the default timeout is 1s",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
+						},
+					},
+					"tunnelTimeout": {
+						SchemaProps: spec.SchemaProps{
+							Description: "tunnelTimeout defines how long a tunnel connection (including websockets) will be held open while the tunnel is idle.\n\nIf unset, the default timeout is 1h",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
+						},
+					},
+					"tlsInspectDelay": {
+						SchemaProps: spec.SchemaProps{
+							Description: "tlsInspectDelay defines how long the router can hold data to find a matching route.\n\nSetting this too short can cause the router to fall back to the default certificate for edge-terminated or reencrypt routes even when a better matching certificate could be used.\n\nIf unset, the default inspect delay is 5s",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
+						},
+					},
 				},
 			},
 		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
 	}
 }
 
@@ -29225,7 +29302,7 @@ func schema_openshift_api_operator_v1_KubeAPIServer(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "KubeAPIServer provides information to configure an operator to manage kube-apiserver.",
+				Description: "KubeAPIServer provides information to configure an operator to manage kube-apiserver.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -29275,7 +29352,7 @@ func schema_openshift_api_operator_v1_KubeAPIServerList(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "KubeAPIServerList is a collection of items",
+				Description: "KubeAPIServerList is a collection of items\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -29493,7 +29570,7 @@ func schema_openshift_api_operator_v1_KubeControllerManager(ref common.Reference
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "KubeControllerManager provides information to configure an operator to manage kube-controller-manager.",
+				Description: "KubeControllerManager provides information to configure an operator to manage kube-controller-manager.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -29543,7 +29620,7 @@ func schema_openshift_api_operator_v1_KubeControllerManagerList(ref common.Refer
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "KubeControllerManagerList is a collection of items",
+				Description: "KubeControllerManagerList is a collection of items\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -29769,7 +29846,7 @@ func schema_openshift_api_operator_v1_KubeScheduler(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "KubeScheduler provides information to configure an operator to manage scheduler.",
+				Description: "KubeScheduler provides information to configure an operator to manage scheduler.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -29819,7 +29896,7 @@ func schema_openshift_api_operator_v1_KubeSchedulerList(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "KubeSchedulerList is a collection of items",
+				Description: "KubeSchedulerList is a collection of items\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -30037,7 +30114,7 @@ func schema_openshift_api_operator_v1_KubeStorageVersionMigrator(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "KubeStorageVersionMigrator provides information to configure an operator to manage kube-storage-version-migrator.",
+				Description: "KubeStorageVersionMigrator provides information to configure an operator to manage kube-storage-version-migrator.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -30085,7 +30162,7 @@ func schema_openshift_api_operator_v1_KubeStorageVersionMigratorList(ref common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "KubeStorageVersionMigratorList is a collection of items",
+				Description: "KubeStorageVersionMigratorList is a collection of items\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -30399,7 +30476,7 @@ func schema_openshift_api_operator_v1_MyOperatorResource(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "MyOperatorResource is an example operator configuration type",
+				Description: "MyOperatorResource is an example operator configuration type\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -30590,7 +30667,7 @@ func schema_openshift_api_operator_v1_Network(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Network describes the cluster's desired network configuration. It is consumed by the cluster-network-operator.",
+				Description: "Network describes the cluster's desired network configuration. It is consumed by the cluster-network-operator.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -30637,7 +30714,7 @@ func schema_openshift_api_operator_v1_NetworkList(ref common.ReferenceCallback) 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "NetworkList contains a list of Network configurations",
+				Description: "NetworkList contains a list of Network configurations\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -31017,16 +31094,30 @@ func schema_openshift_api_operator_v1_NodeStatus(ref common.ReferenceCallback) c
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
 						},
 					},
+					"lastFailedReason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "lastFailedReason is a machine readable failure reason string.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"lastFailedCount": {
 						SchemaProps: spec.SchemaProps{
-							Description: "lastFailedCount is how often the last failed revision failed.",
+							Description: "lastFailedCount is how often the installer pod of the last failed revision failed.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"lastFallbackCount": {
+						SchemaProps: spec.SchemaProps{
+							Description: "lastFallbackCount is how often a fallback to a previous revision happened.",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
 					},
 					"lastFailedRevisionErrors": {
 						SchemaProps: spec.SchemaProps{
-							Description: "lastFailedRevisionErrors is a list of the errors during the failed deployment referenced in lastFailedRevision",
+							Description: "lastFailedRevisionErrors is a list of human readable errors during the failed deployment referenced in lastFailedRevision.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -31118,7 +31209,7 @@ func schema_openshift_api_operator_v1_OpenShiftAPIServer(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OpenShiftAPIServer provides information to configure an operator to manage openshift-apiserver.",
+				Description: "OpenShiftAPIServer provides information to configure an operator to manage openshift-apiserver.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -31168,7 +31259,7 @@ func schema_openshift_api_operator_v1_OpenShiftAPIServerList(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OpenShiftAPIServerList is a collection of items",
+				Description: "OpenShiftAPIServerList is a collection of items\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -31341,7 +31432,7 @@ func schema_openshift_api_operator_v1_OpenShiftControllerManager(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OpenShiftControllerManager provides information to configure an operator to manage openshift-controller-manager.",
+				Description: "OpenShiftControllerManager provides information to configure an operator to manage openshift-controller-manager.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -31389,7 +31480,7 @@ func schema_openshift_api_operator_v1_OpenShiftControllerManagerList(ref common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OpenShiftControllerManagerList is a collection of items",
+				Description: "OpenShiftControllerManagerList is a collection of items\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -32076,7 +32167,7 @@ func schema_openshift_api_operator_v1_ServiceCA(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ServiceCA provides information to configure an operator to manage the service cert controllers",
+				Description: "ServiceCA provides information to configure an operator to manage the service cert controllers\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -32126,7 +32217,7 @@ func schema_openshift_api_operator_v1_ServiceCAList(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ServiceCAList is a collection of items",
+				Description: "ServiceCAList is a collection of items\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -32292,7 +32383,7 @@ func schema_openshift_api_operator_v1_ServiceCatalogAPIServer(ref common.Referen
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ServiceCatalogAPIServer provides information to configure an operator to manage Service Catalog API Server DEPRECATED: will be removed in 4.6",
+				Description: "ServiceCatalogAPIServer provides information to configure an operator to manage Service Catalog API Server DEPRECATED: will be removed in 4.6\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -32340,7 +32431,7 @@ func schema_openshift_api_operator_v1_ServiceCatalogAPIServerList(ref common.Ref
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ServiceCatalogAPIServerList is a collection of items DEPRECATED: will be removed in 4.6",
+				Description: "ServiceCatalogAPIServerList is a collection of items DEPRECATED: will be removed in 4.6\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -32506,7 +32597,7 @@ func schema_openshift_api_operator_v1_ServiceCatalogControllerManager(ref common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ServiceCatalogControllerManager provides information to configure an operator to manage Service Catalog Controller Manager DEPRECATED: will be removed in 4.6",
+				Description: "ServiceCatalogControllerManager provides information to configure an operator to manage Service Catalog Controller Manager DEPRECATED: will be removed in 4.6\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -32554,7 +32645,7 @@ func schema_openshift_api_operator_v1_ServiceCatalogControllerManagerList(ref co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ServiceCatalogControllerManagerList is a collection of items DEPRECATED: will be removed in 4.6",
+				Description: "ServiceCatalogControllerManagerList is a collection of items DEPRECATED: will be removed in 4.6\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -33110,7 +33201,7 @@ func schema_openshift_api_operator_v1_Storage(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Storage provides a means to configure an operator to manage the cluster storage operator. `cluster` is the canonical name.",
+				Description: "Storage provides a means to configure an operator to manage the cluster storage operator. `cluster` is the canonical name.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -33160,7 +33251,7 @@ func schema_openshift_api_operator_v1_StorageList(ref common.ReferenceCallback) 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "StorageList contains a list of Storages.",
+				Description: "StorageList contains a list of Storages.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -33458,7 +33549,7 @@ func schema_openshift_api_operator_v1alpha1_GenericOperatorConfig(ref common.Ref
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GenericOperatorConfig provides information to configure an operator",
+				Description: "GenericOperatorConfig provides information to configure an operator\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -33515,7 +33606,7 @@ func schema_openshift_api_operator_v1alpha1_ImageContentSourcePolicy(ref common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageContentSourcePolicy holds cluster-wide information about how to handle registry mirror rules. When multiple policies are defined, the outcome of the behavior is defined on each field.",
+				Description: "ImageContentSourcePolicy holds cluster-wide information about how to handle registry mirror rules. When multiple policies are defined, the outcome of the behavior is defined on each field.\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -33558,7 +33649,7 @@ func schema_openshift_api_operator_v1alpha1_ImageContentSourcePolicyList(ref com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageContentSourcePolicyList lists the items in the ImageContentSourcePolicy CRD.",
+				Description: "ImageContentSourcePolicyList lists the items in the ImageContentSourcePolicy CRD.\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -34200,7 +34291,7 @@ func schema_openshift_api_operatorcontrolplane_v1alpha1_PodNetworkConnectivityCh
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PodNetworkConnectivityCheck",
+				Description: "PodNetworkConnectivityCheck\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -34303,7 +34394,7 @@ func schema_openshift_api_operatorcontrolplane_v1alpha1_PodNetworkConnectivityCh
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PodNetworkConnectivityCheckList is a collection of PodNetworkConnectivityCheck",
+				Description: "PodNetworkConnectivityCheckList is a collection of PodNetworkConnectivityCheck\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -34467,7 +34558,7 @@ func schema_openshift_api_osin_v1_AllowAllPasswordIdentityProvider(ref common.Re
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "AllowAllPasswordIdentityProvider provides identities for users authenticating using non-empty passwords",
+				Description: "AllowAllPasswordIdentityProvider provides identities for users authenticating using non-empty passwords\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -34494,7 +34585,7 @@ func schema_openshift_api_osin_v1_BasicAuthPasswordIdentityProvider(ref common.R
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BasicAuthPasswordIdentityProvider provides identities for users authenticating using HTTP basic auth credentials",
+				Description: "BasicAuthPasswordIdentityProvider provides identities for users authenticating using HTTP basic auth credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -34554,7 +34645,7 @@ func schema_openshift_api_osin_v1_DenyAllPasswordIdentityProvider(ref common.Ref
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "DenyAllPasswordIdentityProvider provides no identities for users",
+				Description: "DenyAllPasswordIdentityProvider provides no identities for users\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -34581,7 +34672,7 @@ func schema_openshift_api_osin_v1_GitHubIdentityProvider(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GitHubIdentityProvider provides identities for users authenticating using GitHub credentials",
+				Description: "GitHubIdentityProvider provides identities for users authenticating using GitHub credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -34672,7 +34763,7 @@ func schema_openshift_api_osin_v1_GitLabIdentityProvider(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GitLabIdentityProvider provides identities for users authenticating using GitLab credentials",
+				Description: "GitLabIdentityProvider provides identities for users authenticating using GitLab credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -34740,7 +34831,7 @@ func schema_openshift_api_osin_v1_GoogleIdentityProvider(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GoogleIdentityProvider provides identities for users authenticating using Google credentials",
+				Description: "GoogleIdentityProvider provides identities for users authenticating using Google credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -34823,7 +34914,7 @@ func schema_openshift_api_osin_v1_HTPasswdPasswordIdentityProvider(ref common.Re
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTPasswdPasswordIdentityProvider provides identities for users authenticating using htpasswd credentials",
+				Description: "HTPasswdPasswordIdentityProvider provides identities for users authenticating using htpasswd credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -34914,7 +35005,7 @@ func schema_openshift_api_osin_v1_KeystonePasswordIdentityProvider(ref common.Re
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "KeystonePasswordIdentityProvider provides identities for users authenticating using keystone password credentials",
+				Description: "KeystonePasswordIdentityProvider provides identities for users authenticating using keystone password credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -35064,7 +35155,7 @@ func schema_openshift_api_osin_v1_LDAPPasswordIdentityProvider(ref common.Refere
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "LDAPPasswordIdentityProvider provides identities for users authenticating using LDAP credentials",
+				Description: "LDAPPasswordIdentityProvider provides identities for users authenticating using LDAP credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -35355,7 +35446,7 @@ func schema_openshift_api_osin_v1_OpenIDIdentityProvider(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OpenIDIdentityProvider provides identities for users authenticating using OpenID credentials",
+				Description: "OpenIDIdentityProvider provides identities for users authenticating using OpenID credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -35491,7 +35582,8 @@ func schema_openshift_api_osin_v1_OsinServerConfig(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -35576,7 +35668,7 @@ func schema_openshift_api_osin_v1_RequestHeaderIdentityProvider(ref common.Refer
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RequestHeaderIdentityProvider provides identities for users authenticating using request header credentials",
+				Description: "RequestHeaderIdentityProvider provides identities for users authenticating using request header credentials\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -35771,7 +35863,7 @@ func schema_openshift_api_osin_v1_SessionSecrets(ref common.ReferenceCallback) c
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "SessionSecrets list the secrets to use to sign/encrypt and authenticate/decrypt created sessions.",
+				Description: "SessionSecrets list the secrets to use to sign/encrypt and authenticate/decrypt created sessions.\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -35857,7 +35949,7 @@ func schema_openshift_api_project_v1_Project(ref common.ReferenceCallback) commo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Projects are the unit of isolation and collaboration in OpenShift. A project has one or more members, a quota on the resources that the project may consume, and the security controls on the resources in the project. Within a project, members may have different roles - project administrators can set membership, editors can create and manage the resources, and viewers can see but not access running containers. In a normal cluster project administrators are not able to alter their quotas - that is restricted to cluster administrators.\n\nListing or watching projects will return only projects the user has the reader role on.\n\nAn OpenShift project is an alternative representation of a Kubernetes namespace. Projects are exposed as editable to end users while namespaces are not. Direct creation of a project is typically restricted to administrators, while end users should use the requestproject resource.",
+				Description: "Projects are the unit of isolation and collaboration in OpenShift. A project has one or more members, a quota on the resources that the project may consume, and the security controls on the resources in the project. Within a project, members may have different roles - project administrators can set membership, editors can create and manage the resources, and viewers can see but not access running containers. In a normal cluster project administrators are not able to alter their quotas - that is restricted to cluster administrators.\n\nListing or watching projects will return only projects the user has the reader role on.\n\nAn OpenShift project is an alternative representation of a Kubernetes namespace. Projects are exposed as editable to end users while namespaces are not. Direct creation of a project is typically restricted to administrators, while end users should use the requestproject resource.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -35906,7 +35998,7 @@ func schema_openshift_api_project_v1_ProjectList(ref common.ReferenceCallback) c
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ProjectList is a list of Project objects.",
+				Description: "ProjectList is a list of Project objects.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -35956,7 +36048,7 @@ func schema_openshift_api_project_v1_ProjectRequest(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ProjectRequest is the set of options necessary to fully qualify a project request",
+				Description: "ProjectRequest is the set of options necessary to fully qualify a project request\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -36075,7 +36167,7 @@ func schema_openshift_api_quota_v1_AppliedClusterResourceQuota(ref common.Refere
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "AppliedClusterResourceQuota mirrors ClusterResourceQuota at a project scope, for projection into a project.  It allows a project-admin to know which ClusterResourceQuotas are applied to his project and their associated usage.",
+				Description: "AppliedClusterResourceQuota mirrors ClusterResourceQuota at a project scope, for projection into a project.  It allows a project-admin to know which ClusterResourceQuotas are applied to his project and their associated usage.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -36125,7 +36217,7 @@ func schema_openshift_api_quota_v1_AppliedClusterResourceQuotaList(ref common.Re
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "AppliedClusterResourceQuotaList is a collection of AppliedClusterResourceQuotas",
+				Description: "AppliedClusterResourceQuotaList is a collection of AppliedClusterResourceQuotas\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -36175,7 +36267,7 @@ func schema_openshift_api_quota_v1_ClusterResourceQuota(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterResourceQuota mirrors ResourceQuota at a cluster scope.  This object is easily convertible to synthetic ResourceQuota object to allow quota evaluation re-use.",
+				Description: "ClusterResourceQuota mirrors ResourceQuota at a cluster scope.  This object is easily convertible to synthetic ResourceQuota object to allow quota evaluation re-use.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -36225,7 +36317,7 @@ func schema_openshift_api_quota_v1_ClusterResourceQuotaList(ref common.Reference
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ClusterResourceQuotaList is a collection of ClusterResourceQuotas",
+				Description: "ClusterResourceQuotaList is a collection of ClusterResourceQuotas\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -36410,7 +36502,7 @@ func schema_openshift_api_route_v1_Route(ref common.ReferenceCallback) common.Op
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "A route allows developers to expose services through an HTTP(S) aware load balancing and proxy layer via a public DNS entry. The route may further specify TLS options and a certificate, or specify a public CNAME that the router should also accept for HTTP and HTTPS traffic. An administrator typically configures their router to be visible outside the cluster firewall, and may also add additional security, caching, or traffic controls on the service content. Routers usually talk directly to the service endpoints.\n\nOnce a route is created, the `host` field may not be changed. Generally, routers use the oldest route with a given host when resolving conflicts.\n\nRouters are subject to additional customization and may support additional controls via the annotations field.\n\nBecause administrators may configure multiple routers, the route status field is used to return information to clients about the names and states of the route under each router. If a client chooses a duplicate name, for instance, the route status conditions are used to indicate the route cannot be chosen.\n\nTo enable HTTP/2 ALPN on a route it requires a custom (non-wildcard) certificate. This prevents connection coalescing by clients, notably web browsers. We do not support HTTP/2 ALPN on routes that use the default certificate because of the risk of connection re-use/coalescing. Routes that do not have their own custom certificate will not be HTTP/2 ALPN-enabled on either the frontend or the backend.",
+				Description: "A route allows developers to expose services through an HTTP(S) aware load balancing and proxy layer via a public DNS entry. The route may further specify TLS options and a certificate, or specify a public CNAME that the router should also accept for HTTP and HTTPS traffic. An administrator typically configures their router to be visible outside the cluster firewall, and may also add additional security, caching, or traffic controls on the service content. Routers usually talk directly to the service endpoints.\n\nOnce a route is created, the `host` field may not be changed. Generally, routers use the oldest route with a given host when resolving conflicts.\n\nRouters are subject to additional customization and may support additional controls via the annotations field.\n\nBecause administrators may configure multiple routers, the route status field is used to return information to clients about the names and states of the route under each router. If a client chooses a duplicate name, for instance, the route status conditions are used to indicate the route cannot be chosen.\n\nTo enable HTTP/2 ALPN on a route it requires a custom (non-wildcard) certificate. This prevents connection coalescing by clients, notably web browsers. We do not support HTTP/2 ALPN on routes that use the default certificate because of the risk of connection re-use/coalescing. Routes that do not have their own custom certificate will not be HTTP/2 ALPN-enabled on either the frontend or the backend.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -36569,7 +36661,7 @@ func schema_openshift_api_route_v1_RouteList(ref common.ReferenceCallback) commo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RouteList is a collection of Routes.",
+				Description: "RouteList is a collection of Routes.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -36872,7 +36964,7 @@ func schema_openshift_api_samples_v1_Config(ref common.ReferenceCallback) common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Config contains the configuration and detailed condition status for the Samples Operator.",
+				Description: "Config contains the configuration and detailed condition status for the Samples Operator.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -36980,7 +37072,8 @@ func schema_openshift_api_samples_v1_ConfigList(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -37322,7 +37415,7 @@ func schema_openshift_api_security_v1_PodSecurityPolicyReview(ref common.Referen
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PodSecurityPolicyReview checks which service accounts (not users, since that would be cluster-wide) can create the `PodTemplateSpec` in question.",
+				Description: "PodSecurityPolicyReview checks which service accounts (not users, since that would be cluster-wide) can create the `PodTemplateSpec` in question.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -37434,7 +37527,7 @@ func schema_openshift_api_security_v1_PodSecurityPolicySelfSubjectReview(ref com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PodSecurityPolicySelfSubjectReview checks whether this user/SA tuple can create the PodTemplateSpec",
+				Description: "PodSecurityPolicySelfSubjectReview checks whether this user/SA tuple can create the PodTemplateSpec\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -37501,7 +37594,7 @@ func schema_openshift_api_security_v1_PodSecurityPolicySubjectReview(ref common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PodSecurityPolicySubjectReview checks whether a particular user/SA tuple can create the PodTemplateSpec.",
+				Description: "PodSecurityPolicySubjectReview checks whether a particular user/SA tuple can create the PodTemplateSpec.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -37625,7 +37718,7 @@ func schema_openshift_api_security_v1_RangeAllocation(ref common.ReferenceCallba
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RangeAllocation is used so we can easily expose a RangeAllocation typed for security group",
+				Description: "RangeAllocation is used so we can easily expose a RangeAllocation typed for security group\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -37676,7 +37769,7 @@ func schema_openshift_api_security_v1_RangeAllocationList(ref common.ReferenceCa
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RangeAllocationList is a list of RangeAllocations objects",
+				Description: "RangeAllocationList is a list of RangeAllocations objects\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -37795,7 +37888,7 @@ func schema_openshift_api_security_v1_SecurityContextConstraints(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "SecurityContextConstraints governs the ability to make requests that affect the SecurityContext that will be applied to a container. For historical reasons SCC was exposed under the core Kubernetes API group. That exposure is deprecated and will be removed in a future release - users should instead use the security.openshift.io group to manage SecurityContextConstraints.",
+				Description: "SecurityContextConstraints governs the ability to make requests that affect the SecurityContext that will be applied to a container. For historical reasons SCC was exposed under the core Kubernetes API group. That exposure is deprecated and will be removed in a future release - users should instead use the security.openshift.io group to manage SecurityContextConstraints.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -38085,7 +38178,7 @@ func schema_openshift_api_security_v1_SecurityContextConstraintsList(ref common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "SecurityContextConstraintsList is a list of SecurityContextConstraints objects",
+				Description: "SecurityContextConstraintsList is a list of SecurityContextConstraints objects\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -38215,7 +38308,7 @@ func schema_openshift_api_servicecertsigner_v1alpha1_ServiceCertSignerOperatorCo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ServiceCertSignerOperatorConfig provides information to configure an operator to manage the service cert signing controllers",
+				Description: "ServiceCertSignerOperatorConfig provides information to configure an operator to manage the service cert signing controllers\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -38263,7 +38356,7 @@ func schema_openshift_api_servicecertsigner_v1alpha1_ServiceCertSignerOperatorCo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ServiceCertSignerOperatorConfigList is a collection of items",
+				Description: "ServiceCertSignerOperatorConfigList is a collection of items\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -38429,7 +38522,7 @@ func schema_openshift_api_template_v1_BrokerTemplateInstance(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BrokerTemplateInstance holds the service broker-related state associated with a TemplateInstance.  BrokerTemplateInstance is part of an experimental API.",
+				Description: "BrokerTemplateInstance holds the service broker-related state associated with a TemplateInstance.  BrokerTemplateInstance is part of an experimental API.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -38472,7 +38565,7 @@ func schema_openshift_api_template_v1_BrokerTemplateInstanceList(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BrokerTemplateInstanceList is a list of BrokerTemplateInstance objects.",
+				Description: "BrokerTemplateInstanceList is a list of BrokerTemplateInstance objects.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -38631,7 +38724,7 @@ func schema_openshift_api_template_v1_Template(ref common.ReferenceCallback) com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Template contains the inputs needed to produce a Config.",
+				Description: "Template contains the inputs needed to produce a Config.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -38718,7 +38811,7 @@ func schema_openshift_api_template_v1_TemplateInstance(ref common.ReferenceCallb
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "TemplateInstance requests and records the instantiation of a Template. TemplateInstance is part of an experimental API.",
+				Description: "TemplateInstance requests and records the instantiation of a Template. TemplateInstance is part of an experimental API.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -38823,7 +38916,7 @@ func schema_openshift_api_template_v1_TemplateInstanceList(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "TemplateInstanceList is a list of TemplateInstance objects.",
+				Description: "TemplateInstanceList is a list of TemplateInstance objects.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -39038,7 +39131,7 @@ func schema_openshift_api_template_v1_TemplateList(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "TemplateList is a list of Template objects.",
+				Description: "TemplateList is a list of Template objects.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -39088,7 +39181,7 @@ func schema_openshift_api_user_v1_Group(ref common.ReferenceCallback) common.Ope
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Group represents a referenceable set of Users",
+				Description: "Group represents a referenceable set of Users\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -39139,7 +39232,7 @@ func schema_openshift_api_user_v1_GroupList(ref common.ReferenceCallback) common
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GroupList is a collection of Groups",
+				Description: "GroupList is a collection of Groups\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -39189,7 +39282,7 @@ func schema_openshift_api_user_v1_Identity(ref common.ReferenceCallback) common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Identity records a successful authentication of a user with an identity provider. The information about the source of authentication is stored on the identity, and the identity is then associated with a single user object. Multiple identities can reference a single user. Information retrieved from the authentication provider is stored in the extra field using a schema determined by the provider.",
+				Description: "Identity records a successful authentication of a user with an identity provider. The information about the source of authentication is stored on the identity, and the identity is then associated with a single user object. Multiple identities can reference a single user. Information retrieved from the authentication provider is stored in the extra field using a schema determined by the provider.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -39264,7 +39357,7 @@ func schema_openshift_api_user_v1_IdentityList(ref common.ReferenceCallback) com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "IdentityList is a collection of Identities",
+				Description: "IdentityList is a collection of Identities\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -39314,7 +39407,7 @@ func schema_openshift_api_user_v1_User(ref common.ReferenceCallback) common.Open
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Upon log in, every user of the system receives a User and Identity resource. Administrators may directly manipulate the attributes of the users for their own tracking, or set groups via the API. The user name is unique and is chosen based on the value provided by the identity provider - if a user already exists with the incoming name, the user name may have a number appended to it depending on the configuration of the system.",
+				Description: "Upon log in, every user of the system receives a User and Identity resource. Administrators may directly manipulate the attributes of the users for their own tracking, or set groups via the API. The user name is unique and is chosen based on the value provided by the identity provider - if a user already exists with the incoming name, the user name may have a number appended to it depending on the configuration of the system.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -39387,7 +39480,7 @@ func schema_openshift_api_user_v1_UserIdentityMapping(ref common.ReferenceCallba
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "UserIdentityMapping maps a user to an identity",
+				Description: "UserIdentityMapping maps a user to an identity\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -39436,7 +39529,7 @@ func schema_openshift_api_user_v1_UserList(ref common.ReferenceCallback) common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "UserList is a collection of Users",
+				Description: "UserList is a collection of Users\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -40954,13 +41047,15 @@ func schema_k8sio_api_apiserverinternal_v1alpha1_StorageVersionList(ref common.R
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
 						},
 					},
 					"items": {
 						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
+							Description: "Items holds a list of StorageVersion",
+							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
@@ -41518,7 +41613,7 @@ func schema_k8sio_api_apps_v1_Deployment(ref common.ReferenceCallback) common.Op
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Standard object metadata.",
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
@@ -42122,13 +42217,13 @@ func schema_k8sio_api_apps_v1_RollingUpdateDaemonSet(ref common.ReferenceCallbac
 				Properties: map[string]spec.Schema{
 					"maxUnavailable": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The maximum number of DaemonSet pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of total number of DaemonSet pods at the start of the update (ex: 10%). Absolute number is calculated from percentage by rounding down to a minimum of one. This cannot be 0 if MaxSurge is 0 Default value is 1. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their pods stopped for an update at any given time. The update starts by stopping at most 30% of those DaemonSet pods and then brings up new DaemonSet pods in their place. Once the new pods are available, it then proceeds onto other DaemonSet pods, thus ensuring that at least 70% of original number of DaemonSet pods are available at all times during the update.",
+							Description: "The maximum number of DaemonSet pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of total number of DaemonSet pods at the start of the update (ex: 10%). Absolute number is calculated from percentage by rounding up. This cannot be 0 if MaxSurge is 0 Default value is 1. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their pods stopped for an update at any given time. The update starts by stopping at most 30% of those DaemonSet pods and then brings up new DaemonSet pods in their place. Once the new pods are available, it then proceeds onto other DaemonSet pods, thus ensuring that at least 70% of original number of DaemonSet pods are available at all times during the update.",
 							Ref:         ref("k8s.io/apimachinery/pkg/util/intstr.IntOrString"),
 						},
 					},
 					"maxSurge": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The maximum number of nodes with an existing available DaemonSet pod that can have an updated DaemonSet pod during during an update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). This can not be 0 if MaxUnavailable is 0. Absolute number is calculated from percentage by rounding up to a minimum of 1. Default value is 0. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their a new pod created before the old pod is marked as deleted. The update starts by launching new pods on 30% of nodes. Once an updated pod is available (Ready for at least minReadySeconds) the old DaemonSet pod on that node is marked deleted. If the old pod becomes unavailable for any reason (Ready transitions to false, is evicted, or is drained) an updated pod is immediatedly created on that node without considering surge limits. Allowing surge implies the possibility that the resources consumed by the daemonset on any given node can double if the readiness check fails, and so resource intensive daemonsets should take into account that they may cause evictions during disruption. This is an alpha field and requires enabling DaemonSetUpdateSurge feature gate.",
+							Description: "The maximum number of nodes with an existing available DaemonSet pod that can have an updated DaemonSet pod during during an update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). This can not be 0 if MaxUnavailable is 0. Absolute number is calculated from percentage by rounding up to a minimum of 1. Default value is 0. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their a new pod created before the old pod is marked as deleted. The update starts by launching new pods on 30% of nodes. Once an updated pod is available (Ready for at least minReadySeconds) the old DaemonSet pod on that node is marked deleted. If the old pod becomes unavailable for any reason (Ready transitions to false, is evicted, or is drained) an updated pod is immediatedly created on that node without considering surge limits. Allowing surge implies the possibility that the resources consumed by the daemonset on any given node can double if the readiness check fails, and so resource intensive daemonsets should take into account that they may cause evictions during disruption. This is beta field and enabled/disabled by DaemonSetUpdateSurge feature gate.",
 							Ref:         ref("k8s.io/apimachinery/pkg/util/intstr.IntOrString"),
 						},
 					},
@@ -42210,8 +42305,9 @@ func schema_k8sio_api_apps_v1_StatefulSet(ref common.ReferenceCallback) common.O
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -42312,13 +42408,15 @@ func schema_k8sio_api_apps_v1_StatefulSetList(ref common.ReferenceCallback) comm
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							Description: "Standard list's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
 						},
 					},
 					"items": {
 						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
+							Description: "Items is the list of stateful sets.",
+							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
@@ -42404,6 +42502,13 @@ func schema_k8sio_api_apps_v1_StatefulSetSpec(ref common.ReferenceCallback) comm
 					"revisionHistoryLimit": {
 						SchemaProps: spec.SchemaProps{
 							Description: "revisionHistoryLimit is the maximum number of revisions that will be maintained in the StatefulSet's revision history. The revision history consists of all revisions not represented by a currently applied StatefulSetSpec version. The default value is 10.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"minReadySeconds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Minimum number of seconds for which a newly created pod should be ready without any of its container crashing for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready) This is an alpha field and requires enabling StatefulSetMinReadySeconds feature gate.",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
@@ -42499,6 +42604,13 @@ func schema_k8sio_api_apps_v1_StatefulSetStatus(ref common.ReferenceCallback) co
 									},
 								},
 							},
+						},
+					},
+					"availableReplicas": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Total number of available pods (ready for at least minReadySeconds) targeted by this statefulset. This is an alpha field and requires enabling StatefulSetMinReadySeconds feature gate. Remove omitempty when graduating to beta",
+							Type:        []string{"integer"},
+							Format:      "int32",
 						},
 					},
 				},
@@ -43460,6 +43572,13 @@ func schema_k8sio_api_apps_v1beta1_StatefulSetSpec(ref common.ReferenceCallback)
 							Format:      "int32",
 						},
 					},
+					"minReadySeconds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Minimum number of seconds for which a newly created pod should be ready without any of its container crashing for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready) This is an alpha field and requires enabling StatefulSetMinReadySeconds feature gate.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
 				},
 				Required: []string{"template", "serviceName"},
 			},
@@ -43551,6 +43670,13 @@ func schema_k8sio_api_apps_v1beta1_StatefulSetStatus(ref common.ReferenceCallbac
 									},
 								},
 							},
+						},
+					},
+					"availableReplicas": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Total number of available pods (ready for at least minReadySeconds) targeted by this StatefulSet. This is an alpha field and requires enabling StatefulSetMinReadySeconds feature gate. Remove omitempty when graduating to beta",
+							Type:        []string{"integer"},
+							Format:      "int32",
 						},
 					},
 				},
@@ -44655,13 +44781,13 @@ func schema_k8sio_api_apps_v1beta2_RollingUpdateDaemonSet(ref common.ReferenceCa
 				Properties: map[string]spec.Schema{
 					"maxUnavailable": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The maximum number of DaemonSet pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of total number of DaemonSet pods at the start of the update (ex: 10%). Absolute number is calculated from percentage by rounding down to a minimum of one. This cannot be 0 if MaxSurge is 0 Default value is 1. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their pods stopped for an update at any given time. The update starts by stopping at most 30% of those DaemonSet pods and then brings up new DaemonSet pods in their place. Once the new pods are available, it then proceeds onto other DaemonSet pods, thus ensuring that at least 70% of original number of DaemonSet pods are available at all times during the update.",
+							Description: "The maximum number of DaemonSet pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of total number of DaemonSet pods at the start of the update (ex: 10%). Absolute number is calculated from percentage by rounding up. This cannot be 0 if MaxSurge is 0 Default value is 1. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their pods stopped for an update at any given time. The update starts by stopping at most 30% of those DaemonSet pods and then brings up new DaemonSet pods in their place. Once the new pods are available, it then proceeds onto other DaemonSet pods, thus ensuring that at least 70% of original number of DaemonSet pods are available at all times during the update.",
 							Ref:         ref("k8s.io/apimachinery/pkg/util/intstr.IntOrString"),
 						},
 					},
 					"maxSurge": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The maximum number of nodes with an existing available DaemonSet pod that can have an updated DaemonSet pod during during an update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). This can not be 0 if MaxUnavailable is 0. Absolute number is calculated from percentage by rounding up to a minimum of 1. Default value is 0. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their a new pod created before the old pod is marked as deleted. The update starts by launching new pods on 30% of nodes. Once an updated pod is available (Ready for at least minReadySeconds) the old DaemonSet pod on that node is marked deleted. If the old pod becomes unavailable for any reason (Ready transitions to false, is evicted, or is drained) an updated pod is immediatedly created on that node without considering surge limits. Allowing surge implies the possibility that the resources consumed by the daemonset on any given node can double if the readiness check fails, and so resource intensive daemonsets should take into account that they may cause evictions during disruption. This is an alpha field and requires enabling DaemonSetUpdateSurge feature gate.",
+							Description: "The maximum number of nodes with an existing available DaemonSet pod that can have an updated DaemonSet pod during during an update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). This can not be 0 if MaxUnavailable is 0. Absolute number is calculated from percentage by rounding up to a minimum of 1. Default value is 0. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their a new pod created before the old pod is marked as deleted. The update starts by launching new pods on 30% of nodes. Once an updated pod is available (Ready for at least minReadySeconds) the old DaemonSet pod on that node is marked deleted. If the old pod becomes unavailable for any reason (Ready transitions to false, is evicted, or is drained) an updated pod is immediatedly created on that node without considering surge limits. Allowing surge implies the possibility that the resources consumed by the daemonset on any given node can double if the readiness check fails, and so resource intensive daemonsets should take into account that they may cause evictions during disruption. This is beta field and enabled/disabled by DaemonSetUpdateSurge feature gate.",
 							Ref:         ref("k8s.io/apimachinery/pkg/util/intstr.IntOrString"),
 						},
 					},
@@ -44806,6 +44932,11 @@ func schema_k8sio_api_apps_v1beta2_ScaleStatus(ref common.ReferenceCallback) com
 						},
 					},
 					"selector": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-map-type": "atomic",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "label query over pods that should match the replicas count. More info: http://kubernetes.io/docs/user-guide/labels#label-selectors",
 							Type:        []string{"object"},
@@ -45056,6 +45187,13 @@ func schema_k8sio_api_apps_v1beta2_StatefulSetSpec(ref common.ReferenceCallback)
 							Format:      "int32",
 						},
 					},
+					"minReadySeconds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Minimum number of seconds for which a newly created pod should be ready without any of its container crashing for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready) This is an alpha field and requires enabling StatefulSetMinReadySeconds feature gate.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
 				},
 				Required: []string{"selector", "template", "serviceName"},
 			},
@@ -45147,6 +45285,13 @@ func schema_k8sio_api_apps_v1beta2_StatefulSetStatus(ref common.ReferenceCallbac
 									},
 								},
 							},
+						},
+					},
+					"availableReplicas": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Total number of available pods (ready for at least minReadySeconds) targeted by this StatefulSet. This is an alpha field and requires enabling StatefulSetMinReadySeconds feature gate. Remove omitempty when graduating to beta",
+							Type:        []string{"integer"},
+							Format:      "int32",
 						},
 					},
 				},
@@ -45250,20 +45395,23 @@ func schema_k8sio_api_authentication_v1_TokenRequest(ref common.ReferenceCallbac
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/api/authentication/v1.TokenRequestSpec"),
+							Description: "Spec holds information about the request being evaluated",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/authentication/v1.TokenRequestSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/api/authentication/v1.TokenRequestStatus"),
+							Description: "Status is filled in by the server and indicates whether the token can be authenticated.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/authentication/v1.TokenRequestStatus"),
 						},
 					},
 				},
@@ -45373,8 +45521,9 @@ func schema_k8sio_api_authentication_v1_TokenReview(ref common.ReferenceCallback
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -45574,8 +45723,9 @@ func schema_k8sio_api_authentication_v1beta1_TokenReview(ref common.ReferenceCal
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -45587,7 +45737,7 @@ func schema_k8sio_api_authentication_v1beta1_TokenReview(ref common.ReferenceCal
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Status is filled in by the server and indicates whether the request can be authenticated.",
+							Description: "Status is filled in by the server and indicates whether the token can be authenticated.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/authentication/v1beta1.TokenReviewStatus"),
 						},
@@ -45775,8 +45925,9 @@ func schema_k8sio_api_authorization_v1_LocalSubjectAccessReview(ref common.Refer
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -46032,8 +46183,9 @@ func schema_k8sio_api_authorization_v1_SelfSubjectAccessReview(ref common.Refere
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -46109,8 +46261,9 @@ func schema_k8sio_api_authorization_v1_SelfSubjectRulesReview(ref common.Referen
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -46140,7 +46293,8 @@ func schema_k8sio_api_authorization_v1_SelfSubjectRulesReviewSpec(ref common.Ref
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "SelfSubjectRulesReviewSpec defines the specification for SelfSubjectRulesReview.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"namespace": {
 						SchemaProps: spec.SchemaProps{
@@ -46178,8 +46332,9 @@ func schema_k8sio_api_authorization_v1_SubjectAccessReview(ref common.ReferenceC
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -46409,8 +46564,9 @@ func schema_k8sio_api_authorization_v1beta1_LocalSubjectAccessReview(ref common.
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -46666,8 +46822,9 @@ func schema_k8sio_api_authorization_v1beta1_SelfSubjectAccessReview(ref common.R
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -46743,8 +46900,9 @@ func schema_k8sio_api_authorization_v1beta1_SelfSubjectRulesReview(ref common.Re
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -46774,7 +46932,8 @@ func schema_k8sio_api_authorization_v1beta1_SelfSubjectRulesReviewSpec(ref commo
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "SelfSubjectRulesReviewSpec defines the specification for SelfSubjectRulesReview.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"namespace": {
 						SchemaProps: spec.SchemaProps{
@@ -46812,8 +46971,9 @@ func schema_k8sio_api_authorization_v1beta1_SubjectAccessReview(ref common.Refer
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -47143,6 +47303,11 @@ func schema_k8sio_api_autoscaling_v1_CrossVersionObjectReference(ref common.Refe
 					},
 				},
 				Required: []string{"kind", "name"},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
 			},
 		},
 	}
@@ -50204,14 +50369,14 @@ func schema_k8sio_api_batch_v1_JobSpec(ref common.ReferenceCallback) common.Open
 					},
 					"completionMode": {
 						SchemaProps: spec.SchemaProps{
-							Description: "CompletionMode specifies how Pod completions are tracked. It can be `NonIndexed` (default) or `Indexed`.\n\n`NonIndexed` means that the Job is considered complete when there have been .spec.completions successfully completed Pods. Each Pod completion is homologous to each other.\n\n`Indexed` means that the Pods of a Job get an associated completion index from 0 to (.spec.completions - 1), available in the annotation batch.kubernetes.io/job-completion-index. The Job is considered complete when there is one successfully completed Pod for each index. When value is `Indexed`, .spec.completions must be specified and `.spec.parallelism` must be less than or equal to 10^5.\n\nThis field is alpha-level and is only honored by servers that enable the IndexedJob feature gate. More completion modes can be added in the future. If the Job controller observes a mode that it doesn't recognize, the controller skips updates for the Job.",
+							Description: "CompletionMode specifies how Pod completions are tracked. It can be `NonIndexed` (default) or `Indexed`.\n\n`NonIndexed` means that the Job is considered complete when there have been .spec.completions successfully completed Pods. Each Pod completion is homologous to each other.\n\n`Indexed` means that the Pods of a Job get an associated completion index from 0 to (.spec.completions - 1), available in the annotation batch.kubernetes.io/job-completion-index. The Job is considered complete when there is one successfully completed Pod for each index. When value is `Indexed`, .spec.completions must be specified and `.spec.parallelism` must be less than or equal to 10^5. In addition, The Pod name takes the form `$(job-name)-$(index)-$(random-string)`, the Pod hostname takes the form `$(job-name)-$(index)`.\n\nThis field is beta-level. More completion modes can be added in the future. If the Job controller observes a mode that it doesn't recognize, the controller skips updates for the Job.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"suspend": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Suspend specifies whether the Job controller should create Pods or not. If a Job is created with suspend set to true, no Pods are created by the Job controller. If a Job is suspended after creation (i.e. the flag goes from false to true), the Job controller will delete all active Pods associated with this Job. Users must design their workload to gracefully handle this. Suspending a Job will reset the StartTime field of the Job, effectively resetting the ActiveDeadlineSeconds timer too. This is an alpha field and requires the SuspendJob feature gate to be enabled; otherwise this field may not be set to true. Defaults to false.",
+							Description: "Suspend specifies whether the Job controller should create Pods or not. If a Job is created with suspend set to true, no Pods are created by the Job controller. If a Job is suspended after creation (i.e. the flag goes from false to true), the Job controller will delete all active Pods associated with this Job. Users must design their workload to gracefully handle this. Suspending a Job will reset the StartTime field of the Job, effectively resetting the ActiveDeadlineSeconds timer too. Defaults to false.\n\nThis field is beta-level, gated by SuspendJob feature flag (enabled by default).",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -50293,11 +50458,17 @@ func schema_k8sio_api_batch_v1_JobStatus(ref common.ReferenceCallback) common.Op
 							Format:      "",
 						},
 					},
+					"uncountedTerminatedPods": {
+						SchemaProps: spec.SchemaProps{
+							Description: "UncountedTerminatedPods holds the UIDs of Pods that have terminated but the job controller hasn't yet accounted for in the status counters.\n\nThe job controller creates pods with a finalizer. When a pod terminates (succeeded or failed), the controller does three steps to account for it in the job status: (1) Add the pod UID to the arrays in this field. (2) Remove the pod finalizer. (3) Remove the pod UID from the arrays while increasing the corresponding\n    counter.\n\nThis field is alpha-level. The job controller only makes use of this field when the feature gate PodTrackingWithFinalizers is enabled. Old jobs might not be tracked using this field, in which case the field remains null.",
+							Ref:         ref("k8s.io/api/batch/v1.UncountedTerminatedPods"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/batch/v1.JobCondition", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"k8s.io/api/batch/v1.JobCondition", "k8s.io/api/batch/v1.UncountedTerminatedPods", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 
@@ -50327,6 +50498,59 @@ func schema_k8sio_api_batch_v1_JobTemplateSpec(ref common.ReferenceCallback) com
 		},
 		Dependencies: []string{
 			"k8s.io/api/batch/v1.JobSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_k8sio_api_batch_v1_UncountedTerminatedPods(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "UncountedTerminatedPods holds UIDs of Pods that have terminated but haven't been accounted in Job status counters.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"succeeded": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Succeeded holds UIDs of succeeded Pods.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"failed": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Failed holds UIDs of failed Pods.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 }
 
@@ -50644,7 +50868,7 @@ func schema_k8sio_api_certificates_v1_CertificateSigningRequest(ref common.Refer
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Description: "spec contains the certificate request, and is immutable after creation. Only the request, signerName, and usages fields can be set on creation. Other fields are derived by Kubernetes and cannot be modified by users.",
+							Description: "spec contains the certificate request, and is immutable after creation. Only the request, signerName, expirationSeconds, and usages fields can be set on creation. Other fields are derived by Kubernetes and cannot be modified by users.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/certificates/v1.CertificateSigningRequestSpec"),
 						},
@@ -50800,6 +51024,13 @@ func schema_k8sio_api_certificates_v1_CertificateSigningRequestSpec(ref common.R
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
+						},
+					},
+					"expirationSeconds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "expirationSeconds is the requested duration of validity of the issued certificate. The certificate signer may issue a certificate with a different validity duration so a client must check the delta between the notBefore and and notAfter fields in the issued certificate to determine the actual duration.\n\nThe v1.22+ in-tree implementations of the well-known Kubernetes signers will honor this field as long as the requested duration is not greater than the maximum duration they will honor per the --cluster-signing-duration CLI flag to the Kubernetes controller manager.\n\nCertificate signers may not honor this field for various reasons:\n\n  1. Old signer that is unaware of the field (such as the in-tree\n     implementations prior to v1.22)\n  2. Signer whose configured maximum is shorter than the requested duration\n  3. Signer whose configured minimum is longer than the requested duration\n\nThe minimum valid value for expirationSeconds is 600, i.e. 10 minutes.\n\nAs of v1.22, this field is beta and is controlled via the CSRDuration feature gate.",
+							Type:        []string{"integer"},
+							Format:      "int32",
 						},
 					},
 					"usages": {
@@ -50964,7 +51195,7 @@ func schema_k8sio_api_certificates_v1beta1_CertificateSigningRequest(ref common.
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The certificate request itself and any additional information.",
+							Description: "spec contains the certificate request, and is immutable after creation. Only the request, signerName, expirationSeconds, and usages fields can be set on creation. Other fields are derived by Kubernetes and cannot be modified by users.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/certificates/v1beta1.CertificateSigningRequestSpec"),
 						},
@@ -50977,6 +51208,7 @@ func schema_k8sio_api_certificates_v1beta1_CertificateSigningRequest(ref common.
 						},
 					},
 				},
+				Required: []string{"spec"},
 			},
 		},
 		Dependencies: []string{
@@ -51095,7 +51327,7 @@ func schema_k8sio_api_certificates_v1beta1_CertificateSigningRequestSpec(ref com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "This information is immutable after the request is created. Only the Request and Usages fields can be set on creation, other fields are derived by Kubernetes and cannot be modified by users.",
+				Description: "CertificateSigningRequestSpec contains the certificate request.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"request": {
@@ -51115,6 +51347,13 @@ func schema_k8sio_api_certificates_v1beta1_CertificateSigningRequestSpec(ref com
 							Description: "Requested signer for the request. It is a qualified name in the form: `scope-hostname.io/name`. If empty, it will be defaulted:\n 1. If it's a kubelet client certificate, it is assigned\n    \"kubernetes.io/kube-apiserver-client-kubelet\".\n 2. If it's a kubelet serving certificate, it is assigned\n    \"kubernetes.io/kubelet-serving\".\n 3. Otherwise, it is assigned \"kubernetes.io/legacy-unknown\".\nDistribution of trust for signers happens out of band. You can select on this field using `spec.signerName`.",
 							Type:        []string{"string"},
 							Format:      "",
+						},
+					},
+					"expirationSeconds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "expirationSeconds is the requested duration of validity of the issued certificate. The certificate signer may issue a certificate with a different validity duration so a client must check the delta between the notBefore and and notAfter fields in the issued certificate to determine the actual duration.\n\nThe v1.22+ in-tree implementations of the well-known Kubernetes signers will honor this field as long as the requested duration is not greater than the maximum duration they will honor per the --cluster-signing-duration CLI flag to the Kubernetes controller manager.\n\nCertificate signers may not honor this field for various reasons:\n\n  1. Old signer that is unaware of the field (such as the in-tree\n     implementations prior to v1.22)\n  2. Signer whose configured maximum is shorter than the requested duration\n  3. Signer whose configured minimum is longer than the requested duration\n\nThe minimum valid value for expirationSeconds is 600, i.e. 10 minutes.\n\nAs of v1.22, this field is beta and is controlled via the CSRDuration feature gate.",
+							Type:        []string{"integer"},
+							Format:      "int32",
 						},
 					},
 					"usages": {
@@ -52562,6 +52801,11 @@ func schema_k8sio_api_core_v1_ConfigMapKeySelector(ref common.ReferenceCallback)
 				},
 				Required: []string{"key"},
 			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
+			},
 		},
 	}
 }
@@ -52621,7 +52865,7 @@ func schema_k8sio_api_core_v1_ConfigMapNodeConfigSource(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ConfigMapNodeConfigSource contains the information to reference a ConfigMap as a config source for the Node.",
+				Description: "ConfigMapNodeConfigSource contains the information to reference a ConfigMap as a config source for the Node. This API is deprecated since 1.22: https://git.k8s.io/enhancements/keps/sig-node/281-dynamic-kubelet-configuration",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"namespace": {
@@ -52786,7 +53030,7 @@ func schema_k8sio_api_core_v1_Container(ref common.ReferenceCallback) common.Ope
 					},
 					"command": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Entrypoint array. Not executed within a shell. The docker image's ENTRYPOINT is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
+							Description: "Entrypoint array. Not executed within a shell. The docker image's ENTRYPOINT is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. \"$$(VAR_NAME)\" will produce the string literal \"$(VAR_NAME)\". Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -52801,7 +53045,7 @@ func schema_k8sio_api_core_v1_Container(ref common.ReferenceCallback) common.Ope
 					},
 					"args": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Arguments to the entrypoint. The docker image's CMD is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
+							Description: "Arguments to the entrypoint. The docker image's CMD is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. \"$$(VAR_NAME)\" will produce the string literal \"$(VAR_NAME)\". Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -52974,7 +53218,7 @@ func schema_k8sio_api_core_v1_Container(ref common.ReferenceCallback) common.Ope
 					},
 					"securityContext": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Security options the pod should run with. More info: https://kubernetes.io/docs/concepts/policy/security-context/ More info: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
+							Description: "SecurityContext defines the security options the container should be run with. If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext. More info: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
 							Ref:         ref("k8s.io/api/core/v1.SecurityContext"),
 						},
 					},
@@ -53038,7 +53282,6 @@ func schema_k8sio_api_core_v1_ContainerImage(ref common.ReferenceCallback) commo
 						},
 					},
 				},
-				Required: []string{"names"},
 			},
 		},
 	}
@@ -53523,6 +53766,11 @@ func schema_k8sio_api_core_v1_EndpointAddress(ref common.ReferenceCallback) comm
 				},
 				Required: []string{"ip"},
 			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
+			},
 		},
 		Dependencies: []string{
 			"k8s.io/api/core/v1.ObjectReference"},
@@ -53560,13 +53808,18 @@ func schema_k8sio_api_core_v1_EndpointPort(ref common.ReferenceCallback) common.
 					},
 					"appProtocol": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The application protocol for this port. This field follows standard Kubernetes label syntax. Un-prefixed names are reserved for IANA standard service names (as per RFC-6335 and http://www.iana.org/assignments/service-names). Non-standard protocols should use prefixed names such as mycompany.com/my-custom-protocol. This is a beta field that is guarded by the ServiceAppProtocol feature gate and enabled by default.",
+							Description: "The application protocol for this port. This field follows standard Kubernetes label syntax. Un-prefixed names are reserved for IANA standard service names (as per RFC-6335 and http://www.iana.org/assignments/service-names). Non-standard protocols should use prefixed names such as mycompany.com/my-custom-protocol.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 				},
 				Required: []string{"port"},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
 			},
 		},
 	}
@@ -53781,7 +54034,7 @@ func schema_k8sio_api_core_v1_EnvVar(ref common.ReferenceCallback) common.OpenAP
 					},
 					"value": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Variable references $(VAR_NAME) are expanded using the previous defined environment variables in the container and any service environment variables. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Defaults to \"\".",
+							Description: "Variable references $(VAR_NAME) are expanded using the previously defined environment variables in the container and any service environment variables. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. \"$$(VAR_NAME)\" will produce the string literal \"$(VAR_NAME)\". Escaped references will never be expanded, regardless of whether the variable exists or not. Defaults to \"\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -53864,7 +54117,7 @@ func schema_k8sio_api_core_v1_EphemeralContainer(ref common.ReferenceCallback) c
 					},
 					"command": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Entrypoint array. Not executed within a shell. The docker image's ENTRYPOINT is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
+							Description: "Entrypoint array. Not executed within a shell. The docker image's ENTRYPOINT is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. \"$$(VAR_NAME)\" will produce the string literal \"$(VAR_NAME)\". Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -53879,7 +54132,7 @@ func schema_k8sio_api_core_v1_EphemeralContainer(ref common.ReferenceCallback) c
 					},
 					"args": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Arguments to the entrypoint. The docker image's CMD is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
+							Description: "Arguments to the entrypoint. The docker image's CMD is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. \"$$(VAR_NAME)\" will produce the string literal \"$(VAR_NAME)\". Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -54041,7 +54294,7 @@ func schema_k8sio_api_core_v1_EphemeralContainer(ref common.ReferenceCallback) c
 					},
 					"securityContext": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SecurityContext is not allowed for ephemeral containers.",
+							Description: "Optional: SecurityContext defines the security options the ephemeral container should be run with. If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext.",
 							Ref:         ref("k8s.io/api/core/v1.SecurityContext"),
 						},
 					},
@@ -54106,7 +54359,7 @@ func schema_k8sio_api_core_v1_EphemeralContainerCommon(ref common.ReferenceCallb
 					},
 					"command": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Entrypoint array. Not executed within a shell. The docker image's ENTRYPOINT is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
+							Description: "Entrypoint array. Not executed within a shell. The docker image's ENTRYPOINT is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. \"$$(VAR_NAME)\" will produce the string literal \"$(VAR_NAME)\". Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -54121,7 +54374,7 @@ func schema_k8sio_api_core_v1_EphemeralContainerCommon(ref common.ReferenceCallb
 					},
 					"args": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Arguments to the entrypoint. The docker image's CMD is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
+							Description: "Arguments to the entrypoint. The docker image's CMD is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. \"$$(VAR_NAME)\" will produce the string literal \"$(VAR_NAME)\". Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -54283,7 +54536,7 @@ func schema_k8sio_api_core_v1_EphemeralContainerCommon(ref common.ReferenceCallb
 					},
 					"securityContext": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SecurityContext is not allowed for ephemeral containers.",
+							Description: "Optional: SecurityContext defines the security options the ephemeral container should be run with. If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext.",
 							Ref:         ref("k8s.io/api/core/v1.SecurityContext"),
 						},
 					},
@@ -54314,62 +54567,6 @@ func schema_k8sio_api_core_v1_EphemeralContainerCommon(ref common.ReferenceCallb
 		},
 		Dependencies: []string{
 			"k8s.io/api/core/v1.ContainerPort", "k8s.io/api/core/v1.EnvFromSource", "k8s.io/api/core/v1.EnvVar", "k8s.io/api/core/v1.Lifecycle", "k8s.io/api/core/v1.Probe", "k8s.io/api/core/v1.ResourceRequirements", "k8s.io/api/core/v1.SecurityContext", "k8s.io/api/core/v1.VolumeDevice", "k8s.io/api/core/v1.VolumeMount"},
-	}
-}
-
-func schema_k8sio_api_core_v1_EphemeralContainers(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "A list of ephemeral containers used with the Pod ephemeralcontainers subresource.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"ephemeralContainers": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-patch-merge-key": "name",
-								"x-kubernetes-patch-strategy":  "merge",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "A list of ephemeral containers associated with this pod. New ephemeral containers may be appended to this list, but existing ephemeral containers may not be removed or modified.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("k8s.io/api/core/v1.EphemeralContainer"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"ephemeralContainers"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/api/core/v1.EphemeralContainer", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
@@ -55857,6 +56054,11 @@ func schema_k8sio_api_core_v1_LocalObjectReference(ref common.ReferenceCallback)
 					},
 				},
 			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
+			},
 		},
 	}
 }
@@ -56327,7 +56529,7 @@ func schema_k8sio_api_core_v1_NodeConfigSource(ref common.ReferenceCallback) com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "NodeConfigSource specifies a source of node configuration. Exactly one subfield (excluding metadata) must be non-nil.",
+				Description: "NodeConfigSource specifies a source of node configuration. Exactly one subfield (excluding metadata) must be non-nil. This API is deprecated since 1.22",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"configMap": {
@@ -56546,6 +56748,11 @@ func schema_k8sio_api_core_v1_NodeSelector(ref common.ReferenceCallback) common.
 				},
 				Required: []string{"nodeSelectorTerms"},
 			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
+			},
 		},
 		Dependencies: []string{
 			"k8s.io/api/core/v1.NodeSelectorTerm"},
@@ -56634,6 +56841,11 @@ func schema_k8sio_api_core_v1_NodeSelectorTerm(ref common.ReferenceCallback) com
 					},
 				},
 			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
+			},
 		},
 		Dependencies: []string{
 			"k8s.io/api/core/v1.NodeSelectorRequirement"},
@@ -56704,7 +56916,7 @@ func schema_k8sio_api_core_v1_NodeSpec(ref common.ReferenceCallback) common.Open
 					},
 					"configSource": {
 						SchemaProps: spec.SchemaProps{
-							Description: "If specified, the source to get node configuration from The DynamicKubeletConfig feature gate must be enabled for the Kubelet to use this field",
+							Description: "Deprecated. If specified, the source of the node's configuration. The DynamicKubeletConfig feature gate must be enabled for the Kubelet to use this field. This field is deprecated as of 1.22: https://git.k8s.io/enhancements/keps/sig-node/281-dynamic-kubelet-configuration",
 							Ref:         ref("k8s.io/api/core/v1.NodeConfigSource"),
 						},
 					},
@@ -56997,6 +57209,11 @@ func schema_k8sio_api_core_v1_ObjectFieldSelector(ref common.ReferenceCallback) 
 				},
 				Required: []string{"fieldPath"},
 			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
+			},
 		},
 	}
 }
@@ -57057,6 +57274,11 @@ func schema_k8sio_api_core_v1_ObjectReference(ref common.ReferenceCallback) comm
 							Format:      "",
 						},
 					},
+				},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
 				},
 			},
 		},
@@ -57330,7 +57552,13 @@ func schema_k8sio_api_core_v1_PersistentVolumeClaimSpec(ref common.ReferenceCall
 					},
 					"dataSource": {
 						SchemaProps: spec.SchemaProps{
-							Description: "This field can be used to specify either: * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot) * An existing PVC (PersistentVolumeClaim) * An existing custom resource that implements data population (Alpha) In order to use custom resource types that implement data population, the AnyVolumeDataSource feature gate must be enabled. If the provisioner or an external controller can support the specified data source, it will create a new volume based on the contents of the specified data source.",
+							Description: "This field can be used to specify either: * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot) * An existing PVC (PersistentVolumeClaim) If the provisioner or an external controller can support the specified data source, it will create a new volume based on the contents of the specified data source. If the AnyVolumeDataSource feature gate is enabled, this field will always have the same contents as the DataSourceRef field.",
+							Ref:         ref("k8s.io/api/core/v1.TypedLocalObjectReference"),
+						},
+					},
+					"dataSourceRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Specifies the object from which to populate the volume with data, if a non-empty volume is desired. This may be any local object from a non-empty API group (non core object) or a PersistentVolumeClaim object. When this field is specified, volume binding will only succeed if the type of the specified object matches some installed volume populator or dynamic provisioner. This field will replace the functionality of the DataSource field and as such if both fields are non-empty, they must have the same value. For backwards compatibility, both fields (DataSource and DataSourceRef) will be set to the same value automatically if one of them is empty and the other is non-empty. There are two important differences between DataSource and DataSourceRef: * While DataSource only allows two specific types of objects, DataSourceRef\n  allows any non-core object, as well as PersistentVolumeClaim objects.\n* While DataSource ignores disallowed values (dropping them), DataSourceRef\n  preserves all values, and generates an error if a disallowed value is\n  specified.\n(Alpha) Using this field requires the AnyVolumeDataSource feature gate to be enabled.",
 							Ref:         ref("k8s.io/api/core/v1.TypedLocalObjectReference"),
 						},
 					},
@@ -58090,7 +58318,7 @@ func schema_k8sio_api_core_v1_PodAffinityTerm(ref common.ReferenceCallback) comm
 					},
 					"namespaceSelector": {
 						SchemaProps: spec.SchemaProps{
-							Description: "A label query over the set of namespaces that the term applies to. The term is applied to the union of the namespaces selected by this field and the ones listed in the namespaces field. null selector and null or empty namespaces list means \"this pod's namespace\". An empty selector ({}) matches all namespaces. This field is alpha-level and is only honored when PodAffinityNamespaceSelector feature is enabled.",
+							Description: "A label query over the set of namespaces that the term applies to. The term is applied to the union of the namespaces selected by this field and the ones listed in the namespaces field. null selector and null or empty namespaces list means \"this pod's namespace\". An empty selector ({}) matches all namespaces. This field is beta-level and is only honored when PodAffinityNamespaceSelector feature is enabled.",
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
 						},
 					},
@@ -58925,6 +59153,11 @@ func schema_k8sio_api_core_v1_PodSpec(ref common.ReferenceCallback) common.OpenA
 						},
 					},
 					"nodeSelector": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-map-type": "atomic",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "NodeSelector is a selector which must be true for the pod to fit on a node. Selector which must match a node's labels for the pod to be scheduled on that node. More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/",
 							Type:        []string{"object"},
@@ -59105,7 +59338,7 @@ func schema_k8sio_api_core_v1_PodSpec(ref common.ReferenceCallback) common.OpenA
 					},
 					"readinessGates": {
 						SchemaProps: spec.SchemaProps{
-							Description: "If specified, all readiness gates will be evaluated for pod readiness. A pod is ready when all its containers are ready AND all conditions specified in the readiness gates have status equal to \"True\" More info: https://git.k8s.io/enhancements/keps/sig-network/0007-pod-ready%2B%2B.md",
+							Description: "If specified, all readiness gates will be evaluated for pod readiness. A pod is ready when all its containers are ready AND all conditions specified in the readiness gates have status equal to \"True\" More info: https://git.k8s.io/enhancements/keps/sig-network/580-pod-readiness-gates",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -59119,7 +59352,7 @@ func schema_k8sio_api_core_v1_PodSpec(ref common.ReferenceCallback) common.OpenA
 					},
 					"runtimeClassName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "RuntimeClassName refers to a RuntimeClass object in the node.k8s.io group, which should be used to run this pod.  If no RuntimeClass resource matches the named class, the pod will not be run. If unset or empty, the \"legacy\" RuntimeClass will be used, which is an implicit class with an empty definition that uses the default runtime handler. More info: https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md This is a beta feature as of Kubernetes v1.14.",
+							Description: "RuntimeClassName refers to a RuntimeClass object in the node.k8s.io group, which should be used to run this pod.  If no RuntimeClass resource matches the named class, the pod will not be run. If unset or empty, the \"legacy\" RuntimeClass will be used, which is an implicit class with an empty definition that uses the default runtime handler. More info: https://git.k8s.io/enhancements/keps/sig-node/585-runtime-class This is a beta feature as of Kubernetes v1.14.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -59140,7 +59373,7 @@ func schema_k8sio_api_core_v1_PodSpec(ref common.ReferenceCallback) common.OpenA
 					},
 					"overhead": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. This field will be autopopulated at admission time by the RuntimeClass admission controller. If the RuntimeClass admission controller is enabled, overhead must not be set in Pod create requests. The RuntimeClass admission controller will reject Pod create requests which have the overhead already set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero. More info: https://git.k8s.io/enhancements/keps/sig-node/20190226-pod-overhead.md This field is alpha-level as of Kubernetes v1.16, and is only honored by servers that enable the PodOverhead feature.",
+							Description: "Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. This field will be autopopulated at admission time by the RuntimeClass admission controller. If the RuntimeClass admission controller is enabled, overhead must not be set in Pod create requests. The RuntimeClass admission controller will reject Pod create requests which have the overhead already set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero. More info: https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md This field is beta-level as of Kubernetes v1.18, and is only honored by servers that enable the PodOverhead feature.",
 							Type:        []string{"object"},
 							AdditionalProperties: &spec.SchemaOrBool{
 								Allows: true,
@@ -59721,7 +59954,7 @@ func schema_k8sio_api_core_v1_Probe(ref common.ReferenceCallback) common.OpenAPI
 					},
 					"terminationGracePeriodSeconds": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Optional duration in seconds the pod needs to terminate gracefully upon probe failure. The grace period is the duration in seconds after the processes running in the pod are sent a termination signal and the time when the processes are forcibly halted with a kill signal. Set this value longer than the expected cleanup time for your process. If this value is nil, the pod's terminationGracePeriodSeconds will be used. Otherwise, this value overrides the value provided by the pod spec. Value must be non-negative integer. The value zero indicates stop immediately via the kill signal (no opportunity to shut down). This is an alpha field and requires enabling ProbeTerminationGracePeriod feature gate.",
+							Description: "Optional duration in seconds the pod needs to terminate gracefully upon probe failure. The grace period is the duration in seconds after the processes running in the pod are sent a termination signal and the time when the processes are forcibly halted with a kill signal. Set this value longer than the expected cleanup time for your process. If this value is nil, the pod's terminationGracePeriodSeconds will be used. Otherwise, this value overrides the value provided by the pod spec. Value must be non-negative integer. The value zero indicates stop immediately via the kill signal (no opportunity to shut down). This is a beta field and requires enabling ProbeTerminationGracePeriod feature gate. Minimum value is 1. spec.terminationGracePeriodSeconds is used if unset.",
 							Type:        []string{"integer"},
 							Format:      "int64",
 						},
@@ -60216,6 +60449,11 @@ func schema_k8sio_api_core_v1_ReplicationControllerSpec(ref common.ReferenceCall
 						},
 					},
 					"selector": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-map-type": "atomic",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Selector is a label query over pods that should match the Replicas count. If Selector is empty, it is defaulted to the labels present on the Pod template. Label keys and values that must match in order to be controlled by this replication controller, if empty defaulted to labels on Pod template. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors",
 							Type:        []string{"object"},
@@ -60348,6 +60586,11 @@ func schema_k8sio_api_core_v1_ResourceFieldSelector(ref common.ReferenceCallback
 					},
 				},
 				Required: []string{"resource"},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
 			},
 		},
 		Dependencies: []string{
@@ -60835,6 +61078,11 @@ func schema_k8sio_api_core_v1_ScopeSelector(ref common.ReferenceCallback) common
 					},
 				},
 			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
+			},
 		},
 		Dependencies: []string{
 			"k8s.io/api/core/v1.ScopedResourceSelectorRequirement"},
@@ -61067,6 +61315,11 @@ func schema_k8sio_api_core_v1_SecretKeySelector(ref common.ReferenceCallback) co
 				},
 				Required: []string{"key"},
 			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
+			},
 		},
 	}
 }
@@ -61186,6 +61439,11 @@ func schema_k8sio_api_core_v1_SecretReference(ref common.ReferenceCallback) comm
 							Format:      "",
 						},
 					},
+				},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
 				},
 			},
 		},
@@ -61655,7 +61913,7 @@ func schema_k8sio_api_core_v1_ServicePort(ref common.ReferenceCallback) common.O
 					},
 					"appProtocol": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The application protocol for this port. This field follows standard Kubernetes label syntax. Un-prefixed names are reserved for IANA standard service names (as per RFC-6335 and http://www.iana.org/assignments/service-names). Non-standard protocols should use prefixed names such as mycompany.com/my-custom-protocol. This is a beta field that is guarded by the ServiceAppProtocol feature gate and enabled by default.",
+							Description: "The application protocol for this port. This field follows standard Kubernetes label syntax. Un-prefixed names are reserved for IANA standard service names (as per RFC-6335 and http://www.iana.org/assignments/service-names). Non-standard protocols should use prefixed names such as mycompany.com/my-custom-protocol.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -61758,6 +62016,11 @@ func schema_k8sio_api_core_v1_ServiceSpec(ref common.ReferenceCallback) common.O
 						},
 					},
 					"selector": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-map-type": "atomic",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Route service traffic to pods with label keys and values matching this selector. If empty or not present, the service is assumed to have an external process managing its endpoints, which Kubernetes will not modify. Only applies to types ClusterIP, NodePort, and LoadBalancer. Ignored if type is ExternalName. More info: https://kubernetes.io/docs/concepts/services-networking/service/",
 							Type:        []string{"object"},
@@ -61838,7 +62101,7 @@ func schema_k8sio_api_core_v1_ServiceSpec(ref common.ReferenceCallback) common.O
 					},
 					"loadBalancerSourceRanges": {
 						SchemaProps: spec.SchemaProps{
-							Description: "If specified and supported by the platform, this will restrict traffic through the cloud-provider load-balancer will be restricted to the specified client IPs. This field will be ignored if the cloud-provider does not support the feature.\" More info: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/",
+							Description: "If specified and supported by the platform, this will restrict traffic through the cloud-provider load-balancer will be restricted to the specified client IPs. This field will be ignored if the cloud-provider does not support the feature.\" More info: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -61885,21 +62148,6 @@ func schema_k8sio_api_core_v1_ServiceSpec(ref common.ReferenceCallback) common.O
 							Ref:         ref("k8s.io/api/core/v1.SessionAffinityConfig"),
 						},
 					},
-					"topologyKeys": {
-						SchemaProps: spec.SchemaProps{
-							Description: "topologyKeys is a preference-order list of topology keys which implementations of services should use to preferentially sort endpoints when accessing this Service, it can not be used at the same time as externalTrafficPolicy=Local. Topology keys must be valid label keys and at most 16 keys may be specified. Endpoints are chosen based on the first topology key with available backends. If this field is specified and all entries have no backends that match the topology of the client, the service has no backends for that client and connections should fail. The special value \"*\" may be used to mean \"any topology\". This catch-all value, if used, only makes sense as the last value in the list. If this is not specified or empty, no topology constraints will be applied. This field is alpha-level and is only honored by servers that enable the ServiceTopology feature. This field is deprecated and will be removed in a future version.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
-									},
-								},
-							},
-						},
-					},
 					"ipFamilies": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
@@ -61929,7 +62177,7 @@ func schema_k8sio_api_core_v1_ServiceSpec(ref common.ReferenceCallback) common.O
 					},
 					"allocateLoadBalancerNodePorts": {
 						SchemaProps: spec.SchemaProps{
-							Description: "allocateLoadBalancerNodePorts defines if NodePorts will be automatically allocated for services with type LoadBalancer.  Default is \"true\". It may be set to \"false\" if the cluster load-balancer does not rely on NodePorts. allocateLoadBalancerNodePorts may only be set for services with type LoadBalancer and will be cleared if the type is changed to any other type. This field is alpha-level and is only honored by servers that enable the ServiceLBNodePortControl feature.",
+							Description: "allocateLoadBalancerNodePorts defines if NodePorts will be automatically allocated for services with type LoadBalancer.  Default is \"true\". It may be set to \"false\" if the cluster load-balancer does not rely on NodePorts.  If the caller requests specific NodePorts (by specifying a value), those requests will be respected, regardless of this field. This field may only be set for services with type LoadBalancer and will be cleared if the type is changed to any other type. This field is beta-level and is only honored by servers that enable the ServiceLBNodePortControl feature.",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -62334,6 +62582,11 @@ func schema_k8sio_api_core_v1_TopologySelectorTerm(ref common.ReferenceCallback)
 					},
 				},
 			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
+			},
 		},
 		Dependencies: []string{
 			"k8s.io/api/core/v1.TopologySelectorLabelRequirement"},
@@ -62418,6 +62671,11 @@ func schema_k8sio_api_core_v1_TypedLocalObjectReference(ref common.ReferenceCall
 					},
 				},
 				Required: []string{"kind", "name"},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
 			},
 		},
 	}
@@ -63060,6 +63318,13 @@ func schema_k8sio_api_core_v1_WindowsSecurityContextOptions(ref common.Reference
 							Format:      "",
 						},
 					},
+					"hostProcess": {
+						SchemaProps: spec.SchemaProps{
+							Description: "HostProcess determines if a container should be run as a 'Host Process' container. This field is alpha-level and will only be honored by components that enable the WindowsHostProcessContainers feature flag. Setting this field without the feature flag will result in errors when validating the Pod. All of a Pod's containers must have the same effective HostProcess value (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).  In addition, if HostProcess is true then HostNetwork must also be set to true.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
 				},
 			},
 		},
@@ -63261,6 +63526,11 @@ func schema_k8sio_api_discovery_v1_EndpointPort(ref common.ReferenceCallback) co
 							Format:      "",
 						},
 					},
+				},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
 				},
 			},
 		},
@@ -64592,7 +64862,8 @@ func schema_k8sio_api_extensions_v1beta1_DaemonSetUpdateStrategy(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "DaemonSetUpdateStrategy indicates the strategy that the DaemonSet controller will use to perform updates. It includes any additional parameters necessary to perform the update for the indicated strategy.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
 						SchemaProps: spec.SchemaProps{
@@ -65383,7 +65654,8 @@ func schema_k8sio_api_extensions_v1beta1_IngressRule(ref common.ReferenceCallbac
 					},
 					"http": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/api/extensions/v1beta1.HTTPIngressRuleValue"),
+							Description: "http is a list of http selectors pointing to backends. A path is matched against the path of an incoming request. Currently it can contain characters disallowed from the conventional \"path\" part of a URL as defined by RFC 3986. Paths must begin with a '/'. A backend defines the referenced service endpoint to which the traffic will be forwarded to.",
+							Ref:         ref("k8s.io/api/extensions/v1beta1.HTTPIngressRuleValue"),
 						},
 					},
 				},
@@ -65403,7 +65675,8 @@ func schema_k8sio_api_extensions_v1beta1_IngressRuleValue(ref common.ReferenceCa
 				Properties: map[string]spec.Schema{
 					"http": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/api/extensions/v1beta1.HTTPIngressRuleValue"),
+							Description: "http is a list of http selectors pointing to backends. A path is matched against the path of an incoming request. Currently it can contain characters disallowed from the conventional \"path\" part of a URL as defined by RFC 3986. Paths must begin with a '/'. A backend defines the referenced service endpoint to which the traffic will be forwarded to.",
+							Ref:         ref("k8s.io/api/extensions/v1beta1.HTTPIngressRuleValue"),
 						},
 					},
 				},
@@ -65762,7 +66035,7 @@ func schema_k8sio_api_extensions_v1beta1_NetworkPolicyPort(ref common.ReferenceC
 					},
 					"endPort": {
 						SchemaProps: spec.SchemaProps{
-							Description: "If set, indicates that the range of ports from port to endPort, inclusive, should be allowed by the policy. This field cannot be defined if the port field is not defined or if the port field is defined as a named (string) port. The endPort must be equal or greater than port. This feature is in Alpha state and should be enabled using the Feature Gate \"NetworkPolicyEndPort\".",
+							Description: "If set, indicates that the range of ports from port to endPort, inclusive, should be allowed by the policy. This field cannot be defined if the port field is not defined or if the port field is defined as a named (string) port. The endPort must be equal or greater than port. This feature is in Beta state and is enabled by default. It can be disabled using the Feature Gate \"NetworkPolicyEndPort\".",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
@@ -66498,7 +66771,7 @@ func schema_k8sio_api_extensions_v1beta1_RollingUpdateDaemonSet(ref common.Refer
 				Properties: map[string]spec.Schema{
 					"maxUnavailable": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The maximum number of DaemonSet pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of total number of DaemonSet pods at the start of the update (ex: 10%). Absolute number is calculated from percentage by rounding down to a minimum of one. This cannot be 0 if MaxSurge is 0 Default value is 1. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their pods stopped for an update at any given time. The update starts by stopping at most 30% of those DaemonSet pods and then brings up new DaemonSet pods in their place. Once the new pods are available, it then proceeds onto other DaemonSet pods, thus ensuring that at least 70% of original number of DaemonSet pods are available at all times during the update.",
+							Description: "The maximum number of DaemonSet pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of total number of DaemonSet pods at the start of the update (ex: 10%). Absolute number is calculated from percentage by rounding up. This cannot be 0 if MaxSurge is 0 Default value is 1. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their pods stopped for an update at any given time. The update starts by stopping at most 30% of those DaemonSet pods and then brings up new DaemonSet pods in their place. Once the new pods are available, it then proceeds onto other DaemonSet pods, thus ensuring that at least 70% of original number of DaemonSet pods are available at all times during the update.",
 							Ref:         ref("k8s.io/apimachinery/pkg/util/intstr.IntOrString"),
 						},
 					},
@@ -66771,6 +67044,11 @@ func schema_k8sio_api_extensions_v1beta1_ScaleStatus(ref common.ReferenceCallbac
 						},
 					},
 					"selector": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-map-type": "atomic",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "label query over pods that should match the replicas count. More info: http://kubernetes.io/docs/user-guide/labels#label-selectors",
 							Type:        []string{"object"},
@@ -67752,7 +68030,7 @@ func schema_k8sio_api_flowcontrol_v1alpha1_Subject(ref common.ReferenceCallback)
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Required",
+							Description: "`kind` indicates which one of the other fields is non-empty. Required",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -67760,17 +68038,20 @@ func schema_k8sio_api_flowcontrol_v1alpha1_Subject(ref common.ReferenceCallback)
 					},
 					"user": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/api/flowcontrol/v1alpha1.UserSubject"),
+							Description: "`user` matches based on username.",
+							Ref:         ref("k8s.io/api/flowcontrol/v1alpha1.UserSubject"),
 						},
 					},
 					"group": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/api/flowcontrol/v1alpha1.GroupSubject"),
+							Description: "`group` matches based on user group name.",
+							Ref:         ref("k8s.io/api/flowcontrol/v1alpha1.GroupSubject"),
 						},
 					},
 					"serviceAccount": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/api/flowcontrol/v1alpha1.ServiceAccountSubject"),
+							Description: "`serviceAccount` matches ServiceAccounts.",
+							Ref:         ref("k8s.io/api/flowcontrol/v1alpha1.ServiceAccountSubject"),
 						},
 					},
 				},
@@ -68734,7 +69015,7 @@ func schema_k8sio_api_flowcontrol_v1beta1_Subject(ref common.ReferenceCallback) 
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Required",
+							Description: "`kind` indicates which one of the other fields is non-empty. Required",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -68742,17 +69023,20 @@ func schema_k8sio_api_flowcontrol_v1beta1_Subject(ref common.ReferenceCallback) 
 					},
 					"user": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/api/flowcontrol/v1beta1.UserSubject"),
+							Description: "`user` matches based on username.",
+							Ref:         ref("k8s.io/api/flowcontrol/v1beta1.UserSubject"),
 						},
 					},
 					"group": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/api/flowcontrol/v1beta1.GroupSubject"),
+							Description: "`group` matches based on user group name.",
+							Ref:         ref("k8s.io/api/flowcontrol/v1beta1.GroupSubject"),
 						},
 					},
 					"serviceAccount": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/api/flowcontrol/v1beta1.ServiceAccountSubject"),
+							Description: "`serviceAccount` matches ServiceAccounts.",
+							Ref:         ref("k8s.io/api/flowcontrol/v1beta1.ServiceAccountSubject"),
 						},
 					},
 				},
@@ -68823,8 +69107,9 @@ func schema_k8sio_api_imagepolicy_v1alpha1_ImageReview(ref common.ReferenceCallb
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -68976,7 +69261,7 @@ func schema_k8sio_api_networking_v1_HTTPIngressPath(ref common.ReferenceCallback
 				Properties: map[string]spec.Schema{
 					"path": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Path is matched against the path of an incoming request. Currently it can contain characters disallowed from the conventional \"path\" part of a URL as defined by RFC 3986. Paths must begin with a '/'. When unspecified, all paths from incoming requests are matched.",
+							Description: "Path is matched against the path of an incoming request. Currently it can contain characters disallowed from the conventional \"path\" part of a URL as defined by RFC 3986. Paths must begin with a '/' and must be present when using PathType with value \"Exact\" or \"Prefix\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -68996,7 +69281,7 @@ func schema_k8sio_api_networking_v1_HTTPIngressPath(ref common.ReferenceCallback
 						},
 					},
 				},
-				Required: []string{"backend"},
+				Required: []string{"pathType", "backend"},
 			},
 		},
 		Dependencies: []string{
@@ -69818,7 +70103,7 @@ func schema_k8sio_api_networking_v1_NetworkPolicyPort(ref common.ReferenceCallba
 					},
 					"endPort": {
 						SchemaProps: spec.SchemaProps{
-							Description: "If set, indicates that the range of ports from port to endPort, inclusive, should be allowed by the policy. This field cannot be defined if the port field is not defined or if the port field is defined as a named (string) port. The endPort must be equal or greater than port. This feature is in Alpha state and should be enabled using the Feature Gate \"NetworkPolicyEndPort\".",
+							Description: "If set, indicates that the range of ports from port to endPort, inclusive, should be allowed by the policy. This field cannot be defined if the port field is not defined or if the port field is defined as a named (string) port. The endPort must be equal or greater than port. This feature is in Beta state and is enabled by default. It can be disabled using the Feature Gate \"NetworkPolicyEndPort\".",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
@@ -69933,7 +70218,7 @@ func schema_k8sio_api_networking_v1beta1_HTTPIngressPath(ref common.ReferenceCal
 				Properties: map[string]spec.Schema{
 					"path": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Path is matched against the path of an incoming request. Currently it can contain characters disallowed from the conventional \"path\" part of a URL as defined by RFC 3986. Paths must begin with a '/'. When unspecified, all paths from incoming requests are matched.",
+							Description: "Path is matched against the path of an incoming request. Currently it can contain characters disallowed from the conventional \"path\" part of a URL as defined by RFC 3986. Paths must begin with a '/' and must be present when using PathType with value \"Exact\" or \"Prefix\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -70606,6 +70891,11 @@ func schema_k8sio_api_node_v1_Scheduling(ref common.ReferenceCallback) common.Op
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"nodeSelector": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-map-type": "atomic",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "nodeSelector lists labels that must be present on nodes that support this RuntimeClass. Pods using this RuntimeClass can only be scheduled to a node matched by this selector. The RuntimeClass nodeSelector is merged with a pod's existing nodeSelector. Any conflicts will cause the pod to be rejected in admission.",
 							Type:        []string{"object"},
@@ -70682,7 +70972,7 @@ func schema_k8sio_api_node_v1alpha1_RuntimeClass(ref common.ReferenceCallback) c
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md",
+				Description: "RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/585-runtime-class",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -70790,7 +71080,7 @@ func schema_k8sio_api_node_v1alpha1_RuntimeClassSpec(ref common.ReferenceCallbac
 					},
 					"overhead": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. For more details, see https://git.k8s.io/enhancements/keps/sig-node/20190226-pod-overhead.md This field is alpha-level as of Kubernetes v1.15, and is only honored by servers that enable the PodOverhead feature.",
+							Description: "Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. For more details, see https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md This field is beta-level as of Kubernetes v1.18, and is only honored by servers that enable the PodOverhead feature.",
 							Ref:         ref("k8s.io/api/node/v1alpha1.Overhead"),
 						},
 					},
@@ -70817,6 +71107,11 @@ func schema_k8sio_api_node_v1alpha1_Scheduling(ref common.ReferenceCallback) com
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"nodeSelector": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-map-type": "atomic",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "nodeSelector lists labels that must be present on nodes that support this RuntimeClass. Pods using this RuntimeClass can only be scheduled to a node matched by this selector. The RuntimeClass nodeSelector is merged with a pod's existing nodeSelector. Any conflicts will cause the pod to be rejected in admission.",
 							Type:        []string{"object"},
@@ -70893,7 +71188,7 @@ func schema_k8sio_api_node_v1beta1_RuntimeClass(ref common.ReferenceCallback) co
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md",
+				Description: "RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/585-runtime-class",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -70927,7 +71222,7 @@ func schema_k8sio_api_node_v1beta1_RuntimeClass(ref common.ReferenceCallback) co
 					},
 					"overhead": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. For more details, see https://git.k8s.io/enhancements/keps/sig-node/20190226-pod-overhead.md This field is alpha-level as of Kubernetes v1.15, and is only honored by servers that enable the PodOverhead feature.",
+							Description: "Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. For more details, see https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md This field is beta-level as of Kubernetes v1.18, and is only honored by servers that enable the PodOverhead feature.",
 							Ref:         ref("k8s.io/api/node/v1beta1.Overhead"),
 						},
 					},
@@ -71005,6 +71300,11 @@ func schema_k8sio_api_node_v1beta1_Scheduling(ref common.ReferenceCallback) comm
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"nodeSelector": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-map-type": "atomic",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "nodeSelector lists labels that must be present on nodes that support this RuntimeClass. Pods using this RuntimeClass can only be scheduled to a node matched by this selector. The RuntimeClass nodeSelector is merged with a pod's existing nodeSelector. Any conflicts will cause the pod to be rejected in admission.",
 							Type:        []string{"object"},
@@ -71044,6 +71344,48 @@ func schema_k8sio_api_node_v1beta1_Scheduling(ref common.ReferenceCallback) comm
 		},
 		Dependencies: []string{
 			"k8s.io/api/core/v1.Toleration"},
+	}
+}
+
+func schema_k8sio_api_policy_v1_Eviction(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Eviction evicts a pod from its node subject to certain policies and safety constraints. This is a subresource of Pod.  A request to cause such an eviction is created by POSTing to .../pods/<pod name>/evictions.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ObjectMeta describes the pod that is being evicted.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"deleteOptions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "DeleteOptions may be provided",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.DeleteOptions"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.DeleteOptions", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
@@ -71512,8 +71854,9 @@ func schema_k8sio_api_policy_v1beta1_PodDisruptionBudget(ref common.ReferenceCal
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -71561,13 +71904,15 @@ func schema_k8sio_api_policy_v1beta1_PodDisruptionBudgetList(ref common.Referenc
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
 						},
 					},
 					"items": {
 						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
+							Description: "items list individual PodDisruptionBudget objects",
+							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
@@ -72511,7 +72856,7 @@ func schema_k8sio_api_rbac_v1_PolicyRule(ref common.ReferenceCallback) common.Op
 				Properties: map[string]spec.Schema{
 					"verbs": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Verbs is a list of Verbs that apply to ALL the ResourceKinds and AttributeRestrictions contained in this rule.  VerbAll represents all kinds.",
+							Description: "Verbs is a list of Verbs that apply to ALL the ResourceKinds and AttributeRestrictions contained in this rule. '*' represents all verbs.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -72541,7 +72886,7 @@ func schema_k8sio_api_rbac_v1_PolicyRule(ref common.ReferenceCallback) common.Op
 					},
 					"resources": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Resources is a list of resources this rule applies to.  ResourceAll represents all resources.",
+							Description: "Resources is a list of resources this rule applies to. '*' represents all resources.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -72835,6 +73180,11 @@ func schema_k8sio_api_rbac_v1_RoleRef(ref common.ReferenceCallback) common.OpenA
 				},
 				Required: []string{"apiGroup", "kind", "name"},
 			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
+			},
 		},
 	}
 }
@@ -72878,6 +73228,11 @@ func schema_k8sio_api_rbac_v1_Subject(ref common.ReferenceCallback) common.OpenA
 					},
 				},
 				Required: []string{"kind", "name"},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
 			},
 		},
 	}
@@ -73137,7 +73492,7 @@ func schema_k8sio_api_rbac_v1alpha1_PolicyRule(ref common.ReferenceCallback) com
 				Properties: map[string]spec.Schema{
 					"verbs": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Verbs is a list of Verbs that apply to ALL the ResourceKinds and AttributeRestrictions contained in this rule.  VerbAll represents all kinds.",
+							Description: "Verbs is a list of Verbs that apply to ALL the ResourceKinds and AttributeRestrictions contained in this rule. '*' represents all verbs.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -73167,7 +73522,7 @@ func schema_k8sio_api_rbac_v1alpha1_PolicyRule(ref common.ReferenceCallback) com
 					},
 					"resources": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Resources is a list of resources this rule applies to.  ResourceAll represents all resources.",
+							Description: "Resources is a list of resources this rule applies to. '*' represents all resources.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -73763,7 +74118,7 @@ func schema_k8sio_api_rbac_v1beta1_PolicyRule(ref common.ReferenceCallback) comm
 				Properties: map[string]spec.Schema{
 					"verbs": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Verbs is a list of Verbs that apply to ALL the ResourceKinds and AttributeRestrictions contained in this rule.  VerbAll represents all kinds.",
+							Description: "Verbs is a list of Verbs that apply to ALL the ResourceKinds and AttributeRestrictions contained in this rule. '*' represents all verbs.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -74631,7 +74986,7 @@ func schema_k8sio_api_storage_v1_CSIDriverSpec(ref common.ReferenceCallback) com
 					},
 					"fsGroupPolicy": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Defines if the underlying volume supports changing ownership and permission of the volume before being mounted. Refer to the specific FSGroupPolicy values for additional details. This field is alpha-level, and is only honored by servers that enable the CSIVolumeFSGroupPolicy feature gate.\n\nThis field is immutable.",
+							Description: "Defines if the underlying volume supports changing ownership and permission of the volume before being mounted. Refer to the specific FSGroupPolicy values for additional details. This field is beta, and is only honored by servers that enable the CSIVolumeFSGroupPolicy feature gate.\n\nThis field is immutable.\n\nDefaults to ReadWriteOnceWithFSType, which will examine each volume to determine if Kubernetes should modify ownership and permissions of the volume. With the default policy the defined fsGroup will only be applied if a fstype is defined and the volume's access mode contains ReadWriteOnce.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -74643,7 +74998,7 @@ func schema_k8sio_api_storage_v1_CSIDriverSpec(ref common.ReferenceCallback) com
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "TokenRequests indicates the CSI driver needs pods' service account tokens it is mounting volume for to do necessary authentication. Kubelet will pass the tokens in VolumeContext in the CSI NodePublishVolume calls. The CSI driver should parse and validate the following VolumeContext: \"csi.storage.k8s.io/serviceAccount.tokens\": {\n  \"<audience>\": {\n    \"token\": <token>,\n    \"expirationTimestamp\": <expiration timestamp in RFC3339>,\n  },\n  ...\n}\n\nNote: Audience in each TokenRequest should be different and at most one token is empty string. To receive a new token after expiry, RequiresRepublish can be used to trigger NodePublishVolume periodically.\n\nThis is a beta feature and only available when the CSIServiceAccountToken feature is enabled.",
+							Description: "TokenRequests indicates the CSI driver needs pods' service account tokens it is mounting volume for to do necessary authentication. Kubelet will pass the tokens in VolumeContext in the CSI NodePublishVolume calls. The CSI driver should parse and validate the following VolumeContext: \"csi.storage.k8s.io/serviceAccount.tokens\": {\n  \"<audience>\": {\n    \"token\": <token>,\n    \"expirationTimestamp\": <expiration timestamp in RFC3339>,\n  },\n  ...\n}\n\nNote: Audience in each TokenRequest should be different and at most one token is empty string. To receive a new token after expiry, RequiresRepublish can be used to trigger NodePublishVolume periodically.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -74657,7 +75012,7 @@ func schema_k8sio_api_storage_v1_CSIDriverSpec(ref common.ReferenceCallback) com
 					},
 					"requiresRepublish": {
 						SchemaProps: spec.SchemaProps{
-							Description: "RequiresRepublish indicates the CSI driver wants `NodePublishVolume` being periodically called to reflect any possible change in the mounted volume. This field defaults to false.\n\nNote: After a successful initial NodePublishVolume call, subsequent calls to NodePublishVolume should only update the contents of the volume. New mount points will not be seen by a running container.\n\nThis is a beta feature and only available when the CSIServiceAccountToken feature is enabled.",
+							Description: "RequiresRepublish indicates the CSI driver wants `NodePublishVolume` being periodically called to reflect any possible change in the mounted volume. This field defaults to false.\n\nNote: After a successful initial NodePublishVolume call, subsequent calls to NodePublishVolume should only update the contents of the volume. New mount points will not be seen by a running container.",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -74943,6 +75298,11 @@ func schema_k8sio_api_storage_v1_StorageClass(ref common.ReferenceCallback) comm
 						},
 					},
 					"allowedTopologies": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Restrict the node topologies where volumes can be dynamically provisioned. Each volume plugin defines its own supported topology specifications. An empty TopologySelectorTerm list means there is no topology restriction. This field is only honored by servers that enable the VolumeScheduling feature.",
 							Type:        []string{"array"},
@@ -75827,7 +76187,7 @@ func schema_k8sio_api_storage_v1beta1_CSIDriverSpec(ref common.ReferenceCallback
 					},
 					"fsGroupPolicy": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Defines if the underlying volume supports changing ownership and permission of the volume before being mounted. Refer to the specific FSGroupPolicy values for additional details. This field is alpha-level, and is only honored by servers that enable the CSIVolumeFSGroupPolicy feature gate.\n\nThis field is immutable.",
+							Description: "Defines if the underlying volume supports changing ownership and permission of the volume before being mounted. Refer to the specific FSGroupPolicy values for additional details. This field is beta, and is only honored by servers that enable the CSIVolumeFSGroupPolicy feature gate.\n\nThis field is immutable.\n\nDefaults to ReadWriteOnceWithFSType, which will examine each volume to determine if Kubernetes should modify ownership and permissions of the volume. With the default policy the defined fsGroup will only be applied if a fstype is defined and the volume's access mode contains ReadWriteOnce.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -75839,7 +76199,7 @@ func schema_k8sio_api_storage_v1beta1_CSIDriverSpec(ref common.ReferenceCallback
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "TokenRequests indicates the CSI driver needs pods' service account tokens it is mounting volume for to do necessary authentication. Kubelet will pass the tokens in VolumeContext in the CSI NodePublishVolume calls. The CSI driver should parse and validate the following VolumeContext: \"csi.storage.k8s.io/serviceAccount.tokens\": {\n  \"<audience>\": {\n    \"token\": <token>,\n    \"expirationTimestamp\": <expiration timestamp in RFC3339>,\n  },\n  ...\n}\n\nNote: Audience in each TokenRequest should be different and at most one token is empty string. To receive a new token after expiry, RequiresRepublish can be used to trigger NodePublishVolume periodically.\n\nThis is a beta feature and only available when the CSIServiceAccountToken feature is enabled.",
+							Description: "TokenRequests indicates the CSI driver needs pods' service account tokens it is mounting volume for to do necessary authentication. Kubelet will pass the tokens in VolumeContext in the CSI NodePublishVolume calls. The CSI driver should parse and validate the following VolumeContext: \"csi.storage.k8s.io/serviceAccount.tokens\": {\n  \"<audience>\": {\n    \"token\": <token>,\n    \"expirationTimestamp\": <expiration timestamp in RFC3339>,\n  },\n  ...\n}\n\nNote: Audience in each TokenRequest should be different and at most one token is empty string. To receive a new token after expiry, RequiresRepublish can be used to trigger NodePublishVolume periodically.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -75853,7 +76213,7 @@ func schema_k8sio_api_storage_v1beta1_CSIDriverSpec(ref common.ReferenceCallback
 					},
 					"requiresRepublish": {
 						SchemaProps: spec.SchemaProps{
-							Description: "RequiresRepublish indicates the CSI driver wants `NodePublishVolume` being periodically called to reflect any possible change in the mounted volume. This field defaults to false.\n\nNote: After a successful initial NodePublishVolume call, subsequent calls to NodePublishVolume should only update the contents of the volume. New mount points will not be seen by a running container.\n\nThis is a beta feature and only available when the CSIServiceAccountToken feature is enabled.",
+							Description: "RequiresRepublish indicates the CSI driver wants `NodePublishVolume` being periodically called to reflect any possible change in the mounted volume. This field defaults to false.\n\nNote: After a successful initial NodePublishVolume call, subsequent calls to NodePublishVolume should only update the contents of the volume. New mount points will not be seen by a running container.",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -76261,6 +76621,11 @@ func schema_k8sio_api_storage_v1beta1_StorageClass(ref common.ReferenceCallback)
 						},
 					},
 					"allowedTopologies": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Restrict the node topologies where volumes can be dynamically provisioned. Each volume plugin defines its own supported topology specifications. An empty TopologySelectorTerm list means there is no topology restriction. This field is only honored by servers that enable the VolumeScheduling feature.",
 							Type:        []string{"array"},
@@ -76877,8 +77242,9 @@ func schema_pkg_apis_apiextensions_v1_CustomResourceDefinition(ref common.Refere
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard object's metadata More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -76980,8 +77346,9 @@ func schema_pkg_apis_apiextensions_v1_CustomResourceDefinitionList(ref common.Re
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							Description: "Standard object's metadata More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
 						},
 					},
 					"items": {
@@ -78180,8 +78547,9 @@ func schema_pkg_apis_apiextensions_v1beta1_CustomResourceDefinition(ref common.R
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard object's metadata More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -78283,8 +78651,9 @@ func schema_pkg_apis_apiextensions_v1beta1_CustomResourceDefinitionList(ref comm
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							Description: "Standard object's metadata More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
 						},
 					},
 					"items": {
@@ -80348,7 +80717,7 @@ func schema_pkg_apis_meta_v1_ListOptions(ref common.ReferenceCallback) common.Op
 					},
 					"allowWatchBookmarks": {
 						SchemaProps: spec.SchemaProps{
-							Description: "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored. If the feature gate WatchBookmarks is not enabled in apiserver, this field is ignored.",
+							Description: "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored.",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -80439,6 +80808,13 @@ func schema_pkg_apis_meta_v1_ManagedFieldsEntry(ref common.ReferenceCallback) co
 						SchemaProps: spec.SchemaProps{
 							Description: "FieldsV1 holds the first JSON version format as described in the \"FieldsV1\" type.",
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.FieldsV1"),
+						},
+					},
+					"subresource": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Subresource is the name of the subresource used to update that object, or empty string if the object was updated through the main resource. The value of this field is used to distinguish between managers, even if they share the same name. For example, a status update will be distinct from a regular update using the same manager name. Note that the APIVersion field is not related to the Subresource field and it always corresponds to the version of the main resource.",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 				},
@@ -80693,6 +81069,11 @@ func schema_pkg_apis_meta_v1_OwnerReference(ref common.ReferenceCallback) common
 					},
 				},
 				Required: []string{"apiVersion", "kind", "name", "uid"},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
 			},
 		},
 	}
@@ -83439,6 +83820,184 @@ func schema_pkg_apis_audit_v1beta1_PolicyRule(ref common.ReferenceCallback) comm
 	}
 }
 
+func schema_pkg_apis_clientauthentication_v1_Cluster(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Cluster contains information to allow an exec plugin to communicate with the kubernetes cluster being authenticated to.\n\nTo ensure that this struct contains everything someone would need to communicate with a kubernetes cluster (just like they would via a kubeconfig), the fields should shadow \"k8s.io/client-go/tools/clientcmd/api/v1\".Cluster, with the exception of CertificateAuthority, since CA data will always be passed to the plugin as bytes.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"server": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Server is the address of the kubernetes cluster (https://hostname:port).",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"tls-server-name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "TLSServerName is passed to the server for SNI and is used in the client to check server certificates against. If ServerName is empty, the hostname used to contact the server is used.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"insecure-skip-tls-verify": {
+						SchemaProps: spec.SchemaProps{
+							Description: "InsecureSkipTLSVerify skips the validity check for the server's certificate. This will make your HTTPS connections insecure.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"certificate-authority-data": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "CAData contains PEM-encoded certificate authority certificates. If empty, system roots should be used.",
+							Type:        []string{"string"},
+							Format:      "byte",
+						},
+					},
+					"proxy-url": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ProxyURL is the URL to the proxy to be used for all requests to this cluster.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"config": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Config holds additional config data that is specific to the exec plugin with regards to the cluster being authenticated to.\n\nThis data is sourced from the clientcmd Cluster object's extensions[client.authentication.k8s.io/exec] field:\n\nclusters: - name: my-cluster\n  cluster:\n    ...\n    extensions:\n    - name: client.authentication.k8s.io/exec  # reserved extension name for per cluster exec config\n      extension:\n        audience: 06e3fbd18de8  # arbitrary config\n\nIn some environments, the user config may be exactly the same across many clusters (i.e. call this exec plugin) minus some details that are specific to each cluster such as the audience.  This field allows the per cluster config to be directly specified with the cluster info.  Using this field to store secret data is not recommended as one of the prime benefits of exec plugins is that no secrets need to be stored directly in the kubeconfig.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
+						},
+					},
+				},
+				Required: []string{"server"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/runtime.RawExtension"},
+	}
+}
+
+func schema_pkg_apis_clientauthentication_v1_ExecCredential(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ExecCredential is used by exec-based plugins to communicate credentials to HTTP transports.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec holds information passed to the plugin by the transport.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/client-go/pkg/apis/clientauthentication/v1.ExecCredentialSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status is filled in by the plugin and holds the credentials that the transport should use to contact the API.",
+							Ref:         ref("k8s.io/client-go/pkg/apis/clientauthentication/v1.ExecCredentialStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/client-go/pkg/apis/clientauthentication/v1.ExecCredentialSpec", "k8s.io/client-go/pkg/apis/clientauthentication/v1.ExecCredentialStatus"},
+	}
+}
+
+func schema_pkg_apis_clientauthentication_v1_ExecCredentialSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ExecCredentialSpec holds request and runtime specific information provided by the transport.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"cluster": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Cluster contains information to allow an exec plugin to communicate with the kubernetes cluster being authenticated to. Note that Cluster is non-nil only when provideClusterInfo is set to true in the exec provider config (i.e., ExecConfig.ProvideClusterInfo).",
+							Ref:         ref("k8s.io/client-go/pkg/apis/clientauthentication/v1.Cluster"),
+						},
+					},
+					"interactive": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Interactive declares whether stdin has been passed to this exec plugin.",
+							Default:     false,
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"interactive"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/client-go/pkg/apis/clientauthentication/v1.Cluster"},
+	}
+}
+
+func schema_pkg_apis_clientauthentication_v1_ExecCredentialStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ExecCredentialStatus holds credentials for the transport to use.\n\nToken and ClientKeyData are sensitive fields. This data should only be transmitted in-memory between client and exec plugin process. Exec plugin itself should at least be protected via file permissions.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"expirationTimestamp": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ExpirationTimestamp indicates a time when the provided credentials expire.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+					"token": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Token is a bearer token used by the client for request authentication.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"clientCertificateData": {
+						SchemaProps: spec.SchemaProps{
+							Description: "PEM-encoded client TLS certificates (including intermediates, if any).",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"clientKeyData": {
+						SchemaProps: spec.SchemaProps{
+							Description: "PEM-encoded private key for the above certificate.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
 func schema_pkg_apis_clientauthentication_v1alpha1_ExecCredential(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -83713,7 +84272,16 @@ func schema_pkg_apis_clientauthentication_v1beta1_ExecCredentialSpec(ref common.
 							Ref:         ref("k8s.io/client-go/pkg/apis/clientauthentication/v1beta1.Cluster"),
 						},
 					},
+					"interactive": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Interactive declares whether stdin has been passed to this exec plugin.",
+							Default:     false,
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
 				},
+				Required: []string{"interactive"},
 			},
 		},
 		Dependencies: []string{
@@ -83974,7 +84542,7 @@ func schema_k8sio_controller_manager_config_v1alpha1_ControllerLeaderConfigurati
 					},
 					"component": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Component is the name of the component in which the controller should be running. E.g. kube-controller-manager, cloud-controller-manager, etc",
+							Description: "Component is the name of the component in which the controller should be running. E.g. kube-controller-manager, cloud-controller-manager, etc Or '*' meaning the controller can be run under any component that participates in the migration",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -84167,8 +84735,9 @@ func schema_pkg_apis_apiregistration_v1_APIService(ref common.ReferenceCallback)
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -84269,13 +84838,15 @@ func schema_pkg_apis_apiregistration_v1_APIServiceList(ref common.ReferenceCallb
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							Description: "Standard list metadata More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
 						},
 					},
 					"items": {
 						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
+							Description: "Items is the list of APIService",
+							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
@@ -84462,8 +85033,9 @@ func schema_pkg_apis_apiregistration_v1beta1_APIService(ref common.ReferenceCall
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
@@ -84564,13 +85136,15 @@ func schema_pkg_apis_apiregistration_v1beta1_APIServiceList(ref common.Reference
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							Description: "Standard list metadata More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
 						},
 					},
 					"items": {
 						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
+							Description: "Items is the list of APIService",
+							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{

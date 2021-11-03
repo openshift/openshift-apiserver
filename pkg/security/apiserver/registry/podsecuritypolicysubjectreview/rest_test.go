@@ -265,7 +265,7 @@ func TestRequests(t *testing.T) {
 		}
 		csf := fake.NewSimpleClientset(namespace, serviceAccount)
 		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), csf}
-		ctx := apirequest.WithNamespace(apirequest.NewContext(), metav1.NamespaceAll)
+		ctx := apirequest.WithNamespace(apirequest.NewContext(), metav1.NamespaceDefault)
 		_, err := storage.Create(ctx, testcase.request, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
 		switch {
 		case err == nil && len(testcase.errorMessage) == 0:
