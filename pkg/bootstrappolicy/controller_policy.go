@@ -274,7 +274,7 @@ func init() {
 			rbacv1helpers.NewRule("get", "update", "patch").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "update").Groups(extensionsGroup, appsGroup).Resources("replicasets/scale", "deployments/scale").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "update").Groups(deployGroup, legacyDeployGroup).Resources("deploymentconfigs/scale").RuleOrDie(),
-			rbacv1helpers.NewRule("watch", "list").Groups(kapiGroup).Resources("events").RuleOrDie(),
+			rbacv1helpers.NewRule("watch", "list").Groups(eventsGroup, legacyEventGroup).Resources("events").RuleOrDie(),
 			eventsRule(),
 		},
 	})

@@ -76,6 +76,7 @@ var (
 	legacyAuthzGroup    = ""
 	legacyBuildGroup    = ""
 	legacyDeployGroup   = ""
+	legacyEventGroup    = ""
 	legacyImageGroup    = ""
 	legacyProjectGroup  = ""
 	legacyQuotaGroup    = ""
