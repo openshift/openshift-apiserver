@@ -24,27 +24,27 @@ require (
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6
 	github.com/openshift/api v0.0.0-20210603185846-379093ab5d80
-	github.com/openshift/apiserver-library-go v0.0.0-20210426120049-59b0e972bfb7
+	github.com/openshift/apiserver-library-go v0.0.0-20211111022136-bfb62ec0e419
 	github.com/openshift/build-machinery-go v0.0.0-20210423112049-9415d7ebd33e
-	github.com/openshift/client-go v0.0.0-20210331195552-cf6c2669e01f
-	github.com/openshift/library-go v0.0.0-20210331235027-66936e2fcc52
+	github.com/openshift/client-go v0.0.0-20210521082421-73d9475a9142
+	github.com/openshift/library-go v0.0.0-20210521084623-7392ea9b02ca
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd v0.5.0-alpha.5.0.20200910180754-dd1b699fc489
 	k8s.io/api v0.21.1
-	k8s.io/apiextensions-apiserver v0.21.0
+	k8s.io/apiextensions-apiserver v0.21.1
 	k8s.io/apimachinery v0.21.1
-	k8s.io/apiserver v0.21.0
-	k8s.io/client-go v0.21.0
+	k8s.io/apiserver v0.21.1
+	k8s.io/client-go v0.21.1
 	k8s.io/cloud-provider v0.21.0
 	k8s.io/code-generator v0.21.1
-	k8s.io/component-base v0.21.0
+	k8s.io/component-base v0.21.1
 	k8s.io/component-helpers v0.21.0
 	k8s.io/klog/v2 v2.8.0
-	k8s.io/kube-aggregator v0.21.0
+	k8s.io/kube-aggregator v0.21.1
 	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7
 	k8s.io/kubectl v0.21.0
-	k8s.io/kubernetes v1.21.0
+	k8s.io/kubernetes v1.21.1
 )
 
 replace (
