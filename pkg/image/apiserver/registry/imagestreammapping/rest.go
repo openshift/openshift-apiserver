@@ -108,6 +108,8 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		DockerImageReference: ref,
 		Image:                image.Name,
 	}
+	nextList := imageapi.TagEventList{}
+	nextList.Items = append(nextList.Items, next)
 
 	err = wait.ExponentialBackoff(wait.Backoff{Steps: maxRetriesOnConflict}, func() (bool, error) {
 		lastEvent := internalimageutil.LatestTaggedImage(stream, tag)
@@ -118,7 +120,7 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 			// nothing actually changed
 			return true, nil
 		}
-		internalimageutil.UpdateTrackingTags(stream, tag, next)
+		internalimageutil.UpdateTrackingTags(stream, tag, nextList)
 		_, err := s.imageStreamRegistry.UpdateImageStreamStatus(ctx, stream, false, &metav1.UpdateOptions{})
 		if err == nil {
 			return true, nil

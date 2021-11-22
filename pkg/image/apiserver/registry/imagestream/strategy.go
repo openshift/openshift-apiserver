@@ -319,17 +319,23 @@ func (s Strategy) tagsChanged(ctx context.Context, old, stream *imageapi.ImageSt
 func updateChangedTrackingTags(new, old *imageapi.ImageStream) int {
 	changes := 0
 	for newTag, newImages := range new.Status.Tags {
-		if len(newImages.Items) == 0 {
+		var conditionsPresent bool
+		if len(newImages.Conditions) == 0 {
+			conditionsPresent = false
+		} else {
+			conditionsPresent = true
+		}
+		if len(newImages.Items) == 0 && !conditionsPresent {
 			continue
 		}
-		if old != nil {
+		if old != nil && !conditionsPresent {
 			oldImages := old.Status.Tags[newTag]
 			changed, deleted := tagsChanged(newImages.Items, oldImages.Items)
 			if !changed || deleted {
 				continue
 			}
 		}
-		changes += internalimageutil.UpdateTrackingTags(new, newTag, newImages.Items[0])
+		changes += internalimageutil.UpdateTrackingTags(new, newTag, newImages)
 	}
 	return changes
 }

@@ -350,6 +350,24 @@ func ResolveReferenceForTagEvent(stream *imageapi.ImageStream, tag string, lates
 	}
 }
 
+//AddTagConditionToImageStream adds conditions to the given image stream tags.
+func AddTagConditionToImageStream(stream *imageapi.ImageStream, tag string, next imageapi.TagEventCondition) bool {
+	if stream.Status.Tags == nil {
+		stream.Status.Tags = make(map[string]imageapi.TagEventList)
+	}
+
+	tags, ok := stream.Status.Tags[tag]
+	if !ok || len(tags.Conditions) == 0 {
+		stream.Status.Tags[tag] = imageapi.TagEventList{Conditions: []imageapi.TagEventCondition{next}}
+		return true
+	}
+
+	previous := &tags.Conditions[0]
+	previous.Generation = next.Generation
+	stream.Status.Tags[tag] = tags
+	return true
+}
+
 // AddTagEventToImageStream attempts to update the given image stream with a tag event. It will
 // collapse duplicate entries - returning true if a change was made or false if no change
 // occurred. Any successful tag resets the status field.
@@ -394,7 +412,7 @@ func AddTagEventToImageStream(stream *imageapi.ImageStream, tag string, next ima
 	return true
 }
 
-// UpdateTrackingTags sets updatedImage as the most recent TagEvent for all tags
+// UpdateTrackingTags sets updatedTagList as the most recent TagEventList for all tags
 // in stream.spec.tags that have from.kind = "ImageStreamTag" and the tag in from.name
 // = updatedTag. from.name may be either <tag> or <stream name>:<tag>. For now, only
 // references to tags in the current stream are supported.
@@ -404,9 +422,14 @@ func AddTagEventToImageStream(stream *imageapi.ImageStream, tag string, next ima
 // to point at the same image that was just pushed for 2.0.
 //
 // Returns the number of tags changed.
-func UpdateTrackingTags(stream *imageapi.ImageStream, updatedTag string, updatedImage imageapi.TagEvent) int {
+func UpdateTrackingTags(stream *imageapi.ImageStream, updatedTag string, updatedTagList imageapi.TagEventList) int {
 	updated := 0
-	klog.V(5).Infof("UpdateTrackingTags: stream=%s/%s, updatedTag=%s, updatedImage.dockerImageReference=%s, updatedImage.image=%s", stream.Namespace, stream.Name, updatedTag, updatedImage.DockerImageReference, updatedImage.Image)
+	if len(updatedTagList.Items) != 0 {
+		klog.V(5).Infof("UpdateTrackingTags: stream=%s/%s, updatedTag=%s, updatedTagList.dockerImageReference=%s, updatedTagList.image=%s", stream.Namespace, stream.Name, updatedTag, updatedTagList.Items[0].DockerImageReference, updatedTagList.Items[0].Image)
+	} else {
+		klog.V(5).Infof("UpdateTrackingTags: stream=%s/%s, updatedTag=%s, updatedTagList.Items[0].dockerImageReference=doesn't exist, updatedTagList.Items[0].image=doesn't exist", stream.Namespace, stream.Name, updatedTag)
+	}
+
 	for specTag, tagRef := range stream.Spec.Tags {
 		klog.V(5).Infof("Examining spec tag %q, tagRef=%#v", specTag, tagRef)
 
@@ -463,9 +486,16 @@ func UpdateTrackingTags(stream *imageapi.ImageStream, updatedTag string, updated
 			klog.V(5).Infof("tag %q doesn't match updated tag %q - skipping", tag, updatedTag)
 			continue
 		}
+		if len(updatedTagList.Items) != 0 {
+			if AddTagEventToImageStream(stream, specTag, updatedTagList.Items[0]) {
+				klog.V(5).Infof("stream updated with tag events")
+				updated++
+			}
+		}
 
-		if AddTagEventToImageStream(stream, specTag, updatedImage) {
-			klog.V(5).Infof("stream updated")
+		if len(updatedTagList.Conditions) != 0 {
+			AddTagConditionToImageStream(stream, specTag, updatedTagList.Conditions[0])
+			klog.V(5).Infoln("stream updated with tag conditions")
 			updated++
 		}
 	}

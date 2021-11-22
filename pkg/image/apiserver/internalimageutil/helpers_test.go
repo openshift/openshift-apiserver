@@ -952,7 +952,10 @@ func TestUpdateTrackingTags(t *testing.T) {
 			Image:                updatedImage,
 		}
 
-		UpdateTrackingTags(stream, "2.0", newTagEvent)
+		newTagEventList := imageapi.TagEventList{}
+		newTagEventList.Items = append(newTagEventList.Items, newTagEvent)
+
+		UpdateTrackingTags(stream, "2.0", newTagEventList)
 		for _, tag := range test.expectedUpdates {
 			tagEventList, ok := stream.Status.Tags[tag]
 			if !ok {
