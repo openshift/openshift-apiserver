@@ -233,7 +233,7 @@ github.com/opencontainers/image-spec/specs-go/v1
 # github.com/opencontainers/runc v1.0.2
 github.com/opencontainers/runc/libcontainer/apparmor
 github.com/opencontainers/runc/libcontainer/utils
-# github.com/openshift/api v0.0.0-20211108165917-be1be0e89115
+# github.com/openshift/api v0.0.0-20211108165917-be1be0e89115 => github.com/jkhelil/api v0.0.0-20211202083854-b99b08068dc6
 ## explicit
 github.com/openshift/api
 github.com/openshift/api/annotations

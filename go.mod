@@ -46,6 +46,7 @@ replace (
 	github.com/docker/distribution => github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d
 	github.com/docker/docker => github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d
 	github.com/moby/buildkit => github.com/dmcgowan/buildkit v0.0.0-20170731200553-da2b9dc7dab9
+	github.com/openshift/api v0.0.0-20211108165917-be1be0e89115 => github.com/jkhelil/api v0.0.0-20211202083854-b99b08068dc6
 	k8s.io/api => k8s.io/api v0.22.2
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.22.2
 	k8s.io/apimachinery => k8s.io/apimachinery v0.22.2
