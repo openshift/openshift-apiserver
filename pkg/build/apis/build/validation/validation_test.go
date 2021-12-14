@@ -3569,6 +3569,21 @@ func TestValidateBuildVolumes(t *testing.T) {
 			errors: []string{"must specify one volume source"},
 		},
 		{
+			name: "missing source csi should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeCSI,
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"must specify one volume source"},
+		},
+		{
 			name: "multiple sources should fail",
 			volume: buildapi.BuildVolume{
 				Name: "some-volume",
@@ -3821,6 +3836,76 @@ func TestValidateBuildVolumes(t *testing.T) {
 						LocalObjectReference: kapi.LocalObjectReference{
 							Name: "my-configmap",
 						},
+					},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{},
+		},
+		{
+			name: "empty csi driver should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeCSI,
+					CSI:  &kapi.CSIVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"Required value"},
+		},
+		{
+			name: "csi driver name too long should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeCSI,
+					CSI: &kapi.CSIVolumeSource{
+						Driver: "testsourceddssssssssaffffffffffffffffffffdagagddagagerqgeqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtestsourceddssssssssaffffffffffffffffffffdagagddagagerqgeqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtestsourceddssssssssaffffffffffffffffffffdagagddagagerqgeqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
+					},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"must be no more than 63 characters"},
+		},
+		{
+			name: "csi driver name not dns-1123 should fail",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeCSI,
+					CSI: &kapi.CSIVolumeSource{
+						Driver: "underscores_are_bad.k8s.io",
+					},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"must be dns-1123"},
+		},
+		{
+			name: "csi driver name dns-1123 should pass",
+			volume: buildapi.BuildVolume{
+				Name: "some-volume",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeCSI,
+					CSI: &kapi.CSIVolumeSource{
+						Driver: "inline.storage.kubernetes.io",
 					},
 				},
 				Mounts: []buildapi.BuildVolumeMount{
