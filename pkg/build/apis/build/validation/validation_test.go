@@ -3831,6 +3831,97 @@ func TestValidateBuildVolumes(t *testing.T) {
 			},
 			errors: []string{},
 		},
+		{
+			name: "csi source and type should match",
+			volume: buildapi.BuildVolume{
+				Name: "csi-source-type-mismatch-fail",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeConfigMap,
+					CSI: &kapi.CSIVolumeSource{
+						Driver: "csi.driver.ephemeral.io",
+						VolumeAttributes: map[string]string{
+							"attribute": "value",
+						},
+					},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"source type and specified type must match"},
+		},
+		{
+			name: "empty CSI driver name should fail",
+			volume: buildapi.BuildVolume{
+				Name: "csi-empty-driver-name-fail",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeCSI,
+					CSI:  &kapi.CSIVolumeSource{},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"Required value"},
+		},
+		{
+			name: "csi driver name longer than 63 characters should fail",
+			volume: buildapi.BuildVolume{
+				Name: "csi-driver-name-too-long-fail",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeCSI,
+					CSI: &kapi.CSIVolumeSource{
+						Driver: "abcdefghijklmnopqrstuvwxyz1234567890.abcdefghijklmnopqrstuvwxyz1234567890-abcdefghijklmnopqrstuvwxyz1234567890",
+					},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"must have at most 63 bytes"},
+		},
+		{
+			name: "csi driver name that is not a DNS 1123 subdomain should fail",
+			volume: buildapi.BuildVolume{
+				Name: "csi-driver-invalid-dns-1123-fail",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeCSI,
+					CSI: &kapi.CSIVolumeSource{
+						Driver: "subdoman.Invalid-Upper-Case+@SpecialChars.io",
+					},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{"a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters"},
+		},
+		{
+			name: "valid csi driver name should succeed",
+			volume: buildapi.BuildVolume{
+				Name: "csi-driver-name-valid",
+				Source: buildapi.BuildVolumeSource{
+					Type: buildapi.BuildVolumeSourceTypeCSI,
+					CSI: &kapi.CSIVolumeSource{
+						Driver: "valid.csi-driver.io",
+					},
+				},
+				Mounts: []buildapi.BuildVolumeMount{
+					{
+						DestinationPath: "/some/path",
+					},
+				},
+			},
+			errors: []string{},
+		},
 	}
 
 	for _, tt := range tests {

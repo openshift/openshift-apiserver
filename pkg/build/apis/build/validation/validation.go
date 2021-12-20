@@ -829,6 +829,16 @@ func validateBuildVolume(volume buildapi.BuildVolume, fldPath *field.Path) field
 		}
 		foundVolumeSources = append(foundVolumeSources, string(buildapi.BuildVolumeSourceTypeConfigMap))
 	}
+
+	if volume.Source.CSI != nil {
+		if len(volume.Source.CSI.Driver) == 0 {
+			allErrs = append(allErrs, field.Required(fldPath.Child("source").Child("csi").Child("driver"), ""))
+		} else if reasons := validation.ValidateCSIDriverName(volume.Source.CSI.Driver, fldPath.Child("source").Child("csi").Child("driver")); len(reasons) != 0 {
+			allErrs = append(allErrs, reasons...)
+		}
+		foundVolumeSources = append(foundVolumeSources, string(buildapi.BuildVolumeSourceTypeCSI))
+	}
+
 	if len(foundVolumeSources) == 0 {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("source"), volume.Source, "must specify one volume source"))
 	}

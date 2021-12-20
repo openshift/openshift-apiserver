@@ -1796,6 +1796,15 @@ func autoConvert_v1_BuildVolumeSource_To_build_BuildVolumeSource(in *v1.BuildVol
 	} else {
 		out.ConfigMap = nil
 	}
+	if in.CSI != nil {
+		in, out := &in.CSI, &out.CSI
+		*out = new(core.CSIVolumeSource)
+		if err := apiscorev1.Convert_v1_CSIVolumeSource_To_core_CSIVolumeSource(*in, *out, s); err != nil {
+			return err
+		}
+	} else {
+		out.CSI = nil
+	}
 	return nil
 }
 
@@ -1823,6 +1832,15 @@ func autoConvert_build_BuildVolumeSource_To_v1_BuildVolumeSource(in *build.Build
 		}
 	} else {
 		out.ConfigMap = nil
+	}
+	if in.CSI != nil {
+		in, out := &in.CSI, &out.CSI
+		*out = new(corev1.CSIVolumeSource)
+		if err := apiscorev1.Convert_core_CSIVolumeSource_To_v1_CSIVolumeSource(*in, *out, s); err != nil {
+			return err
+		}
+	} else {
+		out.CSI = nil
 	}
 	return nil
 }
