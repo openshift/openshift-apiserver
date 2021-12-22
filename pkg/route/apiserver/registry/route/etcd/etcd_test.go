@@ -14,6 +14,7 @@ import (
 	genericregistrytest "k8s.io/apiserver/pkg/registry/generic/testing"
 	"k8s.io/apiserver/pkg/registry/rest"
 	etcdtesting "k8s.io/apiserver/pkg/storage/etcd3/testing"
+	"k8s.io/apiserver/pkg/storage/storagebackend"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
@@ -57,7 +58,8 @@ func (t *testSAR) Create(_ context.Context, subjectAccessReview *authorizationap
 func newStorage(t *testing.T, allocator routeinterfaces.RouteAllocator) (*REST, *etcdtesting.EtcdTestServer) {
 	server, etcdStorage := etcdtesting.NewUnsecuredEtcd3TestClientServer(t)
 	etcdStorage.Codec = legacyscheme.Codecs.LegacyCodec(schema.GroupVersion{Group: "route.openshift.io", Version: "v1"})
-	restOptions := generic.RESTOptions{StorageConfig: etcdStorage, Decorator: generic.UndecoratedStorage, DeleteCollectionWorkers: 1, ResourcePrefix: "routes"}
+	etcdStorageConfigForRoutes := &storagebackend.ConfigForResource{Config: *etcdStorage, GroupResource: schema.GroupResource{Group: "route.openshift.io", Resource: "routes"}}
+	restOptions := generic.RESTOptions{StorageConfig: etcdStorageConfigForRoutes, Decorator: generic.UndecoratedStorage, DeleteCollectionWorkers: 1, ResourcePrefix: "routes"}
 	storage, _, err := NewREST(restOptions, allocator, &testSAR{allow: true})
 	if err != nil {
 		t.Fatal(err)
