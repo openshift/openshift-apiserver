@@ -7865,7 +7865,7 @@ func schema_openshift_api_config_v1_AuthenticationSpec(ref common.ReferenceCallb
 					},
 					"serviceAccountIssuer": {
 						SchemaProps: spec.SchemaProps{
-							Description: "serviceAccountIssuer is the identifier of the bound service account token issuer. The default is https://kubernetes.default.svc",
+							Description: "serviceAccountIssuer is the identifier of the bound service account token issuer. The default is https://kubernetes.default.svc WARNING: Updating this field will result in the invalidation of all bound tokens with the previous issuer value. Unless the holder of a bound token has explicit support for a change in issuer, they will not request a new bound token until pod restart or until their existing token exceeds 80% of its duration.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -23281,7 +23281,7 @@ func schema_openshift_api_operator_v1_AuthenticationSpec(ref common.ReferenceCal
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -23499,7 +23499,7 @@ func schema_openshift_api_operator_v1_CSISnapshotControllerSpec(ref common.Refer
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -23702,7 +23702,7 @@ func schema_openshift_api_operator_v1_CloudCredentialSpec(ref common.ReferenceCa
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -23915,7 +23915,7 @@ func schema_openshift_api_operator_v1_ClusterCSIDriverSpec(ref common.ReferenceC
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -24147,7 +24147,7 @@ func schema_openshift_api_operator_v1_ConfigSpec(ref common.ReferenceCallback) c
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -24440,7 +24440,7 @@ func schema_openshift_api_operator_v1_ConsoleSpec(ref common.ReferenceCallback) 
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -24946,7 +24946,7 @@ func schema_openshift_api_operator_v1_EtcdSpec(ref common.ReferenceCallback) com
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -25804,7 +25804,7 @@ func schema_openshift_api_operator_v1_KubeAPIServerSpec(ref common.ReferenceCall
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -26057,7 +26057,7 @@ func schema_openshift_api_operator_v1_KubeControllerManagerSpec(ref common.Refer
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -26310,7 +26310,7 @@ func schema_openshift_api_operator_v1_KubeSchedulerSpec(ref common.ReferenceCall
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -26561,7 +26561,7 @@ func schema_openshift_api_operator_v1_KubeStorageVersionMigratorSpec(ref common.
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -26855,7 +26855,7 @@ func schema_openshift_api_operator_v1_MyOperatorResourceSpec(ref common.Referenc
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -27109,7 +27109,7 @@ func schema_openshift_api_operator_v1_NetworkSpec(ref common.ReferenceCallback) 
 					},
 					"logLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "logLevel allows configuring the logging level of the components deployed by the operator. Currently only Kuryr SDN is affected by this setting. Please note that turning on extensive logging may affect performance. The default value is \"Normal\".",
+							Description: "logLevel allows configuring the logging level of the components deployed by the operator. Currently only Kuryr SDN is affected by this setting. Please note that turning on extensive logging may affect performance. The default value is \"Normal\".\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -27406,7 +27406,7 @@ func schema_openshift_api_operator_v1_OpenShiftAPIServerSpec(ref common.Referenc
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -27616,7 +27616,7 @@ func schema_openshift_api_operator_v1_OpenShiftControllerManagerSpec(ref common.
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -27821,7 +27821,7 @@ func schema_openshift_api_operator_v1_OperatorSpec(ref common.ReferenceCallback)
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -28197,7 +28197,7 @@ func schema_openshift_api_operator_v1_ServiceCASpec(ref common.ReferenceCallback
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -28400,7 +28400,7 @@ func schema_openshift_api_operator_v1_ServiceCatalogAPIServerSpec(ref common.Ref
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -28603,7 +28603,7 @@ func schema_openshift_api_operator_v1_ServiceCatalogControllerManagerSpec(ref co
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -28906,7 +28906,7 @@ func schema_openshift_api_operator_v1_StaticPodOperatorSpec(ref common.Reference
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -29181,7 +29181,7 @@ func schema_openshift_api_operator_v1_StorageSpec(ref common.ReferenceCallback) 
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -34018,7 +34018,7 @@ func schema_openshift_api_servicecertsigner_v1alpha1_ServiceCertSignerOperatorCo
 					},
 					"operatorLogLevel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.",
+							Description: "operatorLogLevel is an intent based logging for the operator itself.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for themselves.\n\nValid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
