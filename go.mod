@@ -24,26 +24,26 @@ require (
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
 	github.com/opencontainers/go-digest v1.0.0-rc1
 	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6 // indirect
-	github.com/openshift/api v0.0.0-20200901182017-7ac89ba6b971
-	github.com/openshift/apiserver-library-go v0.0.0-20200901140731-1236dc23c728
+	github.com/openshift/api v0.0.0-20210928121311-b64fe3d0dc32
+	github.com/openshift/apiserver-library-go v0.0.0-20220104154708-ec6045539aee
 	github.com/openshift/build-machinery-go v0.0.0-20200819073603-48aa266c95f7
-	github.com/openshift/client-go v0.0.0-20200827190008-3062137373b5
-	github.com/openshift/library-go v0.0.0-20201123124259-522c6f69be23
+	github.com/openshift/client-go v0.0.0-20210928145214-e2e89b5e9cd8
+	github.com/openshift/library-go v0.0.0-20210928180114-8b90011b8e9e
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd v0.5.0-alpha.5.0.20200819165624-17cef6e3e9d5
-	k8s.io/api v0.19.0
-	k8s.io/apiextensions-apiserver v0.19.0
-	k8s.io/apimachinery v0.19.0
-	k8s.io/apiserver v0.19.0
-	k8s.io/client-go v0.19.0
-	k8s.io/code-generator v0.19.0
-	k8s.io/component-base v0.19.0
+	k8s.io/api v0.19.14
+	k8s.io/apiextensions-apiserver v0.19.14
+	k8s.io/apimachinery v0.19.14
+	k8s.io/apiserver v0.19.14
+	k8s.io/client-go v0.19.14
+	k8s.io/code-generator v0.19.14
+	k8s.io/component-base v0.19.14
 	k8s.io/klog/v2 v2.3.0
-	k8s.io/kube-aggregator v0.19.0
+	k8s.io/kube-aggregator v0.19.14
 	k8s.io/kube-openapi v0.0.0-20200805222855-6aeccd4b50c6
 	k8s.io/kubectl v0.19.0
-	k8s.io/kubernetes v1.19.0
+	k8s.io/kubernetes v1.19.14
 )
 
 replace (
