@@ -219,6 +219,7 @@ API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,A
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,AzureMachineProviderStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,Filter,Values
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,GCPMachineProviderSpec,Disks
+API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,GCPMachineProviderSpec,GPUs
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,GCPMachineProviderSpec,Metadata
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,GCPMachineProviderSpec,NetworkInterfaces
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,GCPMachineProviderSpec,ServiceAccounts
@@ -226,6 +227,8 @@ API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,G
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,GCPMachineProviderSpec,TargetPools
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,GCPMachineProviderStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,GCPServiceAccount,Scopes
+API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,LifecycleHooks,PreDrain
+API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,LifecycleHooks,PreTerminate
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,MachineHealthCheckSpec,UnhealthyConditions
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,MachineSpec,Taints
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,MachineStatus,Addresses
@@ -295,6 +298,7 @@ API rule violation: list_type_missing,github.com/openshift/api/operator/v1,Stati
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,StaticIPAMDNS,Nameservers
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,StaticIPAMDNS,Search
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,StaticPodOperatorStatus,NodeStatuses
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,UpstreamResolvers,Upstreams
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1alpha1,ImageContentSourcePolicySpec,RepositoryDigestMirrors
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1alpha1,NodeStatus,LastFailedDeploymentErrors
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1alpha1,OperatorStatus,Conditions
@@ -457,7 +461,6 @@ API rule violation: list_type_missing,k8s.io/api/core/v1,EphemeralContainerCommo
 API rule violation: list_type_missing,k8s.io/api/core/v1,EphemeralContainerCommon,Command
 API rule violation: list_type_missing,k8s.io/api/core/v1,EphemeralContainerCommon,Env
 API rule violation: list_type_missing,k8s.io/api/core/v1,EphemeralContainerCommon,EnvFrom
-API rule violation: list_type_missing,k8s.io/api/core/v1,EphemeralContainerCommon,Ports
 API rule violation: list_type_missing,k8s.io/api/core/v1,EphemeralContainerCommon,VolumeDevices
 API rule violation: list_type_missing,k8s.io/api/core/v1,EphemeralContainerCommon,VolumeMounts
 API rule violation: list_type_missing,k8s.io/api/core/v1,ExecAction,Command
@@ -823,6 +826,7 @@ API rule violation: names_match,github.com/openshift/api/machine/v1beta1,AWSMach
 API rule violation: names_match,github.com/openshift/api/machine/v1beta1,AWSMachineProviderStatus,InstanceID
 API rule violation: names_match,github.com/openshift/api/machine/v1beta1,AzureMachineProviderStatus,VMID
 API rule violation: names_match,github.com/openshift/api/machine/v1beta1,GCPDisk,SizeGB
+API rule violation: names_match,github.com/openshift/api/machine/v1beta1,GCPMachineProviderSpec,GPUs
 API rule violation: names_match,github.com/openshift/api/machine/v1beta1,GCPMachineProviderSpec,Metadata
 API rule violation: names_match,github.com/openshift/api/machine/v1beta1,GCPMachineProviderStatus,InstanceID
 API rule violation: names_match,github.com/openshift/api/machine/v1beta1,VSphereMachineProviderStatus,InstanceID
@@ -882,6 +886,7 @@ API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiexten
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaProps,XListType
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaProps,XMapType
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaProps,XPreserveUnknownFields
+API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaProps,XValidations
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaPropsOrArray,JSONSchemas
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaPropsOrArray,Schema
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1,JSONSchemaPropsOrBool,Allows
@@ -898,6 +903,7 @@ API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiexten
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaProps,XListType
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaProps,XMapType
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaProps,XPreserveUnknownFields
+API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaProps,XValidations
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaPropsOrArray,JSONSchemas
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaPropsOrArray,Schema
 API rule violation: names_match,k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1,JSONSchemaPropsOrBool,Allows
