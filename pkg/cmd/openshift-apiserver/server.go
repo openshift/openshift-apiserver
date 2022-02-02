@@ -45,6 +45,6 @@ func RunOpenShiftAPIServer(serverConfig *openshiftcontrolplanev1.OpenShiftAPISer
 	}
 
 	klog.Infof("Starting master on %s (%s)", serverConfig.ServingInfo.BindAddress, version.Get().String())
-
+	klog.Infof("TEST")
 	return preparedOpenshiftAPIServer.Run(stopCh)
 }
