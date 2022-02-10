@@ -21,7 +21,7 @@ require (
 	github.com/openshift/apiserver-library-go v0.0.0-20211209162547-8c11dbc46b6e
 	github.com/openshift/build-machinery-go v0.0.0-20211213093930-7e33a7eb4ce3
 	github.com/openshift/client-go v0.0.0-20211209144617-7385dd6338e3
-	github.com/openshift/library-go v0.0.0-20211216141749-1816407208cf
+	github.com/openshift/library-go v0.0.0-20220210170159-18f172cff934
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd/client/v3 v3.5.0
