@@ -119,7 +119,7 @@ const (
 // TODO: add LastTransitionTime, Reason, Message to match NodeCondition api.
 type RouteIngressCondition struct {
 	// Type is the type of the condition.
-	// Currently only Ready.
+	// Currently only Admitted.
 	Type RouteIngressConditionType
 	// Status is the status of the condition.
 	// Can be True, False, Unknown.
