@@ -227,8 +227,6 @@ API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,G
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,GCPMachineProviderSpec,TargetPools
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,GCPMachineProviderStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,GCPServiceAccount,Scopes
-API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,LifecycleHooks,PreDrain
-API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,LifecycleHooks,PreTerminate
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,MachineHealthCheckSpec,UnhealthyConditions
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,MachineSpec,Taints
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,MachineStatus,Addresses
