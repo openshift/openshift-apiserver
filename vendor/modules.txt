@@ -324,7 +324,7 @@ github.com/opencontainers/image-spec/specs-go/v1
 ## explicit; go 1.13
 github.com/opencontainers/runc/libcontainer/apparmor
 github.com/opencontainers/runc/libcontainer/utils
-# github.com/openshift/api v0.0.0-20211222145011-3bf13cf5081a
+# github.com/openshift/api v0.0.0-20220218143101-271bd7e1834c
 ## explicit; go 1.16
 github.com/openshift/api
 github.com/openshift/api/annotations
