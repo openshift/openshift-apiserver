@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/containers/image/pkg/sysregistriesv2"
+	"github.com/containers/image/v5/pkg/sysregistriesv2"
 
 	authorizationapi "k8s.io/api/authorization/v1"
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
