@@ -140,7 +140,7 @@ func (s routeStrategy) Validate(ctx context.Context, obj runtime.Object) field.E
 
 // WarningsOnCreate returns warnings for the creation of the given object.
 func (routeStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
-	return nil
+	return hostAndSubdomainBothSetWarning(obj)
 }
 
 func (routeStrategy) AllowCreateOnUpdate() bool {
@@ -271,7 +271,7 @@ func (s routeStrategy) validateHostUpdate(ctx context.Context, route, older *rou
 
 // WarningsOnUpdate returns warnings for the given update.
 func (routeStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
-	return nil
+	return hostAndSubdomainBothSetWarning(obj)
 }
 
 func (routeStrategy) AllowUnconditionalUpdate() bool {
@@ -342,4 +342,16 @@ func DecorateLegacyRouteWithEmptyDestinationCACertificates(obj runtime.Object) e
 	default:
 		return fmt.Errorf("unknown type passed to %T", obj)
 	}
+}
+
+// hostAndSubdomainBothSetWarning returns a warning if a route has both
+// spec.host and spec.subdomain set.
+func hostAndSubdomainBothSetWarning(obj runtime.Object) []string {
+	newRoute := obj.(*routeapi.Route)
+	if len(newRoute.Spec.Host) != 0 && len(newRoute.Spec.Subdomain) != 0 {
+		var warnings []string
+		warnings = append(warnings, "spec.host is set; spec.subdomain may be ignored")
+		return warnings
+	}
+	return nil
 }
