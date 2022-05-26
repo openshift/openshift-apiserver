@@ -1,6 +1,6 @@
 module github.com/openshift/openshift-apiserver
 
-go 1.17
+go 1.19
 
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
