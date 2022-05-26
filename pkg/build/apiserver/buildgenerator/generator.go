@@ -9,7 +9,14 @@ import (
 	"strconv"
 	"strings"
 
-	v1 "github.com/openshift/openshift-apiserver/pkg/build/apis/build/v1"
+	buildgrp "github.com/openshift/api/build"
+	buildv1 "github.com/openshift/api/build/v1"
+	imagev1 "github.com/openshift/api/image/v1"
+	buildv1clienttyped "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
+	imagev1clienttyped "github.com/openshift/client-go/image/clientset/versioned/typed/image/v1"
+	"github.com/openshift/library-go/pkg/build/buildutil"
+	"github.com/openshift/library-go/pkg/build/naming"
+	"github.com/openshift/library-go/pkg/image/imageutil"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,15 +30,9 @@ import (
 	"k8s.io/kubernetes/pkg/credentialprovider"
 	credentialprovidersecrets "k8s.io/kubernetes/pkg/credentialprovider/secrets"
 
-	buildv1 "github.com/openshift/api/build/v1"
-	imagev1 "github.com/openshift/api/image/v1"
-	buildv1clienttyped "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
-	imagev1clienttyped "github.com/openshift/client-go/image/clientset/versioned/typed/image/v1"
-	"github.com/openshift/library-go/pkg/build/buildutil"
-	"github.com/openshift/library-go/pkg/build/naming"
-	"github.com/openshift/library-go/pkg/image/imageutil"
 	"github.com/openshift/openshift-apiserver/pkg/bootstrappolicy"
-	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
+	internal "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
+	conversions "github.com/openshift/openshift-apiserver/pkg/build/apis/build/v1"
 )
 
 const conflictRetries = 3
@@ -221,17 +222,17 @@ func updateBuildArgs(oldArgs *[]corev1.EnvVar, newArgs []corev1.EnvVar) []corev1
 }
 
 // DEPRECATED: Use only by apiserver
-func (g *BuildGenerator) InstantiateInternal(ctx context.Context, request *buildapi.BuildRequest, opts metav1.CreateOptions) (*buildapi.Build, error) {
+func (g *BuildGenerator) InstantiateInternal(ctx context.Context, request *internal.BuildRequest, opts metav1.CreateOptions) (*internal.Build, error) {
 	versionedRequest := &buildv1.BuildRequest{}
-	if err := v1.Convert_build_BuildRequest_To_v1_BuildRequest(request, versionedRequest, nil); err != nil {
+	if err := conversions.Convert_build_BuildRequest_To_v1_BuildRequest(request, versionedRequest, nil); err != nil {
 		return nil, fmt.Errorf("failed to convert internal BuildRequest to external: %v", err)
 	}
 	build, err := g.Instantiate(ctx, versionedRequest, opts)
 	if err != nil {
 		return nil, err
 	}
-	internalBuild := &buildapi.Build{}
-	if err := v1.Convert_v1_Build_To_build_Build(build, internalBuild, nil); err != nil {
+	internalBuild := &internal.Build{}
+	if err := conversions.Convert_v1_Build_To_build_Build(build, internalBuild, nil); err != nil {
 		return nil, fmt.Errorf("failed to convert external Build to internal: %v", err)
 	}
 	return internalBuild, nil
@@ -436,17 +437,17 @@ func (g *BuildGenerator) updateImageTriggers(ctx context.Context, bc *buildv1.Bu
 
 // Clone returns clone of a Build
 // DEPRECATED: Use only in apiserver
-func (g *BuildGenerator) CloneInternal(ctx context.Context, request *buildapi.BuildRequest) (*buildapi.Build, error) {
+func (g *BuildGenerator) CloneInternal(ctx context.Context, request *internal.BuildRequest) (*internal.Build, error) {
 	versionedRequest := &buildv1.BuildRequest{}
-	if err := v1.Convert_build_BuildRequest_To_v1_BuildRequest(request, versionedRequest, nil); err != nil {
+	if err := conversions.Convert_build_BuildRequest_To_v1_BuildRequest(request, versionedRequest, nil); err != nil {
 		return nil, err
 	}
 	build, err := g.Clone(ctx, versionedRequest)
 	if err != nil {
 		return nil, err
 	}
-	internalBuild := &buildapi.Build{}
-	if err := v1.Convert_v1_Build_To_build_Build(build, internalBuild, nil); err != nil {
+	internalBuild := &internal.Build{}
+	if err := conversions.Convert_v1_Build_To_build_Build(build, internalBuild, nil); err != nil {
 		return nil, err
 	}
 	return internalBuild, nil
@@ -533,8 +534,12 @@ func (e *generatorFatalError) Error() string {
 
 // createBuild is responsible for validating build object and saving it and returning newly created object
 func (g *BuildGenerator) createBuild(ctx context.Context, build *buildv1.Build, opts metav1.CreateOptions) (*buildv1.Build, error) {
-	if !rest.ValidNamespace(ctx, &build.ObjectMeta) {
-		return nil, errors.NewConflict(buildv1.Resource("build"), build.Namespace, fmt.Errorf("Build.Namespace does not match the provided context"))
+	ns, ok := apirequest.NamespaceFrom(ctx)
+	if !ok {
+		return nil, errors.NewConflict(buildgrp.Resource("build"), build.Namespace, errors.NewInternalError(fmt.Errorf("no namespace information found in request context")))
+	}
+	if err := rest.EnsureObjectNamespaceMatchesRequestNamespace(ns, &build.ObjectMeta); err != nil {
+		return nil, errors.NewConflict(buildgrp.Resource("build"), build.Namespace, err)
 	}
 	rest.FillObjectMetaSystemFields(&build.ObjectMeta)
 	err := g.Client.CreateBuild(ctx, build, opts)
