@@ -17,12 +17,12 @@ require (
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.0.2
-	github.com/openshift/api v0.0.0-20220218143101-271bd7e1834c
-	github.com/openshift/apiserver-library-go v0.0.0-20211209162547-8c11dbc46b6e
-	github.com/openshift/build-machinery-go v0.0.0-20211213093930-7e33a7eb4ce3
-	github.com/openshift/client-go v0.0.0-20211209144617-7385dd6338e3
-	github.com/openshift/library-go v0.0.0-20220210170159-18f172cff934
-	github.com/openshift/runtime-utils v0.0.0-20220225175100-8dec0d84fb39
+	github.com/openshift/api v0.0.0-20220531073726-6c4f186339a7
+	github.com/openshift/apiserver-library-go v0.0.0-20220525180945-29f4c54d0291
+	github.com/openshift/build-machinery-go v0.0.0-20220429084610-baff9f8d23b3
+	github.com/openshift/client-go v0.0.0-20220603133046-984ee5ebedcf
+	github.com/openshift/library-go v0.0.0-20220525173854-9b950a41acdc
+	github.com/openshift/runtime-utils v0.0.0-20220513161558-c736ec4e99ce
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd/client/v3 v3.5.1
@@ -83,7 +83,6 @@ require (
 	github.com/google/go-cmp v0.5.5 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.1.2 // indirect
-	github.com/googleapis/gnostic v0.5.5 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7 // indirect
@@ -152,7 +151,7 @@ require (
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
-	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
+	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
@@ -172,7 +171,7 @@ require (
 	k8s.io/controller-manager v0.24.0 // indirect
 	k8s.io/gengo v0.0.0-20211129171323-c02415ce4185 // indirect
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9 // indirect
-	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.25 // indirect
+	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.30 // indirect
 	sigs.k8s.io/json v0.0.0-20211208200746-9f7c6b3444d2 // indirect
 	sigs.k8s.io/kustomize/api v0.11.4 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.13.6 // indirect
