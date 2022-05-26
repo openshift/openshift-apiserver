@@ -1,7 +1,7 @@
 FROM registry.svc.ci.openshift.org/ocp/builder:rhel-8-golang-1.15-openshift-4.6 AS builder
 WORKDIR /go/src/github.com/openshift/openshift-apiserver
 COPY . .
-RUN make build --warn-undefined-variables
+RUN make GOFLAGS='-mod=vendor -p=4 -tags=unsupportedGolang115OnlyUseDeprecatedParseIPv4' build --warn-undefined-variables
 
 FROM registry.svc.ci.openshift.org/ocp/4.6:base
 COPY --from=builder /go/src/github.com/openshift/openshift-apiserver/openshift-apiserver /usr/bin/
