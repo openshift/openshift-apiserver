@@ -190,7 +190,6 @@ func TestNewMetadataFields(t *testing.T) {
 		objMeta.Annotations = nil
 		objMeta.OwnerReferences = nil
 		objMeta.Finalizers = nil
-		objMeta.ClusterName = ""
 		objMeta.ManagedFields = nil
 		objMeta.ZZZ_DeprecatedClusterName = ""
 
