@@ -113,7 +113,7 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	}
 
 	v1Storage := map[string]rest.Storage{}
-	v1Storage["processedTemplates"] = templateregistry.NewREST()
+	v1Storage["processedtemplates"] = templateregistry.NewREST()
 	v1Storage["templates"] = templateStorage
 	v1Storage["templateinstances"] = templateInstanceStorage
 	v1Storage["templateinstances/status"] = templateInstanceStatusStorage
