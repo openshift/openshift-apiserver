@@ -3944,3 +3944,72 @@ func TestValidateBuildVolumes(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateImageLabels(t *testing.T) {
+	tests := []struct {
+		labels      []buildapi.ImageLabel
+		errExpected bool
+		errField    string
+		errType     field.ErrorType
+	}{
+		// 0: missing label name
+		{
+			labels: []buildapi.ImageLabel{
+				{
+					Name:  "",
+					Value: "test",
+				},
+			},
+			errExpected: true,
+			errField:    "imageLabels[0].name",
+			errType:     field.ErrorTypeRequired,
+		},
+		// 1: invalid label name
+		{
+			labels: []buildapi.ImageLabel{
+				{
+					Name:  "invalid,name",
+					Value: "test",
+				},
+			},
+			errExpected: true,
+			errField:    "imageLabels[0].name",
+			errType:     field.ErrorTypeInvalid,
+		},
+		// 2: valid label
+		{
+			labels: []buildapi.ImageLabel{
+				{
+					Name:  "key1",
+					Value: "value1",
+				},
+				{
+					Name:  "prefix/key2",
+					Value: "value2",
+				},
+			},
+			errExpected: false,
+		},
+	}
+
+	for i, tc := range tests {
+		errs := ValidateImageLabels(tc.labels, field.NewPath("imageLabels"))
+		if !tc.errExpected {
+			if len(errs) > 0 {
+				t.Errorf("%d: unexpected error: %v", i, errs.ToAggregate())
+			}
+			continue
+		}
+		if tc.errExpected && len(errs) == 0 {
+			t.Errorf("%d: expected error. Got none.", i)
+			continue
+		}
+		err := errs[0]
+		if err.Field != tc.errField {
+			t.Errorf("%d: unexpected error field: %s", i, err.Field)
+		}
+		if err.Type != tc.errType {
+			t.Errorf("%d: unexpected error type: %s", i, err.Type)
+		}
+	}
+}
