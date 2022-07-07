@@ -375,7 +375,7 @@ func (ac *AuthorizationCache) invalidateCache() bool {
 	for _, clusterRole := range clusterRoleList {
 		temporaryVersions.Insert(clusterRole.ResourceVersion)
 	}
-	if (len(ac.clusterRoleResourceVersions) != len(temporaryVersions)) || !ac.clusterRoleResourceVersions.HasAll(temporaryVersions.List()...) {
+	if !temporaryVersions.Equal(ac.clusterRoleResourceVersions) {
 		invalidateCache = true
 		ac.clusterRoleResourceVersions = temporaryVersions
 	}
@@ -386,11 +386,11 @@ func (ac *AuthorizationCache) invalidateCache() bool {
 		return invalidateCache
 	}
 
-	temporaryVersions.Delete(temporaryVersions.List()...)
+	temporaryVersions = sets.NewString()
 	for _, clusterRoleBinding := range clusterRoleBindingList {
 		temporaryVersions.Insert(clusterRoleBinding.ResourceVersion)
 	}
-	if (len(ac.clusterBindingResourceVersions) != len(temporaryVersions)) || !ac.clusterBindingResourceVersions.HasAll(temporaryVersions.List()...) {
+	if !temporaryVersions.Equal(ac.clusterBindingResourceVersions) {
 		invalidateCache = true
 		ac.clusterBindingResourceVersions = temporaryVersions
 	}
