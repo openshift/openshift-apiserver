@@ -736,9 +736,9 @@ func ValidateImageLabels(labels []buildapi.ImageLabel, fldPath *field.Path) (all
 		if len(lbl.Name) == 0 {
 			allErrs = append(allErrs, field.Required(idxPath.Child("name"), ""))
 			continue
-		}
-		for _, msg := range kvalidation.IsConfigMapKey(lbl.Name) {
-			allErrs = append(allErrs, field.Invalid(idxPath.Child("name"), lbl.Name, msg))
+		} else if errs := kvalidation.IsQualifiedName(lbl.Name); len(errs) != 0 {
+			allErrs = append(allErrs, field.Invalid(idxPath.Child("name"), lbl.Name, strings.Join(errs, "; ")))
+			continue
 		}
 	}
 
