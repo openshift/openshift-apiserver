@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -16,6 +17,7 @@ import (
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes/fake"
 	corev1listers "k8s.io/client-go/listers/core/v1"
+	rbacv1listers "k8s.io/client-go/listers/rbac/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/kubernetes/pkg/controller"
 )
@@ -227,4 +229,106 @@ func (r *alwaysAcceptReviewer) Review(name string) (Review, error) {
 		users:  []string{alice.GetName()},
 		groups: alice.GetGroups(),
 	}, nil
+}
+
+func TestInvalidateCache(t *testing.T) {
+	cr := func(rv string) rbacv1.ClusterRole {
+		return rbacv1.ClusterRole{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:            fmt.Sprintf("clusterrole-%s", rv),
+				ResourceVersion: rv,
+			},
+		}
+	}
+
+	crb := func(rv string) rbacv1.ClusterRoleBinding {
+		return rbacv1.ClusterRoleBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:            fmt.Sprintf("clusterrolebinding-%s", rv),
+				ResourceVersion: rv,
+			},
+		}
+	}
+
+	type trial struct {
+		crs      []rbacv1.ClusterRole
+		crbs     []rbacv1.ClusterRoleBinding
+		expected bool
+	}
+
+	for _, tc := range []struct {
+		name   string
+		trials []trial
+	}{
+		{
+			name: "no changes",
+			trials: []trial{
+				{
+					crs:      []rbacv1.ClusterRole{cr("1")},
+					crbs:     []rbacv1.ClusterRoleBinding{crb("a")},
+					expected: true,
+				},
+				{
+					crs:      []rbacv1.ClusterRole{cr("1")},
+					crbs:     []rbacv1.ClusterRoleBinding{crb("a")},
+					expected: false,
+				},
+			},
+		},
+		{
+			name: "clusterrole change",
+			trials: []trial{
+				{
+					crs:      []rbacv1.ClusterRole{cr("1")},
+					expected: true,
+				},
+				{
+					crs:      []rbacv1.ClusterRole{cr("2")},
+					expected: true,
+				},
+			},
+		},
+		{
+			name: "clusterrolebinding change",
+			trials: []trial{
+				{
+					crbs:     []rbacv1.ClusterRoleBinding{crb("a")},
+					expected: true,
+				},
+				{
+					crbs:     []rbacv1.ClusterRoleBinding{crb("b")},
+					expected: true,
+				},
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+			crbs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+
+			ac := &AuthorizationCache{
+				clusterRoleLister:        syncedClusterRoleLister{ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs)},
+				clusterRoleBindingLister: syncedClusterRoleBindingLister{ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs)},
+			}
+
+			for i, trial := range tc.trials {
+				func() {
+					for i := range trial.crs {
+						crs.Add(&trial.crs[i])
+						defer crs.Delete(&trial.crs[i])
+					}
+					for i := range trial.crbs {
+						crbs.Add(&trial.crbs[i])
+						defer crbs.Delete(&trial.crbs[i])
+					}
+
+					actual := ac.invalidateCache()
+
+					if actual != trial.expected {
+						t.Errorf("expected %t on trial %d of %d, got %t", trial.expected, i+1, len(tc.trials), actual)
+					}
+				}()
+			}
+		})
+	}
 }
