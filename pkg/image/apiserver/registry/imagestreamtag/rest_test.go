@@ -2,6 +2,7 @@ package imagestreamtag
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -68,7 +69,7 @@ func (u *fakeUser) GetExtra() map[string][]string {
 	return map[string][]string{}
 }
 
-func setup(t *testing.T) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
+func setup(t *testing.T, imagestreamRegistryBuilder func(s imagestream.Storage, status, internal rest.Updater) imagestream.Registry) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
 	server, etcdStorage := etcdtesting.NewUnsecuredEtcd3TestClientServer(t)
 	etcdStorage.Codec = legacyscheme.Codecs.LegacyCodec(schema.GroupVersion{Group: "image.openshift.io", Version: "v1"})
 	etcdClient := etcd.NewKV(server.V3Client)
@@ -96,8 +97,13 @@ func setup(t *testing.T) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
 	}
 
 	imageRegistry := image.NewRegistry(imageStorage)
-	imageStreamRegistry := imagestream.NewRegistry(imageStreamStorage, imageStreamStatus, internalStorage)
+	var imageStreamRegistry imagestream.Registry = nil
 
+	if imagestreamRegistryBuilder == nil {
+		imageStreamRegistry = imagestream.NewRegistry(imageStreamStorage, imageStreamStatus, internalStorage)
+	} else {
+		imageStreamRegistry = imagestreamRegistryBuilder(imageStreamStorage, imageStreamStatus, internalStorage)
+	}
 	storage := NewREST(imageRegistry, imageStreamRegistry, rw)
 
 	return etcdClient, server, storage
@@ -191,7 +197,7 @@ func TestGetImageStreamTag(t *testing.T) {
 
 	for name, testCase := range tests {
 		func() {
-			client, server, storage := setup(t)
+			client, server, storage := setup(t, nil)
 			defer server.Terminate(t)
 
 			if testCase.image != nil {
@@ -267,7 +273,7 @@ func TestGetImageStreamTagDIR(t *testing.T) {
 		},
 	}
 
-	client, server, storage := setup(t)
+	client, server, storage := setup(t, nil)
 	defer server.Terminate(t)
 	client.Put(
 		context.TODO(),
@@ -395,7 +401,7 @@ func TestDeleteImageStreamTag(t *testing.T) {
 
 	for name, testCase := range tests {
 		func() {
-			client, server, storage := setup(t)
+			client, server, storage := setup(t, nil)
 			defer server.Terminate(t)
 
 			if testCase.repo != nil {
@@ -532,7 +538,7 @@ func TestCreateImageStreamTag(t *testing.T) {
 
 	for name, tc := range tests {
 		func() {
-			client, server, storage := setup(t)
+			client, server, storage := setup(t, nil)
 			defer server.Terminate(t)
 
 			client.Put(
@@ -565,6 +571,579 @@ func TestCreateImageStreamTag(t *testing.T) {
 					return
 				}
 			}
+		}()
+	}
+}
+
+func TestUpdateImageStreamTag(t *testing.T) {
+	tests := map[string]struct {
+		istag                     runtime.Object
+		expectError               bool
+		createUpdateConflictError bool
+		createUpdateInvalidError  bool
+		createCreateConflictError bool
+		createCreateInvalidError  bool
+		errorTargetKind           string
+		errorTargetID             string
+		expectCreate              bool
+		expectNilResult           bool
+		suppressPut               bool
+	}{
+		"valid istag": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag: &imageapi.TagReference{
+					Name:            "latest",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			expectError:     false,
+			expectNilResult: false,
+			expectCreate:    true,
+		},
+		"valid istag invalid error": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag: &imageapi.TagReference{
+					Name:            "latest",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			expectError:              true,
+			expectNilResult:          true,
+			expectCreate:             false,
+			createUpdateInvalidError: true,
+		},
+		"valid istag conflict error": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag: &imageapi.TagReference{
+					Name:            "latest",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			expectError:               false,
+			expectNilResult:           false,
+			expectCreate:              true,
+			createUpdateConflictError: true,
+		},
+		"valid istag conflict error create": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag: &imageapi.TagReference{
+					Name:            "latest",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			expectError:               true,
+			expectNilResult:           true,
+			expectCreate:              false,
+			createCreateConflictError: true,
+			suppressPut:               true,
+		},
+		"valid istag invalid error create": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag: &imageapi.TagReference{
+					Name:            "latest",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			expectError:              true,
+			expectNilResult:          true,
+			expectCreate:             false,
+			createCreateInvalidError: true,
+			suppressPut:              true,
+		},
+		"invalid tag": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag:   &imageapi.TagReference{},
+			},
+			expectError:     true,
+			errorTargetKind: "ImageStreamTag",
+			errorTargetID:   "test:tag",
+			expectNilResult: true,
+		},
+		"nil tag": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+			},
+			expectNilResult: true,
+			expectError:     true,
+		},
+	}
+
+	for name, tc := range tests {
+		func() {
+			client, server, storage := setup(t,
+
+				func(s imagestream.Storage, status, internal rest.Updater) imagestream.Registry {
+
+					apiTesters := make(map[string]*ApiTester)
+
+					if tc.createUpdateConflictError || tc.createUpdateInvalidError {
+
+						apiTester := NewApiTester()
+						updateResponses := make(map[int]ApiResponse)
+						apiResponse := NewApiResponse()
+
+						if tc.createUpdateConflictError {
+
+							gr := schema.GroupResource{Group: "imageregistry.operator.openshift.io", Resource: "configs"}
+							errors.NewConflict(gr, "test", fmt.Errorf("testing error"))
+
+							apiResponse.response["error"] = errors.NewConflict(gr, "test", fmt.Errorf("testing error"))
+							updateResponses[0] = apiResponse
+						} else if tc.createUpdateInvalidError {
+
+							gk := schema.GroupKind{Group: "imageregistry.operator.openshift.io", Kind: "anyKind"}
+							apiResponse.response["error"] = errors.NewInvalid(gk, "test", nil)
+							updateResponses[0] = apiResponse
+						}
+
+						apiTester.callResponses = updateResponses
+
+						apiTesters["UpdateImageStream"] = apiTester
+					}
+
+					if tc.createCreateConflictError || tc.createCreateInvalidError {
+
+						apiTester := NewApiTester()
+						updateResponses := make(map[int]ApiResponse)
+						apiResponse := NewApiResponse()
+
+						if tc.createCreateConflictError {
+
+							gr := schema.GroupResource{Group: "imageregistry.operator.openshift.io", Resource: "configs"}
+							errors.NewConflict(gr, "test", fmt.Errorf("testing error"))
+
+							apiResponse.response["error"] = errors.NewConflict(gr, "test", fmt.Errorf("testing error"))
+							updateResponses[0] = apiResponse
+						} else if tc.createCreateInvalidError {
+
+							gk := schema.GroupKind{Group: "imageregistry.operator.openshift.io", Kind: "anyKind"}
+							apiResponse.response["error"] = errors.NewInvalid(gk, "test", nil)
+							updateResponses[0] = apiResponse
+						}
+
+						apiTester.callResponses = updateResponses
+
+						apiTesters["CreateImageStream"] = apiTester
+					}
+
+					return NewImageStreamRegistryTester(imagestream.NewRegistry(s, status, internal), apiTesters)
+				},
+			)
+
+			defer server.Terminate(t)
+
+			if !tc.suppressPut {
+				client.Put(
+					context.TODO(),
+					etcdtesting.AddPrefix("/imagestreams/default/test"),
+					runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion),
+						&imageapi.ImageStream{
+							ObjectMeta: metav1.ObjectMeta{
+								CreationTimestamp: metav1.Date(2015, 3, 24, 9, 38, 0, 0, time.UTC),
+								Namespace:         "default",
+								Name:              "test",
+							},
+							Spec: imageapi.ImageStreamSpec{
+								Tags: map[string]imageapi.TagReference{},
+							},
+						},
+					))
+			}
+
+			ctx := apirequest.WithUser(apirequest.NewDefaultContext(), &fakeUser{})
+			istag, ok := tc.istag.(*imageapi.ImageStreamTag)
+
+			if !ok {
+				t.Errorf("%s: obj is not an ImageStreamTag: %#v", name, tc.istag)
+				return
+			}
+
+			result, create, err := storage.Update(ctx, istag.Name, rest.DefaultUpdatedObjectInfo(istag), rest.ValidateAllObjectFunc, rest.ValidateAllObjectUpdateFunc, false, &metav1.UpdateOptions{})
+
+			gotErr := err != nil
+			if e, a := tc.expectError, gotErr; e != a {
+				t.Errorf("%s: Expected err=%v: got %v: %v", name, e, a, err)
+				return
+			}
+			if tc.expectError {
+
+				if !gotErr {
+					t.Errorf("%s: Expected err but did not receive one", name)
+					return
+				}
+
+				status := err.(statusError).Status()
+				if tc.errorTargetKind != "" {
+
+					if nil == status.Details {
+						t.Errorf("%s: Invalid status details, expected: %s got nil", name, tc.errorTargetKind)
+						return
+					}
+
+					if status.Details.Kind != tc.errorTargetKind || status.Details.Name != tc.errorTargetID {
+						t.Errorf("%s: unexpected status: %#v", name, status.Details)
+						return
+					}
+
+				}
+
+			}
+
+			if result == nil && !tc.expectNilResult {
+				t.Errorf("%s: Invalid result (nil)", name)
+				return
+			}
+
+			if create != tc.expectCreate {
+				t.Errorf("%s: Invalid create value: %t", name, create)
+				return
+			}
+
+			if nil != result {
+				resultTag, resultOk := result.(*imageapi.ImageStreamTag)
+
+				if !resultOk {
+					t.Errorf("%s: result is not an ImageStreamTag: %#v", name, result)
+					return
+				}
+
+				if resultTag.ObjectMeta.Name != istag.Name {
+					t.Errorf("%s: result contains unexpected ImageStreamTag name: %s, expected %s", name, resultTag.Tag.Name, istag.Name)
+					return
+				}
+			}
+
+		}()
+	}
+}
+
+func TestUpdateRetryImageStreamTag(t *testing.T) {
+	tests := map[string]struct {
+		istag                     runtime.Object
+		expectError               bool
+		createUpdateConflictError bool
+		createUpdateInvalidError  bool
+		createCreateConflictError bool
+		createCreateInvalidError  bool
+		errorTargetKind           string
+		errorTargetID             string
+		expectCreate              bool
+		expectRetry               bool
+		expectNilResult           bool
+		suppressPut               bool
+	}{
+		"valid istag": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag: &imageapi.TagReference{
+					Name:            "latest",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			expectRetry:     false,
+			expectError:     false,
+			expectNilResult: false,
+			expectCreate:    true,
+		},
+		"valid istag invalid error": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag: &imageapi.TagReference{
+					Name:            "latest",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			expectRetry:              true,
+			expectError:              true,
+			expectNilResult:          true,
+			expectCreate:             false,
+			createUpdateInvalidError: true,
+		},
+		"valid istag conflict error": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag: &imageapi.TagReference{
+					Name:            "latest",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			expectRetry:               true,
+			expectError:               true,
+			expectNilResult:           true,
+			expectCreate:              false,
+			createUpdateConflictError: true,
+		},
+		"valid istag conflict error create": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag: &imageapi.TagReference{
+					Name:            "latest",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			expectRetry:               false,
+			expectError:               true,
+			expectNilResult:           true,
+			expectCreate:              false,
+			createCreateConflictError: true,
+			suppressPut:               true,
+		},
+		"valid istag invalid error create": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag: &imageapi.TagReference{
+					Name:            "latest",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			expectRetry:              false,
+			expectError:              true,
+			expectNilResult:          true,
+			expectCreate:             false,
+			createCreateInvalidError: true,
+			suppressPut:              true,
+		},
+		"invalid tag": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag:   &imageapi.TagReference{},
+			},
+			expectError:     true,
+			expectRetry:     false,
+			expectNilResult: true,
+		},
+		"nil tag": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+			},
+			expectNilResult: true,
+			expectError:     true,
+			expectRetry:     false,
+		},
+	}
+
+	for name, tc := range tests {
+		func() {
+			client, server, storage := setup(t,
+
+				func(s imagestream.Storage, status, internal rest.Updater) imagestream.Registry {
+
+					apiTesters := make(map[string]*ApiTester)
+
+					if tc.createUpdateConflictError || tc.createUpdateInvalidError {
+
+						apiTester := NewApiTester()
+						updateResponses := make(map[int]ApiResponse)
+						apiResponse := NewApiResponse()
+
+						if tc.createUpdateConflictError {
+
+							gr := schema.GroupResource{Group: "imageregistry.operator.openshift.io", Resource: "configs"}
+							errors.NewConflict(gr, "test", fmt.Errorf("testing error"))
+
+							apiResponse.response["error"] = errors.NewConflict(gr, "test", fmt.Errorf("testing error"))
+							updateResponses[0] = apiResponse
+						} else if tc.createUpdateInvalidError {
+
+							gk := schema.GroupKind{Group: "imageregistry.operator.openshift.io", Kind: "anyKind"}
+							apiResponse.response["error"] = errors.NewInvalid(gk, "test", nil)
+							updateResponses[0] = apiResponse
+						}
+
+						apiTester.callResponses = updateResponses
+
+						apiTesters["UpdateImageStream"] = apiTester
+					}
+
+					if tc.createCreateConflictError || tc.createCreateInvalidError {
+
+						apiTester := NewApiTester()
+						updateResponses := make(map[int]ApiResponse)
+						apiResponse := NewApiResponse()
+
+						if tc.createCreateConflictError {
+
+							gr := schema.GroupResource{Group: "imageregistry.operator.openshift.io", Resource: "configs"}
+							errors.NewConflict(gr, "test", fmt.Errorf("testing error"))
+
+							apiResponse.response["error"] = errors.NewConflict(gr, "test", fmt.Errorf("testing error"))
+							updateResponses[0] = apiResponse
+						} else if tc.createCreateInvalidError {
+
+							gk := schema.GroupKind{Group: "imageregistry.operator.openshift.io", Kind: "anyKind"}
+							apiResponse.response["error"] = errors.NewInvalid(gk, "test", nil)
+							updateResponses[0] = apiResponse
+						}
+
+						apiTester.callResponses = updateResponses
+
+						apiTesters["CreateImageStream"] = apiTester
+					}
+
+					return NewImageStreamRegistryTester(imagestream.NewRegistry(s, status, internal), apiTesters)
+				},
+			)
+
+			defer server.Terminate(t)
+
+			if !tc.suppressPut {
+				client.Put(
+					context.TODO(),
+					etcdtesting.AddPrefix("/imagestreams/default/test"),
+					runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion),
+						&imageapi.ImageStream{
+							ObjectMeta: metav1.ObjectMeta{
+								CreationTimestamp: metav1.Date(2015, 3, 24, 9, 38, 0, 0, time.UTC),
+								Namespace:         "default",
+								Name:              "test",
+							},
+							Spec: imageapi.ImageStreamSpec{
+								Tags: map[string]imageapi.TagReference{},
+							},
+						},
+					))
+			}
+
+			ctx := apirequest.WithUser(apirequest.NewDefaultContext(), &fakeUser{})
+			istag, ok := tc.istag.(*imageapi.ImageStreamTag)
+
+			if !ok {
+				t.Errorf("%s: obj is not an ImageStreamTag: %#v", name, tc.istag)
+				return
+			}
+
+			result, create, canRetry, err := storage.update(ctx, istag.Name, rest.DefaultUpdatedObjectInfo(istag), rest.ValidateAllObjectFunc, rest.ValidateAllObjectUpdateFunc, false, &metav1.UpdateOptions{})
+
+			gotErr := err != nil
+			if e, a := tc.expectError, gotErr; e != a {
+				t.Errorf("%s: Expected err=%v: got %v: %v", name, e, a, err)
+				return
+			}
+			if tc.expectError {
+
+				if !gotErr {
+					t.Errorf("%s: Expected err but did not receive one", name)
+					return
+				}
+
+				status := err.(statusError).Status()
+				if tc.errorTargetKind != "" {
+
+					if nil == status.Details {
+						t.Errorf("%s: Invalid status details, expected: %s got nil", name, tc.errorTargetKind)
+						return
+					}
+
+					if status.Details.Kind != tc.errorTargetKind || status.Details.Name != tc.errorTargetID {
+						t.Errorf("%s: unexpected status: %#v", name, status.Details)
+						return
+					}
+
+				}
+
+			}
+
+			if result == nil && !tc.expectNilResult {
+				t.Errorf("%s: Invalid result (nil)", name)
+				return
+			}
+
+			if create != tc.expectCreate {
+				t.Errorf("%s: Invalid create value: %t", name, create)
+				return
+			}
+
+			if canRetry != tc.expectRetry {
+				t.Errorf("%s: Invalid retry value: %t", name, canRetry)
+				return
+			}
+
+			if nil != result {
+				resultTag, resultOk := result.(*imageapi.ImageStreamTag)
+
+				if !resultOk {
+					t.Errorf("%s: result is not an ImageStreamTag: %#v", name, result)
+					return
+				}
+
+				if resultTag.ObjectMeta.Name != istag.Name {
+					t.Errorf("%s: result contains unexpected ImageStreamTag name: %s, expected %s", name, resultTag.Tag.Name, istag.Name)
+					return
+				}
+			}
+
 		}()
 	}
 }
