@@ -708,7 +708,8 @@ func TestUpdateImageStreamTag(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		func() {
+		t.Run(name, func(t *testing.T) {
+
 			client, server, storage := setup(t,
 
 				func(s imagestream.Storage, status, internal rest.Updater) imagestream.Registry {
@@ -718,7 +719,7 @@ func TestUpdateImageStreamTag(t *testing.T) {
 					if tc.createUpdateConflictError || tc.createUpdateInvalidError {
 
 						apiTester := NewApiTester()
-						updateResponses := make(map[int]ApiResponse)
+						updateResponses := make(map[int32]ApiResponse)
 						apiResponse := NewApiResponse()
 
 						if tc.createUpdateConflictError {
@@ -743,7 +744,7 @@ func TestUpdateImageStreamTag(t *testing.T) {
 					if tc.createCreateConflictError || tc.createCreateInvalidError {
 
 						apiTester := NewApiTester()
-						updateResponses := make(map[int]ApiResponse)
+						updateResponses := make(map[int32]ApiResponse)
 						apiResponse := NewApiResponse()
 
 						if tc.createCreateConflictError {
@@ -852,7 +853,7 @@ func TestUpdateImageStreamTag(t *testing.T) {
 				}
 			}
 
-		}()
+		})
 	}
 }
 
@@ -995,7 +996,7 @@ func TestUpdateRetryImageStreamTag(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		func() {
+		t.Run(name, func(t *testing.T) {
 			client, server, storage := setup(t,
 
 				func(s imagestream.Storage, status, internal rest.Updater) imagestream.Registry {
@@ -1005,7 +1006,7 @@ func TestUpdateRetryImageStreamTag(t *testing.T) {
 					if tc.createUpdateConflictError || tc.createUpdateInvalidError {
 
 						apiTester := NewApiTester()
-						updateResponses := make(map[int]ApiResponse)
+						updateResponses := make(map[int32]ApiResponse)
 						apiResponse := NewApiResponse()
 
 						if tc.createUpdateConflictError {
@@ -1030,7 +1031,7 @@ func TestUpdateRetryImageStreamTag(t *testing.T) {
 					if tc.createCreateConflictError || tc.createCreateInvalidError {
 
 						apiTester := NewApiTester()
-						updateResponses := make(map[int]ApiResponse)
+						updateResponses := make(map[int32]ApiResponse)
 						apiResponse := NewApiResponse()
 
 						if tc.createCreateConflictError {
@@ -1144,6 +1145,6 @@ func TestUpdateRetryImageStreamTag(t *testing.T) {
 				}
 			}
 
-		}()
+		})
 	}
 }

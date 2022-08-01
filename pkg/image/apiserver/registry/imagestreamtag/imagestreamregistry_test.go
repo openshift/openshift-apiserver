@@ -2,6 +2,7 @@ package imagestreamtag
 
 import (
 	"context"
+	"sync/atomic"
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
@@ -43,20 +44,20 @@ func NewApiResponse() ApiResponse {
 }
 
 type ApiTester struct {
-	callResponses map[int]ApiResponse
-	callCount     int
+	callResponses map[int32]ApiResponse
+	callCount     int32
 }
 
 func NewApiTester() *ApiTester {
 	tester := &ApiTester{}
 	tester.callCount = 0
-	tester.callResponses = make(map[int]ApiResponse)
+	tester.callResponses = make(map[int32]ApiResponse)
 
 	return tester
 }
 
 func (a *ApiTester) callComplete() {
-	a.callCount++
+	atomic.AddInt32(&a.callCount, 1)
 }
 
 func (r *imageStreamRegistryTester) ListImageStreams(ctx context.Context, options *metainternal.ListOptions) (*imageapi.ImageStreamList, error) {
