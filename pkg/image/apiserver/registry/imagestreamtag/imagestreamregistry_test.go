@@ -2,12 +2,15 @@ package imagestreamtag
 
 import (
 	"context"
+	"fmt"
 	"sync/atomic"
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metainternal "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
 )
 
@@ -136,4 +139,14 @@ func (r *imageStreamRegistryTester) extractImageStreamResponse(apiName string) (
 
 	return false, nil, nil
 
+}
+
+func createInvalidError() error {
+	gk := schema.GroupKind{Group: "imageregistry.operator.openshift.io", Kind: "anyKind"}
+	return errors.NewInvalid(gk, "test", nil)
+}
+
+func createConflictError() error {
+	gr := schema.GroupResource{Group: "imageregistry.operator.openshift.io", Resource: "configs"}
+	return errors.NewConflict(gr, "test", fmt.Errorf("testing error"))
 }
