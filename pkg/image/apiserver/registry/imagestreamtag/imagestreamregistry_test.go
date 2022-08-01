@@ -24,6 +24,10 @@ func NewImageStreamRegistryTester(registry imagestream.Registry, apiTesters map[
 	tester.Registry = registry
 	tester.registryApiTesters = apiTesters
 
+	if tester.registryApiTesters == nil {
+		tester.registryApiTesters = make(map[string]*ApiTester)
+	}
+
 	return tester
 }
 
@@ -103,27 +107,30 @@ func (r *imageStreamRegistryTester) WatchImageStreams(ctx context.Context, optio
 
 func (r *imageStreamRegistryTester) extractImageStreamResponse(apiName string) (bool, *imageapi.ImageStream, error) {
 
-	if apiTester, ok := r.registryApiTesters[apiName]; ok {
+	if r.registryApiTesters != nil {
 
-		// increment the call count when done
-		defer apiTester.callComplete()
+		if apiTester, ok := r.registryApiTesters[apiName]; ok {
 
-		if responses, okResponses := apiTester.callResponses[apiTester.callCount]; okResponses {
+			// increment the call count when done
+			defer apiTester.callComplete()
 
-			var err error = nil
+			if responses, okResponses := apiTester.callResponses[apiTester.callCount]; okResponses {
 
-			if responseErr, okResponse := responses.response["error"]; okResponse {
-				err = responseErr.(error)
+				var err error = nil
+
+				if responseErr, okResponse := responses.response["error"]; okResponse {
+					err = responseErr.(error)
+				}
+
+				if responseImageStream, okImageStream := responses.response["imageStream"]; okImageStream {
+					imageStream := responseImageStream.(imageapi.ImageStream)
+					return true, &imageStream, err
+				} else {
+					return true, nil, err
+				}
 			}
 
-			if responseImageStream, okImageStream := responses.response["imageStream"]; okImageStream {
-				imageStream := responseImageStream.(imageapi.ImageStream)
-				return true, &imageStream, err
-			} else {
-				return true, nil, err
-			}
 		}
-
 	}
 
 	return false, nil, nil
