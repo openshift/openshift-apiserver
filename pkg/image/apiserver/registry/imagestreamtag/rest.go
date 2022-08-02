@@ -211,6 +211,10 @@ func (r *REST) Update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 	var created bool
 	var updateErr error
 
+	// Given a request without a resource version, the comparable logic with a standard resource is "write this no matter what".
+	// So a client is expecting an unconditional write.  The server should provide an unconditional write  if it's able to.
+	// To handle this case we first verify that we are doing an update without a resource version specified.
+	// If so, we rely on RetryOnConflict to detect the conflict error, if any, and retry the update until successful or max attempts are exhausted
 	err := retry.RetryOnConflict(retry.DefaultBackoff, func() error {
 		var canRetry bool
 		result, created, canRetry, updateErr = r.update(ctx, tagName, objInfo, createValidation, updateValidation, forceAllowCreate, options)
