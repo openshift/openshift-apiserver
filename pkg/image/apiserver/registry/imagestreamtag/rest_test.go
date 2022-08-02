@@ -761,6 +761,136 @@ func TestUpdateImageStreamTag(t *testing.T) {
 	}
 }
 
+func TestUpdateImageStreamTagMultipleConflicts(t *testing.T) {
+	tests := map[string]struct {
+		istag           runtime.Object
+		expectError     bool
+		stagedError     error
+		errorTargetKind string
+		errorTargetID   string
+		expectCreate    bool
+		expectNilResult bool
+	}{		
+		"valid istag conflict error": {
+			istag: &imageapi.ImageStreamTag{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "default",
+					Name:      "test:tag",
+				},
+				Image: imageapi.Image{ObjectMeta: metav1.ObjectMeta{Name: "10"}, DockerImageReference: "foo/bar/baz"},
+				Tag: &imageapi.TagReference{
+					Name:            "latest",
+					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+				},
+			},
+			expectError:     false,
+			expectNilResult: false,
+			expectCreate:    true,
+			stagedError:     createConflictError(),
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+
+			client, server, storage := setup(t,
+
+				func(s imagestream.Storage, status, internal rest.Updater) imagestream.Registry {
+
+					apiTesters := make(map[string]*ApiTester)
+
+					if tc.stagedError != nil {
+
+						apiTester := NewApiTester()
+						updateResponses := make(map[int32]ApiResponse)
+						apiResponse := NewApiResponse()
+
+						apiResponse.response["error"] = tc.stagedError
+
+						//same apiResponse for the first 3 update calls, 4th should succeed
+						updateResponses[0] = apiResponse
+						updateResponses[1] = apiResponse
+						updateResponses[2] = apiResponse
+
+						apiTester.callResponses = updateResponses
+
+						apiTesters["UpdateImageStream"] = apiTester
+					}
+
+					return NewImageStreamRegistryTester(imagestream.NewRegistry(s, status, internal), apiTesters)
+				},
+			)
+
+			defer server.Terminate(t)
+
+			client.Put(
+				context.TODO(),
+				etcdtesting.AddPrefix("/imagestreams/default/test"),
+				runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion),
+					&imageapi.ImageStream{
+						ObjectMeta: metav1.ObjectMeta{
+							CreationTimestamp: metav1.Date(2015, 3, 24, 9, 38, 0, 0, time.UTC),
+							Namespace:         "default",
+							Name:              "test",
+						},
+						Spec: imageapi.ImageStreamSpec{
+							Tags: map[string]imageapi.TagReference{},
+						},
+					},
+				))
+
+			ctx := apirequest.WithUser(apirequest.NewDefaultContext(), &fakeUser{})
+			istag, ok := tc.istag.(*imageapi.ImageStreamTag)
+
+			if !ok {
+				t.Fatalf("%s: obj is not an ImageStreamTag: %#v", name, tc.istag)
+			}
+
+			result, create, err := storage.Update(ctx, istag.Name, rest.DefaultUpdatedObjectInfo(istag), rest.ValidateAllObjectFunc, rest.ValidateAllObjectUpdateFunc, false, &metav1.UpdateOptions{})
+
+			gotErr := err != nil
+			if tc.expectError != (err != nil) {
+				t.Fatalf("%s: Expected err=%v: got %v: %v", name, tc.expectError, gotErr, err)
+			}
+
+			if tc.expectError && tc.errorTargetKind != "" {
+
+				status := err.(statusError).Status()
+
+				if nil == status.Details {
+					t.Fatalf("%s: Invalid status details, expected: %s got nil", name, tc.errorTargetKind)
+				}
+
+				if status.Details.Kind != tc.errorTargetKind || status.Details.Name != tc.errorTargetID {
+					t.Fatalf("%s: unexpected status: %#v", name, status.Details)
+				}
+			}
+
+			if result == nil && !tc.expectNilResult {
+				t.Fatalf("%s: Invalid result (nil)", name)
+			}
+
+			if create != tc.expectCreate {
+				t.Fatalf("%s: Invalid create value: %t", name, create)
+			}
+
+			if nil != result {
+				resultTag, resultOk := result.(*imageapi.ImageStreamTag)
+
+				if !resultOk {
+					t.Fatalf("%s: result is not an ImageStreamTag: %#v", name, result)
+				}
+
+				if resultTag.ObjectMeta.Name != istag.Name {
+					t.Fatalf("%s: result contains unexpected ImageStreamTag name: %s, expected %s", name, resultTag.Tag.Name, istag.Name)
+				}
+			}
+
+		})
+	}
+}
+
 func TestUpdateRetryImageStreamTag(t *testing.T) {
 	tests := map[string]struct {
 		istag           runtime.Object
