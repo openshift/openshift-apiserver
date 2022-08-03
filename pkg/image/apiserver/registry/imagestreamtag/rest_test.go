@@ -770,7 +770,7 @@ func TestUpdateImageStreamTagMultipleConflicts(t *testing.T) {
 		errorTargetID   string
 		expectCreate    bool
 		expectNilResult bool
-	}{		
+	}{
 		"valid istag conflict error": {
 			istag: &imageapi.ImageStreamTag{
 				ObjectMeta: metav1.ObjectMeta{
