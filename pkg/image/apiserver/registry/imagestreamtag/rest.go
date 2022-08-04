@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"k8s.io/client-go/util/retry"
 	"k8s.io/klog/v2"
 
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -206,20 +207,58 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 }
 
 func (r *REST) Update(ctx context.Context, tagName string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
-	name, tag, err := nameAndTag(tagName)
+	var result runtime.Object
+	var created bool
+	var updateErr error
+
+	// Given a request without a resource version, the comparable logic with a standard resource is "write this no matter what".
+	// So a client is expecting an unconditional write.  The server should provide an unconditional write  if it's able to.
+	// To handle this case we first verify that we are doing an update without a resource version specified.
+	// If so, we rely on RetryOnConflict to detect the conflict error, if any, and retry the update until successful or max attempts are exhausted
+	err := retry.RetryOnConflict(retry.DefaultBackoff, func() error {
+		var canRetry bool
+		result, created, canRetry, updateErr = r.update(ctx, tagName, objInfo, createValidation, updateValidation, forceAllowCreate, options)
+		// allow RetryOnConflict to check to see if it is conflict and try again
+		if canRetry {
+			return updateErr
+		}
+
+		// if not canRetry return nill for the error, we captured it in updateErr and will pass it back up.
+		return nil
+	})
+
+	// prefer updateErr over err
+	// but if either are non nil return error
+	if updateErr != nil {
+		return nil, false, updateErr
+	}
+
 	if err != nil {
 		return nil, false, err
+	}
+
+	return result, created, updateErr
+}
+
+// returns the new imagestream tag,
+// whether the imagestream tag was newly created,
+// if we can retry the update on conflict (we only retry if a specific resourceVersion is not specified && created is false)
+// and any error encountered during the update
+func (r *REST) update(ctx context.Context, tagName string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, bool, error) {
+	name, tag, err := nameAndTag(tagName)
+	if err != nil {
+		return nil, false, false, err
 	}
 
 	create := false
 	imageStream, err := r.imageStreamRegistry.GetImageStream(ctx, name, &metav1.GetOptions{})
 	if err != nil {
 		if !kapierrors.IsNotFound(err) {
-			return nil, false, err
+			return nil, false, false, err
 		}
 		namespace, ok := apirequest.NamespaceFrom(ctx)
 		if !ok {
-			return nil, false, kapierrors.NewBadRequest("namespace is required on ImageStreamTags")
+			return nil, false, false, kapierrors.NewBadRequest("namespace is required on ImageStreamTags")
 		}
 		imageStream = &imageapi.ImageStream{
 			ObjectMeta: metav1.ObjectMeta{
@@ -234,30 +273,33 @@ func (r *REST) Update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 	// create the synthetic old istag
 	old, err := newISTag(tag, imageStream, nil, true)
 	if err != nil {
-		return nil, false, err
+		return nil, false, false, err
 	}
 
 	obj, err := objInfo.UpdatedObject(ctx, old)
 	if err != nil {
-		return nil, false, err
+		return nil, false, false, err
 	}
 
 	istag, ok := obj.(*imageapi.ImageStreamTag)
 	if !ok {
-		return nil, false, kapierrors.NewBadRequest(fmt.Sprintf("obj is not an ImageStreamTag: %#v", obj))
+		return nil, false, false, kapierrors.NewBadRequest(fmt.Sprintf("obj is not an ImageStreamTag: %#v", obj))
 	}
 
 	// check for conflict
+	canRetry := false
 	switch {
 	case len(istag.ResourceVersion) == 0:
+		// if no resource version is provided then if we encounter an update error it is ok to fetch the updated version and retry...
+		canRetry = true
 		// should disallow blind PUT, but this was previously supported
 		istag.ResourceVersion = imageStream.ResourceVersion
 	case len(imageStream.ResourceVersion) == 0:
 		// image stream did not exist, cannot update
-		return nil, false, kapierrors.NewNotFound(imagegroup.Resource("imagestreamtags"), tagName)
+		return nil, false, false, kapierrors.NewNotFound(imagegroup.Resource("imagestreamtags"), tagName)
 	case imageStream.ResourceVersion != istag.ResourceVersion:
 		// conflicting input and output
-		return nil, false, kapierrors.NewConflict(imagegroup.Resource("imagestreamtags"), istag.Name, fmt.Errorf("another caller has updated the resource version to %s", imageStream.ResourceVersion))
+		return nil, false, false, kapierrors.NewConflict(imagegroup.Resource("imagestreamtags"), istag.Name, fmt.Errorf("another caller has updated the resource version to %s", imageStream.ResourceVersion))
 	}
 
 	// When we began returning image stream labels in 3.6, old clients that didn't need to send labels would be
@@ -268,17 +310,17 @@ func (r *REST) Update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 
 	if create {
 		if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
-			return nil, false, err
+			return nil, false, false, err
 		}
 		if err := createValidation(ctx, obj.DeepCopyObject()); err != nil {
-			return nil, false, err
+			return nil, false, false, err
 		}
 	} else {
 		if err := rest.BeforeUpdate(r.strategy, ctx, obj, old); err != nil {
-			return nil, false, err
+			return nil, false, false, err
 		}
 		if err := updateValidation(ctx, obj.DeepCopyObject(), old.DeepCopyObject()); err != nil {
-			return nil, false, err
+			return nil, false, false, err
 		}
 	}
 
@@ -289,7 +331,7 @@ func (r *REST) Update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 	tagRef, exists := imageStream.Spec.Tags[tag]
 
 	if !exists && istag.Tag == nil {
-		return nil, false, kapierrors.NewBadRequest(fmt.Sprintf("imagestreamtag %s is not a spec tag in imagestream %s/%s, cannot be updated", tag, imageStream.Namespace, imageStream.Name))
+		return nil, false, false, kapierrors.NewBadRequest(fmt.Sprintf("imagestreamtag %s is not a spec tag in imagestream %s/%s, cannot be updated", tag, imageStream.Namespace, imageStream.Name))
 	}
 
 	// if the caller set tag, override the spec tag
@@ -308,18 +350,21 @@ func (r *REST) Update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 		newImageStream, err = r.imageStreamRegistry.UpdateImageStream(ctx, imageStream, false, &metav1.UpdateOptions{})
 	}
 	if err != nil {
-		return nil, false, err
+		// return true for canRetry if we had a failure for resource versions
+		// and no resource version was passed in
+		// only support canRetry if we are updating
+		return nil, false, canRetry && !create, err
 	}
 
 	image, err := r.imageFor(ctx, tag, newImageStream)
 	if err != nil {
 		if !kapierrors.IsNotFound(err) {
-			return nil, false, err
+			return nil, false, false, err
 		}
 	}
 
 	newISTag, err := newISTag(tag, newImageStream, image, true)
-	return newISTag, !exists, err
+	return newISTag, !exists, false, err
 }
 
 // Delete removes a tag from a stream. `id` is of the format <stream name>:<tag>.
