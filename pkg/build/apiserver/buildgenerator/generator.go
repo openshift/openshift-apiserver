@@ -30,7 +30,6 @@ import (
 	"github.com/openshift/library-go/pkg/build/buildutil"
 	"github.com/openshift/library-go/pkg/build/naming"
 	"github.com/openshift/library-go/pkg/image/imageutil"
-	"github.com/openshift/openshift-apiserver/pkg/bootstrappolicy"
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 )
 
@@ -558,7 +557,7 @@ func (g *BuildGenerator) generateBuildFromConfig(ctx context.Context, bc *buildv
 	now := metav1.Now()
 	serviceAccount := bcCopy.Spec.ServiceAccount
 	if len(serviceAccount) == 0 {
-		serviceAccount = bootstrappolicy.BuilderServiceAccountName
+		serviceAccount = "builder"
 	}
 	t := true
 	build := &buildv1.Build{

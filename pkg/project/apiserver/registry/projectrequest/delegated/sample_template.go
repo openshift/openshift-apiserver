@@ -10,7 +10,6 @@ import (
 
 	projectv1 "github.com/openshift/api/project/v1"
 	templatev1 "github.com/openshift/api/template/v1"
-	"github.com/openshift/openshift-apiserver/pkg/bootstrappolicy"
 	projectapi "github.com/openshift/openshift-apiserver/pkg/project/apis/project"
 )
 
@@ -53,7 +52,7 @@ func DefaultTemplate() *templatev1.Template {
 	}
 	ret.Objects = append(ret.Objects, runtime.RawExtension{Raw: objBytes})
 
-	binding := rbacv1helpers.NewRoleBindingForClusterRole(bootstrappolicy.AdminRoleName, ns).Users("${" + ProjectAdminUserParam + "}").BindingOrDie()
+	binding := rbacv1helpers.NewRoleBindingForClusterRole("admin", ns).Users("${" + ProjectAdminUserParam + "}").BindingOrDie()
 	objBytes, err = runtime.Encode(codec, &binding)
 	if err != nil {
 		panic(err)

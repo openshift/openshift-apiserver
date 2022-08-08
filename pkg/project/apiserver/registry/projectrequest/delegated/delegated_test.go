@@ -11,7 +11,6 @@ import (
 	rbacv1listers "k8s.io/client-go/listers/rbac/v1"
 
 	"github.com/go-openapi/errors"
-	"github.com/openshift/openshift-apiserver/pkg/bootstrappolicy"
 )
 
 func TestDelegatedWait(t *testing.T) {
@@ -43,7 +42,7 @@ func waitForResultChannel(storage *REST) chan struct{} {
 	ret := make(chan struct{})
 
 	go func() {
-		storage.waitForRoleBinding("foo", bootstrappolicy.AdminRoleName)
+		storage.waitForRoleBinding("foo", "admin")
 		close(ret)
 	}()
 
@@ -62,10 +61,10 @@ func (t *testRoleBindingNamespaceLister) List(selector labels.Selector) (ret []*
 func (t *testRoleBindingNamespaceLister) Get(name string) (*rbacv1.RoleBinding, error) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
-	if t.bindings[bootstrappolicy.AdminRoleName] != nil {
-		return t.bindings[bootstrappolicy.AdminRoleName], nil
+	if t.bindings[("admin")] != nil {
+		return t.bindings[("admin")], nil
 	}
-	return nil, errors.NotFound("could not find role " + bootstrappolicy.AdminRoleName)
+	return nil, errors.NotFound("could not find role " + ("admin"))
 }
 
 type testRoleBindingLister struct {
@@ -83,7 +82,7 @@ func (t *testRoleBindingLister) List(selector labels.Selector) ([]*rbacv1.RoleBi
 func (t *testRoleBindingLister) addAdminRolebinding() {
 	t.namespacelister.lock.Lock()
 	defer t.namespacelister.lock.Unlock()
-	t.namespacelister.bindings[bootstrappolicy.AdminRoleName] = &rbacv1.RoleBinding{
-		ObjectMeta: metav1.ObjectMeta{Name: bootstrappolicy.AdminRoleName},
+	t.namespacelister.bindings[("admin")] = &rbacv1.RoleBinding{
+		ObjectMeta: metav1.ObjectMeta{Name: "admin"},
 	}
 }

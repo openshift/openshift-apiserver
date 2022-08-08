@@ -15,7 +15,6 @@ import (
 
 	buildv1 "github.com/openshift/api/build/v1"
 	imagev1 "github.com/openshift/api/image/v1"
-	"github.com/openshift/openshift-apiserver/pkg/bootstrappolicy"
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 	_ "github.com/openshift/openshift-apiserver/pkg/build/apis/build/install"
 	"github.com/openshift/openshift-apiserver/pkg/build/apiserver/buildgenerator"
@@ -117,7 +116,7 @@ func MockBuilderServiceAccount(secrets []*corev1.Secret) corev1client.ServiceAcc
 	}
 	fakeObjects = append(fakeObjects, &corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      bootstrappolicy.BuilderServiceAccountName,
+			Name:      "builder",
 			Namespace: metav1.NamespaceDefault,
 		},
 		Secrets: secretRefs,

@@ -24,7 +24,6 @@ import (
 	"github.com/openshift/library-go/pkg/authorization/authorizationutil"
 
 	"github.com/openshift/openshift-apiserver/pkg/api/legacy"
-	"github.com/openshift/openshift-apiserver/pkg/bootstrappolicy"
 	buildapi "github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 	buildv1helpers "github.com/openshift/openshift-apiserver/pkg/build/apis/build/v1"
 )
@@ -115,15 +114,15 @@ func (a *buildByStrategy) ValidateInitialization() error {
 func resourceForStrategyType(strategy buildapi.BuildStrategy) (schema.GroupResource, error) {
 	switch {
 	case strategy.DockerStrategy != nil && strategy.DockerStrategy.ImageOptimizationPolicy != nil && *strategy.DockerStrategy.ImageOptimizationPolicy != buildapi.ImageOptimizationNone:
-		return build.Resource(bootstrappolicy.OptimizedDockerBuildResource), nil
+		return build.Resource("builds/optimizeddocker"), nil
 	case strategy.DockerStrategy != nil:
-		return build.Resource(bootstrappolicy.DockerBuildResource), nil
+		return build.Resource("builds/docker"), nil
 	case strategy.CustomStrategy != nil:
-		return build.Resource(bootstrappolicy.CustomBuildResource), nil
+		return build.Resource("builds/custom"), nil
 	case strategy.SourceStrategy != nil:
-		return build.Resource(bootstrappolicy.SourceBuildResource), nil
+		return build.Resource("builds/source"), nil
 	case strategy.JenkinsPipelineStrategy != nil:
-		return build.Resource(bootstrappolicy.JenkinsPipelineBuildResource), nil
+		return build.Resource("builds/jenkinspipeline"), nil
 	default:
 		return schema.GroupResource{}, fmt.Errorf("unrecognized build strategy: %#v", strategy)
 	}
