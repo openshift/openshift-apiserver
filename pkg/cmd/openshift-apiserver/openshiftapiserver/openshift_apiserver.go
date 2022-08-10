@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/emicklei/go-restful"
+	"github.com/openshift/openshift-apiserver/pkg/bootstrappolicy"
+
 	corev1 "k8s.io/api/core/v1"
 	kapierror "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,6 +26,7 @@ import (
 	openapicontroller "k8s.io/kube-aggregator/pkg/controllers/openapi"
 	"k8s.io/kube-aggregator/pkg/controllers/openapi/aggregator"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
+	rbacrest "k8s.io/kubernetes/pkg/registry/rbac/rest"
 	rbacregistryvalidation "k8s.io/kubernetes/pkg/registry/rbac/validation"
 	rbacauthorizer "k8s.io/kubernetes/plugin/pkg/auth/authorizer/rbac"
 
@@ -408,6 +411,15 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 	AddOpenshiftVersionRoute(s.GenericAPIServer.Handler.GoRestfulContainer, "/version/openshift")
 
 	// register our poststarthooks
+	s.GenericAPIServer.AddPostStartHookOrDie("authorization.openshift.io-bootstrapclusterroles",
+		func(context genericapiserver.PostStartHookContext) error {
+			newContext := genericapiserver.PostStartHookContext{
+				LoopbackClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
+				StopCh:               context.StopCh,
+			}
+			return bootstrapData(bootstrappolicy.Policy()).EnsureRBACPolicy()(newContext)
+
+		})
 	s.GenericAPIServer.AddPostStartHookOrDie("authorization.openshift.io-ensurenodebootstrap-sa", c.EnsureNodeBootstrapServiceAccount)
 	s.GenericAPIServer.AddPostStartHookOrDie("project.openshift.io-projectcache", c.startProjectCache)
 	s.GenericAPIServer.AddPostStartHookOrDie("project.openshift.io-projectauthorizationcache", c.startProjectAuthorizationCache)
@@ -514,4 +526,16 @@ func (c *completedConfig) EnsureNodeBootstrapServiceAccount(_ genericapiserver.P
 	}
 
 	return nil
+}
+
+// bootstrapData casts our policy data to the rbacrest helper that can
+// materialize the policy.
+func bootstrapData(data *bootstrappolicy.PolicyData) *rbacrest.PolicyData {
+	return &rbacrest.PolicyData{
+		ClusterRoles:            data.ClusterRoles,
+		ClusterRoleBindings:     data.ClusterRoleBindings,
+		Roles:                   data.Roles,
+		RoleBindings:            data.RoleBindings,
+		ClusterRolesToAggregate: data.ClusterRolesToAggregate,
+	}
 }
