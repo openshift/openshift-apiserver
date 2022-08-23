@@ -169,11 +169,11 @@ func printSubjectRulesReview(subjectAccessReview *authorizationapi.SubjectRulesR
 	for _, rule := range subjectAccessReview.Status.Rules {
 		row := metav1.TableRow{}
 		row.Cells = append(row.Cells,
-			rule.Verbs.List(),
-			rule.NonResourceURLs.List(),
-			rule.ResourceNames.List(),
-			rule.APIGroups,
-			rule.Resources.List(),
+			join(rule.Verbs.List()),
+			join(rule.NonResourceURLs.List()),
+			join(rule.ResourceNames.List()),
+			join(rule.APIGroups),
+			join(rule.Resources.List()),
 		)
 		rows = append(rows, row)
 	}
@@ -185,11 +185,11 @@ func printSelfSubjectRulesReview(selfSubjectAccessReview *authorizationapi.SelfS
 	for _, rule := range selfSubjectAccessReview.Status.Rules {
 		row := metav1.TableRow{}
 		row.Cells = append(row.Cells,
-			rule.Verbs.List(),
-			rule.NonResourceURLs.List(),
-			rule.ResourceNames.List(),
-			rule.APIGroups,
-			rule.Resources.List(),
+			join(rule.Verbs.List()),
+			join(rule.NonResourceURLs.List()),
+			join(rule.ResourceNames.List()),
+			join(rule.APIGroups),
+			join(rule.Resources.List()),
 		)
 		rows = append(rows, row)
 	}
@@ -322,5 +322,9 @@ func truncatedList(list []string, maxLength int) string {
 	if len(list) > maxLength {
 		return fmt.Sprintf("%s (%d more)", strings.Join(list[0:maxLength], ", "), len(list)-maxLength)
 	}
+	return strings.Join(list, ", ")
+}
+
+func join(list []string) string {
 	return strings.Join(list, ", ")
 }
