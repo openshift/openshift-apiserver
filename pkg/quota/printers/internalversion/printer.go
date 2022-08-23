@@ -2,6 +2,7 @@ package internalversion
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	kprinters "k8s.io/kubernetes/pkg/printers"
 
@@ -42,7 +43,7 @@ func printClusterResourceQuota(clusterResourceQuota *quotaapi.ClusterResourceQuo
 	row.Cells = append(row.Cells,
 		clusterResourceQuota.Name,
 		metav1.FormatLabelSelector(clusterResourceQuota.Spec.Selector.LabelSelector),
-		clusterResourceQuota.Spec.Selector.AnnotationSelector,
+		labels.FormatLabels(clusterResourceQuota.Spec.Selector.AnnotationSelector),
 	)
 
 	return []metav1.TableRow{row}, nil
@@ -68,7 +69,7 @@ func printAppliedClusterResourceQuota(appliedClusterResourceQuota *quotaapi.Appl
 	row.Cells = append(row.Cells,
 		appliedClusterResourceQuota.Name,
 		metav1.FormatLabelSelector(appliedClusterResourceQuota.Spec.Selector.LabelSelector),
-		appliedClusterResourceQuota.Spec.Selector.AnnotationSelector,
+		labels.FormatLabels(appliedClusterResourceQuota.Spec.Selector.AnnotationSelector),
 	)
 
 	return []metav1.TableRow{row}, nil
