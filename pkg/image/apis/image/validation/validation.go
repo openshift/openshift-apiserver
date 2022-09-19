@@ -801,3 +801,43 @@ func getWhitelistTransportForFlag(insecure, allowSecureFallback bool) whitelist.
 	}
 	return whitelist.WhitelistTransportSecure
 }
+
+// ValidateImageStreamLayers ensures that given object is valid.
+func ValidateImageStreamLayers(isl *imageapi.ImageStreamLayers) field.ErrorList {
+	allErrs := field.ErrorList{}
+	for name, ibr := range isl.Images {
+		if ibr.ImageMissing {
+			if len(ibr.Layers) > 0 {
+				allErrs = append(allErrs, field.Invalid(field.NewPath("images").Key(name).Child("layers"), ibr.Layers, "layers must be empty if image is missing"))
+			}
+			if ibr.Config != nil {
+				allErrs = append(allErrs, field.Invalid(field.NewPath("images").Key(name).Child("config"), ibr.Config, "config must be null if image is missing"))
+			}
+			if len(ibr.Manifests) > 0 {
+				allErrs = append(allErrs, field.Invalid(field.NewPath("images").Key(name).Child("manifest"), ibr.Manifests, "manifests must be empty if image is missing"))
+			}
+		} else if len(ibr.Manifests) == 0 {
+			for i, layer := range ibr.Layers {
+				if len(layer) == 0 {
+					allErrs = append(allErrs, field.Invalid(field.NewPath("images").Key(name).Child("layers").Index(i), layer, "layer cannot be empty"))
+				}
+			}
+			if ibr.Config != nil && *ibr.Config == "" {
+				allErrs = append(allErrs, field.Invalid(field.NewPath("images").Key(name).Child("config"), ibr.Config, "config cannot be an empty string"))
+			}
+		} else {
+			if len(ibr.Layers) > 0 {
+				allErrs = append(allErrs, field.Invalid(field.NewPath("images").Key(name).Child("layers"), ibr.Layers, "layers must be empty if manifests are present"))
+			}
+			if ibr.Config != nil {
+				allErrs = append(allErrs, field.Invalid(field.NewPath("images").Key(name).Child("config"), ibr.Config, "config must be null if manifests are present"))
+			}
+			for i, manifest := range ibr.Manifests {
+				if len(manifest) == 0 {
+					allErrs = append(allErrs, field.Invalid(field.NewPath("images").Key(name).Child("manifests").Index(i), manifest, "manifest cannot be empty"))
+				}
+			}
+		}
+	}
+	return allErrs
+}

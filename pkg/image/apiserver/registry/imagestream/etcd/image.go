@@ -177,6 +177,7 @@ type ImageLayers struct {
 	MediaType       string
 	Config          *imagev1.ImageLayer
 	Layers          []imagev1.ImageLayer
+	Manifests       []imagev1.ImageManifest
 }
 
 func imageLayersForImage(image *imagev1.Image) *ImageLayers {
@@ -190,6 +191,7 @@ func imageLayersForImage(image *imagev1.Image) *ImageLayers {
 		MediaType:       mediaType,
 		Config:          configFromImage(image),
 		Layers:          image.DockerImageLayers,
+		Manifests:       image.DockerImageManifests,
 	}
 }
 

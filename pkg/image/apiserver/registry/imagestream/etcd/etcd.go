@@ -20,6 +20,7 @@ import (
 
 	"github.com/openshift/api/image"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
+	imagevalidation "github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
 	imageadmission "github.com/openshift/openshift-apiserver/pkg/image/apiserver/admission/limitrange"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
@@ -215,7 +216,66 @@ func (r *LayersREST) Get(ctx context.Context, name string, options *metav1.GetOp
 		}
 	}
 
+	if errs := imagevalidation.ValidateImageStreamLayers(isl); len(errs) > 0 {
+		return nil, errors.NewInvalid(image.Kind(isl.Kind), "", errs)
+	}
+
 	return isl, nil
+}
+
+// addImageLayersFromCache looks up the image in the cache and then adds
+// metadata about it, its referenced blobs, and its sub-manifests to isl. It
+// returns the names of missing images from the cache.
+func addImageLayersFromCache(isl *imageapi.ImageStreamLayers, imageName string, index ImageLayerIndex) []string {
+	obj, _, _ := index.GetByKey(imageName)
+	entry, ok := obj.(*ImageLayers)
+	if !ok {
+		if _, ok := isl.Images[imageName]; !ok {
+			isl.Images[imageName] = imageapi.ImageBlobReferences{ImageMissing: true}
+		}
+		return []string{imageName}
+	}
+
+	// we have already added this image once
+	if _, ok := isl.Images[imageName]; ok {
+		return nil
+	}
+
+	var reference imageapi.ImageBlobReferences
+	for _, layer := range entry.Layers {
+		reference.Layers = append(reference.Layers, layer.Name)
+		if _, ok := isl.Blobs[layer.Name]; !ok {
+			isl.Blobs[layer.Name] = imageapi.ImageLayerData{LayerSize: &layer.LayerSize, MediaType: layer.MediaType}
+		}
+	}
+
+	if blob := entry.Config; blob != nil {
+		reference.Config = &blob.Name
+		if _, ok := isl.Blobs[blob.Name]; !ok {
+			if blob.LayerSize == 0 {
+				// only send media type since we don't the size of the manifest
+				isl.Blobs[blob.Name] = imageapi.ImageLayerData{MediaType: blob.MediaType}
+			} else {
+				isl.Blobs[blob.Name] = imageapi.ImageLayerData{LayerSize: &blob.LayerSize, MediaType: blob.MediaType}
+			}
+		}
+	}
+
+	for _, manifest := range entry.Manifests {
+		reference.Manifests = append(reference.Manifests, manifest.Digest)
+	}
+
+	// the image manifest is always a blob - schema2 images also have a config blob referenced from the manifest
+	if _, ok := isl.Blobs[imageName]; !ok {
+		isl.Blobs[imageName] = imageapi.ImageLayerData{MediaType: entry.MediaType}
+	}
+	isl.Images[imageName] = reference
+
+	var missing []string
+	for _, child := range reference.Manifests {
+		missing = append(missing, addImageLayersFromCache(isl, child, index)...)
+	}
+	return missing
 }
 
 // addImageStreamLayersFromCache looks up tagged images from the provided image stream in the cache and then adds
@@ -229,46 +289,7 @@ func addImageStreamLayersFromCache(isl *imageapi.ImageStreamLayers, is *imageapi
 				continue
 			}
 
-			obj, _, _ := index.GetByKey(item.Image)
-			entry, ok := obj.(*ImageLayers)
-			if !ok {
-				if _, ok := isl.Images[item.Image]; !ok {
-					isl.Images[item.Image] = imageapi.ImageBlobReferences{ImageMissing: true}
-				}
-				missing = append(missing, item.Image)
-				continue
-			}
-
-			// we have already added this image once
-			if _, ok := isl.Images[item.Image]; ok {
-				continue
-			}
-
-			var reference imageapi.ImageBlobReferences
-			for _, layer := range entry.Layers {
-				reference.Layers = append(reference.Layers, layer.Name)
-				if _, ok := isl.Blobs[layer.Name]; !ok {
-					isl.Blobs[layer.Name] = imageapi.ImageLayerData{LayerSize: &layer.LayerSize, MediaType: layer.MediaType}
-				}
-			}
-
-			if blob := entry.Config; blob != nil {
-				reference.Config = &blob.Name
-				if _, ok := isl.Blobs[blob.Name]; !ok {
-					if blob.LayerSize == 0 {
-						// only send media type since we don't the size of the manifest
-						isl.Blobs[blob.Name] = imageapi.ImageLayerData{MediaType: blob.MediaType}
-					} else {
-						isl.Blobs[blob.Name] = imageapi.ImageLayerData{LayerSize: &blob.LayerSize, MediaType: blob.MediaType}
-					}
-				}
-			}
-
-			// the image manifest is always a blob - schema2 images also have a config blob referenced from the manifest
-			if _, ok := isl.Blobs[item.Image]; !ok {
-				isl.Blobs[item.Image] = imageapi.ImageLayerData{MediaType: entry.MediaType}
-			}
-			isl.Images[item.Image] = reference
+			missing = append(missing, addImageLayersFromCache(isl, item.Image, index)...)
 		}
 	}
 	return missing

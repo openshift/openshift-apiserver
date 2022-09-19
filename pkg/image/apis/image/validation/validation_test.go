@@ -1965,3 +1965,90 @@ func mkWhitelister(t *testing.T, wl openshiftcontrolplanev1.AllowedRegistries) w
 	}
 	return whitelister
 }
+
+func TestValidateImageStreamLayers(t *testing.T) {
+	configDigest := "sha256:bc01a3326866eedd68525a4d2d91d2cf86f9893db054601d6be524d5c9d03981"
+	testCases := []struct {
+		name     string
+		isl      *imageapi.ImageStreamLayers
+		expected field.ErrorList
+	}{
+		{
+			name: "empty",
+			isl: &imageapi.ImageStreamLayers{
+				ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: "bar"},
+			},
+			expected: field.ErrorList{},
+		},
+		{
+			name: "valid",
+			isl: &imageapi.ImageStreamLayers{
+				ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: "bar"},
+				Blobs:      map[string]imageapi.ImageLayerData{},
+				Images: map[string]imageapi.ImageBlobReferences{
+					"sha256:dacd1aa51e0b27c0e36c4981a7a8d9d8ec2c4a74bf125c0a44d0709497a522e9": {
+						ImageMissing: false,
+						Layers: []string{
+							"sha256:22b70bddd3acadc892fca4c2af4260629bfda5dfd11ebc106a93ce24e752b5ed",
+						},
+						Config: &configDigest,
+					},
+				},
+			},
+			expected: field.ErrorList{},
+		},
+		{
+			name: "invalid layer",
+			isl: &imageapi.ImageStreamLayers{
+				ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: "bar"},
+				Blobs:      map[string]imageapi.ImageLayerData{},
+				Images: map[string]imageapi.ImageBlobReferences{
+					"sha256:dacd1aa51e0b27c0e36c4981a7a8d9d8ec2c4a74bf125c0a44d0709497a522e9": {
+						ImageMissing: false,
+						Layers: []string{
+							"sha256:22b70bddd3acadc892fca4c2af4260629bfda5dfd11ebc106a93ce24e752b5ed",
+							"",
+						},
+					},
+				},
+			},
+			expected: field.ErrorList{
+				field.Invalid(
+					field.NewPath("images").Key("sha256:dacd1aa51e0b27c0e36c4981a7a8d9d8ec2c4a74bf125c0a44d0709497a522e9").Child("layers").Index(1),
+					"",
+					"layer cannot be empty",
+				),
+			},
+		},
+		{
+			name: "invalid manifest",
+			isl: &imageapi.ImageStreamLayers{
+				ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: "bar"},
+				Blobs:      map[string]imageapi.ImageLayerData{},
+				Images: map[string]imageapi.ImageBlobReferences{
+					"sha256:6bdd92bf5240be1b5f3bf71324f5e371fe59f0e153b27fa1f1620f78ba16963c": {
+						ImageMissing: false,
+						Manifests: []string{
+							"",
+						},
+					},
+				},
+			},
+			expected: field.ErrorList{
+				field.Invalid(
+					field.NewPath("images").Key("sha256:6bdd92bf5240be1b5f3bf71324f5e371fe59f0e153b27fa1f1620f78ba16963c").Child("manifests").Index(0),
+					"",
+					"manifest cannot be empty",
+				),
+			},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			errs := ValidateImageStreamLayers(tc.isl)
+			if !reflect.DeepEqual(errs, tc.expected) {
+				t.Errorf("unexpected errors: %s", diff.ObjectDiff(tc.expected, errs))
+			}
+		})
+	}
+}
