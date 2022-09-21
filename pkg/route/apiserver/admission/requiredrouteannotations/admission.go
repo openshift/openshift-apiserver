@@ -15,6 +15,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/admission/initializer"
 	"k8s.io/client-go/informers"
@@ -24,12 +25,14 @@ import (
 
 	configv1 "github.com/openshift/api/config/v1"
 	grouproute "github.com/openshift/api/route"
+	routev1 "github.com/openshift/api/route/v1"
 	configinformers "github.com/openshift/client-go/config/informers/externalversions"
 	configv1listers "github.com/openshift/client-go/config/listers/config/v1"
 	routeinformers "github.com/openshift/client-go/route/informers/externalversions"
 	routev1listers "github.com/openshift/client-go/route/listers/route/v1"
 	openshiftapiserveradmission "github.com/openshift/openshift-apiserver/pkg/admission"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
+	routev1conversions "github.com/openshift/openshift-apiserver/pkg/route/apis/route/v1"
 )
 
 const (
@@ -39,10 +42,25 @@ const (
 	hstsAnnotation         = "haproxy.router.openshift.io/hsts_header"
 )
 
+func internalToV1Route(obj runtime.Object) (*routev1.Route, error) {
+	internal, ok := obj.(*routeapi.Route)
+	if !ok {
+		return nil, nil
+	}
+
+	var converted routev1.Route
+	err := routev1conversions.Convert_route_Route_To_v1_Route(internal, &converted, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &converted, nil
+}
+
 func Register(plugins *admission.Plugins) {
 	plugins.Register(pluginName,
 		func(_ io.Reader) (admission.Interface, error) {
-			return NewRequiredRouteAnnotations(), nil
+			return NewRequiredRouteAnnotations(internalToV1Route), nil
 		})
 }
 
@@ -58,6 +76,7 @@ func (cs *cacheSync) hasSynced() bool {
 	defer cs.isSyncedLock.RUnlock()
 	return cs.isSynced
 }
+
 func (cs *cacheSync) setSynced() {
 	cs.isSyncedLock.Lock()
 	defer cs.isSyncedLock.Unlock()
@@ -71,6 +90,11 @@ type requiredRouteAnnotations struct {
 	ingressLister configv1listers.IngressLister
 	cachesToSync  []cache.InformerSynced
 	cacheSyncLock cacheSync
+
+	// This plugin expects to validate objects of type *routev1.Route, which is importable by
+	// both openshift-apiserver and openshift/kubernetes, in order to support OpenShift variants
+	// that serve the Route API via the CR handler instead of via openshift-apiserver.
+	toV1Route func(runtime.Object) (*routev1.Route, error)
 }
 
 // Ensure that the required OpenShift admission interfaces are implemented.
@@ -87,9 +111,9 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 	if a.GetResource().GroupResource() != grouproute.Resource("routes") {
 		return nil
 	}
-	newRoute, isRoute := a.GetObject().(*routeapi.Route)
-	if !isRoute {
-		return nil
+	newRoute, err := o.toV1Route(a.GetObject())
+	if err != nil {
+		return admission.NewForbidden(a, err)
 	}
 
 	// Determine if there are HSTS changes in this update
@@ -99,7 +123,11 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 
 		newHSTS, wants = newRoute.Annotations[hstsAnnotation]
 
-		oldObject := a.GetOldObject().(*routeapi.Route)
+		oldObject, err := o.toV1Route(a.GetOldObject())
+		if err != nil {
+			return admission.NewForbidden(a, err)
+		}
+
 		oldHSTS, has = oldObject.Annotations[hstsAnnotation]
 
 		// Skip the validation if we're not making a change to HSTS at this time
@@ -110,7 +138,7 @@ func (o *requiredRouteAnnotations) Validate(ctx context.Context, a admission.Att
 
 	// Cannot apply HSTS if route is not TLS.  Ignore silently to keep backward compatibility.
 	tls := newRoute.Spec.TLS
-	if tls == nil || (tls.Termination != routeapi.TLSTerminationEdge && tls.Termination != routeapi.TLSTerminationReencrypt) {
+	if tls == nil || (tls.Termination != routev1.TLSTerminationEdge && tls.Termination != routev1.TLSTerminationReencrypt) {
 		// TODO - will address missing annotations on routes as route status in https://issues.redhat.com/browse/NE-678
 		return nil
 	}
@@ -171,9 +199,10 @@ func (o *requiredRouteAnnotations) ValidateInitialization() error {
 	return nil
 }
 
-func NewRequiredRouteAnnotations() *requiredRouteAnnotations {
+func NewRequiredRouteAnnotations(toV1Route func(runtime.Object) (*routev1.Route, error)) *requiredRouteAnnotations {
 	return &requiredRouteAnnotations{
-		Handler: admission.NewHandler(admission.Create, admission.Update),
+		Handler:   admission.NewHandler(admission.Create, admission.Update),
+		toV1Route: toV1Route,
 	}
 }
 
@@ -188,7 +217,7 @@ func (o *requiredRouteAnnotations) SetOpenShiftConfigInformers(informers configi
 }
 
 // isRouteHSTSAllowed returns nil if the route is allowed.  Otherwise, returns details and a suggestion in the error
-func isRouteHSTSAllowed(ingress *configv1.Ingress, newRoute *routeapi.Route, namespace *corev1.Namespace) error {
+func isRouteHSTSAllowed(ingress *configv1.Ingress, newRoute *routev1.Route, namespace *corev1.Namespace) error {
 	requirements := ingress.Spec.RequiredHSTSPolicies
 	for _, requirement := range requirements {
 		// Check if the required namespaceSelector (if any) and the domainPattern match
@@ -237,7 +266,7 @@ const (
 
 // Parse out the hstsConfig fields from the annotation
 // Unrecognized fields are ignored
-func hstsConfigFromRoute(route *routeapi.Route) (*hstsConfig, error) {
+func hstsConfigFromRoute(route *routev1.Route) (*hstsConfig, error) {
 	var ret hstsConfig
 
 	trimmed := strings.ToLower(strings.ReplaceAll(route.Annotations[hstsAnnotation], " ", ""))
@@ -307,7 +336,7 @@ func (c *hstsConfig) meetsRequirements(requirement configv1.RequiredHSTSPolicy) 
 }
 
 // Check if the route matches the required domain/namespace in the HSTS Policy
-func requiredNamespaceDomainMatchesRoute(requirement configv1.RequiredHSTSPolicy, route *routeapi.Route, namespace *corev1.Namespace) (bool, error) {
+func requiredNamespaceDomainMatchesRoute(requirement configv1.RequiredHSTSPolicy, route *routev1.Route, namespace *corev1.Namespace) (bool, error) {
 	matchesNamespace, err := matchesNamespaceSelector(requirement.NamespaceSelector, namespace)
 	if err != nil {
 		return false, err

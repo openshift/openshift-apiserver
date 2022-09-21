@@ -433,7 +433,7 @@ func TestValidate(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.description, func(t *testing.T) {
-			admitter := NewRequiredRouteAnnotations()
+			admitter := NewRequiredRouteAnnotations(internalToV1Route)
 			if admitter == nil {
 				t.Fatal("Unexpected error: admitter is nil")
 			}
