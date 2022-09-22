@@ -19,8 +19,6 @@ import (
 
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	_ "github.com/openshift/openshift-apiserver/pkg/route/apis/route/install"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/registry/route"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeinterfaces"
 	"k8s.io/apiserver/pkg/registry/generic"
 )
 
@@ -55,12 +53,12 @@ func (t *testSAR) Create(_ context.Context, subjectAccessReview *authorizationap
 	}, t.err
 }
 
-func newStorage(t *testing.T, allocator routeinterfaces.RouteAllocator) (*REST, *etcdtesting.EtcdTestServer) {
+func newStorage(t *testing.T) (*REST, *etcdtesting.EtcdTestServer) {
 	server, etcdStorage := etcdtesting.NewUnsecuredEtcd3TestClientServer(t)
 	etcdStorage.Codec = legacyscheme.Codecs.LegacyCodec(schema.GroupVersion{Group: "route.openshift.io", Version: "v1"})
 	etcdStorageConfigForRoutes := &storagebackend.ConfigForResource{Config: *etcdStorage, GroupResource: schema.GroupResource{Group: "route.openshift.io", Resource: "routes"}}
 	restOptions := generic.RESTOptions{StorageConfig: etcdStorageConfigForRoutes, Decorator: generic.UndecoratedStorage, DeleteCollectionWorkers: 1, ResourcePrefix: "routes"}
-	storage, _, err := NewREST(restOptions, allocator, &testSAR{allow: true})
+	storage, _, err := NewREST(restOptions)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,7 +80,7 @@ func validRoute() *routeapi.Route {
 }
 
 func TestCreate(t *testing.T) {
-	storage, server := newStorage(t, nil)
+	storage, server := newStorage(t)
 	defer server.Terminate(t)
 	defer storage.Store.DestroyFunc()
 	test := genericregistrytest.New(t, storage.Store)
@@ -98,7 +96,7 @@ func TestCreate(t *testing.T) {
 
 func TestCreateWithAllocation(t *testing.T) {
 	allocator := &testAllocator{Hostname: "bar"}
-	storage, server := newStorage(t, allocator)
+	storage, server := newStorage(t)
 	defer server.Terminate(t)
 	defer storage.Store.DestroyFunc()
 
@@ -110,7 +108,7 @@ func TestCreateWithAllocation(t *testing.T) {
 	if result.Spec.Host != "bar" {
 		t.Fatalf("unexpected route: %#v", result)
 	}
-	if v, ok := result.Annotations[route.HostGeneratedAnnotationKey]; !ok || v != "true" {
+	if v, ok := result.Annotations["openshift.io/host.generated"]; !ok || v != "true" {
 		t.Fatalf("unexpected route: %#v", result)
 	}
 	if !allocator.Allocate || !allocator.Generate {
@@ -119,7 +117,7 @@ func TestCreateWithAllocation(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	storage, server := newStorage(t, nil)
+	storage, server := newStorage(t)
 	defer server.Terminate(t)
 	defer storage.Store.DestroyFunc()
 	test := genericregistrytest.New(t, storage.Store)
@@ -145,7 +143,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	storage, server := newStorage(t, nil)
+	storage, server := newStorage(t)
 	defer server.Terminate(t)
 	defer storage.Store.DestroyFunc()
 	test := genericregistrytest.New(t, storage.Store)
@@ -155,7 +153,7 @@ func TestList(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	storage, server := newStorage(t, &testAllocator{})
+	storage, server := newStorage(t)
 	defer server.Terminate(t)
 	defer storage.Store.DestroyFunc()
 	test := genericregistrytest.New(t, storage.Store)
@@ -165,7 +163,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	storage, server := newStorage(t, nil)
+	storage, server := newStorage(t)
 	defer server.Terminate(t)
 	defer storage.Store.DestroyFunc()
 	test := genericregistrytest.New(t, storage.Store)
@@ -175,7 +173,7 @@ func TestDelete(t *testing.T) {
 }
 
 func TestWatch(t *testing.T) {
-	storage, server := newStorage(t, nil)
+	storage, server := newStorage(t)
 	defer server.Terminate(t)
 	defer storage.Store.DestroyFunc()
 	test := genericregistrytest.New(t, storage.Store)

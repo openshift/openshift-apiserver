@@ -46,7 +46,6 @@ import (
 	projectcache "github.com/openshift/openshift-apiserver/pkg/project/cache"
 	quotaapiserver "github.com/openshift/openshift-apiserver/pkg/quota/apiserver"
 	routeapiserver "github.com/openshift/openshift-apiserver/pkg/route/apiserver"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeallocationcontroller"
 	securityapiserver "github.com/openshift/openshift-apiserver/pkg/security/apiserver"
 	templateapiserver "github.com/openshift/openshift-apiserver/pkg/template/apiserver"
 	"github.com/openshift/openshift-apiserver/pkg/version"
@@ -77,8 +76,6 @@ type OpenshiftAPIExtraConfig struct {
 	AllowedRegistriesForImport         openshiftcontrolplanev1.AllowedRegistries
 	MaxImagesBulkImportedPerRepository int
 	AdditionalTrustedCA                []byte
-
-	RouteAllocator *routeallocationcontroller.RouteAllocationController
 
 	ProjectAuthorizationCache *projectauth.AuthorizationCache
 	ProjectCache              *projectcache.ProjectCache
@@ -113,9 +110,6 @@ func (c *OpenshiftAPIExtraConfig) Validate() error {
 	}
 	if c.RegistryHostnameRetriever == nil {
 		ret = append(ret, fmt.Errorf("RegistryHostnameRetriever is required"))
-	}
-	if c.RouteAllocator == nil {
-		ret = append(ret, fmt.Errorf("RouteAllocator is required"))
 	}
 	if c.ProjectAuthorizationCache == nil {
 		ret = append(ret, fmt.Errorf("ProjectAuthorizationCache is required"))
@@ -291,7 +285,6 @@ func (c *completedConfig) withRouteAPIServer(delegateAPIServer genericapiserver.
 		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
 		ExtraConfig: routeapiserver.ExtraConfig{
 			KubeAPIServerClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
-			RouteAllocator:            c.ExtraConfig.RouteAllocator,
 			Codecs:                    legacyscheme.Codecs,
 			Scheme:                    legacyscheme.Scheme,
 		},

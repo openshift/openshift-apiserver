@@ -17,7 +17,6 @@ import (
 
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	routeregistry "github.com/openshift/openshift-apiserver/pkg/route/apiserver/registry/route"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeinterfaces"
 	routeprinters "github.com/openshift/openshift-apiserver/pkg/route/printers/internalversion"
 )
 
@@ -34,8 +33,8 @@ func (r *REST) Categories() []string {
 }
 
 // NewREST returns a RESTStorage object that will work against routes.
-func NewREST(optsGetter generic.RESTOptionsGetter, allocator routeinterfaces.RouteAllocator, sarClient routeregistry.SubjectAccessReviewInterface) (*REST, *StatusREST, error) {
-	strategy := routeregistry.NewStrategy(allocator, sarClient)
+func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, *StatusREST, error) {
+	strategy := routeregistry.NewStrategy()
 
 	store := &registry.Store{
 		NewFunc:                  func() runtime.Object { return &routeapi.Route{} },

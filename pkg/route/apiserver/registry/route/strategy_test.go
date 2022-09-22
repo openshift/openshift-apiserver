@@ -42,7 +42,7 @@ func (t *testSAR) Create(_ context.Context, subjectAccessReview *authorizationap
 
 func TestEmptyHostDefaulting(t *testing.T) {
 	ctx := apirequest.NewContext()
-	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true})
+	strategy := NewStrategy()
 
 	hostlessCreatedRoute := &routeapi.Route{}
 	strategy.Validate(ctx, hostlessCreatedRoute)
@@ -71,7 +71,7 @@ func TestEmptyHostDefaulting(t *testing.T) {
 
 func TestEmptyHostDefaultingWhenSubdomainSet(t *testing.T) {
 	ctx := apirequest.NewContext()
-	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true})
+	strategy := NewStrategy()
 
 	hostlessCreatedRoute := &routeapi.Route{}
 	strategy.Validate(ctx, hostlessCreatedRoute)
@@ -432,8 +432,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			sar := &testSAR{allow: tc.allow}
-			strategy := NewStrategy(testAllocator{}, sar)
+			strategy := NewStrategy()
 
 			route := &routeapi.Route{
 				ObjectMeta: metav1.ObjectMeta{
@@ -486,7 +485,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 				t.Fatalf("expected subdomain %s, got %s", tc.expectedSubdomain, route.Spec.Subdomain)
 			}
 			if len(errs) != tc.errs {
-				t.Fatalf("unexpected errors: %v %#v", errs, sar)
+				t.Fatalf("unexpected errors: %v", errs)
 			}
 		})
 	}

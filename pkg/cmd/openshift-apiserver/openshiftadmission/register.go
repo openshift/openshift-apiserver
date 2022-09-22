@@ -13,6 +13,7 @@ import (
 	imageadmission "github.com/openshift/openshift-apiserver/pkg/image/apiserver/admission/limitrange"
 	projectrequestlimit "github.com/openshift/openshift-apiserver/pkg/project/apiserver/admission/requestlimit"
 	requiredrouteannotations "github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/requiredrouteannotations"
+	routehostassignment "github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/routehostassignment"
 )
 
 // TODO register this per apiserver or at least per process
@@ -33,6 +34,7 @@ func RegisterAllAdmissionPlugins(plugins *admission.Plugins) {
 }
 
 func RegisterOpenshiftAdmissionPlugins(plugins *admission.Plugins) {
+	routehostassignment.Register(plugins)
 	projectrequestlimit.Register(plugins)
 	buildsecretinjector.Register(plugins)
 	buildstrategyrestrictions.Register(plugins)
@@ -50,6 +52,7 @@ var (
 		"OwnerReferencesPermissionEnforcement",
 
 		// all custom admission goes here to simulate being part of a webhook
+		"route.openshift.io/RouteHostAssignment",
 		"project.openshift.io/ProjectRequestLimit",
 		"build.openshift.io/BuildConfigSecretInjector",
 		"build.openshift.io/BuildByStrategy",

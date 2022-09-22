@@ -34,6 +34,7 @@ import (
 	openshiftapiserveradmission "github.com/openshift/openshift-apiserver/pkg/admission"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/admission/imagepolicy/originimagereferencemutators"
 	"github.com/openshift/openshift-apiserver/pkg/quota/image"
+	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/routehostassignment"
 )
 
 type InformerAccess interface {
@@ -55,6 +56,7 @@ func NewPluginInitializer(
 	featureGates featuregate.FeatureGate,
 	restMapper meta.RESTMapper,
 	clusterQuotaMappingController *clusterquotamapping.ClusterQuotaMappingController,
+	routeHostDefaulter *routehostassignment.HostDefaulter,
 ) (admission.PluginInitializer, error) {
 	kubeClient, err := kubeclientgoclient.NewForConfig(privilegedLoopbackConfig)
 	if err != nil {
@@ -132,5 +134,6 @@ func NewPluginInitializer(
 			quotaRegistry,
 		),
 		admissionrestconfig.NewInitializer(*rest.CopyConfig(privilegedLoopbackConfig)),
+		routeHostDefaulter,
 	}, nil
 }

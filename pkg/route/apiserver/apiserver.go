@@ -9,17 +9,14 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
-	authorizationclient "k8s.io/client-go/kubernetes/typed/authorization/v1"
 	restclient "k8s.io/client-go/rest"
 
 	routeapiv1 "github.com/openshift/api/route/v1"
 	routeetcd "github.com/openshift/openshift-apiserver/pkg/route/apiserver/registry/route/etcd"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeallocationcontroller"
 )
 
 type ExtraConfig struct {
 	KubeAPIServerClientConfig *restclient.Config
-	RouteAllocator            *routeallocationcontroller.RouteAllocationController
 
 	// TODO these should all become local eventually
 	Scheme *runtime.Scheme
@@ -93,11 +90,7 @@ func (c *completedConfig) V1RESTStorage() (map[string]rest.Storage, error) {
 }
 
 func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
-	authorizationClient, err := authorizationclient.NewForConfig(c.ExtraConfig.KubeAPIServerClientConfig)
-	if err != nil {
-		return nil, err
-	}
-	routeStorage, routeStatusStorage, err := routeetcd.NewREST(c.GenericConfig.RESTOptionsGetter, c.ExtraConfig.RouteAllocator, authorizationClient.SubjectAccessReviews())
+	routeStorage, routeStatusStorage, err := routeetcd.NewREST(c.GenericConfig.RESTOptionsGetter)
 	if err != nil {
 		return nil, fmt.Errorf("error building REST storage: %v", err)
 	}

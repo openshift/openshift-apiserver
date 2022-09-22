@@ -4,47 +4,26 @@ import (
 	"context"
 	"fmt"
 
-	authorizationapi "k8s.io/api/authorization/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/storage/names"
-	authorizationclient "k8s.io/client-go/kubernetes/typed/authorization/v1"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
-	kvalidation "k8s.io/kubernetes/pkg/apis/core/validation"
 
-	"github.com/openshift/library-go/pkg/authorization/authorizationutil"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	"github.com/openshift/openshift-apiserver/pkg/route/apis/route/validation"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeinterfaces"
 )
-
-// HostGeneratedAnnotationKey is the key for an annotation set to "true" if the route's host was generated
-const HostGeneratedAnnotationKey = "openshift.io/host.generated"
-
-// Registry is an interface for performing subject access reviews
-type SubjectAccessReviewInterface interface {
-	Create(ctx context.Context, sar *authorizationapi.SubjectAccessReview, opts metav1.CreateOptions) (result *authorizationapi.SubjectAccessReview, err error)
-}
-
-var _ SubjectAccessReviewInterface = authorizationclient.SubjectAccessReviewInterface(nil)
 
 type routeStrategy struct {
 	runtime.ObjectTyper
 	names.NameGenerator
-	routeinterfaces.RouteAllocator
-	sarClient SubjectAccessReviewInterface
 }
 
 // NewStrategy initializes the default logic that applies when creating and updating
 // Route objects via the REST API.
-func NewStrategy(allocator routeinterfaces.RouteAllocator, sarClient SubjectAccessReviewInterface) routeStrategy {
+func NewStrategy() routeStrategy {
 	return routeStrategy{
-		ObjectTyper:    legacyscheme.Scheme,
-		NameGenerator:  names.SimpleNameGenerator,
-		RouteAllocator: allocator,
-		sarClient:      sarClient,
+		ObjectTyper:   legacyscheme.Scheme,
+		NameGenerator: names.SimpleNameGenerator,
 	}
 }
 
@@ -71,71 +50,9 @@ func (s routeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 	}
 }
 
-// allocateHost allocates a host name ONLY if the route doesn't specify a subdomain wildcard policy and
-// the host name on the route is empty and an allocator is configured.
-// It must first allocate the shard and may return an error if shard allocation fails.
-func (s routeStrategy) allocateHost(ctx context.Context, route *routeapi.Route) field.ErrorList {
-	hostSet := len(route.Spec.Host) > 0
-	certSet := route.Spec.TLS != nil && (len(route.Spec.TLS.CACertificate) > 0 || len(route.Spec.TLS.Certificate) > 0 || len(route.Spec.TLS.DestinationCACertificate) > 0 || len(route.Spec.TLS.Key) > 0)
-	if hostSet || certSet {
-		user, ok := apirequest.UserFrom(ctx)
-		if !ok {
-			return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), fmt.Errorf("unable to verify host field can be set"))}
-		}
-		res, err := s.sarClient.Create(
-			ctx,
-			authorizationutil.AddUserToSAR(
-				user,
-				&authorizationapi.SubjectAccessReview{
-					Spec: authorizationapi.SubjectAccessReviewSpec{
-						ResourceAttributes: &authorizationapi.ResourceAttributes{
-							Namespace:   apirequest.NamespaceValue(ctx),
-							Verb:        "create",
-							Group:       routeapi.GroupName,
-							Resource:    "routes",
-							Subresource: "custom-host",
-						},
-					},
-				},
-			),
-			metav1.CreateOptions{},
-		)
-		if err != nil {
-			return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), err)}
-		}
-		if !res.Status.Allowed {
-			if hostSet {
-				return field.ErrorList{field.Forbidden(field.NewPath("spec", "host"), "you do not have permission to set the host field of the route")}
-			}
-			return field.ErrorList{field.Forbidden(field.NewPath("spec", "tls"), "you do not have permission to set certificate fields on the route")}
-		}
-	}
-
-	if route.Spec.WildcardPolicy == routeapi.WildcardPolicySubdomain {
-		// Don't allocate a host if subdomain wildcard policy.
-		return nil
-	}
-
-	if len(route.Spec.Subdomain) == 0 && len(route.Spec.Host) == 0 && s.RouteAllocator != nil {
-		// TODO: this does not belong here, and should be removed
-		shard, err := s.RouteAllocator.AllocateRouterShard(route)
-		if err != nil {
-			return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), fmt.Errorf("allocation error: %v for route: %#v", err, route))}
-		}
-		route.Spec.Host = s.RouteAllocator.GenerateHostname(route, shard)
-		if route.Annotations == nil {
-			route.Annotations = map[string]string{}
-		}
-		route.Annotations[HostGeneratedAnnotationKey] = "true"
-	}
-	return nil
-}
-
 func (s routeStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	route := obj.(*routeapi.Route)
-	errs := s.allocateHost(ctx, route)
-	errs = append(errs, validation.ValidateRoute(route)...)
-	return errs
+	return validation.ValidateRoute(route)
 }
 
 // WarningsOnCreate returns warnings for the creation of the given object.
@@ -154,9 +71,7 @@ func (routeStrategy) Canonicalize(obj runtime.Object) {
 func (s routeStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	oldRoute := old.(*routeapi.Route)
 	objRoute := obj.(*routeapi.Route)
-	errs := s.validateHostUpdate(ctx, objRoute, oldRoute)
-	errs = append(errs, validation.ValidateRouteUpdate(objRoute, oldRoute)...)
-	return errs
+	return validation.ValidateRouteUpdate(objRoute, oldRoute)
 }
 
 func hasCertificateInfo(tls *routeapi.TLSConfig) bool {
@@ -190,85 +105,6 @@ func certificateChangeRequiresAuth(route, older *routeapi.Route) bool {
 	}
 }
 
-func (s routeStrategy) validateHostUpdate(ctx context.Context, route, older *routeapi.Route) field.ErrorList {
-	hostChanged := route.Spec.Host != older.Spec.Host
-	subdomainChanged := route.Spec.Subdomain != older.Spec.Subdomain
-	certChanged := certificateChangeRequiresAuth(route, older)
-	if !hostChanged && !certChanged && !subdomainChanged {
-		return nil
-	}
-	user, ok := apirequest.UserFrom(ctx)
-	if !ok {
-		return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), fmt.Errorf("unable to verify host field can be changed"))}
-	}
-	res, err := s.sarClient.Create(
-		ctx,
-		authorizationutil.AddUserToSAR(
-			user,
-			&authorizationapi.SubjectAccessReview{
-				Spec: authorizationapi.SubjectAccessReviewSpec{
-					ResourceAttributes: &authorizationapi.ResourceAttributes{
-						Namespace:   apirequest.NamespaceValue(ctx),
-						Verb:        "update",
-						Group:       routeapi.GroupName,
-						Resource:    "routes",
-						Subresource: "custom-host",
-					},
-				},
-			},
-		),
-		metav1.CreateOptions{},
-	)
-	if err != nil {
-		if subdomainChanged {
-			return field.ErrorList{field.InternalError(field.NewPath("spec", "subdomain"), err)}
-		}
-		return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), err)}
-	}
-	if !res.Status.Allowed {
-		if hostChanged {
-			return kvalidation.ValidateImmutableField(route.Spec.Host, older.Spec.Host, field.NewPath("spec", "host"))
-		}
-		if subdomainChanged {
-			return kvalidation.ValidateImmutableField(route.Spec.Subdomain, older.Spec.Subdomain, field.NewPath("spec", "subdomain"))
-		}
-
-		// if tls is being updated without host being updated, we check if 'create' permission exists on custom-host subresource
-		res, err := s.sarClient.Create(
-			ctx,
-			authorizationutil.AddUserToSAR(
-				user,
-				&authorizationapi.SubjectAccessReview{
-					Spec: authorizationapi.SubjectAccessReviewSpec{
-						ResourceAttributes: &authorizationapi.ResourceAttributes{
-							Namespace:   apirequest.NamespaceValue(ctx),
-							Verb:        "create",
-							Group:       routeapi.GroupName,
-							Resource:    "routes",
-							Subresource: "custom-host",
-						},
-					},
-				},
-			),
-			metav1.CreateOptions{},
-		)
-		if err != nil {
-			return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), err)}
-		}
-		if !res.Status.Allowed {
-			if route.Spec.TLS == nil || older.Spec.TLS == nil {
-				return kvalidation.ValidateImmutableField(route.Spec.TLS, older.Spec.TLS, field.NewPath("spec", "tls"))
-			}
-			errs := kvalidation.ValidateImmutableField(route.Spec.TLS.CACertificate, older.Spec.TLS.CACertificate, field.NewPath("spec", "tls", "caCertificate"))
-			errs = append(errs, kvalidation.ValidateImmutableField(route.Spec.TLS.Certificate, older.Spec.TLS.Certificate, field.NewPath("spec", "tls", "certificate"))...)
-			errs = append(errs, kvalidation.ValidateImmutableField(route.Spec.TLS.DestinationCACertificate, older.Spec.TLS.DestinationCACertificate, field.NewPath("spec", "tls", "destinationCACertificate"))...)
-			errs = append(errs, kvalidation.ValidateImmutableField(route.Spec.TLS.Key, older.Spec.TLS.Key, field.NewPath("spec", "tls", "key"))...)
-			return errs
-		}
-	}
-	return nil
-}
-
 // WarningsOnUpdate returns warnings for the given update.
 func (routeStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
 	return hostAndSubdomainBothSetWarning(obj)
@@ -282,7 +118,7 @@ type routeStatusStrategy struct {
 	routeStrategy
 }
 
-var StatusStrategy = routeStatusStrategy{NewStrategy(nil, nil)}
+var StatusStrategy = routeStatusStrategy{NewStrategy()}
 
 func (routeStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
 	newRoute := obj.(*routeapi.Route)

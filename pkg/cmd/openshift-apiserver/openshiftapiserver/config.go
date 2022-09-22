@@ -31,6 +31,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftadmission"
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver/configprocessing"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
+	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/routehostassignment"
 	"github.com/openshift/openshift-apiserver/pkg/version"
 )
 
@@ -162,8 +163,13 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	discoveryClient := cacheddiscovery.NewMemCacheClient(kubeClient.Discovery())
 	restMapper := restmapper.NewDeferredDiscoveryRESTMapper(discoveryClient)
 
+	routeHostDefaulter, err := routehostassignment.NewHostDefaulter(config.RoutingConfig.Subdomain)
+	if err != nil {
+		return nil, err
+	}
+
 	admissionInitializer, err := openshiftadmission.NewPluginInitializer(config.ImagePolicyConfig.InternalRegistryHostname, config.CloudProviderFile, kubeClientConfig, informers,
-		genericConfig.Authorization.Authorizer, feature.DefaultFeatureGate, restMapper, clusterQuotaMappingController)
+		genericConfig.Authorization.Authorizer, feature.DefaultFeatureGate, restMapper, clusterQuotaMappingController, routeHostDefaulter)
 	if err != nil {
 		return nil, err
 	}
@@ -215,11 +221,6 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 		informers.GetKubernetesInformers().Rbac().V1(),
 	)
 
-	routeAllocator, err := configprocessing.RouteAllocator(config.RoutingConfig.Subdomain)
-	if err != nil {
-		return nil, err
-	}
-
 	ruleResolver := NewRuleResolver(informers.kubernetesInformers.Rbac().V1())
 
 	ret := &OpenshiftAPIConfig{
@@ -237,7 +238,6 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 			AllowedRegistriesForImport:         config.ImagePolicyConfig.AllowedRegistriesForImport,
 			MaxImagesBulkImportedPerRepository: config.ImagePolicyConfig.MaxImagesBulkImportedPerRepository,
 			AdditionalTrustedCA:                caData,
-			RouteAllocator:                     routeAllocator,
 			ProjectAuthorizationCache:          projectAuthorizationCache,
 			ProjectCache:                       projectCache,
 			ProjectRequestTemplate:             config.ProjectConfig.ProjectRequestTemplate,
