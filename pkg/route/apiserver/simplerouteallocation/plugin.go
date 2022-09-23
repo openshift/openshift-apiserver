@@ -38,7 +38,7 @@ func NewSimpleAllocationPlugin(suffix string) (*SimpleAllocationPlugin, error) {
 // Allocate a router shard for the given route. This plugin always returns
 // the "global" router shard.
 // TODO: replace with per router allocation
-func (p *SimpleAllocationPlugin) Allocate(route *routeapi.Route) (*routeapi.RouterShard, error) {
+func (p *SimpleAllocationPlugin) AllocateRouterShard(route *routeapi.Route) (*routeapi.RouterShard, error) {
 	klog.V(4).Infof("Allocating global shard *.%s to Route: %s", p.DNSSuffix, route.Name)
 
 	return &routeapi.RouterShard{ShardName: "global", DNSSuffix: p.DNSSuffix}, nil

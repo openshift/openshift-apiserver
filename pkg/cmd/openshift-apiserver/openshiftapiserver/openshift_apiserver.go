@@ -46,7 +46,7 @@ import (
 	projectcache "github.com/openshift/openshift-apiserver/pkg/project/cache"
 	quotaapiserver "github.com/openshift/openshift-apiserver/pkg/quota/apiserver"
 	routeapiserver "github.com/openshift/openshift-apiserver/pkg/route/apiserver"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeallocationcontroller"
+	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/simplerouteallocation"
 	securityapiserver "github.com/openshift/openshift-apiserver/pkg/security/apiserver"
 	templateapiserver "github.com/openshift/openshift-apiserver/pkg/template/apiserver"
 	"github.com/openshift/openshift-apiserver/pkg/version"
@@ -78,7 +78,7 @@ type OpenshiftAPIExtraConfig struct {
 	MaxImagesBulkImportedPerRepository int
 	AdditionalTrustedCA                []byte
 
-	RouteAllocator *routeallocationcontroller.RouteAllocationController
+	RouteAllocator *simplerouteallocation.SimpleAllocationPlugin
 
 	ProjectAuthorizationCache *projectauth.AuthorizationCache
 	ProjectCache              *projectcache.ProjectCache

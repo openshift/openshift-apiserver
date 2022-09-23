@@ -31,6 +31,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftadmission"
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver/configprocessing"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
+	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/simplerouteallocation"
 	"github.com/openshift/openshift-apiserver/pkg/version"
 )
 
@@ -215,7 +216,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 		informers.GetKubernetesInformers().Rbac().V1(),
 	)
 
-	routeAllocator, err := configprocessing.RouteAllocator(config.RoutingConfig.Subdomain)
+	routeAllocator, err := simplerouteallocation.NewSimpleAllocationPlugin(config.RoutingConfig.Subdomain)
 	if err != nil {
 		return nil, err
 	}
