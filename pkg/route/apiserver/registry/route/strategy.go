@@ -118,11 +118,7 @@ func (s routeStrategy) allocateHost(ctx context.Context, route *routeapi.Route) 
 
 	if len(route.Spec.Subdomain) == 0 && len(route.Spec.Host) == 0 && s.RouteAllocator != nil {
 		// TODO: this does not belong here, and should be removed
-		shard, err := s.RouteAllocator.AllocateRouterShard(route)
-		if err != nil {
-			return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), fmt.Errorf("allocation error: %v for route: %#v", err, route))}
-		}
-		route.Spec.Host = s.RouteAllocator.GenerateHostname(route, shard)
+		route.Spec.Host = s.RouteAllocator.GenerateHostname(route)
 		if route.Annotations == nil {
 			route.Annotations = map[string]string{}
 		}

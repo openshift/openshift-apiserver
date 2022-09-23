@@ -18,10 +18,7 @@ import (
 type testAllocator struct {
 }
 
-func (t testAllocator) AllocateRouterShard(*routeapi.Route) (*routeapi.RouterShard, error) {
-	return &routeapi.RouterShard{}, nil
-}
-func (t testAllocator) GenerateHostname(*routeapi.Route, *routeapi.RouterShard) string {
+func (t testAllocator) GenerateHostname(*routeapi.Route) string {
 	return "mygeneratedhost.com"
 }
 

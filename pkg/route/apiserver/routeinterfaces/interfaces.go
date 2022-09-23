@@ -7,6 +7,5 @@ import (
 // RouteAllocator is the interface for the route allocation controller
 // which handles requests for RouterShard allocation and name generation.
 type RouteAllocator interface {
-	AllocateRouterShard(*api.Route) (*api.RouterShard, error)
-	GenerateHostname(*api.Route, *api.RouterShard) string
+	GenerateHostname(*api.Route) string
 }

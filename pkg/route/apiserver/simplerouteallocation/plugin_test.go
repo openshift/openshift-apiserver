@@ -141,8 +141,7 @@ func TestSimpleAllocationPlugin(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		shard, _ := plugin.AllocateRouterShard(tc.route)
-		name := plugin.GenerateHostname(tc.route, shard)
+		name := plugin.GenerateHostname(tc.route)
 		switch {
 		case len(name) == 0 && !tc.empty, len(name) != 0 && tc.empty:
 			t.Errorf("Test case %s got %d length name.", tc.name, len(name))
@@ -233,11 +232,7 @@ func TestSimpleAllocationPluginViaController(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		shard, err := plugin.AllocateRouterShard(tc.route)
-		if err != nil {
-			t.Errorf("Test case %s got an error %s", tc.name, err)
-		}
-		name := plugin.GenerateHostname(tc.route, shard)
+		name := plugin.GenerateHostname(tc.route)
 		switch {
 		case len(name) == 0 && !tc.empty, len(name) != 0 && tc.empty:
 			t.Errorf("Test case %s got %d length name.", tc.name, len(name))

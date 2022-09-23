@@ -26,16 +26,10 @@ import (
 
 type testAllocator struct {
 	Hostname string
-	Err      error
-	Allocate bool
 	Generate bool
 }
 
-func (a *testAllocator) AllocateRouterShard(*routeapi.Route) (*routeapi.RouterShard, error) {
-	a.Allocate = true
-	return nil, a.Err
-}
-func (a *testAllocator) GenerateHostname(*routeapi.Route, *routeapi.RouterShard) string {
+func (a *testAllocator) GenerateHostname(*routeapi.Route) string {
 	a.Generate = true
 	return a.Hostname
 }
@@ -113,7 +107,7 @@ func TestCreateWithAllocation(t *testing.T) {
 	if v, ok := result.Annotations[route.HostGeneratedAnnotationKey]; !ok || v != "true" {
 		t.Fatalf("unexpected route: %#v", result)
 	}
-	if !allocator.Allocate || !allocator.Generate {
+	if !allocator.Generate {
 		t.Fatalf("unexpected allocator: %#v", allocator)
 	}
 }
