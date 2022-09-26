@@ -29,17 +29,20 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 func SetObjectDefaults_ImageStream(in *v1.ImageStream) {
 	for i := range in.Spec.Tags {
 		a := &in.Spec.Tags[i]
+		SetDefaults_TagImportPolicy(&a.ImportPolicy)
 		SetDefaults_TagReferencePolicy(&a.ReferencePolicy)
 	}
 }
 
 func SetObjectDefaults_ImageStreamImport(in *v1.ImageStreamImport) {
 	if in.Spec.Repository != nil {
+		SetDefaults_TagImportPolicy(&in.Spec.Repository.ImportPolicy)
 		SetDefaults_TagReferencePolicy(&in.Spec.Repository.ReferencePolicy)
 	}
 	for i := range in.Spec.Images {
 		a := &in.Spec.Images[i]
 		SetDefaults_ImageImportSpec(a)
+		SetDefaults_TagImportPolicy(&a.ImportPolicy)
 		SetDefaults_TagReferencePolicy(&a.ReferencePolicy)
 	}
 	if in.Status.Import != nil {
@@ -56,6 +59,7 @@ func SetObjectDefaults_ImageStreamList(in *v1.ImageStreamList) {
 
 func SetObjectDefaults_ImageStreamTag(in *v1.ImageStreamTag) {
 	if in.Tag != nil {
+		SetDefaults_TagImportPolicy(&in.Tag.ImportPolicy)
 		SetDefaults_TagReferencePolicy(&in.Tag.ReferencePolicy)
 	}
 }
@@ -69,6 +73,7 @@ func SetObjectDefaults_ImageStreamTagList(in *v1.ImageStreamTagList) {
 
 func SetObjectDefaults_ImageTag(in *v1.ImageTag) {
 	if in.Spec != nil {
+		SetDefaults_TagImportPolicy(&in.Spec.ImportPolicy)
 		SetDefaults_TagReferencePolicy(&in.Spec.ReferencePolicy)
 	}
 }
