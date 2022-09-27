@@ -7,7 +7,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	routev1 "github.com/openshift/api/route/v1"
-	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 )
 
 const (
@@ -31,8 +30,8 @@ bGvtpjWA4r9WASIDPFsxk/cDEEEO6iPxgMOf5MdpQC2y2MU0rzF/Gg==
 	testDestinationCACertificate = testCACertificate
 )
 
-func createRouteSpecTo(name string, kind string) routeapi.RouteTargetReference {
-	svc := routeapi.RouteTargetReference{
+func createRouteSpecTo(name string, kind string) routev1.RouteTargetReference {
+	svc := routev1.RouteTargetReference{
 		Name: name,
 		Kind: kind,
 	}
@@ -68,16 +67,16 @@ func createRouteSpecTo(name string, kind string) routeapi.RouteTargetReference {
 func TestValidateRoute(t *testing.T) {
 	tests := []struct {
 		name           string
-		route          *routeapi.Route
+		route          *routev1.Route
 		expectedErrors int
 	}{
 		{
 			name: "No Name",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "host",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -86,11 +85,11 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "No namespace",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "name",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "host",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -99,12 +98,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "No host",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					To: createRouteSpecTo("serviceName", "Service"),
 				},
 			},
@@ -112,7 +111,7 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
@@ -120,7 +119,7 @@ func TestValidateRoute(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "true",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "**",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -129,7 +128,7 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid single label host",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
@@ -137,7 +136,7 @@ func TestValidateRoute(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "true",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "test",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -146,7 +145,7 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid host (start & end alpha)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
@@ -154,7 +153,7 @@ func TestValidateRoute(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "true",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "abc.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -163,12 +162,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid host (start & end numeric)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "1.test.com.2",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -177,7 +176,7 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host (trailing '.')",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
@@ -185,7 +184,7 @@ func TestValidateRoute(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "true",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "abc.test.com.",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -194,7 +193,7 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host ('*' not allowed)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
@@ -202,7 +201,7 @@ func TestValidateRoute(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "true",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "abc.*.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -211,7 +210,7 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host ('%!&#@$^' not allowed)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
@@ -219,7 +218,7 @@ func TestValidateRoute(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "true",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "abc.%!&#@$^.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -228,7 +227,7 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host ('A-Z' not allowed)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
@@ -236,7 +235,7 @@ func TestValidateRoute(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "true",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "A.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -245,7 +244,7 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host (trailing '-' not allowed)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
@@ -253,7 +252,7 @@ func TestValidateRoute(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "true",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "abc.test.com.-",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -262,12 +261,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid host (many segements/labels allowed)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "x.abc.y.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -276,7 +275,7 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid host 63 chars label",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
@@ -284,7 +283,7 @@ func TestValidateRoute(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "true",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-1234.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -293,7 +292,7 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid host (64 chars label annotation override)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
@@ -301,7 +300,7 @@ func TestValidateRoute(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "true",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-12345.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -310,12 +309,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid host (253 chars)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s12345678.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -324,12 +323,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host (279 chars)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s1234567890.t1234567890.u1234567890.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -338,12 +337,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host (does not conform DNS host name)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "**",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -352,12 +351,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid single label host (conform DNS host name)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "test",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -366,12 +365,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid host (conform DNS host name start & end alpha)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "abc.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -380,12 +379,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid host (conform DNS host name - start & end numeric)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "1.abc.test.com.2",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -394,12 +393,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host (does not conform DNS host name - trailing '.')",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "abc.test.com.",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -408,12 +407,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host (does not conform DNS host name - '*' not allowed)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "abc.*.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -422,12 +421,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host (does not conform DNS host name - '%!&#@$^' not allowed)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "abc.%!&#@$^.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -436,12 +435,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host (does not conform DNS host name - 'A-Z' not allowed)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "A.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -450,12 +449,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host (does not conform DNS host name - trailing '-' not allowed)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "abc.test.com.-",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -464,12 +463,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid host (conform DNS host name - many segments/labels allowed)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "x.abc.y.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -478,12 +477,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid host (conform DNS host name - 63 chars label)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-1234.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -492,12 +491,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host (does not conform  DNS host name - 64 chars label)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-12345.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -506,12 +505,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid host (conform DNS host name - 253 chars)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s123456789.t1.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -520,7 +519,7 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host (does conform DNS host name - 254 chars)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
@@ -528,7 +527,7 @@ func TestValidateRoute(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "false",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s1234567890.t12.test.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -537,12 +536,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid subdomain",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Subdomain: "api.ci",
 					To:        createRouteSpecTo("serviceName", "Service"),
 				},
@@ -551,12 +550,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid subdomain (253 chars)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Subdomain: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s12345678.test.com",
 					To:        createRouteSpecTo("serviceName", "Service"),
 				},
@@ -565,12 +564,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid subdomain (279 chars)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Subdomain: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s1234567890.t1234567890.u1234567890.test.com",
 					To:        createRouteSpecTo("serviceName", "Service"),
 				},
@@ -579,12 +578,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid DNS 952 subdomain",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Subdomain: "**",
 					To:        createRouteSpecTo("serviceName", "Service"),
 				},
@@ -593,12 +592,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid subdomain (conform DNS host name - 253 chars)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Subdomain: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s123456789.t1.test.com",
 					To:        createRouteSpecTo("serviceName", "Service"),
 				},
@@ -607,7 +606,7 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid subdomain (does conform DNS host name - 254 chars)",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
@@ -615,7 +614,7 @@ func TestValidateRoute(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "false",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Subdomain: "name-namespace.a1234567890.b1234567890.c1234567890.d1234567890.e1234567890.f1234567890.g1234567890.h1234567890.i1234567890.j1234567890.k1234567890.l1234567890.m1234567890.n1234567890.o1234567890.p1234567890.q1234567890.r1234567890.s1234567890.t12.test.com",
 					To:        createRouteSpecTo("serviceName", "Service"),
 				},
@@ -624,12 +623,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "No service name",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "host",
 					To:   createRouteSpecTo("", "Service"),
 				},
@@ -638,12 +637,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "No service kind",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "host",
 					To:   createRouteSpecTo("serviceName", ""),
 				},
@@ -652,15 +651,15 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Zero port",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "www.example.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
-					Port: &routeapi.RoutePort{
+					Port: &routev1.RoutePort{
 						TargetPort: intstr.FromInt(0),
 					},
 				},
@@ -669,15 +668,15 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Empty string port",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "www.example.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
-					Port: &routeapi.RoutePort{
+					Port: &routev1.RoutePort{
 						TargetPort: intstr.FromString(""),
 					},
 				},
@@ -686,12 +685,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid route",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "www.example.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -700,12 +699,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Valid route with path",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "www.example.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 					Path: "/test",
@@ -715,12 +714,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid route with path",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "www.example.com",
 					To:   createRouteSpecTo("serviceName", "Service"),
 					Path: "test",
@@ -730,17 +729,17 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Passthrough route with path",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "www.example.com",
 					Path: "/test",
 					To:   createRouteSpecTo("serviceName", "Service"),
-					TLS: &routeapi.TLSConfig{
-						Termination: routeapi.TLSTerminationPassthrough,
+					TLS: &routev1.TLSConfig{
+						Termination: routev1.TLSTerminationPassthrough,
 					},
 				},
 			},
@@ -748,12 +747,12 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "No wildcard policy",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "nowildcard",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "no.wildcard.test",
 					To:   createRouteSpecTo("serviceName", "Service"),
 				},
@@ -762,42 +761,42 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "wildcard policy none",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "nowildcard2",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host:           "none.wildcard.test",
 					To:             createRouteSpecTo("serviceName", "Service"),
-					WildcardPolicy: routeapi.WildcardPolicyNone,
+					WildcardPolicy: routev1.WildcardPolicyNone,
 				},
 			},
 			expectedErrors: 0,
 		},
 		{
 			name: "wildcard policy subdomain",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "wildcardpolicy",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host:           "subdomain.wildcard.test",
 					To:             createRouteSpecTo("serviceName", "Service"),
-					WildcardPolicy: routeapi.WildcardPolicySubdomain,
+					WildcardPolicy: routev1.WildcardPolicySubdomain,
 				},
 			},
 			expectedErrors: 0,
 		},
 		{
 			name: "Invalid wildcard policy",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "badwildcard",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host:           "bad.wildcard.test",
 					To:             createRouteSpecTo("serviceName", "Service"),
 					WildcardPolicy: "bad-wolf",
@@ -807,29 +806,29 @@ func TestValidateRoute(t *testing.T) {
 		},
 		{
 			name: "Invalid host for wildcard policy",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "badhost",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					To:             createRouteSpecTo("serviceName", "Service"),
-					WildcardPolicy: routeapi.WildcardPolicySubdomain,
+					WildcardPolicy: routev1.WildcardPolicySubdomain,
 				},
 			},
 			expectedErrors: 1,
 		},
 		{
 			name: "Empty host for wildcard policy",
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "emptyhost",
 					Namespace: "foo",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host:           "",
 					To:             createRouteSpecTo("serviceName", "Service"),
-					WildcardPolicy: routeapi.WildcardPolicySubdomain,
+					WildcardPolicy: routev1.WildcardPolicySubdomain,
 				},
 			},
 			expectedErrors: 1,
@@ -837,7 +836,7 @@ func TestValidateRoute(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		errs := ValidateRoute(tc.route)
+		errs := validateRouteV1(tc.route)
 		if len(errs) != tc.expectedErrors {
 			t.Errorf("Test case %s expected %d error(s), got %d. %v", tc.name, tc.expectedErrors, len(errs), errs)
 		}
@@ -847,14 +846,14 @@ func TestValidateRoute(t *testing.T) {
 func TestValidateTLS(t *testing.T) {
 	tests := []struct {
 		name           string
-		route          *routeapi.Route
+		route          *routev1.Route
 		expectedErrors int
 	}{
 		{
 			name: "No TLS Termination",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{
 						Termination: "",
 					},
 				},
@@ -863,10 +862,10 @@ func TestValidateTLS(t *testing.T) {
 		},
 		{
 			name: "Passthrough termination OK",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{
-						Termination: routeapi.TLSTerminationPassthrough,
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{
+						Termination: routev1.TLSTerminationPassthrough,
 					},
 				},
 			},
@@ -874,10 +873,10 @@ func TestValidateTLS(t *testing.T) {
 		},
 		{
 			name: "Reencrypt termination OK with certs",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{
-						Termination:              routeapi.TLSTerminationReencrypt,
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{
+						Termination:              routev1.TLSTerminationReencrypt,
 						Certificate:              "def",
 						Key:                      "ghi",
 						CACertificate:            "jkl",
@@ -889,10 +888,10 @@ func TestValidateTLS(t *testing.T) {
 		},
 		{
 			name: "Reencrypt termination OK without certs",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{
-						Termination:              routeapi.TLSTerminationReencrypt,
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{
+						Termination:              routev1.TLSTerminationReencrypt,
 						DestinationCACertificate: "abc",
 					},
 				},
@@ -901,10 +900,10 @@ func TestValidateTLS(t *testing.T) {
 		},
 		{
 			name: "Reencrypt termination no dest cert",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{
-						Termination:   routeapi.TLSTerminationReencrypt,
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{
+						Termination:   routev1.TLSTerminationReencrypt,
 						Certificate:   "def",
 						Key:           "ghi",
 						CACertificate: "jkl",
@@ -915,10 +914,10 @@ func TestValidateTLS(t *testing.T) {
 		},
 		{
 			name: "Edge termination OK with certs",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{
-						Termination:   routeapi.TLSTerminationEdge,
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{
+						Termination:   routev1.TLSTerminationEdge,
 						Certificate:   "abc",
 						Key:           "abc",
 						CACertificate: "abc",
@@ -929,10 +928,10 @@ func TestValidateTLS(t *testing.T) {
 		},
 		{
 			name: "Edge termination OK without certs",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{
-						Termination: routeapi.TLSTerminationEdge,
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{
+						Termination: routev1.TLSTerminationEdge,
 					},
 				},
 			},
@@ -940,10 +939,10 @@ func TestValidateTLS(t *testing.T) {
 		},
 		{
 			name: "Edge termination, dest cert",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{
-						Termination:              routeapi.TLSTerminationEdge,
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{
+						Termination:              routev1.TLSTerminationEdge,
 						DestinationCACertificate: "abc",
 					},
 				},
@@ -952,45 +951,45 @@ func TestValidateTLS(t *testing.T) {
 		},
 		{
 			name: "Passthrough termination, cert",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{Termination: routeapi.TLSTerminationPassthrough, Certificate: "test"},
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{Termination: routev1.TLSTerminationPassthrough, Certificate: "test"},
 				},
 			},
 			expectedErrors: 1,
 		},
 		{
 			name: "Passthrough termination, key",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{Termination: routeapi.TLSTerminationPassthrough, Key: "test"},
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{Termination: routev1.TLSTerminationPassthrough, Key: "test"},
 				},
 			},
 			expectedErrors: 1,
 		},
 		{
 			name: "Passthrough termination, ca cert",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{Termination: routeapi.TLSTerminationPassthrough, CACertificate: "test"},
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{Termination: routev1.TLSTerminationPassthrough, CACertificate: "test"},
 				},
 			},
 			expectedErrors: 1,
 		},
 		{
 			name: "Passthrough termination, dest ca cert",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{Termination: routeapi.TLSTerminationPassthrough, DestinationCACertificate: "test"},
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{Termination: routev1.TLSTerminationPassthrough, DestinationCACertificate: "test"},
 				},
 			},
 			expectedErrors: 1,
 		},
 		{
 			name: "Invalid termination type",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{
 						Termination: "invalid",
 					},
 				},
@@ -1010,20 +1009,20 @@ func TestValidateTLS(t *testing.T) {
 
 func TestValidatePassthroughInsecureEdgeTerminationPolicy(t *testing.T) {
 
-	insecureTypes := map[routeapi.InsecureEdgeTerminationPolicyType]bool{
+	insecureTypes := map[routev1.InsecureEdgeTerminationPolicyType]bool{
 		"": false,
-		routeapi.InsecureEdgeTerminationPolicyNone:     false,
-		routeapi.InsecureEdgeTerminationPolicyAllow:    true,
-		routeapi.InsecureEdgeTerminationPolicyRedirect: false,
+		routev1.InsecureEdgeTerminationPolicyNone:     false,
+		routev1.InsecureEdgeTerminationPolicyAllow:    true,
+		routev1.InsecureEdgeTerminationPolicyRedirect: false,
 		"support HTTPsec": true,
 		"or maybe HSTS":   true,
 	}
 
 	for key, expected := range insecureTypes {
-		route := &routeapi.Route{
-			Spec: routeapi.RouteSpec{
-				TLS: &routeapi.TLSConfig{
-					Termination:                   routeapi.TLSTerminationPassthrough,
+		route := &routev1.Route{
+			Spec: routev1.RouteSpec{
+				TLS: &routev1.TLSConfig{
+					Termination:                   routev1.TLSTerminationPassthrough,
 					InsecureEdgeTerminationPolicy: key,
 				},
 			},
@@ -1045,86 +1044,86 @@ func TestValidatePassthroughInsecureEdgeTerminationPolicy(t *testing.T) {
 func TestValidateRouteUpdate(t *testing.T) {
 	tests := []struct {
 		name           string
-		route          *routeapi.Route
-		change         func(route *routeapi.Route)
+		route          *routev1.Route
+		change         func(route *routev1.Route)
 		expectedErrors int
 	}{
 		{
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:            "bar",
 					Namespace:       "foo",
 					ResourceVersion: "1",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "host",
-					To: routeapi.RouteTargetReference{
+					To: routev1.RouteTargetReference{
 						Name: "serviceName",
 						Kind: "Service",
 					},
 				},
 			},
-			change:         func(route *routeapi.Route) { route.Spec.Host = "" },
+			change:         func(route *routev1.Route) { route.Spec.Host = "" },
 			expectedErrors: 0, // now controlled by rbac
 		},
 		{
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:            "bar",
 					Namespace:       "foo",
 					ResourceVersion: "1",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "host",
-					To: routeapi.RouteTargetReference{
+					To: routev1.RouteTargetReference{
 						Name: "serviceName",
 						Kind: "Service",
 					},
 				},
 			},
-			change:         func(route *routeapi.Route) { route.Spec.Host = "other" },
+			change:         func(route *routev1.Route) { route.Spec.Host = "other" },
 			expectedErrors: 0, // now controlled by rbac
 		},
 		{
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:            "bar",
 					Namespace:       "foo",
 					ResourceVersion: "1",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "host",
-					To: routeapi.RouteTargetReference{
+					To: routev1.RouteTargetReference{
 						Name: "serviceName",
 						Kind: "Service",
 					},
 				},
 			},
-			change:         func(route *routeapi.Route) { route.Name = "baz" },
+			change:         func(route *routev1.Route) { route.Name = "baz" },
 			expectedErrors: 1,
 		},
 		{
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:            "bar",
 					Namespace:       "foo",
 					ResourceVersion: "1",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-12345.test.com",
-					To: routeapi.RouteTargetReference{
+					To: routev1.RouteTargetReference{
 						Name: "serviceName",
 						Kind: "Service",
 					},
 				},
 			},
-			change: func(route *routeapi.Route) {
+			change: func(route *routev1.Route) {
 				route.Spec.Host = "abc.test.com"
 			}, // old route was invalid - ignore validation check
 			expectedErrors: 0,
 		},
 		{
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:            "bar",
 					Namespace:       "foo",
@@ -1133,21 +1132,21 @@ func TestValidateRouteUpdate(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "true",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "name-namespace-1234567890-1234567890-1234567890-1234567890-12345.test.com",
-					To: routeapi.RouteTargetReference{
+					To: routev1.RouteTargetReference{
 						Name: "serviceName",
 						Kind: "Service",
 					},
 				},
 			},
-			change: func(route *routeapi.Route) {
+			change: func(route *routev1.Route) {
 				route.Spec.Host = "abc.test.com"
 			}, // old route was invalid - ignore validation check even if annoatation is set
 			expectedErrors: 0,
 		},
 		{
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:            "bar",
 					Namespace:       "foo",
@@ -1156,35 +1155,35 @@ func TestValidateRouteUpdate(t *testing.T) {
 						routev1.AllowNonDNSCompliantHostAnnotation: "true",
 					},
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "abc.test.com",
-					To: routeapi.RouteTargetReference{
+					To: routev1.RouteTargetReference{
 						Name: "serviceName",
 						Kind: "Service",
 					},
 				},
 			},
-			change: func(route *routeapi.Route) {
+			change: func(route *routev1.Route) {
 				route.Spec.Host = "name-namespace-1234567890-1234567890-1234567890-1234567890-12345.test.com"
 			}, // new route is invalid - skip check as annotation is set
 			expectedErrors: 0,
 		},
 		{
-			route: &routeapi.Route{
+			route: &routev1.Route{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:            "bar",
 					Namespace:       "foo",
 					ResourceVersion: "1",
 				},
-				Spec: routeapi.RouteSpec{
+				Spec: routev1.RouteSpec{
 					Host: "abc.test.com",
-					To: routeapi.RouteTargetReference{
+					To: routev1.RouteTargetReference{
 						Name: "serviceName",
 						Kind: "Service",
 					},
 				},
 			},
-			change: func(route *routeapi.Route) {
+			change: func(route *routev1.Route) {
 				route.Spec.Host = "name-namespace-1234567890-1234567890-1234567890-1234567890-12345.test.com"
 			}, // new route is invalid - do labels check
 			expectedErrors: 1,
@@ -1194,7 +1193,7 @@ func TestValidateRouteUpdate(t *testing.T) {
 	for i, tc := range tests {
 		newRoute := tc.route.DeepCopy()
 		tc.change(newRoute)
-		errs := ValidateRouteUpdate(newRoute, tc.route)
+		errs := validateRouteUpdateV1(newRoute, tc.route)
 		if len(errs) != tc.expectedErrors {
 			t.Errorf("%d: expected %d error(s), got %d. %v", i, tc.expectedErrors, len(errs), errs)
 		}
@@ -1204,7 +1203,7 @@ func TestValidateRouteUpdate(t *testing.T) {
 func TestValidateInsecureEdgeTerminationPolicy(t *testing.T) {
 	tests := []struct {
 		name           string
-		insecure       routeapi.InsecureEdgeTerminationPolicyType
+		insecure       routev1.InsecureEdgeTerminationPolicyType
 		expectedErrors int
 	}{
 		{
@@ -1219,17 +1218,17 @@ func TestValidateInsecureEdgeTerminationPolicy(t *testing.T) {
 		},
 		{
 			name:           "insecure option none",
-			insecure:       routeapi.InsecureEdgeTerminationPolicyNone,
+			insecure:       routev1.InsecureEdgeTerminationPolicyNone,
 			expectedErrors: 0,
 		},
 		{
 			name:           "insecure option allow",
-			insecure:       routeapi.InsecureEdgeTerminationPolicyAllow,
+			insecure:       routev1.InsecureEdgeTerminationPolicyAllow,
 			expectedErrors: 0,
 		},
 		{
 			name:           "insecure option redirect",
-			insecure:       routeapi.InsecureEdgeTerminationPolicyRedirect,
+			insecure:       routev1.InsecureEdgeTerminationPolicyRedirect,
 			expectedErrors: 0,
 		},
 		{
@@ -1240,10 +1239,10 @@ func TestValidateInsecureEdgeTerminationPolicy(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		route := &routeapi.Route{
-			Spec: routeapi.RouteSpec{
-				TLS: &routeapi.TLSConfig{
-					Termination:                   routeapi.TLSTerminationEdge,
+		route := &routev1.Route{
+			Spec: routev1.RouteSpec{
+				TLS: &routev1.TLSConfig{
+					Termination:                   routev1.TLSTerminationEdge,
 					InsecureEdgeTerminationPolicy: tc.insecure,
 				},
 			},
@@ -1259,14 +1258,14 @@ func TestValidateInsecureEdgeTerminationPolicy(t *testing.T) {
 func TestValidateEdgeReencryptInsecureEdgeTerminationPolicy(t *testing.T) {
 	tests := []struct {
 		name  string
-		route *routeapi.Route
+		route *routev1.Route
 	}{
 		{
 			name: "Reencrypt termination",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{
-						Termination:              routeapi.TLSTerminationReencrypt,
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{
+						Termination:              routev1.TLSTerminationReencrypt,
 						DestinationCACertificate: "dca",
 					},
 				},
@@ -1274,10 +1273,10 @@ func TestValidateEdgeReencryptInsecureEdgeTerminationPolicy(t *testing.T) {
 		},
 		{
 			name: "Reencrypt termination DestCACert",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{
-						Termination:              routeapi.TLSTerminationReencrypt,
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{
+						Termination:              routev1.TLSTerminationReencrypt,
 						DestinationCACertificate: testDestinationCACertificate,
 					},
 				},
@@ -1285,20 +1284,20 @@ func TestValidateEdgeReencryptInsecureEdgeTerminationPolicy(t *testing.T) {
 		},
 		{
 			name: "Edge termination",
-			route: &routeapi.Route{
-				Spec: routeapi.RouteSpec{
-					TLS: &routeapi.TLSConfig{
-						Termination: routeapi.TLSTerminationEdge,
+			route: &routev1.Route{
+				Spec: routev1.RouteSpec{
+					TLS: &routev1.TLSConfig{
+						Termination: routev1.TLSTerminationEdge,
 					},
 				},
 			},
 		},
 	}
 
-	insecureTypes := map[routeapi.InsecureEdgeTerminationPolicyType]bool{
-		routeapi.InsecureEdgeTerminationPolicyNone:     false,
-		routeapi.InsecureEdgeTerminationPolicyAllow:    false,
-		routeapi.InsecureEdgeTerminationPolicyRedirect: false,
+	insecureTypes := map[routev1.InsecureEdgeTerminationPolicyType]bool{
+		routev1.InsecureEdgeTerminationPolicyNone:     false,
+		routev1.InsecureEdgeTerminationPolicyAllow:    false,
+		routev1.InsecureEdgeTerminationPolicyRedirect: false,
 		"support HTTPsec": true,
 		"or maybe HSTS":   true,
 	}

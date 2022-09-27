@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"strings"
 
-	routev1 "github.com/openshift/api/route/v1"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -16,13 +15,32 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 
+	routev1 "github.com/openshift/api/route/v1"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
+	routev1conversion "github.com/openshift/openshift-apiserver/pkg/route/apis/route/v1"
 )
 
-var ValidateRouteName = apimachineryvalidation.NameIsDNSSubdomain
+var validateRouteName = apimachineryvalidation.NameIsDNSSubdomain
+
+func toRouteV1(internal *routeapi.Route) (*routev1.Route, field.ErrorList) {
+	var external routev1.Route
+	if err := routev1conversion.Convert_route_Route_To_v1_Route(internal, &external, nil); err != nil {
+		return nil, field.ErrorList{field.InternalError(field.NewPath(""), err)}
+	}
+	return &external, nil
+}
 
 // ValidateRoute tests if required fields in the route are set.
 func ValidateRoute(route *routeapi.Route) field.ErrorList {
+	external, errs := toRouteV1(route)
+	if len(errs) > 0 {
+		return errs
+	}
+
+	return validateRouteV1(external)
+}
+
+func validateRouteV1(route *routev1.Route) field.ErrorList {
 	return validateRoute(route, true)
 }
 
@@ -47,9 +65,9 @@ func checkLabelSegments(host string) bool {
 }
 
 // validateRoute - private function to validate route
-func validateRoute(route *routeapi.Route, checkHostname bool) field.ErrorList {
+func validateRoute(route *routev1.Route, checkHostname bool) field.ErrorList {
 	//ensure meta is set properly
-	result := validation.ValidateObjectMeta(&route.ObjectMeta, true, ValidateRouteName, field.NewPath("metadata"))
+	result := validation.ValidateObjectMeta(&route.ObjectMeta, true, validateRouteName, field.NewPath("metadata"))
 
 	specPath := field.NewPath("spec")
 
@@ -96,7 +114,7 @@ func validateRoute(route *routeapi.Route, checkHostname bool) field.ErrorList {
 	}
 
 	if len(route.Spec.Path) > 0 && route.Spec.TLS != nil &&
-		route.Spec.TLS.Termination == routeapi.TLSTerminationPassthrough {
+		route.Spec.TLS.Termination == routev1.TLSTerminationPassthrough {
 		result = append(result, field.Invalid(specPath.Child("path"), route.Spec.Path, "passthrough termination does not support paths"))
 	}
 
@@ -141,7 +159,21 @@ func validateRoute(route *routeapi.Route, checkHostname bool) field.ErrorList {
 	return result
 }
 
-func ValidateRouteUpdate(route *routeapi.Route, older *routeapi.Route) field.ErrorList {
+func ValidateRouteUpdate(route *routeapi.Route, oldRoute *routeapi.Route) field.ErrorList {
+	external, errs := toRouteV1(route)
+	if len(errs) > 0 {
+		return errs
+	}
+
+	oldExternal, errs := toRouteV1(oldRoute)
+	if len(errs) > 0 {
+		return errs
+	}
+
+	return validateRouteUpdateV1(external, oldExternal)
+}
+
+func validateRouteUpdateV1(route *routev1.Route, older *routev1.Route) field.ErrorList {
 	allErrs := validation.ValidateObjectMetaUpdate(&route.ObjectMeta, &older.ObjectMeta, field.NewPath("metadata"))
 	allErrs = append(allErrs, validation.ValidateImmutableField(route.Spec.WildcardPolicy, older.Spec.WildcardPolicy, field.NewPath("spec", "wildcardPolicy"))...)
 	hostnameUpdated := route.Spec.Host != older.Spec.Host
@@ -153,7 +185,21 @@ func ValidateRouteUpdate(route *routeapi.Route, older *routeapi.Route) field.Err
 //
 // Note that this function shouldn't call ValidateRouteUpdate, otherwise
 // we are risking to break existing routes.
-func ValidateRouteStatusUpdate(route *routeapi.Route, older *routeapi.Route) field.ErrorList {
+func ValidateRouteStatusUpdate(route *routeapi.Route, oldRoute *routeapi.Route) field.ErrorList {
+	external, errs := toRouteV1(route)
+	if len(errs) > 0 {
+		return errs
+	}
+
+	oldExternal, errs := toRouteV1(oldRoute)
+	if len(errs) > 0 {
+		return errs
+	}
+
+	return validateRouteStatusUpdateV1(external, oldExternal)
+}
+
+func validateRouteStatusUpdateV1(route *routev1.Route, older *routev1.Route) field.ErrorList {
 	allErrs := validation.ValidateObjectMetaUpdate(&route.ObjectMeta, &older.ObjectMeta, field.NewPath("metadata"))
 
 	// TODO: validate route status
@@ -238,7 +284,7 @@ var knownBlockDecoders = map[string]blockVerifierFunc{
 
 // validateTLS tests fields for different types of TLS combinations are set.  Called
 // by ValidateRoute.
-func validateTLS(route *routeapi.Route, fldPath *field.Path) field.ErrorList {
+func validateTLS(route *routev1.Route, fldPath *field.Path) field.ErrorList {
 	result := field.ErrorList{}
 	tls := route.Spec.TLS
 
@@ -250,9 +296,9 @@ func validateTLS(route *routeapi.Route, fldPath *field.Path) field.ErrorList {
 	switch tls.Termination {
 	// reencrypt may specify destination ca cert
 	// cert, key, cacert may not be specified because the route may be a wildcard
-	case routeapi.TLSTerminationReencrypt:
+	case routev1.TLSTerminationReencrypt:
 	//passthrough term should not specify any cert
-	case routeapi.TLSTerminationPassthrough:
+	case routev1.TLSTerminationPassthrough:
 		if len(tls.Certificate) > 0 {
 			result = append(result, field.Invalid(fldPath.Child("certificate"), "redacted certificate data", "passthrough termination does not support certificates"))
 		}
@@ -270,12 +316,12 @@ func validateTLS(route *routeapi.Route, fldPath *field.Path) field.ErrorList {
 		}
 	// edge cert should only specify cert, key, and cacert but those certs
 	// may not be specified if the route is a wildcard route
-	case routeapi.TLSTerminationEdge:
+	case routev1.TLSTerminationEdge:
 		if len(tls.DestinationCACertificate) > 0 {
 			result = append(result, field.Invalid(fldPath.Child("destinationCACertificate"), "redacted destination ca certificate data", "edge termination does not support destination certificates"))
 		}
 	default:
-		validValues := []string{string(routeapi.TLSTerminationEdge), string(routeapi.TLSTerminationPassthrough), string(routeapi.TLSTerminationReencrypt)}
+		validValues := []string{string(routev1.TLSTerminationEdge), string(routev1.TLSTerminationPassthrough), string(routev1.TLSTerminationReencrypt)}
 		result = append(result, field.NotSupported(fldPath.Child("termination"), tls.Termination, validValues))
 	}
 
@@ -288,7 +334,7 @@ func validateTLS(route *routeapi.Route, fldPath *field.Path) field.ErrorList {
 
 // validateInsecureEdgeTerminationPolicy tests fields for different types of
 // insecure options. Called by validateTLS.
-func validateInsecureEdgeTerminationPolicy(tls *routeapi.TLSConfig, fldPath *field.Path) *field.Error {
+func validateInsecureEdgeTerminationPolicy(tls *routev1.TLSConfig, fldPath *field.Path) *field.Error {
 	// Check insecure option value if specified (empty is ok).
 	if len(tls.InsecureEdgeTerminationPolicy) == 0 {
 		return nil
@@ -296,23 +342,23 @@ func validateInsecureEdgeTerminationPolicy(tls *routeapi.TLSConfig, fldPath *fie
 
 	// It is an edge-terminated or reencrypt route, check insecure option value is
 	// one of None(for disable), Allow or Redirect.
-	allowedValues := map[routeapi.InsecureEdgeTerminationPolicyType]struct{}{
-		routeapi.InsecureEdgeTerminationPolicyNone:     {},
-		routeapi.InsecureEdgeTerminationPolicyAllow:    {},
-		routeapi.InsecureEdgeTerminationPolicyRedirect: {},
+	allowedValues := map[routev1.InsecureEdgeTerminationPolicyType]struct{}{
+		routev1.InsecureEdgeTerminationPolicyNone:     {},
+		routev1.InsecureEdgeTerminationPolicyAllow:    {},
+		routev1.InsecureEdgeTerminationPolicyRedirect: {},
 	}
 
 	switch tls.Termination {
-	case routeapi.TLSTerminationReencrypt:
+	case routev1.TLSTerminationReencrypt:
 		fallthrough
-	case routeapi.TLSTerminationEdge:
+	case routev1.TLSTerminationEdge:
 		if _, ok := allowedValues[tls.InsecureEdgeTerminationPolicy]; !ok {
-			msg := fmt.Sprintf("invalid value for InsecureEdgeTerminationPolicy option, acceptable values are %s, %s, %s, or empty", routeapi.InsecureEdgeTerminationPolicyNone, routeapi.InsecureEdgeTerminationPolicyAllow, routeapi.InsecureEdgeTerminationPolicyRedirect)
+			msg := fmt.Sprintf("invalid value for InsecureEdgeTerminationPolicy option, acceptable values are %s, %s, %s, or empty", routev1.InsecureEdgeTerminationPolicyNone, routev1.InsecureEdgeTerminationPolicyAllow, routev1.InsecureEdgeTerminationPolicyRedirect)
 			return field.Invalid(fldPath, tls.InsecureEdgeTerminationPolicy, msg)
 		}
-	case routeapi.TLSTerminationPassthrough:
-		if routeapi.InsecureEdgeTerminationPolicyNone != tls.InsecureEdgeTerminationPolicy && routeapi.InsecureEdgeTerminationPolicyRedirect != tls.InsecureEdgeTerminationPolicy {
-			msg := fmt.Sprintf("invalid value for InsecureEdgeTerminationPolicy option, acceptable values are %s, %s, or empty", routeapi.InsecureEdgeTerminationPolicyNone, routeapi.InsecureEdgeTerminationPolicyRedirect)
+	case routev1.TLSTerminationPassthrough:
+		if routev1.InsecureEdgeTerminationPolicyNone != tls.InsecureEdgeTerminationPolicy && routev1.InsecureEdgeTerminationPolicyRedirect != tls.InsecureEdgeTerminationPolicy {
+			msg := fmt.Sprintf("invalid value for InsecureEdgeTerminationPolicy option, acceptable values are %s, %s, or empty", routev1.InsecureEdgeTerminationPolicyNone, routev1.InsecureEdgeTerminationPolicyRedirect)
 			return field.Invalid(fldPath, tls.InsecureEdgeTerminationPolicy, msg)
 		}
 	}
@@ -321,12 +367,12 @@ func validateInsecureEdgeTerminationPolicy(tls *routeapi.TLSConfig, fldPath *fie
 }
 
 var (
-	allowedWildcardPolicies    = []string{string(routeapi.WildcardPolicyNone), string(routeapi.WildcardPolicySubdomain)}
+	allowedWildcardPolicies    = []string{string(routev1.WildcardPolicyNone), string(routev1.WildcardPolicySubdomain)}
 	allowedWildcardPoliciesSet = sets.NewString(allowedWildcardPolicies...)
 )
 
 // validateWildcardPolicy tests that the wildcard policy is either empty or one of the supported types.
-func validateWildcardPolicy(host string, policy routeapi.WildcardPolicyType, fldPath *field.Path) *field.Error {
+func validateWildcardPolicy(host string, policy routev1.WildcardPolicyType, fldPath *field.Path) *field.Error {
 	if len(policy) == 0 {
 		return nil
 	}
@@ -336,7 +382,7 @@ func validateWildcardPolicy(host string, policy routeapi.WildcardPolicyType, fld
 		return field.NotSupported(fldPath, policy, allowedWildcardPolicies)
 	}
 
-	if policy == routeapi.WildcardPolicySubdomain && len(host) == 0 {
+	if policy == routev1.WildcardPolicySubdomain && len(host) == 0 {
 		return field.Invalid(fldPath, policy, "host name not specified for wildcard policy")
 	}
 
