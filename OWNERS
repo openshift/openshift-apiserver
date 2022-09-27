@@ -4,10 +4,16 @@ reviewers:
   - sttts
   - tkashem
   - p0lyn0mial
+  - benluddy
+  - sanchezl
+  - dgrisonnet
 approvers:
   - deads2k
   - mfojtik
   - sttts
   - tkashem
   - p0lyn0mial
+  - benluddy
+  - sanchezl
+  - dgrisonnet
 component: openshift-apiserver
