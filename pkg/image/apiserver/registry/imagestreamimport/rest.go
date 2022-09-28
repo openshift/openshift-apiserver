@@ -35,6 +35,7 @@ import (
 	"github.com/openshift/library-go/pkg/quota/quotautil"
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
+	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
@@ -418,6 +419,10 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		return nil, err
 	}
 	isi.Status.Import = obj.(*imageapi.ImageStream)
+
+	if errs := validation.ValidateImageStreamImport(isi); len(errs) != 0 {
+		return nil, kapierrors.NewInvalid(image.Kind("ImageStreamImport"), isi.Name, errs)
+	}
 	return isi, nil
 }
 
