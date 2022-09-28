@@ -19,7 +19,7 @@ import (
 
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	_ "github.com/openshift/openshift-apiserver/pkg/route/apis/route/install"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/registry/route"
+	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/routehostassignment"
 	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeinterfaces"
 	"k8s.io/apiserver/pkg/registry/generic"
 )
@@ -110,7 +110,7 @@ func TestCreateWithAllocation(t *testing.T) {
 	if result.Spec.Host != "bar" {
 		t.Fatalf("unexpected route: %#v", result)
 	}
-	if v, ok := result.Annotations[route.HostGeneratedAnnotationKey]; !ok || v != "true" {
+	if v, ok := result.Annotations[routehostassignment.HostGeneratedAnnotationKey]; !ok || v != "true" {
 		t.Fatalf("unexpected route: %#v", result)
 	}
 	if !allocator.Allocate || !allocator.Generate {
