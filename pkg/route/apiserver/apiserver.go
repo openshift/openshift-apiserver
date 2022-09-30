@@ -14,12 +14,12 @@ import (
 
 	routeapiv1 "github.com/openshift/api/route/v1"
 	routeetcd "github.com/openshift/openshift-apiserver/pkg/route/apiserver/registry/route/etcd"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeallocationcontroller"
+	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/simplerouteallocation"
 )
 
 type ExtraConfig struct {
 	KubeAPIServerClientConfig *restclient.Config
-	RouteAllocator            *routeallocationcontroller.RouteAllocationController
+	RouteAllocator            *simplerouteallocation.SimpleAllocationPlugin
 
 	// TODO these should all become local eventually
 	Scheme *runtime.Scheme

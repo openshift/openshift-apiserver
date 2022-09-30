@@ -7,7 +7,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation"
 
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
-	rac "github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeallocationcontroller"
 )
 
 func TestNewSimpleAllocationPlugin(t *testing.T) {
@@ -142,7 +141,7 @@ func TestSimpleAllocationPlugin(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		shard, _ := plugin.Allocate(tc.route)
+		shard, _ := plugin.AllocateRouterShard(tc.route)
 		name := plugin.GenerateHostname(tc.route, shard)
 		switch {
 		case len(name) == 0 && !tc.empty, len(name) != 0 && tc.empty:
@@ -228,16 +227,17 @@ func TestSimpleAllocationPluginViaController(t *testing.T) {
 		},
 	}
 
-	plugin, _ := NewSimpleAllocationPlugin("www.example.org")
-	fac := &rac.RouteAllocationControllerFactory{}
-	sac := fac.Create(plugin)
+	plugin, err := NewSimpleAllocationPlugin("www.example.org")
+	if err != nil {
+		t.Fatalf("unexpected error")
+	}
 
 	for _, tc := range tests {
-		shard, err := sac.AllocateRouterShard(tc.route)
+		shard, err := plugin.AllocateRouterShard(tc.route)
 		if err != nil {
 			t.Errorf("Test case %s got an error %s", tc.name, err)
 		}
-		name := sac.GenerateHostname(tc.route, shard)
+		name := plugin.GenerateHostname(tc.route, shard)
 		switch {
 		case len(name) == 0 && !tc.empty, len(name) != 0 && tc.empty:
 			t.Errorf("Test case %s got %d length name.", tc.name, len(name))
