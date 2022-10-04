@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	authorizationv1 "k8s.io/api/authorization/v1"
+	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/endpoints/request"
-	kvalidation "k8s.io/kubernetes/pkg/apis/core/validation"
 
 	"github.com/openshift/library-go/pkg/authorization/authorizationutil"
 	routeinternal "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
@@ -151,10 +151,10 @@ func ValidateHostUpdate(ctx context.Context, route, older *routeinternal.Route, 
 	}
 	if !res.Status.Allowed {
 		if hostChanged {
-			return kvalidation.ValidateImmutableField(route.Spec.Host, older.Spec.Host, field.NewPath("spec", "host"))
+			return apimachineryvalidation.ValidateImmutableField(route.Spec.Host, older.Spec.Host, field.NewPath("spec", "host"))
 		}
 		if subdomainChanged {
-			return kvalidation.ValidateImmutableField(route.Spec.Subdomain, older.Spec.Subdomain, field.NewPath("spec", "subdomain"))
+			return apimachineryvalidation.ValidateImmutableField(route.Spec.Subdomain, older.Spec.Subdomain, field.NewPath("spec", "subdomain"))
 		}
 
 		// if tls is being updated without host being updated, we check if 'create' permission exists on custom-host subresource
@@ -181,12 +181,12 @@ func ValidateHostUpdate(ctx context.Context, route, older *routeinternal.Route, 
 		}
 		if !res.Status.Allowed {
 			if route.Spec.TLS == nil || older.Spec.TLS == nil {
-				return kvalidation.ValidateImmutableField(route.Spec.TLS, older.Spec.TLS, field.NewPath("spec", "tls"))
+				return apimachineryvalidation.ValidateImmutableField(route.Spec.TLS, older.Spec.TLS, field.NewPath("spec", "tls"))
 			}
-			errs := kvalidation.ValidateImmutableField(route.Spec.TLS.CACertificate, older.Spec.TLS.CACertificate, field.NewPath("spec", "tls", "caCertificate"))
-			errs = append(errs, kvalidation.ValidateImmutableField(route.Spec.TLS.Certificate, older.Spec.TLS.Certificate, field.NewPath("spec", "tls", "certificate"))...)
-			errs = append(errs, kvalidation.ValidateImmutableField(route.Spec.TLS.DestinationCACertificate, older.Spec.TLS.DestinationCACertificate, field.NewPath("spec", "tls", "destinationCACertificate"))...)
-			errs = append(errs, kvalidation.ValidateImmutableField(route.Spec.TLS.Key, older.Spec.TLS.Key, field.NewPath("spec", "tls", "key"))...)
+			errs := apimachineryvalidation.ValidateImmutableField(route.Spec.TLS.CACertificate, older.Spec.TLS.CACertificate, field.NewPath("spec", "tls", "caCertificate"))
+			errs = append(errs, apimachineryvalidation.ValidateImmutableField(route.Spec.TLS.Certificate, older.Spec.TLS.Certificate, field.NewPath("spec", "tls", "certificate"))...)
+			errs = append(errs, apimachineryvalidation.ValidateImmutableField(route.Spec.TLS.DestinationCACertificate, older.Spec.TLS.DestinationCACertificate, field.NewPath("spec", "tls", "destinationCACertificate"))...)
+			errs = append(errs, apimachineryvalidation.ValidateImmutableField(route.Spec.TLS.Key, older.Spec.TLS.Key, field.NewPath("spec", "tls", "key"))...)
 			return errs
 		}
 	}

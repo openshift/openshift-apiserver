@@ -8,12 +8,13 @@ import (
 	"fmt"
 	"strings"
 
+	corev1 "k8s.io/api/core/v1"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
 	kvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"k8s.io/kubernetes/pkg/apis/core/validation"
 
 	routev1 "github.com/openshift/api/route/v1"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
@@ -67,7 +68,7 @@ func checkLabelSegments(host string) bool {
 // validateRoute - private function to validate route
 func validateRoute(route *routev1.Route, checkHostname bool) field.ErrorList {
 	//ensure meta is set properly
-	result := validation.ValidateObjectMeta(&route.ObjectMeta, true, validateRouteName, field.NewPath("metadata"))
+	result := validateObjectMeta(&route.ObjectMeta, true, validateRouteName, field.NewPath("metadata"))
 
 	specPath := field.NewPath("spec")
 
@@ -174,8 +175,8 @@ func ValidateRouteUpdate(route *routeapi.Route, oldRoute *routeapi.Route) field.
 }
 
 func validateRouteUpdateV1(route *routev1.Route, older *routev1.Route) field.ErrorList {
-	allErrs := validation.ValidateObjectMetaUpdate(&route.ObjectMeta, &older.ObjectMeta, field.NewPath("metadata"))
-	allErrs = append(allErrs, validation.ValidateImmutableField(route.Spec.WildcardPolicy, older.Spec.WildcardPolicy, field.NewPath("spec", "wildcardPolicy"))...)
+	allErrs := validateObjectMetaUpdate(&route.ObjectMeta, &older.ObjectMeta, field.NewPath("metadata"))
+	allErrs = append(allErrs, apimachineryvalidation.ValidateImmutableField(route.Spec.WildcardPolicy, older.Spec.WildcardPolicy, field.NewPath("spec", "wildcardPolicy"))...)
 	hostnameUpdated := route.Spec.Host != older.Spec.Host
 	allErrs = append(allErrs, validateRoute(route, hostnameUpdated && validLabels(older.Spec.Host))...)
 	return allErrs
@@ -200,7 +201,7 @@ func ValidateRouteStatusUpdate(route *routeapi.Route, oldRoute *routeapi.Route) 
 }
 
 func validateRouteStatusUpdateV1(route *routev1.Route, older *routev1.Route) field.ErrorList {
-	allErrs := validation.ValidateObjectMetaUpdate(&route.ObjectMeta, &older.ObjectMeta, field.NewPath("metadata"))
+	allErrs := validateObjectMetaUpdate(&route.ObjectMeta, &older.ObjectMeta, field.NewPath("metadata"))
 
 	// TODO: validate route status
 	return allErrs
@@ -387,4 +388,45 @@ func validateWildcardPolicy(host string, policy routev1.WildcardPolicyType, fldP
 	}
 
 	return nil
+}
+
+// The special finalizer name validations were copied from k8s.io/kubernetes to eliminate that
+// dependency and preserve the existing behavior.
+
+// k8s.io/kubernetes/pkg/apis/core/validation.ValidateObjectMeta
+func validateObjectMeta(meta *metav1.ObjectMeta, requiresNamespace bool, nameFn apimachineryvalidation.ValidateNameFunc, fldPath *field.Path) field.ErrorList {
+	allErrs := apimachineryvalidation.ValidateObjectMeta(meta, requiresNamespace, apimachineryvalidation.ValidateNameFunc(nameFn), fldPath)
+	// run additional checks for the finalizer name
+	for i := range meta.Finalizers {
+		allErrs = append(allErrs, validateKubeFinalizerName(string(meta.Finalizers[i]), fldPath.Child("finalizers").Index(i))...)
+	}
+	return allErrs
+}
+
+// k8s.io/kubernetes/pkg/apis/core/validation.ValidateObjectMetaUpdate
+func validateObjectMetaUpdate(newMeta, oldMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
+	allErrs := apimachineryvalidation.ValidateObjectMetaUpdate(newMeta, oldMeta, fldPath)
+	// run additional checks for the finalizer name
+	for i := range newMeta.Finalizers {
+		allErrs = append(allErrs, validateKubeFinalizerName(string(newMeta.Finalizers[i]), fldPath.Child("finalizers").Index(i))...)
+	}
+
+	return allErrs
+}
+
+var standardFinalizers = sets.NewString(
+	string(corev1.FinalizerKubernetes),
+	metav1.FinalizerOrphanDependents,
+	metav1.FinalizerDeleteDependents,
+)
+
+func validateKubeFinalizerName(stringValue string, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+	if len(strings.Split(stringValue, "/")) == 1 {
+		if !standardFinalizers.Has(stringValue) {
+			return append(allErrs, field.Invalid(fldPath, stringValue, "name is neither a standard finalizer name nor is it fully qualified"))
+		}
+	}
+
+	return allErrs
 }
