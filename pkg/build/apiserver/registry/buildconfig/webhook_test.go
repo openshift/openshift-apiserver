@@ -23,6 +23,7 @@ import (
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 
 	buildv1 "github.com/openshift/api/build/v1"
+	buildapplyv1 "github.com/openshift/client-go/build/applyconfigurations/build/v1"
 	buildfake "github.com/openshift/client-go/build/clientset/versioned/fake"
 	buildclientv1 "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
 
@@ -41,6 +42,14 @@ type fakeBuildConfigInterface struct {
 	inst      fakeInstantiator
 	client    buildclientv1.BuildConfigInterface
 	namespace string
+}
+
+func (f *fakeBuildConfigInterface) Apply(ctx context.Context, buildConfig *buildapplyv1.BuildConfigApplyConfiguration, opts metav1.ApplyOptions) (result *buildv1.BuildConfig, err error) {
+	return f.client.Apply(ctx, buildConfig, opts)
+}
+
+func (f *fakeBuildConfigInterface) ApplyStatus(ctx context.Context, buildConfig *buildapplyv1.BuildConfigApplyConfiguration, opts metav1.ApplyOptions) (result *buildv1.BuildConfig, err error) {
+	return f.client.ApplyStatus(ctx, buildConfig, opts)
 }
 
 func (f *fakeBuildConfigInterface) Create(ctx context.Context, build *buildv1.BuildConfig, opts metav1.CreateOptions) (*buildv1.BuildConfig, error) {
