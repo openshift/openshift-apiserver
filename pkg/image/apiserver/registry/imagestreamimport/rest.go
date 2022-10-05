@@ -209,6 +209,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		imageConfig.Spec.RegistrySources.InsecureRegistries,
 		imageConfig.Spec.RegistrySources.BlockedRegistries,
 		icspRules,
+		nil, nil,
 	); err != nil {
 		klog.Warningf("failed to merge ImageContentSourcePolicy resources, mirrored images will not be found: %v", err)
 	}
