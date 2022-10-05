@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/MakeNowJust/heredoc"
-	"github.com/emicklei/go-restful"
+	"github.com/emicklei/go-restful/v3"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 
 	extensionsapiserver "k8s.io/apiextensions-apiserver/pkg/apiserver"
