@@ -31,6 +31,7 @@ var _ rest.Getter = &REST{}
 var _ rest.CreaterUpdater = &REST{}
 var _ rest.GracefulDeleter = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 func NewREST(client restclient.Interface) utilregistry.NoWatchStorage {
 	return utilregistry.WrapNoWatchStorageError(&REST{
@@ -42,6 +43,9 @@ func NewREST(client restclient.Interface) utilregistry.NoWatchStorage {
 func (s *REST) New() runtime.Object {
 	return &authorizationapi.RoleBinding{}
 }
+
+func (s *REST) Destroy() {}
+
 func (s *REST) NewList() runtime.Object {
 	return &authorizationapi.RoleBindingList{}
 }

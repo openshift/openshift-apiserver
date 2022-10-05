@@ -60,6 +60,7 @@ type REST struct {
 var _ rest.Lister = &REST{}
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 func NewREST(message, templateNamespace, templateName string,
 	projectClient projectv1typedclient.ProjectsGetter,
@@ -84,6 +85,8 @@ func NewREST(message, templateNamespace, templateName string,
 func (r *REST) New() runtime.Object {
 	return &projectapi.ProjectRequest{}
 }
+
+func (r *REST) Destroy() {}
 
 func (r *REST) NewList() runtime.Object {
 	return &metav1.Status{}

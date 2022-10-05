@@ -20,6 +20,7 @@ type NoWatchStorage interface {
 	rest.CreaterUpdater
 	rest.GracefulDeleter
 	rest.Scoper
+	rest.Storage
 }
 
 // WrapNoWatchStorageError uses syncStatusError to inject the correct group
@@ -70,6 +71,8 @@ func (s *noWatchStorageErrWrapper) Delete(ctx context.Context, name string, dele
 func (s *noWatchStorageErrWrapper) New() runtime.Object {
 	return s.delegate.New()
 }
+
+func (s *noWatchStorageErrWrapper) Destroy() {}
 
 func (s *noWatchStorageErrWrapper) NewList() runtime.Object {
 	return s.delegate.NewList()

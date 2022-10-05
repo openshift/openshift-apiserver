@@ -22,6 +22,7 @@ type REST struct {
 }
 
 var _ rest.GetterWithOptions = &REST{}
+var _ rest.Storage = &REST{}
 
 // NewREST returns a new REST.
 func NewREST(secrets corev1client.SecretsGetter) *REST {
@@ -31,6 +32,8 @@ func NewREST(secrets corev1client.SecretsGetter) *REST {
 func (r *REST) New() runtime.Object {
 	return &coreapi.SecretList{}
 }
+
+func (r *REST) Destroy() {}
 
 func (r *REST) NewGetOptions() (runtime.Object, bool, string) {
 	return &metav1.ListOptions{}, false, ""

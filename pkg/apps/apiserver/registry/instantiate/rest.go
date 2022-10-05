@@ -39,8 +39,9 @@ func NewREST(store registry.Store, imagesclient imagev1client.Interface, kc kube
 	return &REST{store: &store, is: imagesclient.ImageV1(), rn: kc.CoreV1(), admit: admission}
 }
 
-// REST implements the Creater interface.
-var _ = rest.Creater(&REST{})
+// REST implements the Creater & Storage interfaces.
+var _ rest.Creater = &REST{}
+var _ rest.Storage = &REST{}
 
 type REST struct {
 	store *registry.Store
@@ -130,6 +131,10 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	})
 
 	return ret, err
+}
+
+func (s *REST) Destroy() {
+	s.store.Destroy()
 }
 
 // processTriggers will go over all deployment triggers that require processing and update

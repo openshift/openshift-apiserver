@@ -61,6 +61,7 @@ type REST struct {
 
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 // NewREST returns a REST storage implementation that handles importing images.
 // Insecure transport is optional, and both transports should not include
@@ -95,7 +96,9 @@ func (r *REST) New() runtime.Object {
 	return &imageapi.ImageStreamImport{}
 }
 
-func (s *REST) NamespaceScoped() bool {
+func (r *REST) Destroy() {}
+
+func (r *REST) NamespaceScoped() bool {
 	return true
 }
 

@@ -40,6 +40,7 @@ type REST struct {
 
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 // NewREST returns a new REST.
 func NewREST(imageRegistry image.Registry, imageStreamRegistry imagestream.Registry, registry registryhostname.RegistryHostnameRetriever) *REST {
@@ -55,7 +56,9 @@ func (r *REST) New() runtime.Object {
 	return &imageapi.ImageStreamMapping{}
 }
 
-func (s *REST) NamespaceScoped() bool {
+func (r *REST) Destroy() {}
+
+func (r *REST) NamespaceScoped() bool {
 	return true
 }
 
@@ -64,8 +67,8 @@ func (s *REST) NamespaceScoped() bool {
 // with a resource conflict, the update will be retried if the newer
 // ImageStream has no tag diffs from the previous state. If tag diffs are
 // detected, the conflict error is returned.
-func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
-	if err := rest.BeforeCreate(s.strategy, ctx, obj); err != nil {
+func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
+	if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
 		return nil, err
 	}
 	if err := createValidation(ctx, obj.DeepCopyObject()); err != nil {
@@ -74,7 +77,7 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 
 	mapping := obj.(*imageapi.ImageStreamMapping)
 
-	stream, err := s.findStreamForMapping(ctx, mapping)
+	stream, err := r.findStreamForMapping(ctx, mapping)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +88,7 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		tag = imagev1.DefaultImageTag
 	}
 
-	imageCreateErr := s.imageRegistry.CreateImage(ctx, &image)
+	imageCreateErr := r.imageRegistry.CreateImage(ctx, &image)
 	if imageCreateErr != nil && !errors.IsAlreadyExists(imageCreateErr) {
 		return nil, imageCreateErr
 	}
@@ -119,7 +122,7 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 			return true, nil
 		}
 		internalimageutil.UpdateTrackingTags(stream, tag, next)
-		_, err := s.imageStreamRegistry.UpdateImageStreamStatus(ctx, stream, false, &metav1.UpdateOptions{})
+		_, err := r.imageStreamRegistry.UpdateImageStreamStatus(ctx, stream, false, &metav1.UpdateOptions{})
 		if err == nil {
 			return true, nil
 		}
@@ -128,7 +131,7 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		}
 		// If the update conflicts, get the latest stream and check for tag
 		// updates. If the latest tag hasn't changed, retry.
-		latestStream, findLatestErr := s.findStreamForMapping(ctx, mapping)
+		latestStream, findLatestErr := r.findStreamForMapping(ctx, mapping)
 		if findLatestErr != nil {
 			return false, findLatestErr
 		}
@@ -174,12 +177,12 @@ func dockerImageReferenceForStream(stream *imageapi.ImageStream) (imageapi.Docke
 }
 
 // findStreamForMapping retrieves an ImageStream whose DockerImageRepository matches dockerRepo.
-func (s *REST) findStreamForMapping(ctx context.Context, mapping *imageapi.ImageStreamMapping) (*imageapi.ImageStream, error) {
+func (r *REST) findStreamForMapping(ctx context.Context, mapping *imageapi.ImageStreamMapping) (*imageapi.ImageStream, error) {
 	if len(mapping.Name) > 0 {
-		return s.imageStreamRegistry.GetImageStream(ctx, mapping.Name, &metav1.GetOptions{})
+		return r.imageStreamRegistry.GetImageStream(ctx, mapping.Name, &metav1.GetOptions{})
 	}
 	if len(mapping.DockerImageRepository) != 0 {
-		list, err := s.imageStreamRegistry.ListImageStreams(ctx, &metainternal.ListOptions{})
+		list, err := r.imageStreamRegistry.ListImageStreams(ctx, &metainternal.ListOptions{})
 		if err != nil {
 			return nil, err
 		}

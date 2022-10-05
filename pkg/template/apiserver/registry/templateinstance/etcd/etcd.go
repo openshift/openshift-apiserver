@@ -58,8 +58,8 @@ type StatusREST struct {
 	store *registry.Store
 }
 
-// StatusREST implements Patcher
-var _ = rest.Patcher(&StatusREST{})
+var _ rest.Patcher = &StatusREST{}
+var _ rest.Storage = &StatusREST{}
 
 // New creates a new templateInstance resource
 func (r *StatusREST) New() runtime.Object {
@@ -74,4 +74,8 @@ func (r *StatusREST) Get(ctx context.Context, name string, options *metav1.GetOp
 // Update alters the status subset of an object.
 func (r *StatusREST) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
 	return r.store.Update(ctx, name, objInfo, createValidation, updateValidation, forceAllowCreate, options)
+}
+
+func (r *StatusREST) Destroy() {
+	r.store.Destroy()
 }

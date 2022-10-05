@@ -22,6 +22,7 @@ type REST struct {
 var _ rest.StandardStorage = &REST{}
 var _ rest.ShortNamesProvider = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 // ShortNames implements the ShortNamesProvider interface. Returns a list of short names for a resource.
 func (r *REST) ShortNames() []string {
@@ -61,6 +62,8 @@ func (r *REST) List(ctx context.Context, options *metainternalversion.ListOption
 func (r *REST) New() runtime.Object {
 	return &securityapi.SecurityContextConstraints{}
 }
+
+func (r *REST) Destroy() {}
 
 func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
 	return nil, errors.NewInternalError(fmt.Errorf("unsupported"))

@@ -23,11 +23,14 @@ type CloneREST struct {
 }
 
 var _ rest.Creater = &CloneREST{}
+var _ rest.Storage = &CloneREST{}
 
 // New creates a new build clone request
 func (s *CloneREST) New() runtime.Object {
 	return &buildapi.BuildRequest{}
 }
+
+func (s *CloneREST) Destroy() {}
 
 // Create instantiates a new build from an existing build
 func (s *CloneREST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {

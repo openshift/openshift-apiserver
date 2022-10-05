@@ -34,6 +34,7 @@ type REST struct {
 }
 
 var _ rest.Creater = &REST{}
+var _ rest.Storage = &REST{}
 
 // NewREST safely creates a new REST.
 func NewREST(appsclient appsclient.Interface, kc kubernetes.Interface) *REST {
@@ -48,6 +49,8 @@ func NewREST(appsclient appsclient.Interface, kc kubernetes.Interface) *REST {
 func (r *REST) New() runtime.Object {
 	return &appsapi.DeploymentConfigRollback{}
 }
+
+func (r *REST) Destroy() {}
 
 // Create generates a new DeploymentConfig representing a rollback.
 func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {

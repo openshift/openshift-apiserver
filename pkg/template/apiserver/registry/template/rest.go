@@ -28,6 +28,7 @@ type REST struct {
 
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 // NewREST creates new RESTStorage interface for processing Template objects. If
 // legacyReturn is used, a Config object is returned. Otherwise, a List is returned
@@ -42,6 +43,8 @@ func NewREST() *REST {
 func (s *REST) New() runtime.Object {
 	return &templateapi.Template{}
 }
+
+func (s *REST) Destroy() {}
 
 func (s *REST) NamespaceScoped() bool {
 	return true

@@ -21,6 +21,7 @@ type REST struct {
 
 var _ rest.StandardStorage = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 // NewREST returns a RESTStorage object that will work against nodes.
 func NewREST() (*REST, error) {
@@ -46,6 +47,8 @@ func (r *REST) List(ctx context.Context, options *metainternalversion.ListOption
 func (r *REST) New() runtime.Object {
 	return &authorizationapi.RoleBindingRestriction{}
 }
+
+func (r *REST) Destroy() {}
 
 func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
 	return nil, errors.NewInternalError(fmt.Errorf("unsupported"))

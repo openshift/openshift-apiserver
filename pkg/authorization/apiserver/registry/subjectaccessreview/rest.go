@@ -26,6 +26,7 @@ type REST struct {
 
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 // NewREST creates a new REST for policies.
 func NewREST(authorizer kauthorizer.Authorizer) *REST {
@@ -36,6 +37,8 @@ func NewREST(authorizer kauthorizer.Authorizer) *REST {
 func (r *REST) New() runtime.Object {
 	return &authorizationapi.SubjectAccessReview{}
 }
+
+func (r *REST) Destroy() {}
 
 func (s *REST) NamespaceScoped() bool {
 	return false
