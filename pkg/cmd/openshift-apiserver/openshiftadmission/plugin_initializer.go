@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/admission/initializer"
 	webhookinitializer "k8s.io/apiserver/pkg/admission/plugin/webhook/initializer"
-	"k8s.io/apiserver/pkg/authorization/authorizer"
 	"k8s.io/apiserver/pkg/quota/v1/generic"
+	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/util/webhook"
 	kexternalinformers "k8s.io/client-go/informers"
 	kubeclientgoclient "k8s.io/client-go/kubernetes"
@@ -47,11 +48,10 @@ type InformerAccess interface {
 }
 
 func NewPluginInitializer(
-	internalImageRegistryHostname string,
-	cloudConfigFile string,
+	config *openshiftcontrolplanev1.OpenShiftAPIServerConfig,
+	genericConfig *genericapiserver.RecommendedConfig,
 	privilegedLoopbackConfig *rest.Config,
 	informers InformerAccess,
-	authorizer authorizer.Authorizer,
 	featureGates featuregate.FeatureGate,
 	restMapper meta.RESTMapper,
 	clusterQuotaMappingController *clusterquotamapping.ClusterQuotaMappingController,
@@ -77,19 +77,21 @@ func NewPluginInitializer(
 	}
 
 	var cloudConfig []byte
-	if len(cloudConfigFile) != 0 {
+	if len(config.CloudProviderFile) != 0 {
 		var err error
-		cloudConfig, err = ioutil.ReadFile(cloudConfigFile)
+		cloudConfig, err = ioutil.ReadFile(config.CloudProviderFile)
 		if err != nil {
-			return nil, fmt.Errorf("error reading from cloud configuration file %s: %v", cloudConfigFile, err)
+			return nil, fmt.Errorf("error reading from cloud configuration file %s: %v", config.CloudProviderFile, err)
 		}
 	}
+
 	// note: we are passing a combined quota registry here...
 	genericInitializer := initializer.New(
 		kubeClient,
 		informers.GetKubernetesInformers(),
-		authorizer,
+		genericConfig.Authorization.Authorizer,
 		featureGates,
+		genericConfig.DrainedNotify(),
 	)
 	kubePluginInitializer := kubeapiserveradmission.NewPluginInitializer(
 		cloudConfig,
@@ -125,7 +127,10 @@ func NewPluginInitializer(
 		webhookInitializer,
 		kubePluginInitializer,
 		openshiftPluginInitializer,
-		imagepolicy.NewInitializer(originimagereferencemutators.OriginImageMutators{}, internalImageRegistryHostname),
+		imagepolicy.NewInitializer(
+			originimagereferencemutators.OriginImageMutators{},
+			config.ImagePolicyConfig.InternalRegistryHostname,
+		),
 		clusterresourcequota.NewInitializer(
 			informers.GetOpenshiftQuotaInformers().Quota().V1().ClusterResourceQuotas(),
 			clusterQuotaMappingController.GetClusterQuotaMapper(),
