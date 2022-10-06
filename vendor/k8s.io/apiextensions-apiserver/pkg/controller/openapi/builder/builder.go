@@ -22,7 +22,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/emicklei/go-restful"
+	"github.com/emicklei/go-restful/v3"
 
 	v1 "k8s.io/api/autoscaling/v1"
 	apiextensionshelpers "k8s.io/apiextensions-apiserver/pkg/apihelpers"
@@ -80,6 +80,7 @@ func refForOpenAPIVersion(schemaRef string, v2 bool) string {
 }
 
 var definitions map[string]common.OpenAPIDefinition
+var definitionsV3 map[string]common.OpenAPIDefinition
 var buildDefinitions sync.Once
 var namer *openapi.DefinitionNamer
 
@@ -247,12 +248,13 @@ type builder struct {
 }
 
 // subresource is a handy method to get subresource name. Valid inputs are:
-//     input                     output
-//     ""                        ""
-//     "/"                       ""
-//     "/{name}"                 ""
-//     "/{name}/scale"           "scale"
-//     "/{name}/scale/foo"       invalid input
+//
+//	input                     output
+//	""                        ""
+//	"/"                       ""
+//	"/{name}"                 ""
+//	"/{name}/scale"           "scale"
+//	"/{name}/scale/foo"       invalid input
 func subresource(path string) string {
 	parts := strings.Split(path, "/")
 	if len(parts) <= 2 {
@@ -302,9 +304,10 @@ func (b *builder) descriptionFor(path, operationVerb string) string {
 }
 
 // buildRoute returns a RouteBuilder for WebService to consume and builds path in swagger
-//     action can be one of: GET, PUT, PATCH, POST, DELETE;
-//     verb can be one of: list, read, replace, patch, create, delete, deletecollection;
-//     sample is the sample Go type for response type.
+//
+//	action can be one of: GET, PUT, PATCH, POST, DELETE;
+//	verb can be one of: list, read, replace, patch, create, delete, deletecollection;
+//	sample is the sample Go type for response type.
 func (b *builder) buildRoute(root, path, httpMethod, actionVerb, operationVerb string, sample interface{}) *restful.RouteBuilder {
 	var namespaced string
 	if b.namespaced {
@@ -460,30 +463,36 @@ func addEmbeddedProperties(s *spec.Schema, opts Options) {
 // getDefinition gets definition for given Kubernetes type. This function is extracted from
 // kube-openapi builder logic
 func getDefinition(name string, v2 bool) spec.Schema {
-	buildDefinitions.Do(generateBuildDefinitionsFunc(v2))
-	return definitions[name].Schema
+	buildDefinitions.Do(generateBuildDefinitionsFunc)
+
+	if v2 {
+		return definitions[name].Schema
+	}
+	return definitionsV3[name].Schema
 }
 
 func withDescription(s spec.Schema, desc string) spec.Schema {
 	return *s.WithDescription(desc)
 }
 
-func generateBuildDefinitionsFunc(v2 bool) func() {
-	return func() {
-		namer = openapi.NewDefinitionNamer(runtime.NewScheme())
-		definitions = utilopenapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions)(func(name string) spec.Ref {
-			defName, _ := namer.GetDefinitionName(name)
-			prefix := v3DefinitionPrefix
-			if v2 {
-				prefix = definitionPrefix
-			}
-			return spec.MustCreateRef(prefix + common.EscapeJsonPointer(defName))
-		})
-	}
+func generateBuildDefinitionsFunc() {
+	namer = openapi.NewDefinitionNamer(runtime.NewScheme())
+	definitionsV3 = utilopenapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions)(func(name string) spec.Ref {
+		defName, _ := namer.GetDefinitionName(name)
+		prefix := v3DefinitionPrefix
+		return spec.MustCreateRef(prefix + common.EscapeJsonPointer(defName))
+	})
+
+	definitions = utilopenapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions)(func(name string) spec.Ref {
+		defName, _ := namer.GetDefinitionName(name)
+		prefix := definitionPrefix
+		return spec.MustCreateRef(prefix + common.EscapeJsonPointer(defName))
+	})
 }
 
 // addTypeMetaProperties adds Kubernetes-specific type meta properties to input schema:
-//     apiVersion and kind
+//
+//	apiVersion and kind
 func addTypeMetaProperties(s *spec.Schema, v2 bool) {
 	s.SetProperty("apiVersion", getDefinition(typeMetaType, v2).SchemaProps.Properties["apiVersion"])
 	s.SetProperty("kind", getDefinition(typeMetaType, v2).SchemaProps.Properties["kind"])
@@ -495,7 +504,7 @@ func (b *builder) buildListSchema(v2 bool) *spec.Schema {
 	doc := fmt.Sprintf("List of %s. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md", b.plural)
 	s := new(spec.Schema).WithDescription(fmt.Sprintf("%s is a list of %s", b.listKind, b.kind)).
 		WithRequired("items").
-		SetProperty("items", *spec.ArrayProperty(spec.RefSchema(name)).WithDescription(doc)).
+		SetProperty("items", *spec.ArrayProperty(spec.RefSchema(refForOpenAPIVersion(name, v2))).WithDescription(doc)).
 		SetProperty("metadata", *spec.RefSchema(refForOpenAPIVersion(listMetaSchemaRef, v2)).WithDescription(swaggerPartialObjectMetadataListDescriptions["metadata"]))
 
 	addTypeMetaProperties(s, v2)
@@ -528,7 +537,7 @@ func (b *builder) getOpenAPIConfig(v2 bool) *common.Config {
 		},
 		GetOperationIDAndTags: openapi.GetOperationIDAndTags,
 		GetDefinitionName: func(name string) (string, spec.Extensions) {
-			buildDefinitions.Do(generateBuildDefinitionsFunc(v2))
+			buildDefinitions.Do(generateBuildDefinitionsFunc)
 			return namer.GetDefinitionName(name)
 		},
 		GetDefinitions: func(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
