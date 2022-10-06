@@ -325,6 +325,14 @@ func Convert_v1_SecretList_To_image_v1_SecretList(in *core.SecretList, out *v1.S
 	return nil
 }
 
+func Convert_v1_ImageImportStatus_To_image_ImageImportStatus(in *v1.ImageImportStatus, out *image.ImageImportStatus, s conversion.Scope) error {
+	return autoConvert_v1_ImageImportStatus_To_image_ImageImportStatus(in, out, s)
+}
+
+func Convert_v1_TagImportPolicy_To_image_TagImportPolicy(in *v1.TagImportPolicy, out *image.TagImportPolicy, s conversion.Scope) error {
+	return autoConvert_v1_TagImportPolicy_To_image_TagImportPolicy(in, out, s)
+}
+
 func AddConversionFuncs(s *runtime.Scheme) error {
 	if err := s.AddConversionFunc((*[]newer.TagEventCondition)(nil), (*[]v1.TagEventCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_image_TagEventConditionArray_to_v1_TagEventConditionArray(a.(*[]newer.TagEventCondition), b.(*[]v1.TagEventCondition), scope)
