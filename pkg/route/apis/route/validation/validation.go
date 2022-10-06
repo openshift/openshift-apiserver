@@ -430,3 +430,21 @@ func validateKubeFinalizerName(stringValue string, fldPath *field.Path) field.Er
 
 	return allErrs
 }
+
+func Warnings(route *routeapi.Route) []string {
+	external, errs := toRouteV1(route)
+	if len(errs) > 0 {
+		return nil
+	}
+
+	return warningsV1(external)
+}
+
+func warningsV1(route *routev1.Route) []string {
+	if len(route.Spec.Host) != 0 && len(route.Spec.Subdomain) != 0 {
+		var warnings []string
+		warnings = append(warnings, "spec.host is set; spec.subdomain may be ignored")
+		return warnings
+	}
+	return nil
+}

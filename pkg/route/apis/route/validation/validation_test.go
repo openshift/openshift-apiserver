@@ -1316,3 +1316,47 @@ func TestValidateEdgeReencryptInsecureEdgeTerminationPolicy(t *testing.T) {
 		}
 	}
 }
+
+func TestWarnings(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		host      string
+		subdomain string
+		expected  []string
+	}{
+		{
+			name:      "both host and subdomain set",
+			host:      "foo",
+			subdomain: "bar",
+			expected:  []string{"spec.host is set; spec.subdomain may be ignored"},
+		},
+		{
+			name: "only host set",
+			host: "foo",
+		},
+		{
+			name:      "only subdomain set",
+			subdomain: "bar",
+		},
+		{
+			name: "both host and subdomain unset",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			actual := warningsV1(&routev1.Route{
+				Spec: routev1.RouteSpec{
+					Host:      tc.host,
+					Subdomain: tc.subdomain,
+				},
+			})
+			if len(actual) != len(tc.expected) {
+				t.Fatalf("expected %#v, got %#v", tc.expected, actual)
+			}
+			for i := range actual {
+				if actual[i] != tc.expected[i] {
+					t.Fatalf("expected %#v, got %#v", tc.expected, actual)
+				}
+			}
+		})
+	}
+}
