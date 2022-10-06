@@ -11,6 +11,7 @@ import (
 
 	authorizationapi "k8s.io/api/authorization/v1"
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -109,6 +110,12 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	}
 
 	inputMeta := isi.ObjectMeta
+
+	objectMeta, err := meta.Accessor(obj)
+	if err != nil {
+		return nil, err
+	}
+	rest.FillObjectMetaSystemFields(objectMeta)
 
 	if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
 		return nil, err

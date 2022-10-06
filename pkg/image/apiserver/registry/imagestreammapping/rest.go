@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/klog/v2"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -68,6 +69,12 @@ func (r *REST) NamespaceScoped() bool {
 // ImageStream has no tag diffs from the previous state. If tag diffs are
 // detected, the conflict error is returned.
 func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
+	objectMeta, err := meta.Accessor(obj)
+	if err != nil {
+		return nil, err
+	}
+	rest.FillObjectMetaSystemFields(objectMeta)
+
 	if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
 		return nil, err
 	}
