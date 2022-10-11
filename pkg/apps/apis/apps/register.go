@@ -3,6 +3,7 @@ package apps
 import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/kubernetes/pkg/apis/autoscaling"
 	core "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/extensions"
 )
@@ -40,6 +41,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&DeploymentRequest{},
 		&DeploymentLog{},
 		&DeploymentLogOptions{},
+		&autoscaling.Scale{},
 	)
 	return nil
 }

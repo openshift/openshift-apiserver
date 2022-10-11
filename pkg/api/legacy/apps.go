@@ -5,6 +5,8 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/kubernetes/pkg/apis/autoscaling"
+	autoscalingv1conversions "k8s.io/kubernetes/pkg/apis/autoscaling/v1"
 	"k8s.io/kubernetes/pkg/apis/core"
 	corev1conversions "k8s.io/kubernetes/pkg/apis/core/v1"
 	"k8s.io/kubernetes/pkg/apis/extensions"
@@ -24,8 +26,11 @@ func InstallInternalLegacyApps(scheme *runtime.Scheme) {
 		addUngroupifiedInternalAppsTypes,
 		core.AddToScheme,
 		extensions.AddToScheme,
+		autoscaling.AddToScheme,
+
 		corev1conversions.AddToScheme,
 		extensionsv1beta1conversions.AddToScheme,
+		autoscalingv1conversions.AddToScheme,
 
 		appsv1helpers.RegisterDefaults,
 		appsv1helpers.RegisterConversions,
