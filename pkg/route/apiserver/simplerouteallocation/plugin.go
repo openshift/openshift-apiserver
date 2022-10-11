@@ -35,21 +35,12 @@ func NewSimpleAllocationPlugin(suffix string) (*SimpleAllocationPlugin, error) {
 	return &SimpleAllocationPlugin{DNSSuffix: suffix}, nil
 }
 
-// Allocate a router shard for the given route. This plugin always returns
-// the "global" router shard.
-// TODO: replace with per router allocation
-func (p *SimpleAllocationPlugin) AllocateRouterShard(route *routeapi.Route) (*routeapi.RouterShard, error) {
-	klog.V(4).Infof("Allocating global shard *.%s to Route: %s", p.DNSSuffix, route.Name)
-
-	return &routeapi.RouterShard{ShardName: "global", DNSSuffix: p.DNSSuffix}, nil
-}
-
 // GenerateHostname generates a host name for a route - using the service name,
 // namespace (if provided) and the router shard dns suffix.
 // TODO: move to router code, and have the routers set this back on the route status.
-func (p *SimpleAllocationPlugin) GenerateHostname(route *routeapi.Route, shard *routeapi.RouterShard) string {
+func (p *SimpleAllocationPlugin) GenerateHostname(route *routeapi.Route) (string, error) {
 	if len(route.Name) == 0 || len(route.Namespace) == 0 {
-		return ""
+		return "", nil
 	}
-	return fmt.Sprintf("%s-%s.%s", strings.Replace(route.Name, ".", "-", -1), route.Namespace, shard.DNSSuffix)
+	return fmt.Sprintf("%s-%s.%s", strings.Replace(route.Name, ".", "-", -1), route.Namespace, p.DNSSuffix), nil
 }

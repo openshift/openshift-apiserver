@@ -17,7 +17,6 @@ import (
 
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	routeregistry "github.com/openshift/openshift-apiserver/pkg/route/apiserver/registry/route"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeinterfaces"
 	routeprinters "github.com/openshift/openshift-apiserver/pkg/route/printers/internalversion"
 )
 
@@ -33,8 +32,12 @@ func (r *REST) Categories() []string {
 	return []string{"all"}
 }
 
+type HostnameGenerator interface {
+	GenerateHostname(*routeapi.Route) (string, error)
+}
+
 // NewREST returns a RESTStorage object that will work against routes.
-func NewREST(optsGetter generic.RESTOptionsGetter, allocator routeinterfaces.RouteAllocator, sarClient routeregistry.SubjectAccessReviewInterface) (*REST, *StatusREST, error) {
+func NewREST(optsGetter generic.RESTOptionsGetter, allocator HostnameGenerator, sarClient routeregistry.SubjectAccessReviewInterface) (*REST, *StatusREST, error) {
 	strategy := routeregistry.NewStrategy(allocator, sarClient)
 
 	store := &registry.Store{

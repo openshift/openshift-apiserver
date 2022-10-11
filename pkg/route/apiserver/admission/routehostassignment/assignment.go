@@ -12,7 +12,6 @@ import (
 
 	"github.com/openshift/library-go/pkg/authorization/authorizationutil"
 	routeinternal "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeinterfaces"
 )
 
 // HostGeneratedAnnotationKey is the key for an annotation set to "true" if the route's host was generated
@@ -23,10 +22,14 @@ type SubjectAccessReviewCreator interface {
 	Create(ctx context.Context, sar *authorizationv1.SubjectAccessReview, opts metav1.CreateOptions) (*authorizationv1.SubjectAccessReview, error)
 }
 
+type HostnameGenerator interface {
+	GenerateHostname(*routeinternal.Route) (string, error)
+}
+
 // AllocateHost allocates a host name ONLY if the route doesn't specify a subdomain wildcard policy and
 // the host name on the route is empty and an allocator is configured.
 // It must first allocate the shard and may return an error if shard allocation fails.
-func AllocateHost(ctx context.Context, route *routeinternal.Route, sarc SubjectAccessReviewCreator, routeAllocator routeinterfaces.RouteAllocator) field.ErrorList {
+func AllocateHost(ctx context.Context, route *routeinternal.Route, sarc SubjectAccessReviewCreator, routeAllocator HostnameGenerator) field.ErrorList {
 	hostSet := len(route.Spec.Host) > 0
 	certSet := route.Spec.TLS != nil && (len(route.Spec.TLS.CACertificate) > 0 || len(route.Spec.TLS.Certificate) > 0 || len(route.Spec.TLS.DestinationCACertificate) > 0 || len(route.Spec.TLS.Key) > 0)
 	if hostSet || certSet {
@@ -70,11 +73,11 @@ func AllocateHost(ctx context.Context, route *routeinternal.Route, sarc SubjectA
 
 	if len(route.Spec.Subdomain) == 0 && len(route.Spec.Host) == 0 && routeAllocator != nil {
 		// TODO: this does not belong here, and should be removed
-		shard, err := routeAllocator.AllocateRouterShard(route)
+		host, err := routeAllocator.GenerateHostname(route)
 		if err != nil {
 			return field.ErrorList{field.InternalError(field.NewPath("spec", "host"), fmt.Errorf("allocation error: %v for route: %#v", err, route))}
 		}
-		route.Spec.Host = routeAllocator.GenerateHostname(route, shard)
+		route.Spec.Host = host
 		if route.Annotations == nil {
 			route.Annotations = map[string]string{}
 		}
