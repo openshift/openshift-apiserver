@@ -7,7 +7,7 @@ import (
 	kvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/klog/v2"
 
-	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
+	routev1 "github.com/openshift/api/route/v1"
 )
 
 // Default DNS suffix to use if no configuration is passed to this plugin.
@@ -38,7 +38,7 @@ func NewSimpleAllocationPlugin(suffix string) (*SimpleAllocationPlugin, error) {
 // GenerateHostname generates a host name for a route - using the service name,
 // namespace (if provided) and the router shard dns suffix.
 // TODO: move to router code, and have the routers set this back on the route status.
-func (p *SimpleAllocationPlugin) GenerateHostname(route *routeapi.Route) (string, error) {
+func (p *SimpleAllocationPlugin) GenerateHostname(route *routev1.Route) (string, error) {
 	if len(route.Name) == 0 || len(route.Namespace) == 0 {
 		return "", nil
 	}

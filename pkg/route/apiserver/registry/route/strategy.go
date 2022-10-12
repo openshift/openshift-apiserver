@@ -12,6 +12,7 @@ import (
 	authorizationclient "k8s.io/client-go/kubernetes/typed/authorization/v1"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
+	routev1 "github.com/openshift/api/route/v1"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	"github.com/openshift/openshift-apiserver/pkg/route/apis/route/validation"
 	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/routehostassignment"
@@ -25,7 +26,7 @@ type SubjectAccessReviewInterface interface {
 var _ SubjectAccessReviewInterface = authorizationclient.SubjectAccessReviewInterface(nil)
 
 type HostnameGenerator interface {
-	GenerateHostname(*routeapi.Route) (string, error)
+	GenerateHostname(*routev1.Route) (string, error)
 }
 
 type routeStrategy struct {

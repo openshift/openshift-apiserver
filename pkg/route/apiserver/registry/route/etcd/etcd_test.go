@@ -17,6 +17,7 @@ import (
 	"k8s.io/apiserver/pkg/storage/storagebackend"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
+	routev1 "github.com/openshift/api/route/v1"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	_ "github.com/openshift/openshift-apiserver/pkg/route/apis/route/install"
 	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/routehostassignment"
@@ -29,7 +30,7 @@ type testAllocator struct {
 	Generate bool
 }
 
-func (a *testAllocator) GenerateHostname(*routeapi.Route) (string, error) {
+func (a *testAllocator) GenerateHostname(*routev1.Route) (string, error) {
 	a.Generate = true
 	return a.Hostname, a.Err
 }

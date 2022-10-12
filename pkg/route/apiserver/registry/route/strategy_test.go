@@ -12,13 +12,14 @@ import (
 	"k8s.io/apiserver/pkg/authentication/user"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 
+	routev1 "github.com/openshift/api/route/v1"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 )
 
 type testAllocator struct {
 }
 
-func (t testAllocator) GenerateHostname(*routeapi.Route) (string, error) {
+func (t testAllocator) GenerateHostname(*routev1.Route) (string, error) {
 	return "mygeneratedhost.com", nil
 }
 
