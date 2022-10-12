@@ -20,24 +20,18 @@ import (
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	_ "github.com/openshift/openshift-apiserver/pkg/route/apis/route/install"
 	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/routehostassignment"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeinterfaces"
 	"k8s.io/apiserver/pkg/registry/generic"
 )
 
 type testAllocator struct {
 	Hostname string
 	Err      error
-	Allocate bool
 	Generate bool
 }
 
-func (a *testAllocator) AllocateRouterShard(*routeapi.Route) (*routeapi.RouterShard, error) {
-	a.Allocate = true
-	return nil, a.Err
-}
-func (a *testAllocator) GenerateHostname(*routeapi.Route, *routeapi.RouterShard) string {
+func (a *testAllocator) GenerateHostname(*routeapi.Route) (string, error) {
 	a.Generate = true
-	return a.Hostname
+	return a.Hostname, a.Err
 }
 
 type testSAR struct {
@@ -55,7 +49,7 @@ func (t *testSAR) Create(_ context.Context, subjectAccessReview *authorizationap
 	}, t.err
 }
 
-func newStorage(t *testing.T, allocator routeinterfaces.RouteAllocator) (*REST, *etcdtesting.EtcdTestServer) {
+func newStorage(t *testing.T, allocator HostnameGenerator) (*REST, *etcdtesting.EtcdTestServer) {
 	server, etcdStorage := etcdtesting.NewUnsecuredEtcd3TestClientServer(t)
 	etcdStorage.Codec = legacyscheme.Codecs.LegacyCodec(schema.GroupVersion{Group: "route.openshift.io", Version: "v1"})
 	etcdStorageConfigForRoutes := &storagebackend.ConfigForResource{Config: *etcdStorage, GroupResource: schema.GroupResource{Group: "route.openshift.io", Resource: "routes"}}
@@ -113,8 +107,8 @@ func TestCreateWithAllocation(t *testing.T) {
 	if v, ok := result.Annotations[routehostassignment.HostGeneratedAnnotationKey]; !ok || v != "true" {
 		t.Fatalf("unexpected route: %#v", result)
 	}
-	if !allocator.Allocate || !allocator.Generate {
-		t.Fatalf("unexpected allocator: %#v", allocator)
+	if !allocator.Generate {
+		t.Fatalf("hostname generator not invoked: %#v", allocator)
 	}
 }
 

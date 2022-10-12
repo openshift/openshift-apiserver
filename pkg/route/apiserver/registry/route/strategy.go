@@ -15,7 +15,6 @@ import (
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	"github.com/openshift/openshift-apiserver/pkg/route/apis/route/validation"
 	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/routehostassignment"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/routeinterfaces"
 )
 
 // Registry is an interface for performing subject access reviews
@@ -25,21 +24,25 @@ type SubjectAccessReviewInterface interface {
 
 var _ SubjectAccessReviewInterface = authorizationclient.SubjectAccessReviewInterface(nil)
 
+type HostnameGenerator interface {
+	GenerateHostname(*routeapi.Route) (string, error)
+}
+
 type routeStrategy struct {
 	runtime.ObjectTyper
 	names.NameGenerator
-	routeinterfaces.RouteAllocator
-	sarClient SubjectAccessReviewInterface
+	hostnameGenerator HostnameGenerator
+	sarClient         SubjectAccessReviewInterface
 }
 
 // NewStrategy initializes the default logic that applies when creating and updating
 // Route objects via the REST API.
-func NewStrategy(allocator routeinterfaces.RouteAllocator, sarClient SubjectAccessReviewInterface) routeStrategy {
+func NewStrategy(allocator HostnameGenerator, sarClient SubjectAccessReviewInterface) routeStrategy {
 	return routeStrategy{
-		ObjectTyper:    legacyscheme.Scheme,
-		NameGenerator:  names.SimpleNameGenerator,
-		RouteAllocator: allocator,
-		sarClient:      sarClient,
+		ObjectTyper:       legacyscheme.Scheme,
+		NameGenerator:     names.SimpleNameGenerator,
+		hostnameGenerator: allocator,
+		sarClient:         sarClient,
 	}
 }
 
@@ -68,7 +71,7 @@ func (s routeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 
 func (s routeStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	route := obj.(*routeapi.Route)
-	errs := routehostassignment.AllocateHost(ctx, route, s.sarClient, s.RouteAllocator)
+	errs := routehostassignment.AllocateHost(ctx, route, s.sarClient, s.hostnameGenerator)
 	errs = append(errs, validation.ValidateRoute(route)...)
 	return errs
 }

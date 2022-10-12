@@ -17,11 +17,8 @@ import (
 type testAllocator struct {
 }
 
-func (t testAllocator) AllocateRouterShard(*routeinternal.Route) (*routeinternal.RouterShard, error) {
-	return &routeinternal.RouterShard{}, nil
-}
-func (t testAllocator) GenerateHostname(*routeinternal.Route, *routeinternal.RouterShard) string {
-	return "mygeneratedhost.com"
+func (t testAllocator) GenerateHostname(*routeinternal.Route) (string, error) {
+	return "mygeneratedhost.com", nil
 }
 
 type testSAR struct {
