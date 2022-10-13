@@ -14,7 +14,7 @@ import (
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
 	routegroup "github.com/openshift/api/route"
-
+	routev1 "github.com/openshift/api/route/v1"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	routeregistry "github.com/openshift/openshift-apiserver/pkg/route/apiserver/registry/route"
 	routeprinters "github.com/openshift/openshift-apiserver/pkg/route/printers/internalversion"
@@ -33,7 +33,7 @@ func (r *REST) Categories() []string {
 }
 
 type HostnameGenerator interface {
-	GenerateHostname(*routeapi.Route) (string, error)
+	GenerateHostname(*routev1.Route) (string, error)
 }
 
 // NewREST returns a RESTStorage object that will work against routes.

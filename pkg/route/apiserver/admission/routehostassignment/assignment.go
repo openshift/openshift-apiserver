@@ -10,8 +10,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/endpoints/request"
 
+	routev1 "github.com/openshift/api/route/v1"
 	"github.com/openshift/library-go/pkg/authorization/authorizationutil"
-	routeinternal "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 )
 
 // HostGeneratedAnnotationKey is the key for an annotation set to "true" if the route's host was generated
@@ -23,13 +23,13 @@ type SubjectAccessReviewCreator interface {
 }
 
 type HostnameGenerator interface {
-	GenerateHostname(*routeinternal.Route) (string, error)
+	GenerateHostname(*routev1.Route) (string, error)
 }
 
 // AllocateHost allocates a host name ONLY if the route doesn't specify a subdomain wildcard policy and
 // the host name on the route is empty and an allocator is configured.
 // It must first allocate the shard and may return an error if shard allocation fails.
-func AllocateHost(ctx context.Context, route *routeinternal.Route, sarc SubjectAccessReviewCreator, routeAllocator HostnameGenerator) field.ErrorList {
+func allocateHostV1(ctx context.Context, route *routev1.Route, sarc SubjectAccessReviewCreator, routeAllocator HostnameGenerator) field.ErrorList {
 	hostSet := len(route.Spec.Host) > 0
 	certSet := route.Spec.TLS != nil && (len(route.Spec.TLS.CACertificate) > 0 || len(route.Spec.TLS.Certificate) > 0 || len(route.Spec.TLS.DestinationCACertificate) > 0 || len(route.Spec.TLS.Key) > 0)
 	if hostSet || certSet {
@@ -46,7 +46,7 @@ func AllocateHost(ctx context.Context, route *routeinternal.Route, sarc SubjectA
 						ResourceAttributes: &authorizationv1.ResourceAttributes{
 							Namespace:   request.NamespaceValue(ctx),
 							Verb:        "create",
-							Group:       routeinternal.GroupName,
+							Group:       routev1.GroupName,
 							Resource:    "routes",
 							Subresource: "custom-host",
 						},
@@ -66,7 +66,7 @@ func AllocateHost(ctx context.Context, route *routeinternal.Route, sarc SubjectA
 		}
 	}
 
-	if route.Spec.WildcardPolicy == routeinternal.WildcardPolicySubdomain {
+	if route.Spec.WildcardPolicy == routev1.WildcardPolicySubdomain {
 		// Don't allocate a host if subdomain wildcard policy.
 		return nil
 	}
@@ -86,7 +86,7 @@ func AllocateHost(ctx context.Context, route *routeinternal.Route, sarc SubjectA
 	return nil
 }
 
-func hasCertificateInfo(tls *routeinternal.TLSConfig) bool {
+func hasCertificateInfo(tls *routev1.TLSConfig) bool {
 	if tls == nil {
 		return false
 	}
@@ -96,7 +96,7 @@ func hasCertificateInfo(tls *routeinternal.TLSConfig) bool {
 		len(tls.DestinationCACertificate) > 0
 }
 
-func certificateChangeRequiresAuth(route, older *routeinternal.Route) bool {
+func certificateChangeRequiresAuth(route, older *routev1.Route) bool {
 	switch {
 	case route.Spec.TLS != nil && older.Spec.TLS != nil:
 		a, b := route.Spec.TLS, older.Spec.TLS
@@ -117,7 +117,7 @@ func certificateChangeRequiresAuth(route, older *routeinternal.Route) bool {
 	}
 }
 
-func ValidateHostUpdate(ctx context.Context, route, older *routeinternal.Route, sarc SubjectAccessReviewCreator) field.ErrorList {
+func validateHostUpdateV1(ctx context.Context, route, older *routev1.Route, sarc SubjectAccessReviewCreator) field.ErrorList {
 	hostChanged := route.Spec.Host != older.Spec.Host
 	subdomainChanged := route.Spec.Subdomain != older.Spec.Subdomain
 	certChanged := certificateChangeRequiresAuth(route, older)
@@ -137,7 +137,7 @@ func ValidateHostUpdate(ctx context.Context, route, older *routeinternal.Route, 
 					ResourceAttributes: &authorizationv1.ResourceAttributes{
 						Namespace:   request.NamespaceValue(ctx),
 						Verb:        "update",
-						Group:       routeinternal.GroupName,
+						Group:       routev1.GroupName,
 						Resource:    "routes",
 						Subresource: "custom-host",
 					},
@@ -170,7 +170,7 @@ func ValidateHostUpdate(ctx context.Context, route, older *routeinternal.Route, 
 						ResourceAttributes: &authorizationv1.ResourceAttributes{
 							Namespace:   request.NamespaceValue(ctx),
 							Verb:        "create",
-							Group:       routeinternal.GroupName,
+							Group:       routev1.GroupName,
 							Resource:    "routes",
 							Subresource: "custom-host",
 						},
