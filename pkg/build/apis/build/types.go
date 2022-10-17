@@ -892,40 +892,40 @@ type JenkinsPipelineBuildStrategy struct {
 //
 // 1. Shell script:
 //
-// 	BuildPostCommitSpec{
-// 		Script: "rake test --verbose",
-// 	}
+//	BuildPostCommitSpec{
+//		Script: "rake test --verbose",
+//	}
 //
 // The above is a convenient form which is equivalent to:
 //
-// 	BuildPostCommitSpec{
-// 		Command: []string{"/bin/sh", "-ic"},
-// 		Args: []string{"rake test --verbose"},
-// 	}
+//	BuildPostCommitSpec{
+//		Command: []string{"/bin/sh", "-ic"},
+//		Args: []string{"rake test --verbose"},
+//	}
 //
 // 2. Command as the image entrypoint:
 //
-// 	BuildPostCommitSpec{
-// 		Command: []string{"rake", "test", "--verbose"},
-// 	}
+//	BuildPostCommitSpec{
+//		Command: []string{"rake", "test", "--verbose"},
+//	}
 //
 // Command overrides the image entrypoint in the exec form, as documented in
 // Docker: https://docs.docker.com/engine/reference/builder/#entrypoint.
 //
 // 3. Pass arguments to the default entrypoint:
 //
-// 	BuildPostCommitSpec{
-// 		Args: []string{"rake", "test", "--verbose"},
-// 	}
+//	BuildPostCommitSpec{
+//		Args: []string{"rake", "test", "--verbose"},
+//	}
 //
 // This form is only useful if the image entrypoint can handle arguments.
 //
 // 4. Shell script with arguments:
 //
-// 	BuildPostCommitSpec{
-// 		Script: "rake test $1",
-// 		Args: []string{"--verbose"},
-// 	}
+//	BuildPostCommitSpec{
+//		Script: "rake test $1",
+//		Args: []string{"--verbose"},
+//	}
 //
 // This form is useful if you need to pass arguments that would otherwise be
 // hard to quote properly in the shell script. In the script, $0 will be
@@ -933,10 +933,10 @@ type JenkinsPipelineBuildStrategy struct {
 //
 // 5. Command with arguments:
 //
-// 	BuildPostCommitSpec{
-// 		Command: []string{"rake", "test"},
-// 		Args: []string{"--verbose"},
-// 	}
+//	BuildPostCommitSpec{
+//		Command: []string{"rake", "test"},
+//		Args: []string{"--verbose"},
+//	}
 //
 // This form is equivalent to appending the arguments to the Command slice.
 //
@@ -1154,7 +1154,7 @@ type BuildTriggerPolicy struct {
 // BuildTriggerType refers to a specific BuildTriggerPolicy implementation.
 type BuildTriggerType string
 
-//NOTE: Adding a new trigger type requires adding the type to KnownTriggerTypes
+// NOTE: Adding a new trigger type requires adding the type to KnownTriggerTypes
 var KnownTriggerTypes = sets.NewString(
 	string(GitHubWebHookBuildTriggerType),
 	string(GenericWebHookBuildTriggerType),
