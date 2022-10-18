@@ -608,8 +608,11 @@ func addSubjectsToNamespace(subjectRecordStore cache.Store, subjects []string, n
 
 func (ac *AuthorizationCache) notifyWatchers(namespace string, exists *reviewRecord, users, groups sets.String) {
 	ac.watcherLock.Lock()
-	defer ac.watcherLock.Unlock()
-	for _, watcher := range ac.watchers {
+	watchers := make([]CacheWatcher, len(ac.watchers))
+	copy(watchers, ac.watchers)
+	ac.watcherLock.Unlock()
+
+	for _, watcher := range watchers {
 		watcher.GroupMembershipChanged(namespace, users, groups)
 	}
 }
