@@ -1,29 +1,32 @@
-# this is the boilerplate crd def that controller-gen reads and modifies with the
-# contents from shared_configmap_type.go
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: sharedconfigmaps.sharedresource.openshift.io
   annotations:
-    api-approved.openshift.io: https://github.com/openshift/api/pull/979
-    displayName: SharedConfigMap
-    description: Extension for sharing ConfigMaps across Namespaces
+    api-approved.openshift.io: https://github.com/openshift/api/pull/1084
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
+  name: projecthelmchartrepositories.helm.openshift.io
 spec:
-  scope: Cluster
-  group: sharedresource.openshift.io
+  group: helm.openshift.io
   names:
-    plural: sharedconfigmaps
-    singular: sharedconfigmap
-    kind: SharedConfigMap
-    listKind: SharedConfigMapList
+    kind: ProjectHelmChartRepository
+    listKind: ProjectHelmChartRepositoryList
+    plural: projecthelmchartrepositories
+    singular: projecthelmchartrepository
+  scope: Namespaced
   versions:
-    - name: v1alpha1
+    - name: v1beta1
       served: true
       storage: true
-      "schema":
-        "openAPIV3Schema":
-          description: "SharedConfigMap allows a ConfigMap to be shared across namespaces. Pods can mount the shared ConfigMap by adding a CSI volume to the pod specification using the \"csi.sharedresource.openshift.io\" CSI driver and a reference to the SharedConfigMap in the volume attributes: \n spec: \n \tvolumes: \t- name: shared-configmap \t  csi: \t    driver: csi.sharedresource.openshift.io \t    volumeAttributes: \t      sharedConfigMap: my-share \n For the mount to be successful, the pod's service account must be granted permission to 'use' the named SharedConfigMap object within its namespace with an appropriate Role and RoleBinding. For compactness, here are example `oc` invocations for creating such Role and RoleBinding objects. \n \t`oc create role shared-resource-my-share --verb=use --resource=sharedconfigmaps.sharedresource.openshift.io --resource-name=my-share` \t`oc create rolebinding shared-resource-my-share --role=shared-resource-my-share --serviceaccount=my-namespace:default` \n Shared resource objects, in this case ConfigMaps, have default permissions of list, get, and watch for system authenticated users. \n Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support. These capabilities should not be used by applications needing long term support."
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          description: "ProjectHelmChartRepository holds namespace-wide configuration for proxied Helm chart repository \n Compatibility level 2: Stable within a major release for a minimum of 9 months or 3 minor releases (whichever is longer)."
           type: object
+          required:
+            - spec
           properties:
             apiVersion:
               description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
@@ -34,33 +37,55 @@ spec:
             metadata:
               type: object
             spec:
-              description: spec is the specification of the desired shared configmap
+              description: spec holds user settable values for configuration
               type: object
-              required:
-                - configMapRef
               properties:
-                configMapRef:
-                  description: configMapRef is a reference to the ConfigMap to share
+                connectionConfig:
+                  description: Required configuration for connecting to the chart repo
                   type: object
-                  required:
-                    - name
-                    - namespace
                   properties:
-                    name:
-                      description: name represents the name of the ConfigMap that is being referenced.
+                    ca:
+                      description: ca is an optional reference to a config map by name containing the PEM-encoded CA bundle. It is used as a trust anchor to validate the TLS certificate presented by the remote server. The key "ca-bundle.crt" is used to locate the data. If empty, the default system roots are used. The namespace for this config map is openshift-config.
+                      type: object
+                      required:
+                        - name
+                      properties:
+                        name:
+                          description: name is the metadata.name of the referenced config map
+                          type: string
+                    tlsClientConfig:
+                      description: tlsClientConfig is an optional reference to a secret by name that contains the PEM-encoded TLS client certificate and private key to present when connecting to the server. The key "tls.crt" is used to locate the client certificate. The key "tls.key" is used to locate the private key. The namespace for this secret is openshift-config.
+                      type: object
+                      required:
+                        - name
+                      properties:
+                        name:
+                          description: name is the metadata.name of the referenced secret
+                          type: string
+                    url:
+                      description: Chart repository URL
                       type: string
-                    namespace:
-                      description: namespace represents the namespace where the referenced ConfigMap is located.
-                      type: string
+                      maxLength: 2048
+                      pattern: ^https?:\/\/
                 description:
-                  description: description is a user readable explanation of what the backing resource provides.
+                  description: Optional human readable repository description, it can be used by UI for displaying purposes
                   type: string
+                  maxLength: 2048
+                  minLength: 1
+                disabled:
+                  description: If set to true, disable the repo usage in the cluster/namespace
+                  type: boolean
+                name:
+                  description: Optional associated human readable repository name, it can be used by UI for displaying purposes
+                  type: string
+                  maxLength: 100
+                  minLength: 1
             status:
-              description: status is the observed status of the shared configmap
+              description: Observed status of the repository within the namespace..
               type: object
               properties:
                 conditions:
-                  description: conditions represents any observations made on this particular shared resource by the underlying CSI driver or Share controller.
+                  description: conditions is a list of conditions and their statuses
                   type: array
                   items:
                     description: "Condition contains details for one aspect of the current state of this API Resource. --- This struct is intended for direct use as an array at the field path .status.conditions.  For example, type FooStatus struct{     // Represents the observations of a foo's current state.     // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"     // +patchMergeKey=type     // +patchStrategy=merge     // +listType=map     // +listMapKey=type     Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"` \n     // other fields }"
