@@ -149,6 +149,10 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	if err != nil {
 		return nil, err
 	}
+	if len(template.Namespace) == 0 {
+		// template is a namespaced resource, so we need to specify one
+		template.Namespace = "default"
+	}
 
 	for i := range template.Parameters {
 		switch template.Parameters[i].Name {
