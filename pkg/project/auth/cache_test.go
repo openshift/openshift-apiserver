@@ -1,10 +1,8 @@
 package auth
 
 import (
-	"context"
 	"fmt"
 	"strconv"
-	"sync"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -12,7 +10,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apiserver/pkg/authentication/user"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes/fake"
@@ -179,56 +176,6 @@ func TestSyncNamespace(t *testing.T) {
 	validateList(t, authorizationCache, bob, sets.NewString("foo", "bar", "car"))
 	validateList(t, authorizationCache, eve, sets.NewString("bar", "car"))
 	validateList(t, authorizationCache, frank, sets.NewString())
-}
-
-func TestRaces(t *testing.T) {
-	namespaceList := corev1.NamespaceList{}
-	mockKubeClient := fake.NewSimpleClientset(&namespaceList)
-
-	informers := informers.NewSharedInformerFactory(mockKubeClient, controller.NoResyncPeriodFunc())
-	nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
-	nsLister := corev1listers.NewNamespaceLister(nsIndexer)
-
-	authorizationCache := NewAuthorizationCache(
-		nsLister,
-		informers.Core().V1().Namespaces().Informer(),
-		&alwaysAcceptReviewer{},
-		informers.Rbac().V1(),
-	)
-	authorizationCache.skip = &neverSkipSynchronizer{}
-
-	// synchronize the cache continuously
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	go func() {
-		i := 0
-		wait.UntilWithContext(ctx, func(ctx context.Context) {
-			nsIndexer.Add(&corev1.Namespace{
-				ObjectMeta: metav1.ObjectMeta{Name: fmt.Sprintf("foo%d", i), ResourceVersion: fmt.Sprintf("%d", i)},
-			})
-			i++
-			authorizationCache.synchronize()
-		}, 0)
-	}()
-
-	var wg sync.WaitGroup
-	for i := 0; i < 1000; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			authorizationCache.List(alice, labels.Everything())
-		}()
-	}
-	wg.Wait()
-}
-
-type alwaysAcceptReviewer struct{}
-
-func (r *alwaysAcceptReviewer) Review(name string) (Review, error) {
-	return &mockReview{
-		users:  []string{alice.GetName()},
-		groups: alice.GetGroups(),
-	}, nil
 }
 
 func TestInvalidateCache(t *testing.T) {
