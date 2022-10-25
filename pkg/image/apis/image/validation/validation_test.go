@@ -250,6 +250,114 @@ func TestValidateImageSignature(t *testing.T) {
 
 }
 
+func TestValidateImageManifests(t *testing.T) {
+	testCases := []struct {
+		name           string
+		imageManifests []imageapi.ImageManifest
+		expected       field.ErrorList
+	}{
+		{
+			name: "invalid digest",
+			imageManifests: []imageapi.ImageManifest{
+				{
+					Digest:       "abc",
+					MediaType:    "foo/bar",
+					Architecture: "foo",
+					OS:           "bar",
+				},
+			},
+			expected: field.ErrorList{
+				field.Invalid(
+					field.NewPath("dockerImageManifests").Index(0).Child("digest"),
+					"abc",
+					"digest does not conform with OCI image specification",
+				),
+			},
+		},
+		{
+			name: "invalid media type",
+			imageManifests: []imageapi.ImageManifest{
+				{
+					Digest:       "sha256:82bc737c1fede1c1534446cd5fdd0737c4e0f3650454c9e1905e2d70af95778e",
+					MediaType:    "foobar",
+					Architecture: "foo",
+					OS:           "bar",
+				},
+			},
+			expected: field.ErrorList{
+				field.Invalid(
+					field.NewPath("dockerImageManifests").Index(0).Child("mediaType"),
+					"foobar",
+					"media type does not conform to RFC6838",
+				),
+			},
+		},
+		{
+			name: "required architecture",
+			imageManifests: []imageapi.ImageManifest{
+				{
+					Digest:    "sha256:82bc737c1fede1c1534446cd5fdd0737c4e0f3650454c9e1905e2d70af95778e",
+					MediaType: "foo/bar",
+					OS:        "bar",
+				},
+			},
+			expected: field.ErrorList{
+				field.Required(
+					field.NewPath("dockerImageManifests").Index(0).Child("architecture"),
+					"",
+				),
+			},
+		},
+		{
+			name: "required OS",
+			imageManifests: []imageapi.ImageManifest{
+				{
+					Digest:       "sha256:82bc737c1fede1c1534446cd5fdd0737c4e0f3650454c9e1905e2d70af95778e",
+					MediaType:    "foo/bar",
+					Architecture: "bar",
+				},
+			},
+			expected: field.ErrorList{
+				field.Required(
+					field.NewPath("dockerImageManifests").Index(0).Child("os"),
+					"",
+				),
+			},
+		},
+		{
+			name: "negative size",
+			imageManifests: []imageapi.ImageManifest{
+				{
+					Digest:       "sha256:82bc737c1fede1c1534446cd5fdd0737c4e0f3650454c9e1905e2d70af95778e",
+					MediaType:    "foo/bar",
+					Architecture: "bar",
+					OS:           "linux",
+					ManifestSize: -2,
+				},
+			},
+			expected: field.ErrorList{
+				field.Invalid(
+					field.NewPath("dockerImageManifests").Index(0).Child("size"),
+					int64(-2),
+					"manifest size cannot be negative",
+				),
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			errs := validateImageManifests(testCase.imageManifests, field.NewPath("dockerImageManifests"))
+			if !reflect.DeepEqual(errs, testCase.expected) {
+				t.Errorf(
+					"unexpected errors: %s",
+					diff.ObjectDiff(testCase.expected, errs),
+				)
+			}
+		})
+	}
+}
+
 func TestValidateImageStreamMappingNotOK(t *testing.T) {
 	errorCases := map[string]struct {
 		I imageapi.ImageStreamMapping
@@ -581,6 +689,46 @@ func TestValidateImageStream(t *testing.T) {
 			name:      name192Char,
 			expected: field.ErrorList{
 				field.Invalid(field.NewPath("metadata", "name"), name192Char, "'namespace/name' cannot be longer than 255 characters"),
+			},
+		},
+		"valid importMode": {
+			namespace: "namespace",
+			name:      "foo",
+			specTags: map[string]imageapi.TagReference{
+				"tag": {
+					From: &kapi.ObjectReference{
+						Kind: "DockerImage",
+						Name: "abc",
+					},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+					ImportPolicy:    imageapi.TagImportPolicy{ImportMode: imageapi.ImportModePreserveOriginal},
+				},
+			},
+			expected: nil,
+		},
+		"invalid importMode": {
+			namespace: "namespace",
+			name:      "foo",
+			specTags: map[string]imageapi.TagReference{
+				"tag": {
+					From: &kapi.ObjectReference{
+						Kind: "DockerImage",
+						Name: "abc",
+					},
+					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+					ImportPolicy:    imageapi.TagImportPolicy{ImportMode: "Invalid"},
+				},
+			},
+			expected: field.ErrorList{
+				field.Invalid(
+					field.NewPath("spec", "tags").Key("tag").Child("importPolicy", "importMode"),
+					imageapi.ImportModeType("Invalid"),
+					fmt.Sprintf(
+						"invalid import mode, valid modes are '', '%s', '%s'",
+						imageapi.ImportModeLegacy,
+						imageapi.ImportModePreserveOriginal,
+					),
+				),
 			},
 		},
 	} {
@@ -1725,6 +1873,62 @@ func TestValidateImageStreamImport(t *testing.T) {
 			name:      name192Char,
 			expected: field.ErrorList{
 				field.Invalid(field.NewPath("metadata", "name"), name192Char, "'namespace/name' cannot be longer than 255 characters"),
+			},
+		},
+		"invalid image importMode": {
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: validMeta,
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "abc",
+							},
+							ImportPolicy: imageapi.TagImportPolicy{
+								ImportMode: "Invalid",
+							},
+						},
+					},
+				},
+			},
+			expected: field.ErrorList{
+				field.Invalid(
+					field.NewPath("spec", "images").Index(0).Child("importPolicy", "importMode"),
+					imageapi.ImportModeType("Invalid"),
+					fmt.Sprintf(
+						"invalid import mode, valid modes are '', '%s', '%s'",
+						imageapi.ImportModeLegacy,
+						imageapi.ImportModePreserveOriginal,
+					),
+				),
+			},
+		},
+		"invalid repository importMode": {
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: validMeta,
+				Spec: imageapi.ImageStreamImportSpec{
+					Repository: &imageapi.RepositoryImportSpec{
+						From: kapi.ObjectReference{
+							Kind: "DockerImage",
+							Name: "abc",
+						},
+						ImportPolicy: imageapi.TagImportPolicy{
+							ImportMode: "Invalid",
+						},
+					},
+				},
+			},
+			expected: field.ErrorList{
+				field.Invalid(
+					field.NewPath("spec", "repository", "importPolicy", "importMode"),
+					imageapi.ImportModeType("Invalid"),
+					fmt.Sprintf(
+						"invalid import mode, valid modes are '', '%s', '%s'",
+						imageapi.ImportModeLegacy,
+						imageapi.ImportModePreserveOriginal,
+					),
+				),
 			},
 		},
 	}
