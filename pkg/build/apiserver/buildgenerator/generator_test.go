@@ -993,7 +993,7 @@ func TestCreateBuildNamespaceError(t *testing.T) {
 	generator := mockBuildGenerator(nil, nil, nil, nil, nil, nil, nil)
 
 	_, err := generator.createBuild(apirequest.NewContext(), build, metav1.CreateOptions{})
-	if err == nil || !strings.Contains(err.Error(), "Build.Namespace") {
+	if err == nil || !strings.Contains(err.Error(), "namespace") {
 		t.Errorf("Expected namespace error, got different %v", err)
 	}
 }

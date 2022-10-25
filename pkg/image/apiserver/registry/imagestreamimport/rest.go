@@ -11,6 +11,7 @@ import (
 
 	authorizationapi "k8s.io/api/authorization/v1"
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -61,6 +62,7 @@ type REST struct {
 
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 // NewREST returns a REST storage implementation that handles importing images.
 // Insecure transport is optional, and both transports should not include
@@ -95,7 +97,9 @@ func (r *REST) New() runtime.Object {
 	return &imageapi.ImageStreamImport{}
 }
 
-func (s *REST) NamespaceScoped() bool {
+func (r *REST) Destroy() {}
+
+func (r *REST) NamespaceScoped() bool {
 	return true
 }
 
@@ -106,6 +110,12 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	}
 
 	inputMeta := isi.ObjectMeta
+
+	objectMeta, err := meta.Accessor(obj)
+	if err != nil {
+		return nil, err
+	}
+	rest.FillObjectMetaSystemFields(objectMeta)
 
 	if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
 		return nil, err
@@ -206,6 +216,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		imageConfig.Spec.RegistrySources.InsecureRegistries,
 		imageConfig.Spec.RegistrySources.BlockedRegistries,
 		icspRules,
+		nil, nil,
 	); err != nil {
 		klog.Warningf("failed to merge ImageContentSourcePolicy resources, mirrored images will not be found: %v", err)
 	}

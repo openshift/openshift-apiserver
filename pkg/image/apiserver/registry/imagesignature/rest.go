@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -27,6 +28,7 @@ type REST struct {
 var _ rest.Creater = &REST{}
 var _ rest.GracefulDeleter = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 // NewREST returns a new REST.
 func NewREST(imageClient imagev1typedclient.ImagesGetter) *REST {
@@ -38,11 +40,19 @@ func (r *REST) New() runtime.Object {
 	return &imageapi.ImageSignature{}
 }
 
-func (s *REST) NamespaceScoped() bool {
+func (r *REST) Destroy() {}
+
+func (r *REST) NamespaceScoped() bool {
 	return false
 }
 
 func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
+	objectMeta, err := meta.Accessor(obj)
+	if err != nil {
+		return nil, err
+	}
+	rest.FillObjectMetaSystemFields(objectMeta)
+
 	signature := obj.(*imageapi.ImageSignature)
 
 	if err := rest.BeforeCreate(Strategy, ctx, obj); err != nil {

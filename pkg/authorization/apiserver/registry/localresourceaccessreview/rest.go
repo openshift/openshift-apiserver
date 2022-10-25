@@ -24,6 +24,7 @@ type REST struct {
 
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 func NewREST(clusterRARRegistry resourceaccessreview.Registry) *REST {
 	return &REST{clusterRARRegistry}
@@ -32,6 +33,8 @@ func NewREST(clusterRARRegistry resourceaccessreview.Registry) *REST {
 func (r *REST) New() runtime.Object {
 	return &authorizationapi.LocalResourceAccessReview{}
 }
+
+func (r *REST) Destroy() {}
 
 func (s *REST) NamespaceScoped() bool {
 	return true

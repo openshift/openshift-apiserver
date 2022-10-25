@@ -19,7 +19,6 @@ package apiserver
 import (
 	"fmt"
 	"net/http"
-	"path"
 	"sort"
 	"strings"
 	"sync"
@@ -235,7 +234,7 @@ func (r *crdHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if !ok {
 		responsewriters.ErrorNegotiated(
 			apierrors.NewInternalError(fmt.Errorf("no RequestInfo found in the context")),
-			Codecs, schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}, w, req,
+			Codecs, schema.GroupVersion{}, w, req,
 		)
 		return
 	}
@@ -584,6 +583,23 @@ func (r *crdHandler) tearDown(oldInfo *crdInfo) {
 	}
 }
 
+// Destroy shuts down storage layer for all registered CRDs.
+// It should be called as a last step of the shutdown sequence.
+func (r *crdHandler) destroy() {
+	r.customStorageLock.Lock()
+	defer r.customStorageLock.Unlock()
+
+	storageMap := r.customStorage.Load().(crdStorageMap)
+	for _, crdInfo := range storageMap {
+		for _, storage := range crdInfo.storages {
+			// DestroyFunc have to be implemented in idempotent way,
+			// so the potential race with r.tearDown() (being called
+			// from a goroutine) is safe.
+			storage.CustomResource.DestroyFunc()
+		}
+	}
+}
+
 // GetCustomResourceListerCollectionDeleter returns the ListerCollectionDeleter of
 // the given crd.
 func (r *crdHandler) GetCustomResourceListerCollectionDeleter(crd *apiextensionsv1.CustomResourceDefinition) (finalizer.ListerCollectionDeleter, error) {
@@ -814,14 +830,6 @@ func (r *crdHandler) getOrCreateServingInfoFor(uid types.UID, name string) (*crd
 			replicasPathInCustomResource,
 		)
 
-		selfLinkPrefix := ""
-		switch crd.Spec.Scope {
-		case apiextensionsv1.ClusterScoped:
-			selfLinkPrefix = "/" + path.Join("apis", crd.Spec.Group, v.Name) + "/" + crd.Status.AcceptedNames.Plural + "/"
-		case apiextensionsv1.NamespaceScoped:
-			selfLinkPrefix = "/" + path.Join("apis", crd.Spec.Group, v.Name, "namespaces") + "/"
-		}
-
 		clusterScoped := crd.Spec.Scope == apiextensionsv1.ClusterScoped
 
 		// CRDs explicitly do not support protobuf, but some objects returned by the API server do
@@ -843,9 +851,8 @@ func (r *crdHandler) getOrCreateServingInfoFor(uid types.UID, name string) (*crd
 
 		requestScopes[v.Name] = &handlers.RequestScope{
 			Namer: handlers.ContextBasedNaming{
-				SelfLinker:         meta.NewAccessor(),
-				ClusterScoped:      clusterScoped,
-				SelfLinkPathPrefix: selfLinkPrefix,
+				Namer:         meta.NewAccessor(),
+				ClusterScoped: clusterScoped,
 			},
 			Serializer:          negotiatedSerializer,
 			ParameterCodec:      parameterCodec,
@@ -888,7 +895,13 @@ func (r *crdHandler) getOrCreateServingInfoFor(uid types.UID, name string) (*crd
 			requestScopes[v.Name] = &reqScope
 		}
 
-		// override scaleSpec subresource values
+		scaleColumns, err := getScaleColumnsForVersion(crd, v.Name)
+		if err != nil {
+			return nil, fmt.Errorf("the server could not properly serve the CR scale subresource columns %w", err)
+		}
+		scaleTable, _ := tableconvertor.New(scaleColumns)
+
+		// override scale subresource values
 		// shallow copy
 		scaleScope := *requestScopes[v.Name]
 		scaleConverter := scale.NewScaleConverter()
@@ -896,11 +909,10 @@ func (r *crdHandler) getOrCreateServingInfoFor(uid types.UID, name string) (*crd
 		scaleScope.Serializer = serializer.NewCodecFactory(scaleConverter.Scheme())
 		scaleScope.Kind = autoscalingv1.SchemeGroupVersion.WithKind("Scale")
 		scaleScope.Namer = handlers.ContextBasedNaming{
-			SelfLinker:         meta.NewAccessor(),
-			ClusterScoped:      clusterScoped,
-			SelfLinkPathPrefix: selfLinkPrefix,
-			SelfLinkPathSuffix: "/scale",
+			Namer:         meta.NewAccessor(),
+			ClusterScoped: clusterScoped,
 		}
+		scaleScope.TableConvertor = scaleTable
 
 		if utilfeature.DefaultFeatureGate.Enabled(features.ServerSideApply) && subresources != nil && subresources.Scale != nil {
 			scaleScope, err = scopeWithFieldManager(
@@ -921,10 +933,8 @@ func (r *crdHandler) getOrCreateServingInfoFor(uid types.UID, name string) (*crd
 		statusScope := *requestScopes[v.Name]
 		statusScope.Subresource = "status"
 		statusScope.Namer = handlers.ContextBasedNaming{
-			SelfLinker:         meta.NewAccessor(),
-			ClusterScoped:      clusterScoped,
-			SelfLinkPathPrefix: selfLinkPrefix,
-			SelfLinkPathSuffix: "/status",
+			Namer:         meta.NewAccessor(),
+			ClusterScoped: clusterScoped,
 		}
 
 		if utilfeature.DefaultFeatureGate.Enabled(features.ServerSideApply) && subresources != nil && subresources.Status != nil {
@@ -1321,10 +1331,14 @@ func (v *unstructuredSchemaCoercer) apply(u *unstructured.Unstructured) (unknown
 	if err != nil {
 		return nil, err
 	}
-	objectMeta, foundObjectMeta, err := schemaobjectmeta.GetObjectMeta(u.Object, v.dropInvalidMetadata)
+	objectMeta, foundObjectMeta, metaUnknownFields, err := schemaobjectmeta.GetObjectMetaWithOptions(u.Object, schemaobjectmeta.ObjectMetaOptions{
+		DropMalformedFields:     v.dropInvalidMetadata,
+		ReturnUnknownFieldPaths: v.returnUnknownFieldPaths,
+	})
 	if err != nil {
 		return nil, err
 	}
+	unknownFieldPaths = append(unknownFieldPaths, metaUnknownFields...)
 
 	// compare group and kind because also other object like DeleteCollection options pass through here
 	gv, err := schema.ParseGroupVersion(apiVersion)
@@ -1335,17 +1349,23 @@ func (v *unstructuredSchemaCoercer) apply(u *unstructured.Unstructured) (unknown
 	if gv.Group == v.structuralSchemaGK.Group && kind == v.structuralSchemaGK.Kind {
 		if !v.preserveUnknownFields {
 			// TODO: switch over pruning and coercing at the root to schemaobjectmeta.Coerce too
-			pruneOpts := structuralpruning.PruneOptions{}
+			pruneOpts := structuralschema.UnknownFieldPathOptions{}
 			if v.returnUnknownFieldPaths {
-				pruneOpts.ReturnPruned = true
+				pruneOpts.TrackUnknownFieldPaths = true
 			}
-			unknownFieldPaths = structuralpruning.PruneWithOptions(u.Object, v.structuralSchemas[gv.Version], false, pruneOpts)
+			unknownFieldPaths = append(unknownFieldPaths, structuralpruning.PruneWithOptions(u.Object, v.structuralSchemas[gv.Version], true, pruneOpts)...)
 			structuraldefaulting.PruneNonNullableNullsWithoutDefaults(u.Object, v.structuralSchemas[gv.Version])
 		}
 
-		if err := schemaobjectmeta.Coerce(nil, u.Object, v.structuralSchemas[gv.Version], false, v.dropInvalidMetadata); err != nil {
+		err, paths := schemaobjectmeta.CoerceWithOptions(nil, u.Object, v.structuralSchemas[gv.Version], false, schemaobjectmeta.CoerceOptions{
+			DropInvalidFields:       v.dropInvalidMetadata,
+			ReturnUnknownFieldPaths: v.returnUnknownFieldPaths,
+		})
+		if err != nil {
 			return nil, err
 		}
+		unknownFieldPaths = append(unknownFieldPaths, paths...)
+
 		// fixup missing generation in very old CRs
 		if v.repairGeneration && objectMeta.Generation == 0 {
 			objectMeta.Generation = 1

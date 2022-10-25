@@ -9,6 +9,7 @@ import (
 
 	v1 "github.com/openshift/openshift-apiserver/pkg/build/apis/build/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -47,14 +48,23 @@ type InstantiateREST struct {
 
 var _ rest.Creater = &InstantiateREST{}
 var _ rest.StorageMetadata = &InstantiateREST{}
+var _ rest.Storage = &InstantiateREST{}
 
 // New creates a new build generation request
 func (s *InstantiateREST) New() runtime.Object {
 	return &buildapi.BuildRequest{}
 }
 
+func (s *InstantiateREST) Destroy() {}
+
 // Create instantiates a new build from a build configuration
 func (s *InstantiateREST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
+	objectMeta, err := meta.Accessor(obj)
+	if err != nil {
+		return nil, err
+	}
+	rest.FillObjectMetaSystemFields(objectMeta)
+
 	if err := rest.BeforeCreate(Strategy, ctx, obj); err != nil {
 		return nil, err
 	}
@@ -112,6 +122,8 @@ func (r *BinaryInstantiateREST) New() runtime.Object {
 	return &buildapi.BinaryBuildRequestOptions{}
 }
 
+func (r *BinaryInstantiateREST) Destroy() {}
+
 // Connect returns a ConnectHandler that will handle the request/response for a request
 func (r *BinaryInstantiateREST) Connect(ctx context.Context, name string, options runtime.Object, responder rest.Responder) (http.Handler, error) {
 	return &binaryInstantiateHandler{
@@ -166,6 +178,11 @@ func (h *binaryInstantiateHandler) ServeHTTP(w http.ResponseWriter, r *http.Requ
 
 func (h *binaryInstantiateHandler) handle(r io.Reader) (runtime.Object, error) {
 	h.options.Name = h.name
+	objectMeta, err := meta.Accessor(h.options)
+	if err != nil {
+		return nil, err
+	}
+	rest.FillObjectMetaSystemFields(objectMeta)
 	if err := rest.BeforeCreate(BinaryStrategy, h.ctx, h.options); err != nil {
 		klog.Infof("failed to validate binary: %#v", h.options)
 		return nil, err

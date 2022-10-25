@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metainternal "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -51,6 +52,7 @@ var _ rest.CreaterUpdater = &REST{}
 var _ rest.GracefulDeleter = &REST{}
 var _ rest.ShortNamesProvider = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 // ShortNames implements the ShortNamesProvider interface. Returns a list of short names for a resource.
 func (r *REST) ShortNames() []string {
@@ -62,12 +64,14 @@ func (r *REST) New() runtime.Object {
 	return &imageapi.ImageTag{}
 }
 
+func (r *REST) Destroy() {}
+
 // NewList returns a new list object
 func (r *REST) NewList() runtime.Object {
 	return &imageapi.ImageTagList{}
 }
 
-func (s *REST) NamespaceScoped() bool {
+func (r *REST) NamespaceScoped() bool {
 	return true
 }
 
@@ -152,6 +156,11 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	if !ok {
 		return nil, kapierrors.NewBadRequest(fmt.Sprintf("obj is not an ImageTag: %#v", obj))
 	}
+	objectMeta, err := meta.Accessor(obj)
+	if err != nil {
+		return nil, err
+	}
+	rest.FillObjectMetaSystemFields(objectMeta)
 	if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
 		return nil, err
 	}
@@ -272,17 +281,18 @@ func (r *REST) Update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 	}
 
 	if create {
-		if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
+		rest.FillObjectMetaSystemFields(itag.GetObjectMeta())
+		if err := rest.BeforeCreate(r.strategy, ctx, itag); err != nil {
 			return nil, false, err
 		}
-		if err := createValidation(ctx, obj.DeepCopyObject()); err != nil {
+		if err := createValidation(ctx, itag.DeepCopyObject()); err != nil {
 			return nil, false, err
 		}
 	} else {
-		if err := rest.BeforeUpdate(r.strategy, ctx, obj, old); err != nil {
+		if err := rest.BeforeUpdate(r.strategy, ctx, itag, old); err != nil {
 			return nil, false, err
 		}
-		if err := updateValidation(ctx, obj.DeepCopyObject(), old.DeepCopyObject()); err != nil {
+		if err := updateValidation(ctx, itag.DeepCopyObject(), old.DeepCopyObject()); err != nil {
 			return nil, false, err
 		}
 	}

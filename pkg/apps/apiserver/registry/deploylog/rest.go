@@ -54,7 +54,8 @@ type REST struct {
 }
 
 // REST implements GetterWithOptions
-var _ = rest.GetterWithOptions(&REST{})
+var _ rest.GetterWithOptions = &REST{}
+var _ rest.Storage = &REST{}
 
 // NewREST creates a new REST for DeploymentLogs. It uses three clients: one for configs,
 // one for deployments (replication controllers) and one for pods to get the necessary
@@ -82,6 +83,8 @@ func (r *REST) NewGetOptions() (runtime.Object, bool, string) {
 func (r *REST) New() runtime.Object {
 	return &appsapi.DeploymentLog{}
 }
+
+func (r *REST) Destroy() {}
 
 // Get returns a streamer resource with the contents of the deployment log
 func (r *REST) Get(ctx context.Context, name string, opts runtime.Object) (runtime.Object, error) {

@@ -39,6 +39,8 @@ func init() {
 	webhookEncodingCodecFactory = serializer.NewCodecFactory(webhookEncodingScheme)
 }
 
+var _ rest.Storage = &WebHook{}
+
 type WebHook struct {
 	groupVersion      schema.GroupVersion
 	buildConfigClient buildclienttyped.BuildConfigsGetter
@@ -68,6 +70,8 @@ func newWebHookREST(buildConfigClient buildclienttyped.BuildConfigsGetter, secre
 func (h *WebHook) New() runtime.Object {
 	return &buildapi.Build{}
 }
+
+func (h *WebHook) Destroy() {}
 
 // Connect responds to connections with a ConnectHandler
 func (h *WebHook) Connect(ctx context.Context, name string, options runtime.Object, responder rest.Responder) (http.Handler, error) {

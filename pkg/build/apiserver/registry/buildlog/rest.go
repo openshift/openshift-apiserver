@@ -61,7 +61,8 @@ func NewREST(buildClient buildtypedclient.BuildsGetter, podClient kubetypedclien
 	return r
 }
 
-var _ = rest.GetterWithOptions(&REST{})
+var _ rest.GetterWithOptions = &REST{}
+var _ rest.Storage = &REST{}
 
 // Get returns a streamer resource with the contents of the build log
 func (r *REST) Get(ctx context.Context, name string, opts runtime.Object) (runtime.Object, error) {
@@ -335,6 +336,8 @@ func (r *REST) NewGetOptions() (runtime.Object, bool, string) {
 func (r *REST) New() runtime.Object {
 	return &buildapi.BuildLog{}
 }
+
+func (r *REST) Destroy() {}
 
 // pipeLogs retrieves the logs for a particular container and streams them into the provided writer.
 func (r *REST) pipeLogs(ctx context.Context, namespace, buildPodName string, containerLogOpts *kapi.PodLogOptions, writer io.Writer) error {

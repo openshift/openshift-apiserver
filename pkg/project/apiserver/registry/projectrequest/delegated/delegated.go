@@ -60,6 +60,7 @@ type REST struct {
 var _ rest.Lister = &REST{}
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 func NewREST(message, templateNamespace, templateName string,
 	projectClient projectv1typedclient.ProjectsGetter,
@@ -85,6 +86,8 @@ func (r *REST) New() runtime.Object {
 	return &projectapi.ProjectRequest{}
 }
 
+func (r *REST) Destroy() {}
+
 func (r *REST) NewList() runtime.Object {
 	return &metav1.Status{}
 }
@@ -106,6 +109,11 @@ var (
 )
 
 func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
+	objectMeta, err := meta.Accessor(obj)
+	if err != nil {
+		return nil, err
+	}
+	rest.FillObjectMetaSystemFields(objectMeta)
 	if err := rest.BeforeCreate(projectrequestregistry.Strategy, ctx, obj); err != nil {
 		return nil, err
 	}
@@ -140,6 +148,10 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	template, err := r.getTemplate(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if len(template.Namespace) == 0 {
+		// template is a namespaced resource, so we need to specify one
+		template.Namespace = "default"
 	}
 
 	for i := range template.Parameters {

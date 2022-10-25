@@ -30,6 +30,7 @@ type REST struct {
 
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 func NewREST(ruleResolver rbacregistryvalidation.AuthorizationRuleResolver, clusterRoleGetter rbaclisters.ClusterRoleLister) *REST {
 	return &REST{ruleResolver: ruleResolver, clusterRoleGetter: clusterRoleGetter}
@@ -39,7 +40,9 @@ func (r *REST) New() runtime.Object {
 	return &authorizationapi.SubjectRulesReview{}
 }
 
-func (s *REST) NamespaceScoped() bool {
+func (r *REST) Destroy() {}
+
+func (r *REST) NamespaceScoped() bool {
 	return true
 }
 

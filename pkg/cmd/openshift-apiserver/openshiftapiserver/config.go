@@ -162,9 +162,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	clusterQuotaMappingController := NewClusterQuotaMappingController(informers.kubernetesInformers.Core().V1().Namespaces(), informers.quotaInformers.Quota().V1().ClusterResourceQuotas())
 	discoveryClient := cacheddiscovery.NewMemCacheClient(kubeClient.Discovery())
 	restMapper := restmapper.NewDeferredDiscoveryRESTMapper(discoveryClient)
-
-	admissionInitializer, err := openshiftadmission.NewPluginInitializer(config.ImagePolicyConfig.InternalRegistryHostname, config.CloudProviderFile, kubeClientConfig, informers,
-		genericConfig.Authorization.Authorizer, feature.DefaultFeatureGate, restMapper, clusterQuotaMappingController)
+	admissionInitializer, err := openshiftadmission.NewPluginInitializer(config, genericConfig, kubeClientConfig, informers, feature.DefaultFeatureGate, restMapper, clusterQuotaMappingController)
 	if err != nil {
 		return nil, err
 	}

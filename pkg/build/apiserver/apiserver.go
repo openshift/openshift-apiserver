@@ -162,9 +162,9 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	)
 	v1Storage["builds/details"] = buildDetailsStorage
 
-	v1Storage["buildConfigs"] = buildConfigStorage
-	v1Storage["buildConfigs/webhooks"] = buildConfigWebHooks
-	v1Storage["buildConfigs/instantiate"] = buildconfiginstantiate.NewStorage(buildGenerator)
-	v1Storage["buildConfigs/instantiatebinary"] = buildconfiginstantiate.NewBinaryStorage(buildGenerator, buildClient.BuildV1(), c.ExtraConfig.KubeAPIServerClientConfig)
+	v1Storage["buildconfigs"] = buildConfigStorage
+	v1Storage["buildconfigs/webhooks"] = buildConfigWebHooks
+	v1Storage["buildconfigs/instantiate"] = buildconfiginstantiate.NewStorage(buildGenerator)
+	v1Storage["buildconfigs/instantiatebinary"] = buildconfiginstantiate.NewBinaryStorage(buildGenerator, buildClient.BuildV1(), c.ExtraConfig.KubeAPIServerClientConfig)
 	return v1Storage, nil
 }

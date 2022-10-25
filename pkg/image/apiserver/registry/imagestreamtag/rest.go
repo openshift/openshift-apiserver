@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/util/retry"
 	"k8s.io/klog/v2"
 
@@ -53,6 +54,7 @@ var _ rest.CreaterUpdater = &REST{}
 var _ rest.GracefulDeleter = &REST{}
 var _ rest.ShortNamesProvider = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 // ShortNames implements the ShortNamesProvider interface. Returns a list of short names for a resource.
 func (r *REST) ShortNames() []string {
@@ -64,12 +66,14 @@ func (r *REST) New() runtime.Object {
 	return &imageapi.ImageStreamTag{}
 }
 
+func (r *REST) Destroy() {}
+
 // NewList returns a new list object
 func (r *REST) NewList() runtime.Object {
 	return &imageapi.ImageStreamTagList{}
 }
 
-func (s *REST) NamespaceScoped() bool {
+func (r *REST) NamespaceScoped() bool {
 	return true
 }
 
@@ -140,6 +144,11 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	if !ok {
 		return nil, kapierrors.NewBadRequest(fmt.Sprintf("obj is not an ImageStreamTag: %#v", obj))
 	}
+	objectMeta, err := meta.Accessor(obj)
+	if err != nil {
+		return nil, err
+	}
+	rest.FillObjectMetaSystemFields(objectMeta)
 	if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
 		return nil, err
 	}
@@ -251,7 +260,7 @@ func (r *REST) update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 	}
 
 	create := false
-	imageStream, err := r.imageStreamRegistry.GetImageStream(ctx, name, &metav1.GetOptions{})
+	originalImageStream, err := r.imageStreamRegistry.GetImageStream(ctx, name, &metav1.GetOptions{})
 	if err != nil {
 		if !kapierrors.IsNotFound(err) {
 			return nil, false, false, err
@@ -260,94 +269,95 @@ func (r *REST) update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 		if !ok {
 			return nil, false, false, kapierrors.NewBadRequest("namespace is required on ImageStreamTags")
 		}
-		imageStream = &imageapi.ImageStream{
+		originalImageStream = &imageapi.ImageStream{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: namespace,
 				Name:      name,
 			},
 		}
-		rest.FillObjectMetaSystemFields(&imageStream.ObjectMeta)
+		rest.FillObjectMetaSystemFields(&originalImageStream.ObjectMeta)
 		create = true
 	}
 
 	// create the synthetic old istag
-	old, err := newISTag(tag, imageStream, nil, true)
+	originalImageStreamTag, err := newISTag(tag, originalImageStream, nil, true)
 	if err != nil {
 		return nil, false, false, err
 	}
 
-	obj, err := objInfo.UpdatedObject(ctx, old)
+	imageStreamTagObj, err := objInfo.UpdatedObject(ctx, originalImageStreamTag)
 	if err != nil {
 		return nil, false, false, err
 	}
 
-	istag, ok := obj.(*imageapi.ImageStreamTag)
+	imageStreamTag, ok := imageStreamTagObj.(*imageapi.ImageStreamTag)
 	if !ok {
-		return nil, false, false, kapierrors.NewBadRequest(fmt.Sprintf("obj is not an ImageStreamTag: %#v", obj))
+		return nil, false, false, kapierrors.NewBadRequest(fmt.Sprintf("obj is not an ImageStreamTag: %#v", imageStreamTagObj))
 	}
 
 	// check for conflict
 	canRetry := false
 	switch {
-	case len(istag.ResourceVersion) == 0:
+	case len(imageStreamTag.ResourceVersion) == 0:
 		// if no resource version is provided then if we encounter an update error it is ok to fetch the updated version and retry...
 		canRetry = true
 		// should disallow blind PUT, but this was previously supported
-		istag.ResourceVersion = imageStream.ResourceVersion
-	case len(imageStream.ResourceVersion) == 0:
+		imageStreamTag.ResourceVersion = originalImageStream.ResourceVersion
+	case len(originalImageStream.ResourceVersion) == 0:
 		// image stream did not exist, cannot update
 		return nil, false, false, kapierrors.NewNotFound(imagegroup.Resource("imagestreamtags"), tagName)
-	case imageStream.ResourceVersion != istag.ResourceVersion:
+	case originalImageStream.ResourceVersion != imageStreamTag.ResourceVersion:
 		// conflicting input and output
-		return nil, false, false, kapierrors.NewConflict(imagegroup.Resource("imagestreamtags"), istag.Name, fmt.Errorf("another caller has updated the resource version to %s", imageStream.ResourceVersion))
+		return nil, false, false, kapierrors.NewConflict(imagegroup.Resource("imagestreamtags"), imageStreamTag.Name, fmt.Errorf("another caller has updated the resource version to %s", originalImageStream.ResourceVersion))
 	}
 
 	// When we began returning image stream labels in 3.6, old clients that didn't need to send labels would be
 	// broken on update. Explicitly default labels if they are unset.  We don't support mutation of labels on update.
-	if len(imageStream.Labels) > 0 && len(istag.Labels) == 0 {
-		istag.Labels = imageStream.Labels
+	if len(originalImageStream.Labels) > 0 && len(imageStreamTag.Labels) == 0 {
+		imageStreamTag.Labels = originalImageStream.Labels
 	}
 
 	if create {
-		if err := rest.BeforeCreate(r.strategy, ctx, obj); err != nil {
+		rest.FillObjectMetaSystemFields(imageStreamTag.GetObjectMeta())
+		if err := rest.BeforeCreate(r.strategy, ctx, imageStreamTag); err != nil {
 			return nil, false, false, err
 		}
-		if err := createValidation(ctx, obj.DeepCopyObject()); err != nil {
+		if err := createValidation(ctx, imageStreamTag.DeepCopyObject()); err != nil {
 			return nil, false, false, err
 		}
 	} else {
-		if err := rest.BeforeUpdate(r.strategy, ctx, obj, old); err != nil {
+		if err := rest.BeforeUpdate(r.strategy, ctx, imageStreamTag, originalImageStreamTag); err != nil {
 			return nil, false, false, err
 		}
-		if err := updateValidation(ctx, obj.DeepCopyObject(), old.DeepCopyObject()); err != nil {
+		if err := updateValidation(ctx, imageStreamTag.DeepCopyObject(), originalImageStreamTag.DeepCopyObject()); err != nil {
 			return nil, false, false, err
 		}
 	}
 
 	// update the spec tag
-	if imageStream.Spec.Tags == nil {
-		imageStream.Spec.Tags = map[string]imageapi.TagReference{}
+	if originalImageStream.Spec.Tags == nil {
+		originalImageStream.Spec.Tags = map[string]imageapi.TagReference{}
 	}
-	tagRef, exists := imageStream.Spec.Tags[tag]
+	tagRef, exists := originalImageStream.Spec.Tags[tag]
 
-	if !exists && istag.Tag == nil {
-		return nil, false, false, kapierrors.NewBadRequest(fmt.Sprintf("imagestreamtag %s is not a spec tag in imagestream %s/%s, cannot be updated", tag, imageStream.Namespace, imageStream.Name))
+	if !exists && imageStreamTag.Tag == nil {
+		return nil, false, false, kapierrors.NewBadRequest(fmt.Sprintf("imagestreamtag %s is not a spec tag in imagestream %s/%s, cannot be updated", tag, originalImageStream.Namespace, originalImageStream.Name))
 	}
 
 	// if the caller set tag, override the spec tag
-	if istag.Tag != nil {
-		tagRef = *istag.Tag
+	if imageStreamTag.Tag != nil {
+		tagRef = *imageStreamTag.Tag
 		tagRef.Name = tag
 	}
-	tagRef.Annotations = istag.Annotations
-	imageStream.Spec.Tags[tag] = tagRef
+	tagRef.Annotations = imageStreamTag.Annotations
+	originalImageStream.Spec.Tags[tag] = tagRef
 
 	// mutate the image stream
 	var newImageStream *imageapi.ImageStream
 	if create {
-		newImageStream, err = r.imageStreamRegistry.CreateImageStream(ctx, imageStream, &metav1.CreateOptions{})
+		newImageStream, err = r.imageStreamRegistry.CreateImageStream(ctx, originalImageStream, &metav1.CreateOptions{})
 	} else {
-		newImageStream, err = r.imageStreamRegistry.UpdateImageStream(ctx, imageStream, false, &metav1.UpdateOptions{})
+		newImageStream, err = r.imageStreamRegistry.UpdateImageStream(ctx, originalImageStream, false, &metav1.UpdateOptions{})
 	}
 	if err != nil {
 		// return true for canRetry if we had a failure for resource versions

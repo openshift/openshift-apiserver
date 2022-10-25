@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/emicklei/go-restful"
+	"github.com/emicklei/go-restful/v3"
 
 	corev1 "k8s.io/api/core/v1"
 	kapierror "k8s.io/apimachinery/pkg/api/errors"

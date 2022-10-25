@@ -43,10 +43,13 @@ func NewREST(quotaMapper clusterquotamapping.ClusterQuotaMapper, quotaLister quo
 var _ rest.Getter = &AppliedClusterResourceQuotaREST{}
 var _ rest.Lister = &AppliedClusterResourceQuotaREST{}
 var _ rest.Scoper = &AppliedClusterResourceQuotaREST{}
+var _ rest.Storage = &AppliedClusterResourceQuotaREST{}
 
 func (r *AppliedClusterResourceQuotaREST) New() runtime.Object {
 	return &quotaapi.AppliedClusterResourceQuota{}
 }
+
+func (r *AppliedClusterResourceQuotaREST) Destroy() {}
 
 func (s *AppliedClusterResourceQuotaREST) NamespaceScoped() bool {
 	return true

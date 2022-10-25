@@ -22,6 +22,7 @@ type REST struct {
 var _ rest.StandardStorage = &REST{}
 var _ rest.ShortNamesProvider = &REST{}
 var _ rest.Scoper = &REST{}
+var _ rest.Storage = &REST{}
 
 // ShortNames implements the ShortNamesProvider interface. Returns a list of short names for a resource.
 func (r *REST) ShortNames() []string {
@@ -53,6 +54,8 @@ func (r *REST) New() runtime.Object {
 	return &quotaapi.ClusterResourceQuota{}
 }
 
+func (r *REST) Destroy() {}
+
 func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
 	return nil, errors.NewInternalError(fmt.Errorf("unsupported"))
 }
@@ -79,9 +82,14 @@ type StatusREST struct {
 
 // StatusREST implements Patcher
 var _ = rest.Patcher(&StatusREST{})
+var _ = rest.Storage(&StatusREST{})
 
 func (r *StatusREST) New() runtime.Object {
 	return &quotaapi.ClusterResourceQuota{}
+}
+
+func (r *StatusREST) Destroy() {
+	// nothing to do
 }
 
 // Get retrieves the object from the storage. It is required to support Patch.

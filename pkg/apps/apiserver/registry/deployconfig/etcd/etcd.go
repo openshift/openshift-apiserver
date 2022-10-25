@@ -85,8 +85,9 @@ type ScaleREST struct {
 	store *registry.Store
 }
 
-var _ = rest.Patcher(&ScaleREST{})
-var _ = rest.GroupVersionKindProvider(&ScaleREST{})
+var _ rest.Patcher = &ScaleREST{}
+var _ rest.GroupVersionKindProvider = &ScaleREST{}
+var _ rest.Storage = &ScaleREST{}
 
 // New creates a new Scale object
 func (r *ScaleREST) New() runtime.Object {
@@ -144,6 +145,10 @@ func (r *ScaleREST) Update(ctx context.Context, name string, objInfo rest.Update
 	return scale, false, nil
 }
 
+func (r *ScaleREST) Destroy() {
+	r.store.Destroy()
+}
+
 // scaleFromConfig builds a scale resource out of a deployment config.
 func scaleFromConfig(dc *appsapi.DeploymentConfig) *autoscaling.Scale {
 	// We need to make sure that the implicit selector won't have invalid value specified by user.
@@ -178,8 +183,9 @@ type StatusREST struct {
 	store *registry.Store
 }
 
-// StatusREST implements Patcher
-var _ = rest.Patcher(&StatusREST{})
+// StatusREST implements Patcher & Storage
+var _ rest.Patcher = &StatusREST{}
+var _ rest.Storage = &StatusREST{}
 
 func (r *StatusREST) New() runtime.Object {
 	return &appsapi.DeploymentConfig{}
@@ -193,6 +199,10 @@ func (r *StatusREST) Get(ctx context.Context, name string, options *metav1.GetOp
 // Update alters the status subset of an deploymentConfig.
 func (r *StatusREST) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
 	return r.store.Update(ctx, name, objInfo, createValidation, updateValidation, forceAllowCreate, options)
+}
+
+func (r *StatusREST) Destroy() {
+	r.store.Destroy()
 }
 
 // LegacyREST allows us to wrap and alter some behavior

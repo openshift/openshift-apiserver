@@ -126,6 +126,7 @@ type StatusREST struct {
 
 var _ rest.Getter = &StatusREST{}
 var _ rest.Updater = &StatusREST{}
+var _ rest.Storage = &StatusREST{}
 
 // StatusREST implements Patcher
 var _ = rest.Patcher(&StatusREST{})
@@ -142,6 +143,10 @@ func (r *StatusREST) Get(ctx context.Context, name string, options *metav1.GetOp
 // Update alters the status subset of an object.
 func (r *StatusREST) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
 	return r.store.Update(ctx, name, objInfo, createValidation, updateValidation, forceAllowCreate, options)
+}
+
+func (r *StatusREST) Destroy() {
+	r.store.Destroy()
 }
 
 // InternalREST implements the REST endpoint for changing both the spec and status of an image stream.
@@ -173,10 +178,13 @@ type LayersREST struct {
 }
 
 var _ rest.Getter = &LayersREST{}
+var _ rest.Storage = &LayersREST{}
 
 func (r *LayersREST) New() runtime.Object {
 	return &imageapi.ImageStreamLayers{}
 }
+
+func (r *LayersREST) Destroy() {}
 
 // Get returns the layers for an image stream.
 func (r *LayersREST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {

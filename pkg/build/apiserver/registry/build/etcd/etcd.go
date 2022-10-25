@@ -63,6 +63,7 @@ type DetailsREST struct {
 }
 
 var _ rest.Updater = &DetailsREST{}
+var _ rest.Storage = &DetailsREST{}
 
 // New returns an empty object that can be used with Update after request data has been put into it.
 func (r *DetailsREST) New() runtime.Object {
@@ -72,6 +73,10 @@ func (r *DetailsREST) New() runtime.Object {
 // Update finds a resource in the storage and updates it.
 func (r *DetailsREST) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
 	return r.store.Update(ctx, name, objInfo, createValidation, updateValidation, forceAllowCreate, options)
+}
+
+func (r *DetailsREST) Destroy() {
+	r.store.Destroy()
 }
 
 // LegacyREST allows us to wrap and alter some behavior
