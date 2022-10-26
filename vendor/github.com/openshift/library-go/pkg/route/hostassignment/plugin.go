@@ -1,4 +1,4 @@
-package simplerouteallocation
+package hostassignment
 
 import (
 	"fmt"

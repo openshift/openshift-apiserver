@@ -13,13 +13,13 @@ import (
 	restclient "k8s.io/client-go/rest"
 
 	routeapiv1 "github.com/openshift/api/route/v1"
+	routehostassignment "github.com/openshift/library-go/pkg/route/hostassignment"
 	routeetcd "github.com/openshift/openshift-apiserver/pkg/route/apiserver/registry/route/etcd"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/simplerouteallocation"
 )
 
 type ExtraConfig struct {
 	KubeAPIServerClientConfig *restclient.Config
-	RouteAllocator            *simplerouteallocation.SimpleAllocationPlugin
+	RouteAllocator            *routehostassignment.SimpleAllocationPlugin
 
 	// TODO these should all become local eventually
 	Scheme *runtime.Scheme

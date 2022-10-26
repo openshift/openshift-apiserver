@@ -11,6 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
+	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistrytest "k8s.io/apiserver/pkg/registry/generic/testing"
 	"k8s.io/apiserver/pkg/registry/rest"
 	etcdtesting "k8s.io/apiserver/pkg/storage/etcd3/testing"
@@ -18,10 +19,9 @@ import (
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	routev1 "github.com/openshift/api/route/v1"
+	routehostassignment "github.com/openshift/library-go/pkg/route/hostassignment"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	_ "github.com/openshift/openshift-apiserver/pkg/route/apis/route/install"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/routehostassignment"
-	"k8s.io/apiserver/pkg/registry/generic"
 )
 
 type testAllocator struct {
