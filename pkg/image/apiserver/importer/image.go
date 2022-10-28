@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/docker/distribution"
+	"github.com/docker/distribution/manifest/manifestlist"
 	"github.com/docker/distribution/manifest/schema1"
 	"github.com/docker/distribution/registry/api/errcode"
 	godigest "github.com/opencontainers/go-digest"
@@ -86,6 +87,53 @@ func schema2OrOCIToImage(manifest distribution.Manifest, imageConfig []byte, d g
 		DockerImageConfig:            string(imageConfig),
 		DockerImageManifestMediaType: mediatype,
 		DockerImageMetadataVersion:   "1.0",
+	}
+
+	return image, nil
+}
+
+func manifestListToImage(
+	manifest *manifestlist.DeserializedManifestList,
+	d godigest.Digest,
+) (*imageapi.Image, error) {
+	mediatype, payload, err := manifest.Payload()
+	if err != nil {
+		return nil, err
+	}
+
+	digest := godigest.FromBytes(payload)
+	if len(d) > 0 && digest != d {
+		return nil, fmt.Errorf(
+			"content integrity error: the manifest retrieved (media type: %s) "+
+				"with digest %s does not match the digest calculated from "+
+				"the content %s",
+			mediatype,
+			d,
+			digest,
+		)
+	}
+
+	image := &imageapi.Image{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: digest.String(),
+		},
+		DockerImageMetadata: imageapi.DockerImage{
+			ID:      digest.String(),
+			Created: metav1.Now(),
+		},
+		DockerImageManifestMediaType: mediatype,
+	}
+
+	for _, manifest := range manifest.Manifests {
+		m := imageapi.ImageManifest{
+			Digest:       manifest.Digest.String(),
+			MediaType:    manifest.MediaType,
+			ManifestSize: manifest.Size,
+			Architecture: manifest.Platform.Architecture,
+			OS:           manifest.Platform.OS,
+			Variant:      manifest.Platform.Variant,
+		}
+		image.DockerImageManifests = append(image.DockerImageManifests, m)
 	}
 
 	return image, nil

@@ -35,6 +35,16 @@ func Convert_image_Image_To_v1_Image(in *newer.Image, out *v1.Image, s conversio
 	out.DockerImageManifestMediaType = in.DockerImageManifestMediaType
 	out.DockerImageConfig = in.DockerImageConfig
 
+	out.DockerImageManifests = nil
+	if in.DockerImageManifests != nil {
+		out.DockerImageManifests = make([]v1.ImageManifest, len(in.DockerImageManifests))
+		for i := range in.DockerImageManifests {
+			if err := s.Convert(&in.DockerImageManifests[i], &out.DockerImageManifests[i]); err != nil {
+				return err
+			}
+		}
+	}
+
 	gvString := in.DockerImageMetadataVersion
 	if len(gvString) == 0 {
 		gvString = "1.0"
@@ -92,6 +102,16 @@ func Convert_v1_Image_To_image_Image(in *v1.Image, out *newer.Image, s conversio
 	out.DockerImageManifest = in.DockerImageManifest
 	out.DockerImageManifestMediaType = in.DockerImageManifestMediaType
 	out.DockerImageConfig = in.DockerImageConfig
+
+	out.DockerImageManifests = nil
+	if in.DockerImageManifests != nil {
+		out.DockerImageManifests = make([]newer.ImageManifest, len(in.DockerImageManifests))
+		for i := range in.DockerImageManifests {
+			if err := s.Convert(&in.DockerImageManifests[i], &out.DockerImageManifests[i]); err != nil {
+				return err
+			}
+		}
+	}
 
 	version := in.DockerImageMetadataVersion
 	if len(version) == 0 {

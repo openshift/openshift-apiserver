@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 
 	imagev1 "github.com/openshift/api/image/v1"
 	"github.com/openshift/library-go/pkg/image/reference"
@@ -20,5 +20,11 @@ func SetDefaults_ImageImportSpec(obj *imagev1.ImageImportSpec) {
 func SetDefaults_TagReferencePolicy(obj *imagev1.TagReferencePolicy) {
 	if len(obj.Type) == 0 {
 		obj.Type = imagev1.SourceTagReferencePolicy
+	}
+}
+
+func SetDefaults_TagImportPolicy(obj *imagev1.TagImportPolicy) {
+	if len(obj.ImportMode) == 0 {
+		obj.ImportMode = imagev1.ImportModeLegacy
 	}
 }

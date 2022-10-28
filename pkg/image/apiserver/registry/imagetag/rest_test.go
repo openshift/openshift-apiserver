@@ -138,6 +138,9 @@ func TestGetImageTag(t *testing.T) {
 								"color": "blue",
 								"size":  "large",
 							},
+							ImportPolicy: imageapi.TagImportPolicy{
+								ImportMode: imageapi.ImportModeLegacy,
+							},
 						},
 					},
 				},
@@ -167,6 +170,9 @@ func TestGetImageTag(t *testing.T) {
 					Name:            "latest",
 					Annotations:     map[string]string{"color": "blue", "size": "large"},
 					ReferencePolicy: imageapi.TagReferencePolicy{Type: "Source"},
+					ImportPolicy: imageapi.TagImportPolicy{
+						ImportMode: imageapi.ImportModeLegacy,
+					},
 				},
 				Status: &imageapi.NamedTagEventList{
 					Tag: "latest",
@@ -204,6 +210,9 @@ func TestGetImageTag(t *testing.T) {
 								"color": "blue",
 								"size":  "large",
 							},
+							ImportPolicy: imageapi.TagImportPolicy{
+								ImportMode: imageapi.ImportModeLegacy,
+							},
 						},
 					},
 				},
@@ -233,6 +242,9 @@ func TestGetImageTag(t *testing.T) {
 					Name:            "latest",
 					Annotations:     map[string]string{"color": "blue", "size": "large"},
 					ReferencePolicy: imageapi.TagReferencePolicy{Type: "Source"},
+					ImportPolicy: imageapi.TagImportPolicy{
+						ImportMode: imageapi.ImportModeLegacy,
+					},
 				},
 				Status: &imageapi.NamedTagEventList{
 					Tag: "latest",
@@ -318,6 +330,9 @@ func TestGetImageTag(t *testing.T) {
 								"color": "blue",
 								"size":  "large",
 							},
+							ImportPolicy: imageapi.TagImportPolicy{
+								ImportMode: imageapi.ImportModeLegacy,
+							},
 						},
 					},
 				},
@@ -334,6 +349,9 @@ func TestGetImageTag(t *testing.T) {
 					Name:            "latest",
 					Annotations:     map[string]string{"color": "blue", "size": "large"},
 					ReferencePolicy: imageapi.TagReferencePolicy{Type: "Source"},
+					ImportPolicy: imageapi.TagImportPolicy{
+						ImportMode: imageapi.ImportModeLegacy,
+					},
 				},
 			},
 		},
@@ -421,6 +439,9 @@ func TestListImageTag(t *testing.T) {
 									"color": "blue",
 									"size":  "large",
 								},
+								ImportPolicy: imageapi.TagImportPolicy{
+									ImportMode: imageapi.ImportModeLegacy,
+								},
 							},
 						},
 					},
@@ -452,6 +473,9 @@ func TestListImageTag(t *testing.T) {
 						Name:            "latest",
 						Annotations:     map[string]string{"color": "blue", "size": "large"},
 						ReferencePolicy: imageapi.TagReferencePolicy{Type: "Source"},
+						ImportPolicy: imageapi.TagImportPolicy{
+							ImportMode: imageapi.ImportModeLegacy,
+						},
 					},
 					Status: &imageapi.NamedTagEventList{
 						Tag: "latest",
@@ -492,6 +516,9 @@ func TestListImageTag(t *testing.T) {
 									"color": "blue",
 									"size":  "large",
 								},
+								ImportPolicy: imageapi.TagImportPolicy{
+									ImportMode: imageapi.ImportModeLegacy,
+								},
 							},
 						},
 					},
@@ -523,6 +550,9 @@ func TestListImageTag(t *testing.T) {
 						Name:            "latest",
 						Annotations:     map[string]string{"color": "blue", "size": "large"},
 						ReferencePolicy: imageapi.TagReferencePolicy{Type: "Source"},
+						ImportPolicy: imageapi.TagImportPolicy{
+							ImportMode: imageapi.ImportModeLegacy,
+						},
 					},
 					Status: &imageapi.NamedTagEventList{
 						Tag: "latest",
@@ -649,6 +679,9 @@ func TestListImageTag(t *testing.T) {
 									"color": "blue",
 									"size":  "large",
 								},
+								ImportPolicy: imageapi.TagImportPolicy{
+									ImportMode: imageapi.ImportModeLegacy,
+								},
 							},
 						},
 					},
@@ -667,6 +700,9 @@ func TestListImageTag(t *testing.T) {
 						Name:            "latest",
 						Annotations:     map[string]string{"color": "blue", "size": "large"},
 						ReferencePolicy: imageapi.TagReferencePolicy{Type: "Source"},
+						ImportPolicy: imageapi.TagImportPolicy{
+							ImportMode: imageapi.ImportModeLegacy,
+						},
 					},
 				},
 			},
@@ -915,6 +951,9 @@ func TestDeleteImageTag(t *testing.T) {
 					ReferencePolicy: imageapi.TagReferencePolicy{
 						Type: imageapi.SourceTagReferencePolicy,
 					},
+					ImportPolicy: imageapi.TagImportPolicy{
+						ImportMode: imageapi.ImportModeLegacy,
+					},
 				},
 			}
 			expectedStreamStatus := map[string]imageapi.TagEventList{
@@ -1008,6 +1047,9 @@ func TestCreateImageTag(t *testing.T) {
 					Generation:      int64p(1),
 					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
 					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+					ImportPolicy: imageapi.TagImportPolicy{
+						ImportMode: imageapi.ImportModeLegacy,
+					},
 				},
 			},
 		},
@@ -1079,6 +1121,9 @@ func TestCreateImageTag(t *testing.T) {
 					Generation:      int64p(1),
 					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
 					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+					ImportPolicy: imageapi.TagImportPolicy{
+						ImportMode: imageapi.ImportModeLegacy,
+					},
 				},
 			},
 		},
@@ -1203,6 +1248,9 @@ func TestUpdateImageTag(t *testing.T) {
 					Generation:      int64p(1),
 					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
 					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+					ImportPolicy: imageapi.TagImportPolicy{
+						ImportMode: imageapi.ImportModeLegacy,
+					},
 				},
 				Status: &imageapi.NamedTagEventList{
 					Tag: "tag",
@@ -1294,6 +1342,9 @@ func TestUpdateImageTag(t *testing.T) {
 					Generation:      int64p(1),
 					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
 					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+					ImportPolicy: imageapi.TagImportPolicy{
+						ImportMode: imageapi.ImportModeLegacy,
+					},
 				},
 			},
 		},
@@ -1346,6 +1397,9 @@ func TestUpdateImageTag(t *testing.T) {
 					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
 					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
 					Annotations:     map[string]string{"a": "c"},
+					ImportPolicy: imageapi.TagImportPolicy{
+						ImportMode: imageapi.ImportModeLegacy,
+					},
 				},
 			},
 		},
@@ -1499,6 +1553,9 @@ func TestUpdateImageTag(t *testing.T) {
 					Generation:      int64p(1),
 					From:            &kapi.ObjectReference{Kind: "DockerImage", Name: "foo/bar/baz"},
 					ReferencePolicy: imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy},
+					ImportPolicy: imageapi.TagImportPolicy{
+						ImportMode: imageapi.ImportModeLegacy,
+					},
 				},
 			},
 		},

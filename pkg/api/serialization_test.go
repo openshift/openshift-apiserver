@@ -205,6 +205,12 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 				}
 			}
 		},
+		func(j *image.TagImportPolicy, c fuzz.Continue) {
+			c.FuzzNoCustom(j)
+			if len(j.ImportMode) == 0 {
+				j.ImportMode = image.ImportModeLegacy
+			}
+		},
 		func(j *image.ImageStreamMapping, c fuzz.Continue) {
 			c.FuzzNoCustom(j)
 			j.DockerImageRepository = ""

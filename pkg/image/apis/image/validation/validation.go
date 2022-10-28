@@ -43,6 +43,9 @@ var RepositoryNameComponentAnchoredRegexp = regexp.MustCompile(`^` + RepositoryN
 // Copied from github.com/docker/distribution/registry/api/v2/names.go v2.1.1
 var RepositoryNameRegexp = regexp.MustCompile(`(?:` + RepositoryNameComponentRegexp.String() + `/)*` + RepositoryNameComponentRegexp.String())
 
+var imageDigestRegexp = regexp.MustCompile(`[A-Za-z][A-Za-z0-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*[:][[:xdigit:]]{32,}`)
+var imageMediaTypeRegexp = regexp.MustCompile(`^ *([A-Za-z0-9][A-Za-z0-9!#$&^_-]{0,126})\/([A-Za-z0-9][A-Za-z0-9!#$&^_.+-]{0,126}) *$`)
+
 func ValidateImageStreamName(name string, prefix bool) []string {
 	if reasons := path.ValidatePathSegmentName(name, prefix); len(reasons) != 0 {
 		return reasons
@@ -74,7 +77,86 @@ func validateImage(image *imageapi.Image, fldPath *field.Path) field.ErrorList {
 		result = append(result, validateImageSignature(&sig, fldPath.Child("signatures").Index(i))...)
 	}
 
+	if len(image.DockerImageManifests) > 0 {
+		result = append(
+			result,
+			validateImageManifests(image.DockerImageManifests, fldPath.Child("dockerImageManifests"))...,
+		)
+		if len(image.DockerImageLayers) > 0 {
+			result = append(
+				result,
+				field.Invalid(
+					fldPath.Child("dockerImageLayers"),
+					image.DockerImageLayers,
+					"dockerImageLayers should not be set when dockerImageManifests is set",
+				),
+			)
+		}
+	}
+
 	return result
+}
+
+func validateImageManifests(imageManifests []imageapi.ImageManifest, fldPath *field.Path) field.ErrorList {
+	var errs field.ErrorList
+
+	for i, m := range imageManifests {
+		if valid := imageDigestRegexp.MatchString(m.Digest); !valid {
+			msg := "digest does not conform with OCI image specification"
+			errs = append(
+				errs,
+				field.Invalid(
+					fldPath.Index(i).Child("digest"),
+					m.Digest,
+					msg,
+				),
+			)
+		}
+
+		if valid := imageMediaTypeRegexp.MatchString(m.MediaType); !valid {
+			errs = append(
+				errs,
+				field.Invalid(
+					fldPath.Index(i).Child("mediaType"),
+					m.MediaType,
+					"media type does not conform to RFC6838",
+				),
+			)
+		}
+
+		if len(m.Architecture) == 0 {
+			errs = append(
+				errs,
+				field.Required(
+					fldPath.Index(i).Child("architecture"),
+					m.Architecture,
+				),
+			)
+		}
+
+		if len(m.OS) == 0 {
+			errs = append(
+				errs,
+				field.Required(
+					fldPath.Index(i).Child("os"),
+					m.OS,
+				),
+			)
+		}
+
+		if m.ManifestSize < 0 {
+			errs = append(
+				errs,
+				field.Invalid(
+					fldPath.Index(i).Child("size"),
+					m.ManifestSize,
+					"manifest size cannot be negative",
+				),
+			)
+		}
+	}
+
+	return errs
 }
 
 func ValidateImageUpdate(newImage, oldImage *imageapi.Image) field.ErrorList {
@@ -173,6 +255,22 @@ func ValidateImageSignatureUpdate(newImageSignature, oldImageSignature *imageapi
 	}
 
 	return allErrs
+}
+
+func ValidateImportPolicy(importPolicy imageapi.TagImportPolicy, fldPath *field.Path) field.ErrorList {
+	var errs field.ErrorList
+
+	im := importPolicy.ImportMode
+	if len(im) != 0 && im != imageapi.ImportModeLegacy && im != imageapi.ImportModePreserveOriginal {
+		msg := fmt.Sprintf(
+			"invalid import mode, valid modes are '', '%s', '%s'",
+			imageapi.ImportModeLegacy,
+			imageapi.ImportModePreserveOriginal,
+		)
+		errs = append(errs, field.Invalid(fldPath.Child("importMode"), importPolicy.ImportMode, msg))
+	}
+
+	return errs
 }
 
 // ValidateImageStream tests required fields for an ImageStream.
@@ -290,6 +388,8 @@ func ValidateImageStreamTagReference(
 	default:
 		errs = append(errs, field.Invalid(fldPath.Child("referencePolicy", "type"), tagRef.ReferencePolicy.Type, fmt.Sprintf("valid values are %q, %q", imageapi.SourceTagReferencePolicy, imageapi.LocalTagReferencePolicy)))
 	}
+
+	errs = append(errs, ValidateImportPolicy(tagRef.ImportPolicy, fldPath.Child("importPolicy"))...)
 
 	return errs
 }
@@ -650,6 +750,8 @@ func ValidateImageStreamImport(isi *imageapi.ImageStreamImport) field.ErrorList 
 		default:
 			errs = append(errs, field.Invalid(imagesPath.Index(i).Child("from", "kind"), from.Kind, "only DockerImage is supported"))
 		}
+
+		errs = append(errs, ValidateImportPolicy(spec.ImportPolicy, imagesPath.Index(i).Child("importPolicy"))...)
 	}
 
 	if spec := isi.Spec.Repository; spec != nil {
@@ -670,6 +772,8 @@ func ValidateImageStreamImport(isi *imageapi.ImageStreamImport) field.ErrorList 
 		default:
 			errs = append(errs, field.Invalid(repoPath.Child("from", "kind"), from.Kind, "only DockerImage is supported"))
 		}
+
+		errs = append(errs, ValidateImportPolicy(spec.ImportPolicy, repoPath.Child("importPolicy"))...)
 	}
 	if len(isi.Spec.Images) == 0 && isi.Spec.Repository == nil {
 		errs = append(errs, field.Invalid(imagesPath, nil, "you must specify at least one image or a repository import"))
