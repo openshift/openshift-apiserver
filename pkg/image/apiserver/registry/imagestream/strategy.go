@@ -408,6 +408,9 @@ func tagRefChanged(old, next imageapi.TagReference, streamNamespace string) bool
 	if old.Reference != next.Reference {
 		return true
 	}
+	if old.ImportPolicy.ImportMode != next.ImportPolicy.ImportMode {
+		return true
+	}
 	return tagRefGenerationChanged(old, next)
 }
 
