@@ -446,6 +446,7 @@ func autoConvert_v1_ImageBlobReferences_To_image_ImageBlobReferences(in *v1.Imag
 	out.ImageMissing = in.ImageMissing
 	out.Layers = *(*[]string)(unsafe.Pointer(&in.Layers))
 	out.Config = (*string)(unsafe.Pointer(in.Config))
+	out.Manifests = *(*[]string)(unsafe.Pointer(&in.Manifests))
 	return nil
 }
 
@@ -458,6 +459,7 @@ func autoConvert_image_ImageBlobReferences_To_v1_ImageBlobReferences(in *image.I
 	out.ImageMissing = in.ImageMissing
 	out.Layers = *(*[]string)(unsafe.Pointer(&in.Layers))
 	out.Config = (*string)(unsafe.Pointer(in.Config))
+	out.Manifests = *(*[]string)(unsafe.Pointer(&in.Manifests))
 	return nil
 }
 
