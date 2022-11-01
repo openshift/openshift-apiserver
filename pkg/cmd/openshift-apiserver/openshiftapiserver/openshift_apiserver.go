@@ -34,6 +34,7 @@ import (
 	quotainformer "github.com/openshift/client-go/quota/informers/externalversions"
 	securityv1informer "github.com/openshift/client-go/security/informers/externalversions"
 	"github.com/openshift/library-go/pkg/quota/clusterquotamapping"
+	routehostassignment "github.com/openshift/library-go/pkg/route/hostassignment"
 	oappsapiserver "github.com/openshift/openshift-apiserver/pkg/apps/apiserver"
 	authorizationapiserver "github.com/openshift/openshift-apiserver/pkg/authorization/apiserver"
 	"github.com/openshift/openshift-apiserver/pkg/bootstrappolicy"
@@ -46,7 +47,6 @@ import (
 	projectcache "github.com/openshift/openshift-apiserver/pkg/project/cache"
 	quotaapiserver "github.com/openshift/openshift-apiserver/pkg/quota/apiserver"
 	routeapiserver "github.com/openshift/openshift-apiserver/pkg/route/apiserver"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/simplerouteallocation"
 	securityapiserver "github.com/openshift/openshift-apiserver/pkg/security/apiserver"
 	templateapiserver "github.com/openshift/openshift-apiserver/pkg/template/apiserver"
 	"github.com/openshift/openshift-apiserver/pkg/version"
@@ -78,7 +78,7 @@ type OpenshiftAPIExtraConfig struct {
 	MaxImagesBulkImportedPerRepository int
 	AdditionalTrustedCA                []byte
 
-	RouteAllocator *simplerouteallocation.SimpleAllocationPlugin
+	RouteAllocator *routehostassignment.SimpleAllocationPlugin
 
 	ProjectAuthorizationCache *projectauth.AuthorizationCache
 	ProjectCache              *projectcache.ProjectCache

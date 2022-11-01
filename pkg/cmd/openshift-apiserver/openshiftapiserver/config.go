@@ -28,10 +28,10 @@ import (
 	"github.com/openshift/library-go/pkg/apiserver/apiserverconfig"
 	"github.com/openshift/library-go/pkg/config/helpers"
 	"github.com/openshift/library-go/pkg/config/serving"
+	routehostassignment "github.com/openshift/library-go/pkg/route/hostassignment"
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftadmission"
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver/configprocessing"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/simplerouteallocation"
 	"github.com/openshift/openshift-apiserver/pkg/version"
 )
 
@@ -214,7 +214,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 		informers.GetKubernetesInformers().Rbac().V1(),
 	)
 
-	routeAllocator, err := simplerouteallocation.NewSimpleAllocationPlugin(config.RoutingConfig.Subdomain)
+	routeAllocator, err := routehostassignment.NewSimpleAllocationPlugin(config.RoutingConfig.Subdomain)
 	if err != nil {
 		return nil, err
 	}

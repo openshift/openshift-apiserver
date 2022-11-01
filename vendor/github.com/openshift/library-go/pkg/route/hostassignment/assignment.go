@@ -1,4 +1,4 @@
-package routehostassignment
+package hostassignment
 
 import (
 	"context"
@@ -29,7 +29,7 @@ type HostnameGenerator interface {
 // AllocateHost allocates a host name ONLY if the route doesn't specify a subdomain wildcard policy and
 // the host name on the route is empty and an allocator is configured.
 // It must first allocate the shard and may return an error if shard allocation fails.
-func allocateHostV1(ctx context.Context, route *routev1.Route, sarc SubjectAccessReviewCreator, routeAllocator HostnameGenerator) field.ErrorList {
+func AllocateHost(ctx context.Context, route *routev1.Route, sarc SubjectAccessReviewCreator, routeAllocator HostnameGenerator) field.ErrorList {
 	hostSet := len(route.Spec.Host) > 0
 	certSet := route.Spec.TLS != nil && (len(route.Spec.TLS.CACertificate) > 0 || len(route.Spec.TLS.Certificate) > 0 || len(route.Spec.TLS.DestinationCACertificate) > 0 || len(route.Spec.TLS.Key) > 0)
 	if hostSet || certSet {
@@ -117,7 +117,7 @@ func certificateChangeRequiresAuth(route, older *routev1.Route) bool {
 	}
 }
 
-func validateHostUpdateV1(ctx context.Context, route, older *routev1.Route, sarc SubjectAccessReviewCreator) field.ErrorList {
+func ValidateHostUpdate(ctx context.Context, route, older *routev1.Route, sarc SubjectAccessReviewCreator) field.ErrorList {
 	hostChanged := route.Spec.Host != older.Spec.Host
 	subdomainChanged := route.Spec.Subdomain != older.Spec.Subdomain
 	certChanged := certificateChangeRequiresAuth(route, older)
