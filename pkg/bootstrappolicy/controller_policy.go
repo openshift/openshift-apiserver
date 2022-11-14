@@ -346,7 +346,6 @@ func init() {
 	// the controller needs to be bound to the roles it is going to try to create
 	bindControllerRole(InfraDefaultRoleBindingsControllerServiceAccountName, ImagePullerRoleName)
 	bindControllerRole(InfraDefaultRoleBindingsControllerServiceAccountName, ImageBuilderRoleName)
-	bindControllerRole(InfraDefaultRoleBindingsControllerServiceAccountName, DeployerRoleName)
 	addControllerRole(rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraDefaultRoleBindingsControllerServiceAccountName},
 		Rules: []rbacv1.PolicyRule{
