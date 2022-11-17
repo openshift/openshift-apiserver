@@ -582,27 +582,6 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 		},
 		{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: DeployerRoleName,
-				Annotations: map[string]string{
-					openShiftDescription: "Grants the right to deploy within a project.  Used primarily with service accounts for automated deployments.",
-				},
-			},
-			Rules: []rbacv1.PolicyRule{
-				// "delete" is required here for compatibility with older deployer images
-				// (see https://github.com/openshift/origin/pull/14322#issuecomment-303968976)
-				// TODO: remove "delete" rule few releases after 3.6
-				rbacv1helpers.NewRule("delete").Groups(kapiGroup).Resources("replicationcontrollers").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "list", "watch", "update").Groups(kapiGroup).Resources("replicationcontrollers").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "update").Groups(kapiGroup).Resources("replicationcontrollers/scale").RuleOrDie(),
-				rbacv1helpers.NewRule("get", "list", "watch", "create").Groups(kapiGroup).Resources("pods").RuleOrDie(),
-				rbacv1helpers.NewRule("get").Groups(kapiGroup).Resources("pods/log").RuleOrDie(),
-				rbacv1helpers.NewRule("create", "list").Groups(kapiGroup).Resources("events").RuleOrDie(),
-
-				rbacv1helpers.NewRule("create", "update").Groups(imageGroup, legacyImageGroup).Resources("imagestreamtags", "imagetags").RuleOrDie(),
-			},
-		},
-		{
-			ObjectMeta: metav1.ObjectMeta{
 				Name: MasterRoleName,
 			},
 			Rules: []rbacv1.PolicyRule{
