@@ -12,6 +12,7 @@ require (
 	github.com/emicklei/go-restful/v3 v3.8.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-openapi/errors v0.19.2
+	github.com/google/go-cmp v0.5.8
 	github.com/google/gofuzz v1.2.0
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
@@ -40,6 +41,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20220803162953-67bda5d908f1
 	k8s.io/kubectl v0.25.2
 	k8s.io/kubernetes v1.25.2
+	k8s.io/utils v0.0.0-20220823124924-e9cbc92d1a73
 )
 
 require (
@@ -80,7 +82,6 @@ require (
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/cel-go v0.12.5 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
-	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
@@ -167,7 +168,6 @@ require (
 	k8s.io/cli-runtime v0.25.2 // indirect
 	k8s.io/controller-manager v0.25.2 // indirect
 	k8s.io/gengo v0.0.0-20211129171323-c02415ce4185 // indirect
-	k8s.io/utils v0.0.0-20220823124924-e9cbc92d1a73 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.32 // indirect
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
 	sigs.k8s.io/kustomize/api v0.12.1 // indirect
