@@ -1,6 +1,8 @@
-package v1
+package defaulting
 
-import "github.com/openshift/api/route/v1"
+import (
+	v1 "github.com/openshift/api/route/v1"
+)
 
 // If adding or changing route defaults, updates may be required to
 // pkg/router/controller/controller.go to ensure the routes generated from
