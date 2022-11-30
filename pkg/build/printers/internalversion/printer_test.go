@@ -8,7 +8,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kprinters "k8s.io/kubernetes/pkg/printers"
 
-	"github.com/openshift/openshift-apiserver/pkg/template/apis/template"
+	"github.com/openshift/openshift-apiserver/pkg/build/apis/build"
 )
 
 func TestPrintersWithDeepCopy(t *testing.T) {
@@ -17,21 +17,15 @@ func TestPrintersWithDeepCopy(t *testing.T) {
 		printer func() ([]metav1.TableRow, error)
 	}{
 		{
-			name: "Template",
+			name: "Build",
 			printer: func() ([]metav1.TableRow, error) {
-				return printTemplate(&template.Template{}, kprinters.GenerateOptions{})
+				return printBuild(&build.Build{}, kprinters.GenerateOptions{})
 			},
 		},
 		{
-			name: "TemplateInstance",
+			name: "BuildConfig",
 			printer: func() ([]metav1.TableRow, error) {
-				return printTemplateInstance(&template.TemplateInstance{}, kprinters.GenerateOptions{})
-			},
-		},
-		{
-			name: "BrokerTemplateInstance",
-			printer: func() ([]metav1.TableRow, error) {
-				return printBrokerTemplateInstance(&template.BrokerTemplateInstance{}, kprinters.GenerateOptions{})
+				return printBuildConfig(&build.BuildConfig{}, kprinters.GenerateOptions{})
 			},
 		},
 	}

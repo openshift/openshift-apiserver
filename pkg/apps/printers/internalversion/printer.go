@@ -80,7 +80,7 @@ func printDeploymentConfig(dc *appsapi.DeploymentConfig, options kprinters.Gener
 	name := dc.Name
 	trigger := strings.Join(triggers.List(), ",")
 
-	row.Cells = append(row.Cells, name, dc.Status.LatestVersion, desired, dc.Status.UpdatedReplicas, trigger)
+	row.Cells = append(row.Cells, name, dc.Status.LatestVersion, desired, int64(dc.Status.UpdatedReplicas), trigger)
 
 	return []metav1.TableRow{row}, nil
 }
