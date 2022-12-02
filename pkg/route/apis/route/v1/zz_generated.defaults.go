@@ -7,6 +7,7 @@ package v1
 
 import (
 	v1 "github.com/openshift/api/route/v1"
+	defaulting "github.com/openshift/library-go/pkg/route/defaulting"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -20,18 +21,18 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 }
 
 func SetObjectDefaults_Route(in *v1.Route) {
-	SetDefaults_RouteSpec(&in.Spec)
-	SetDefaults_RouteTargetReference(&in.Spec.To)
+	defaulting.SetDefaults_RouteSpec(&in.Spec)
+	defaulting.SetDefaults_RouteTargetReference(&in.Spec.To)
 	for i := range in.Spec.AlternateBackends {
 		a := &in.Spec.AlternateBackends[i]
-		SetDefaults_RouteTargetReference(a)
+		defaulting.SetDefaults_RouteTargetReference(a)
 	}
 	if in.Spec.TLS != nil {
-		SetDefaults_TLSConfig(in.Spec.TLS)
+		defaulting.SetDefaults_TLSConfig(in.Spec.TLS)
 	}
 	for i := range in.Status.Ingress {
 		a := &in.Status.Ingress[i]
-		SetDefaults_RouteIngress(a)
+		defaulting.SetDefaults_RouteIngress(a)
 	}
 }
 
