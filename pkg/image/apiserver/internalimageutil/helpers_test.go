@@ -214,18 +214,37 @@ func TestImageWithMetadata(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		imageWithMetadata := test.image
-		err := InternalImageWithMetadata(&imageWithMetadata)
-		gotError := err != nil
-		if e, a := test.expectError, gotError; e != a {
-			t.Fatalf("%s: expectError=%t, gotError=%t: %s", name, e, a, err)
-		}
-		if test.expectError {
-			continue
-		}
-		if e, a := test.expectedImage, imageWithMetadata; !kapihelper.Semantic.DeepEqual(e, a) {
-			t.Errorf("%s: image: %s", name, diff.ObjectDiff(e, a))
-		}
+		t.Run(name, func(t *testing.T) {
+			imageWithMetadata := test.image
+			err := InternalImageWithMetadata(&imageWithMetadata)
+			gotError := err != nil
+			if e, a := test.expectError, gotError; e != a {
+				t.Fatalf("expectError=%t, gotError=%t: %s", e, a, err)
+			}
+			if test.expectError {
+				return
+			}
+			if e, a := test.expectedImage, imageWithMetadata; !kapihelper.Semantic.DeepEqual(e, a) {
+				t.Errorf("image: %s", diff.ObjectDiff(e, a))
+			}
+		})
+	}
+}
+
+func TestImageWithMetadataWithManifestList(t *testing.T) {
+	image := validImageWithManifestListData()
+	err := InternalImageWithMetadata(&image)
+	if err != nil {
+		t.Fatalf("error getting metadata for image: %#v", err)
+	}
+
+	if image.DockerImageMetadata.ID != image.Name {
+		t.Error("expected image metadata ID to match image name")
+		t.Logf("want: %q", image.Name)
+		t.Logf("got:  %q", image.DockerImageMetadata.ID)
+	}
+	if image.DockerImageMetadata.Created.IsZero() {
+		t.Error("expected image metadata created field to not be zero")
 	}
 }
 
@@ -427,6 +446,86 @@ func validImageWithManifestV2Data() imageapi.Image {
         }
     ]
 }`,
+	}
+}
+
+func validImageWithManifestListData() imageapi.Image {
+	return imageapi.Image{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "sha256:8b8cc63bcc10374ef349ec4f27a3aa1eb2dcd5a098d4f5f51fafac4df5db3fd7",
+		},
+		DockerImageManifest: `{
+  "manifests": [
+    {
+      "digest": "sha256:d4ea9af4372bd4c4973725c727f0718e68de3d37452d9f5a1abe77c64907d6c2",
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      "size": 429
+    },
+    {
+      "digest": "sha256:31630ae562f99165f42e98cb079d64d970cfec203bb0d0973bafb4fdac72650c",
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "platform": {
+        "architecture": "arm64",
+        "os": "linux"
+      },
+      "size": 429
+    },
+    {
+      "digest": "sha256:9e2c03e2fdcaf6c5f9df005ec56ab767615d260be6816a3727ee31f5b3055803",
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "platform": {
+        "architecture": "ppc64le",
+        "os": "linux"
+      },
+      "size": 429
+    },
+    {
+      "digest": "sha256:9712ef29952de0c6f9d3c5ef5913fe49515191c2396740c6e937d5a02bfb5d1c",
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "platform": {
+        "architecture": "s390x",
+        "os": "linux"
+      },
+      "size": 429
+    }
+  ],
+  "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+  "schemaVersion": 2
+}`,
+		DockerImageManifests: []imageapi.ImageManifest{
+			{
+				Digest:       "sha256:d4ea9af4372bd4c4973725c727f0718e68de3d37452d9f5a1abe77c64907d6c2",
+				MediaType:    "application/vnd.docker.distribution.manifest.v2+json",
+				ManifestSize: 429,
+				Architecture: "amd64",
+				OS:           "linux",
+			},
+			{
+				Digest:       "sha256:31630ae562f99165f42e98cb079d64d970cfec203bb0d0973bafb4fdac72650c",
+				MediaType:    "application/vnd.docker.distribution.manifest.v2+json",
+				ManifestSize: 429,
+				Architecture: "arm64",
+				OS:           "linux",
+			},
+			{
+				Digest:       "sha256:9e2c03e2fdcaf6c5f9df005ec56ab767615d260be6816a3727ee31f5b3055803",
+				MediaType:    "application/vnd.docker.distribution.manifest.v2+json",
+				ManifestSize: 429,
+				Architecture: "ppc64le",
+				OS:           "linux",
+			},
+			{
+				Digest:       "sha256:9712ef29952de0c6f9d3c5ef5913fe49515191c2396740c6e937d5a02bfb5d1c",
+				MediaType:    "application/vnd.docker.distribution.manifest.v2+json",
+				ManifestSize: 429,
+				Architecture: "s390x",
+				OS:           "linux",
+			},
+		},
 	}
 }
 

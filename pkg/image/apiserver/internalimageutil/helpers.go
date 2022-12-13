@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/docker/distribution/manifest/manifestlist"
 	"github.com/docker/distribution/manifest/ocischema"
 	"github.com/docker/distribution/manifest/schema1"
 	"github.com/docker/distribution/manifest/schema2"
@@ -41,6 +42,14 @@ func InternalImageWithMetadata(image *imageapi.Image) error {
 	manifest := dockerapi10.DockerImageManifest{}
 	if err := json.Unmarshal([]byte(image.DockerImageManifest), &manifest); err != nil {
 		return err
+	}
+
+	// manifest lists lack many of the fields handled by this function.
+	// if we encounter one, set the metadata basics and bail.
+	if manifest.MediaType == manifestlist.MediaTypeManifestList || manifest.MediaType == imgspecv1.MediaTypeImageIndex {
+		image.DockerImageMetadata.ID = image.Name
+		image.DockerImageMetadata.Created = metav1.Now()
+		return nil
 	}
 
 	err := fillImageLayers(image, manifest)
