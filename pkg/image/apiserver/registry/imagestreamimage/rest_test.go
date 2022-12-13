@@ -30,8 +30,7 @@ import (
 
 var testDefaultRegistry = func(_ context.Context) (string, bool) { return "defaultregistry:5000", true }
 
-type fakeSubjectAccessReviewRegistry struct {
-}
+type fakeSubjectAccessReviewRegistry struct{}
 
 func (f *fakeSubjectAccessReviewRegistry) Create(_ context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationapi.SubjectAccessReview, error) {
 	return nil, nil
@@ -70,10 +69,12 @@ func setup(t *testing.T) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
 
 func TestGet(t *testing.T) {
 	tests := map[string]struct {
-		input       string
-		repo        *imageapi.ImageStream
-		image       *imageapi.Image
-		expectError bool
+		input                   string
+		repo                    *imageapi.ImageStream
+		images                  []*imageapi.Image
+		expectedImageMetadataID string
+		expectedConfigHostname  string
+		expectError             bool
 	}{
 		"empty string": {
 			input:       "",
@@ -139,11 +140,14 @@ func TestGet(t *testing.T) {
 					},
 				},
 			},
-			image: &imageapi.Image{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "id",
-				},
-				DockerImageManifest: `{
+			expectedImageMetadataID: "2d24f826cb16146e2016ff349a8a33ed5830f3b938d45c0f82943f4ab8c097e7",
+			expectedConfigHostname:  "43bd710ec89a",
+			images: []*imageapi.Image{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "id",
+					},
+					DockerImageManifest: `{
    "name": "library/ubuntu",
    "tag": "latest",
    "architecture": "amd64",
@@ -204,8 +208,7 @@ func TestGet(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		// Wrap in a func so we clean up the test etcd after every loop
-		func() {
+		t.Run(name, func(t *testing.T) {
 			client, server, storage := setup(t)
 			defer server.Terminate(t)
 
@@ -222,22 +225,27 @@ func TestGet(t *testing.T) {
 					return
 				}
 			}
-			if test.image != nil {
-				_, err := client.Put(
-					context.TODO(),
-					etcdtesting.AddPrefix("/images/"+test.image.Name),
-					runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), test.image),
-				)
-				if err != nil {
-					t.Errorf("Unexpected error: %v", err)
-					return
+			if len(test.images) > 0 {
+				for _, image := range test.images {
+					_, err := client.Put(
+						context.TODO(),
+						etcdtesting.AddPrefix("/images/"+image.Name),
+						runtime.EncodeOrDie(
+							legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion),
+							image,
+						),
+					)
+					if err != nil {
+						t.Errorf("Unexpected error: %v", err)
+						return
+					}
 				}
 			}
 
 			obj, err := storage.Get(ctx, test.input, &metav1.GetOptions{})
 			gotError := err != nil
 			if e, a := test.expectError, gotError; e != a {
-				t.Errorf("%s: expected error=%t, got=%t: %s", name, e, a, err)
+				t.Errorf("expected error=%t, got=%t: %s", e, a, err)
 				return
 			}
 			if test.expectError {
@@ -252,12 +260,15 @@ func TestGet(t *testing.T) {
 			if e, a := test.input, imageStreamImage.Name; e != a {
 				t.Errorf("%s: name: expected %q, got %q", name, e, a)
 			}
-			if e, a := "2d24f826cb16146e2016ff349a8a33ed5830f3b938d45c0f82943f4ab8c097e7", imageStreamImage.Image.DockerImageMetadata.ID; e != a {
-				t.Errorf("%s: id: expected %q, got %q", name, e, a)
+			expectedID := test.expectedImageMetadataID
+			if expectedID != "" && expectedID != imageStreamImage.Image.DockerImageMetadata.ID {
+				t.Errorf("id: expected %q, got %q", expectedID, imageStreamImage.Image.DockerImageMetadata.ID)
 			}
-			if e, a := "43bd710ec89a", imageStreamImage.Image.DockerImageMetadata.ContainerConfig.Hostname; e != a {
-				t.Errorf("%s: container config hostname: expected %q, got %q", name, e, a)
+			expectedConfigHostname := test.expectedConfigHostname
+			hostname := imageStreamImage.Image.DockerImageMetadata.ContainerConfig.Hostname
+			if expectedConfigHostname != "" && expectedConfigHostname != hostname {
+				t.Errorf("container config hostname: expected %q, got %q", expectedConfigHostname, hostname)
 			}
-		}()
+		})
 	}
 }
