@@ -250,7 +250,12 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error building REST storage: %v", err)
 	}
-	imageStreamRegistry := imagestream.NewRegistry(imageStreamStorage, imageStreamStatusStorage, internalImageStreamStorage)
+	imageStreamRegistry := imagestream.NewRegistry(
+		imageStreamStorage,
+		imageStreamStatusStorage,
+		internalImageStreamStorage,
+		imageStreamLayersStorage,
+	)
 	imageStreamMappingStorage := imagestreammapping.NewREST(imageRegistry, imageStreamRegistry, c.ExtraConfig.RegistryHostnameRetriever)
 	imageStreamTagStorage := imagestreamtag.NewREST(imageRegistry, imageStreamRegistry, whitelister)
 	imageTagStorage := imagetag.NewREST(imageRegistry, imageStreamRegistry, whitelister)

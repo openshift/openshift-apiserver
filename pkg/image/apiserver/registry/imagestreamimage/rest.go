@@ -11,7 +11,7 @@ import (
 	"k8s.io/kubernetes/pkg/printers"
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
-	imagegroup "github.com/openshift/api/image"
+	imagev1 "github.com/openshift/api/image/v1"
 	"github.com/openshift/library-go/pkg/image/imageutil"
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
@@ -31,10 +31,12 @@ type REST struct {
 	rest.TableConvertor
 }
 
-var _ rest.Getter = &REST{}
-var _ rest.ShortNamesProvider = &REST{}
-var _ rest.Scoper = &REST{}
-var _ rest.Storage = &REST{}
+var (
+	_ rest.Getter             = &REST{}
+	_ rest.ShortNamesProvider = &REST{}
+	_ rest.Scoper             = &REST{}
+	_ rest.Storage            = &REST{}
+)
 
 // ShortNames implements the ShortNamesProvider interface. Returns a list of short names for a resource.
 func (r *REST) ShortNames() []string {
@@ -79,21 +81,24 @@ func (r *REST) Get(ctx context.Context, id string, options *metav1.GetOptions) (
 		return nil, err
 	}
 
-	repo, err := r.imageStreamRegistry.GetImageStream(ctx, name, &metav1.GetOptions{})
+	imageName := ""
+
+	// using the layers api to get the image name instead of the image stream
+	// tag history enable us to also list images belonging to a manifest list,
+	// which are not listed in an image stream tag history.
+	layers, err := r.imageStreamRegistry.GetImageStreamLayers(ctx, name, &metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
-
-	if repo.Status.Tags == nil {
-		return nil, errors.NewNotFound(imagegroup.Resource("imagestreamimage"), id)
+	for id := range layers.Images {
+		if imageutil.DigestOrImageMatch(id, imageID) {
+			imageName = id
+		}
+	}
+	if imageName == "" {
+		return nil, errors.NewNotFound(imagev1.Resource("imagestreamimage"), id)
 	}
 
-	event, err := internalimageutil.ResolveImageID(repo, imageID)
-	if err != nil {
-		return nil, err
-	}
-
-	imageName := event.Image
 	image, err := r.imageRegistry.GetImage(ctx, imageName, &metav1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -109,7 +114,7 @@ func (r *REST) Get(ctx context.Context, id string, options *metav1.GetOptions) (
 			Namespace:         apirequest.NamespaceValue(ctx),
 			Name:              imageutil.JoinImageStreamImage(name, imageID),
 			CreationTimestamp: image.ObjectMeta.CreationTimestamp,
-			Annotations:       repo.Annotations,
+			Annotations:       layers.ObjectMeta.Annotations,
 		},
 		Image: *image,
 	}

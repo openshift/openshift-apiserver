@@ -6,9 +6,11 @@ import (
 
 	etcd "go.etcd.io/etcd/client/v3"
 	authorizationapi "k8s.io/api/authorization/v1"
+	"k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/diff"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/generic"
 	etcdtesting "k8s.io/apiserver/pkg/storage/etcd3/testing"
@@ -38,33 +40,6 @@ func (f *fakeSubjectAccessReviewRegistry) Create(_ context.Context, subjectAcces
 
 func (f *fakeSubjectAccessReviewRegistry) CreateContext(ctx context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview) (*authorizationapi.SubjectAccessReview, error) {
 	return f.Create(ctx, subjectAccessReview, metav1.CreateOptions{})
-}
-
-func setup(t *testing.T) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
-	server, etcdStorage := etcdtesting.NewUnsecuredEtcd3TestClientServer(t)
-	etcdStorage.Codec = legacyscheme.Codecs.LegacyCodec(schema.GroupVersion{Group: "image.openshift.io", Version: "v1"})
-	etcdClient := etcd.NewKV(server.V3Client)
-	etcdStorageConfigForImages := &storagebackend.ConfigForResource{Config: *etcdStorage, GroupResource: schema.GroupResource{Group: "image.openshift.io", Resource: "images"}}
-	imageRESTOptions := generic.RESTOptions{StorageConfig: etcdStorageConfigForImages, Decorator: generic.UndecoratedStorage, DeleteCollectionWorkers: 1, ResourcePrefix: "images"}
-
-	imageStorage, err := imageetcd.NewREST(imageRESTOptions)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defaultRegistry := registryhostname.TestingRegistryHostnameRetriever(testDefaultRegistry, "", "")
-	etcdStorageConfigForImageStreams := &storagebackend.ConfigForResource{Config: *etcdStorage, GroupResource: schema.GroupResource{Group: "image.openshift.io", Resource: "imagestreams"}}
-	imagestreamRESTOptions := generic.RESTOptions{StorageConfig: etcdStorageConfigForImageStreams, Decorator: generic.UndecoratedStorage, DeleteCollectionWorkers: 1, ResourcePrefix: "imagestreams"}
-	imageStreamStorage, _, imageStreamStatus, internalStorage, err := imagestreametcd.NewRESTWithLimitVerifier(imagestreamRESTOptions, defaultRegistry, &fakeSubjectAccessReviewRegistry{}, &admfake.ImageStreamLimitVerifier{}, &fake.RegistryWhitelister{}, imagestreametcd.NewEmptyLayerIndex())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	imageRegistry := image.NewRegistry(imageStorage)
-	imageStreamRegistry := imagestream.NewRegistry(imageStreamStorage, imageStreamStatus, internalStorage)
-
-	storage := NewREST(imageRegistry, imageStreamRegistry)
-
-	return etcdClient, server, storage
 }
 
 func TestGet(t *testing.T) {
@@ -203,16 +178,127 @@ func TestGet(t *testing.T) {
       }
    ]
 }`,
+				},
+			},
+		},
+		"uses annotations from image stream": {
+			input:       "repo@sha256:abc321",
+			expectError: false,
+			repo: &imageapi.ImageStream{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "ns",
+					Name:      "repo",
+					Annotations: map[string]string{
+						"test":         "123",
+						"another-test": "abc",
+					},
+				},
+				Status: imageapi.ImageStreamStatus{
+					Tags: map[string]imageapi.TagEventList{
+						"latest": {
+							Items: []imageapi.TagEvent{
+								{Image: "anotherid"},
+								{Image: "anotherid2"},
+								{Image: "sha256:abc321"},
+							},
+						},
+					},
+				},
+			},
+			images: []*imageapi.Image{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "sha256:abc321",
+					},
+				},
+			},
+		},
+		"matches partial sha": {
+			input:       "repo@sha256:ff46b782",
+			expectError: false,
+			repo: &imageapi.ImageStream{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "ns",
+					Name:      "repo",
+				},
+				Status: imageapi.ImageStreamStatus{
+					Tags: map[string]imageapi.TagEventList{
+						"latest": {
+							Items: []imageapi.TagEvent{
+								{Image: "anotherid"},
+								{Image: "anotherid2"},
+								{Image: "sha256:ff46b78279f207db3b8e57e20dee7cecef3567d09489369d80591f150f9c8154"},
+							},
+						},
+					},
+				},
+			},
+			images: []*imageapi.Image{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "sha256:ff46b78279f207db3b8e57e20dee7cecef3567d09489369d80591f150f9c8154",
+					},
+				},
 			},
 		},
 	}
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			client, server, storage := setup(t)
+			server, etcdStorage := etcdtesting.NewUnsecuredEtcd3TestClientServer(t)
 			defer server.Terminate(t)
+			etcdStorage.Codec = legacyscheme.Codecs.LegacyCodec(
+				schema.GroupVersion{Group: "image.openshift.io", Version: "v1"})
+			client := etcd.NewKV(server.V3Client)
+			etcdStorageConfigForImages := &storagebackend.ConfigForResource{
+				Config:        *etcdStorage,
+				GroupResource: schema.GroupResource{Group: "image.openshift.io", Resource: "images"},
+			}
+			imageRESTOptions := generic.RESTOptions{
+				StorageConfig:           etcdStorageConfigForImages,
+				Decorator:               generic.UndecoratedStorage,
+				DeleteCollectionWorkers: 1,
+				ResourcePrefix:          "images",
+			}
+			imageStorage, err := imageetcd.NewREST(imageRESTOptions)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defaultRegistry := registryhostname.TestingRegistryHostnameRetriever(testDefaultRegistry, "", "")
+			etcdStorageConfigForImageStreams := &storagebackend.ConfigForResource{
+				Config:        *etcdStorage,
+				GroupResource: schema.GroupResource{Group: "image.openshift.io", Resource: "imagestreams"},
+			}
+			imagestreamRESTOptions := generic.RESTOptions{
+				StorageConfig:           etcdStorageConfigForImageStreams,
+				Decorator:               generic.UndecoratedStorage,
+				DeleteCollectionWorkers: 1,
+				ResourcePrefix:          "imagestreams",
+			}
+			imageIndex := imagestreametcd.NewMockImageLayerIndex()
+			imageStreamStorage, imageStreamLayersStorage, imageStreamStatus, internalStorage, err := imagestreametcd.NewRESTWithLimitVerifier(
+				imagestreamRESTOptions,
+				defaultRegistry,
+				&fakeSubjectAccessReviewRegistry{},
+				&admfake.ImageStreamLimitVerifier{},
+				&fake.RegistryWhitelister{},
+				imageIndex,
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
 
+			imageRegistry := image.NewRegistry(imageStorage)
+			imageStreamRegistry := imagestream.NewRegistry(
+				imageStreamStorage,
+				imageStreamStatus,
+				internalStorage,
+				imageStreamLayersStorage,
+			)
+
+			storage := NewREST(imageRegistry, imageStreamRegistry)
 			ctx := apirequest.NewDefaultContext()
+
 			if test.repo != nil {
 				ctx = apirequest.WithNamespace(apirequest.NewContext(), test.repo.Namespace)
 				_, err := client.Put(
@@ -236,20 +322,24 @@ func TestGet(t *testing.T) {
 						),
 					)
 					if err != nil {
-						t.Errorf("Unexpected error: %v", err)
-						return
+						t.Fatalf("Unexpected error: %v", err)
 					}
+					imageIndex.Add(&imagev1.Image{
+						ObjectMeta:          image.ObjectMeta,
+						DockerImageManifest: image.DockerImageManifest,
+					})
 				}
 			}
 
 			obj, err := storage.Get(ctx, test.input, &metav1.GetOptions{})
-			gotError := err != nil
-			if e, a := test.expectError, gotError; e != a {
-				t.Errorf("expected error=%t, got=%t: %s", e, a, err)
+			if test.expectError {
+				if err == nil {
+					t.Fatal("expected error but didn't get one")
+				}
 				return
 			}
-			if test.expectError {
-				return
+			if err != nil {
+				t.Fatalf("unexpected error: %#v", err)
 			}
 
 			imageStreamImage := obj.(*imageapi.ImageStreamImage)
@@ -260,6 +350,14 @@ func TestGet(t *testing.T) {
 			if e, a := test.input, imageStreamImage.Name; e != a {
 				t.Errorf("%s: name: expected %q, got %q", name, e, a)
 			}
+
+			expectedAnnotations := test.repo.ObjectMeta.Annotations
+			gotAnnotations := imageStreamImage.ObjectMeta.Annotations
+			if !equality.Semantic.DeepEqual(expectedAnnotations, gotAnnotations) {
+				t.Error("Expected image stream annotations to match image stream image's")
+				t.Log(diff.ObjectGoPrintDiff(expectedAnnotations, gotAnnotations))
+			}
+
 			expectedID := test.expectedImageMetadataID
 			if expectedID != "" && expectedID != imageStreamImage.Image.DockerImageMetadata.ID {
 				t.Errorf("id: expected %q, got %q", expectedID, imageStreamImage.Image.DockerImageMetadata.ID)

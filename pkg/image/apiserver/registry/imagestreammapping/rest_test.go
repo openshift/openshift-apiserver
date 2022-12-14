@@ -44,8 +44,7 @@ const testDefaultRegistryURL = "defaultregistry:5000"
 
 var testDefaultRegistry = func(_ context.Context) (string, bool) { return testDefaultRegistryURL, true }
 
-type fakeSubjectAccessReviewRegistry struct {
-}
+type fakeSubjectAccessReviewRegistry struct{}
 
 func (f *fakeSubjectAccessReviewRegistry) Create(_ context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationapi.SubjectAccessReview, error) {
 	return nil, nil
@@ -69,13 +68,18 @@ func setup(t *testing.T) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
 	registry := registryhostname.TestingRegistryHostnameRetriever(testDefaultRegistry, "", "")
 	etcdStorageConfigForImageStreams := &storagebackend.ConfigForResource{Config: *etcdStorage, GroupResource: schema.GroupResource{Group: "image.openshift.io", Resource: "imagestreams"}}
 	imagestreamRESTOptions := generic.RESTOptions{StorageConfig: etcdStorageConfigForImageStreams, Decorator: generic.UndecoratedStorage, DeleteCollectionWorkers: 1, ResourcePrefix: "imagestreams"}
-	imageStreamStorage, _, imageStreamStatus, internalStorage, err := imagestreametcd.NewRESTWithLimitVerifier(imagestreamRESTOptions, registry, &fakeSubjectAccessReviewRegistry{}, &admfake.ImageStreamLimitVerifier{}, &fake.RegistryWhitelister{}, imagestreametcd.NewEmptyLayerIndex())
+	imageStreamStorage, imageStreamLayersStorage, imageStreamStatus, internalStorage, err := imagestreametcd.NewRESTWithLimitVerifier(imagestreamRESTOptions, registry, &fakeSubjectAccessReviewRegistry{}, &admfake.ImageStreamLimitVerifier{}, &fake.RegistryWhitelister{}, imagestreametcd.imagestreametcd.NewMockImageLayerIndex())
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	imageRegistry := image.NewRegistry(imageStorage)
-	imageStreamRegistry := imagestream.NewRegistry(imageStreamStorage, imageStreamStatus, internalStorage)
+	imageStreamRegistry := imagestream.NewRegistry(
+		imageStreamStorage,
+		imageStreamStatus,
+		internalStorage,
+		imageStreamLayersStorage,
+	)
 
 	storage := NewREST(imageRegistry, imageStreamRegistry, registry)
 
@@ -743,18 +747,23 @@ type fakeImageRegistry struct {
 func (f *fakeImageRegistry) ListImages(ctx context.Context, options *metainternal.ListOptions) (*imageapi.ImageList, error) {
 	return f.listImages(ctx, options)
 }
+
 func (f *fakeImageRegistry) GetImage(ctx context.Context, id string, options *metav1.GetOptions) (*imageapi.Image, error) {
 	return f.getImage(ctx, id, options)
 }
+
 func (f *fakeImageRegistry) CreateImage(ctx context.Context, image *imageapi.Image) error {
 	return f.createImage(ctx, image)
 }
+
 func (f *fakeImageRegistry) DeleteImage(ctx context.Context, id string) error {
 	return f.deleteImage(ctx, id)
 }
+
 func (f *fakeImageRegistry) WatchImages(ctx context.Context, options *metainternal.ListOptions) (watch.Interface, error) {
 	return f.watchImages(ctx, options)
 }
+
 func (f *fakeImageRegistry) UpdateImage(ctx context.Context, image *imageapi.Image) (*imageapi.Image, error) {
 	return f.updateImage(ctx, image)
 }
@@ -762,6 +771,7 @@ func (f *fakeImageRegistry) UpdateImage(ctx context.Context, image *imageapi.Ima
 type fakeImageStreamRegistry struct {
 	listImageStreams        func(ctx context.Context, options *metainternal.ListOptions) (*imageapi.ImageStreamList, error)
 	getImageStream          func(ctx context.Context, id string, options *metav1.GetOptions) (*imageapi.ImageStream, error)
+	getImageStreamLayers    func(ctx context.Context, id string, options *metav1.GetOptions) (*imageapi.ImageStreamLayers, error)
 	createImageStream       func(ctx context.Context, repo *imageapi.ImageStream) (*imageapi.ImageStream, error)
 	updateImageStream       func(ctx context.Context, repo *imageapi.ImageStream) (*imageapi.ImageStream, error)
 	updateImageStreamSpec   func(ctx context.Context, repo *imageapi.ImageStream) (*imageapi.ImageStream, error)
@@ -773,24 +783,35 @@ type fakeImageStreamRegistry struct {
 func (f *fakeImageStreamRegistry) ListImageStreams(ctx context.Context, options *metainternal.ListOptions) (*imageapi.ImageStreamList, error) {
 	return f.listImageStreams(ctx, options)
 }
+
 func (f *fakeImageStreamRegistry) GetImageStream(ctx context.Context, id string, options *metav1.GetOptions) (*imageapi.ImageStream, error) {
 	return f.getImageStream(ctx, id, options)
 }
+
+func (f *fakeImageStreamRegistry) GetImageStreamLayers(ctx context.Context, id string, options *metav1.GetOptions) (*imageapi.ImageStreamLayers, error) {
+	return f.getImageStreamLayers(ctx, id, options)
+}
+
 func (f *fakeImageStreamRegistry) CreateImageStream(ctx context.Context, repo *imageapi.ImageStream, options *metav1.CreateOptions) (*imageapi.ImageStream, error) {
 	return f.createImageStream(ctx, repo)
 }
+
 func (f *fakeImageStreamRegistry) UpdateImageStream(ctx context.Context, repo *imageapi.ImageStream, forceAllowCreate bool, options *metav1.UpdateOptions) (*imageapi.ImageStream, error) {
 	return f.updateImageStream(ctx, repo)
 }
+
 func (f *fakeImageStreamRegistry) UpdateImageStreamSpec(ctx context.Context, repo *imageapi.ImageStream, forceAllowCreate bool, options *metav1.UpdateOptions) (*imageapi.ImageStream, error) {
 	return f.updateImageStreamSpec(ctx, repo)
 }
+
 func (f *fakeImageStreamRegistry) UpdateImageStreamStatus(ctx context.Context, repo *imageapi.ImageStream, forceAllowCreate bool, options *metav1.UpdateOptions) (*imageapi.ImageStream, error) {
 	return f.updateImageStreamStatus(ctx, repo)
 }
+
 func (f *fakeImageStreamRegistry) DeleteImageStream(ctx context.Context, id string) (*metav1.Status, error) {
 	return f.deleteImageStream(ctx, id)
 }
+
 func (f *fakeImageStreamRegistry) WatchImageStreams(ctx context.Context, options *metainternal.ListOptions) (watch.Interface, error) {
 	return f.watchImageStreams(ctx, options)
 }
