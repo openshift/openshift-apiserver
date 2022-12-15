@@ -92,7 +92,7 @@ func setup(
 		&fakeSubjectAccessReviewRegistry{},
 		&admfake.ImageStreamLimitVerifier{},
 		rw,
-		imagestreametcd.NewEmptyLayerIndex(),
+		imagestreametcd.NewMockImageLayerIndex(),
 	)
 	if err != nil {
 		t.Fatal(err)

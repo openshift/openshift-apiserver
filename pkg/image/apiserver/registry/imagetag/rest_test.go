@@ -89,7 +89,7 @@ func setup(t *testing.T) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
 		&fakeSubjectAccessReviewRegistry{},
 		&admfake.ImageStreamLimitVerifier{},
 		rw,
-		imagestreametcd.NewEmptyLayerIndex(),
+		imagestreametcd.NewMockImageLayerIndex(),
 	)
 	if err != nil {
 		t.Fatal(err)

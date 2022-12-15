@@ -35,30 +35,49 @@ type ImageListWatch interface {
 	Watch(context.Context, metav1.ListOptions) (watch.Interface, error)
 }
 
+type MockImageLayerIndex struct {
+	imageLayers map[string]*ImageLayers
+}
+
+func NewMockImageLayerIndex() *MockImageLayerIndex {
+	return &MockImageLayerIndex{
+		imageLayers: make(map[string]*ImageLayers),
+	}
+}
+
+func (i MockImageLayerIndex) HasSynced() bool {
+	return true
+}
+
+func (i MockImageLayerIndex) GetByKey(key string) (item interface{}, exists bool, err error) {
+	item, exists = i.imageLayers[key]
+	if !exists {
+		// return untyped nil as an item
+		return nil, false, nil
+	}
+	return item, true, nil
+}
+
+func (i MockImageLayerIndex) Run(stopCh <-chan struct{}) {
+}
+
+func (i MockImageLayerIndex) Add(image *imagev1.Image) {
+	i.imageLayers[image.Name] = imageLayersForImage(image)
+}
+
 type imageLayerIndex struct {
 	informer cache.SharedIndexInformer
 }
 
-func NewEmptyLayerIndex() ImageLayerIndex {
-	return imageLayerIndex{}
-}
-
 func (i imageLayerIndex) HasSynced() bool {
-	if i.informer == nil {
-		return true
-	}
 	return i.informer.HasSynced()
 }
+
 func (i imageLayerIndex) GetByKey(key string) (item interface{}, exists bool, err error) {
-	if i.informer == nil {
-		return nil, false, nil
-	}
 	return i.informer.GetStore().GetByKey(key)
 }
+
 func (i imageLayerIndex) Run(stopCh <-chan struct{}) {
-	if i.informer == nil {
-		return
-	}
 	i.informer.Run(stopCh)
 }
 
