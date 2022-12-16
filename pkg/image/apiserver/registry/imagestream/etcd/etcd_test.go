@@ -70,7 +70,7 @@ func newStorage(t *testing.T) (*REST, *StatusREST, *InternalREST, *etcdtesting.E
 		&fakeSubjectAccessReviewRegistry{},
 		&admfake.ImageStreamLimitVerifier{},
 		&fake.RegistryWhitelister{},
-		NewEmptyLayerIndex(),
+		NewMockImageLayerIndex(),
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -150,8 +150,7 @@ func TestGetImageStreamOK(t *testing.T) {
 	}
 }
 
-type fakeUser struct {
-}
+type fakeUser struct{}
 
 var _ user.Info = &fakeUser{}
 

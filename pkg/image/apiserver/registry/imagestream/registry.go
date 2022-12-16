@@ -18,6 +18,8 @@ type Registry interface {
 	ListImageStreams(ctx context.Context, options *metainternal.ListOptions) (*imageapi.ImageStreamList, error)
 	// GetImageStream retrieves a specific image stream.
 	GetImageStream(ctx context.Context, id string, options *metav1.GetOptions) (*imageapi.ImageStream, error)
+	// GetImageStreamLayers retrieves layers of a specific image stream
+	GetImageStreamLayers(ctx context.Context, imageStreamID string, options *metav1.GetOptions) (*imageapi.ImageStreamLayers, error)
 	// CreateImageStream creates a new image stream.
 	CreateImageStream(ctx context.Context, repo *imageapi.ImageStream, options *metav1.CreateOptions) (*imageapi.ImageStream, error)
 	// UpdateImageStream updates an image stream.
@@ -48,12 +50,13 @@ type storage struct {
 	Storage
 	status   rest.Updater
 	internal rest.Updater
+	layers   rest.Getter
 }
 
 // NewRegistry returns a new Registry interface for the given Storage. Any mismatched
 // types will panic.
-func NewRegistry(s Storage, status, internal rest.Updater) Registry {
-	return &storage{Storage: s, status: status, internal: internal}
+func NewRegistry(s Storage, status, internal rest.Updater, layers rest.Getter) Registry {
+	return &storage{Storage: s, status: status, internal: internal, layers: layers}
 }
 
 func (s *storage) ListImageStreams(ctx context.Context, options *metainternal.ListOptions) (*imageapi.ImageStreamList, error) {
@@ -114,4 +117,16 @@ func (s *storage) DeleteImageStream(ctx context.Context, imageStreamID string) (
 
 func (s *storage) WatchImageStreams(ctx context.Context, options *metainternal.ListOptions) (watch.Interface, error) {
 	return s.Watch(ctx, options)
+}
+
+func (s *storage) GetImageStreamLayers(
+	ctx context.Context,
+	imageStreamID string,
+	options *metav1.GetOptions,
+) (*imageapi.ImageStreamLayers, error) {
+	obj, err := s.layers.Get(ctx, imageStreamID, options)
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*imageapi.ImageStreamLayers), nil
 }

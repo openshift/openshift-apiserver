@@ -38,8 +38,7 @@ import (
 
 var testDefaultRegistry = func(_ context.Context) (string, bool) { return "defaultregistry:5000", true }
 
-type fakeSubjectAccessReviewRegistry struct {
-}
+type fakeSubjectAccessReviewRegistry struct{}
 
 func (f *fakeSubjectAccessReviewRegistry) Create(_ context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationapi.SubjectAccessReview, error) {
 	return nil, nil
@@ -49,8 +48,7 @@ func (f *fakeSubjectAccessReviewRegistry) CreateContext(ctx context.Context, sub
 	return nil, nil
 }
 
-type fakeUser struct {
-}
+type fakeUser struct{}
 
 var _ user.Info = &fakeUser{}
 
@@ -85,20 +83,25 @@ func setup(t *testing.T) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
 		t.Fatal(err)
 	}
 	registry := registryhostname.TestingRegistryHostnameRetriever(testDefaultRegistry, "", "")
-	imageStreamStorage, _, imageStreamStatus, internalStorage, err := imagestreametcd.NewRESTWithLimitVerifier(
+	imageStreamStorage, imageStreamLayersStorage, imageStreamStatus, internalStorage, err := imagestreametcd.NewRESTWithLimitVerifier(
 		imagestreamRESTOptions,
 		registry,
 		&fakeSubjectAccessReviewRegistry{},
 		&admfake.ImageStreamLimitVerifier{},
 		rw,
-		imagestreametcd.NewEmptyLayerIndex(),
+		imagestreametcd.NewMockImageLayerIndex(),
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	imageRegistry := image.NewRegistry(imageStorage)
-	imageStreamRegistry := imagestream.NewRegistry(imageStreamStorage, imageStreamStatus, internalStorage)
+	imageStreamRegistry := imagestream.NewRegistry(
+		imageStreamStorage,
+		imageStreamStatus,
+		internalStorage,
+		imageStreamLayersStorage,
+	)
 
 	storage := NewREST(imageRegistry, imageStreamRegistry, rw)
 
@@ -1286,7 +1289,7 @@ func TestUpdateImageTag(t *testing.T) {
 						{
 							DockerImageReference: "initial/image:1",
 							Image:                "sha256:0000000001",
-							//Generation:           2,
+							// Generation:           2,
 						},
 					},
 				},

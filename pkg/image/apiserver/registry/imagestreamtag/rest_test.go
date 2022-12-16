@@ -2,7 +2,6 @@ package imagestreamtag
 
 import (
 	"context"
-
 	"reflect"
 	"testing"
 	"time"
@@ -37,8 +36,7 @@ import (
 
 var testDefaultRegistry = func(_ context.Context) (string, bool) { return "defaultregistry:5000", true }
 
-type fakeSubjectAccessReviewRegistry struct {
-}
+type fakeSubjectAccessReviewRegistry struct{}
 
 func (f *fakeSubjectAccessReviewRegistry) Create(_ context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationapi.SubjectAccessReview, error) {
 	return nil, nil
@@ -48,8 +46,7 @@ func (f *fakeSubjectAccessReviewRegistry) CreateContext(ctx context.Context, sub
 	return nil, nil
 }
 
-type fakeUser struct {
-}
+type fakeUser struct{}
 
 var _ user.Info = &fakeUser{}
 
@@ -69,7 +66,12 @@ func (u *fakeUser) GetExtra() map[string][]string {
 	return map[string][]string{}
 }
 
-func setup(t *testing.T, imagestreamRegistryBuilder func(s imagestream.Storage, status, internal rest.Updater) imagestream.Registry) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
+type imagestreamRegistryBuilderFn func(s imagestream.Storage, status, internal rest.Updater, layers rest.Getter) imagestream.Registry
+
+func setup(
+	t *testing.T,
+	imagestreamRegistryBuilder imagestreamRegistryBuilderFn,
+) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
 	server, etcdStorage := etcdtesting.NewUnsecuredEtcd3TestClientServer(t)
 	etcdStorage.Codec = legacyscheme.Codecs.LegacyCodec(schema.GroupVersion{Group: "image.openshift.io", Version: "v1"})
 	etcdClient := etcd.NewKV(server.V3Client)
@@ -84,13 +86,13 @@ func setup(t *testing.T, imagestreamRegistryBuilder func(s imagestream.Storage, 
 		t.Fatal(err)
 	}
 	registry := registryhostname.TestingRegistryHostnameRetriever(testDefaultRegistry, "", "")
-	imageStreamStorage, _, imageStreamStatus, internalStorage, err := imagestreametcd.NewRESTWithLimitVerifier(
+	imageStreamStorage, imageStreamLayersStorage, imageStreamStatus, internalStorage, err := imagestreametcd.NewRESTWithLimitVerifier(
 		imagestreamRESTOptions,
 		registry,
 		&fakeSubjectAccessReviewRegistry{},
 		&admfake.ImageStreamLimitVerifier{},
 		rw,
-		imagestreametcd.NewEmptyLayerIndex(),
+		imagestreametcd.NewMockImageLayerIndex(),
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -100,9 +102,19 @@ func setup(t *testing.T, imagestreamRegistryBuilder func(s imagestream.Storage, 
 	var imageStreamRegistry imagestream.Registry = nil
 
 	if imagestreamRegistryBuilder == nil {
-		imageStreamRegistry = imagestream.NewRegistry(imageStreamStorage, imageStreamStatus, internalStorage)
+		imageStreamRegistry = imagestream.NewRegistry(
+			imageStreamStorage,
+			imageStreamStatus,
+			internalStorage,
+			imageStreamLayersStorage,
+		)
 	} else {
-		imageStreamRegistry = imagestreamRegistryBuilder(imageStreamStorage, imageStreamStatus, internalStorage)
+		imageStreamRegistry = imagestreamRegistryBuilder(
+			imageStreamStorage,
+			imageStreamStatus,
+			internalStorage,
+			imageStreamLayersStorage,
+		)
 	}
 	storage := NewREST(imageRegistry, imageStreamRegistry, rw)
 
@@ -160,7 +172,8 @@ func TestGetImageStreamTag(t *testing.T) {
 					Tags: map[string]imageapi.TagEventList{
 						"latest": {Items: []imageapi.TagEvent{{DockerImageReference: "test", Image: ""}}},
 					},
-				}},
+				},
+			},
 			expectError:     true,
 			errorTargetKind: "imagestreamtags",
 			errorTargetID:   "test:latest",
@@ -188,7 +201,8 @@ func TestGetImageStreamTag(t *testing.T) {
 					Tags: map[string]imageapi.TagEventList{
 						"other": {Items: []imageapi.TagEvent{{DockerImageReference: "test", Image: "10"}}},
 					},
-				}},
+				},
+			},
 			expectError:     true,
 			errorTargetKind: "imagestreamtags",
 			errorTargetID:   "test:latest",
@@ -670,11 +684,9 @@ func TestUpdateImageStreamTag(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-
 			client, server, storage := setup(t,
 
-				func(s imagestream.Storage, status, internal rest.Updater) imagestream.Registry {
-
+				func(s imagestream.Storage, status, internal rest.Updater, layers rest.Getter) imagestream.Registry {
 					apiTesters := make(map[string]*ApiTester)
 
 					if tc.stagedError != nil {
@@ -691,7 +703,10 @@ func TestUpdateImageStreamTag(t *testing.T) {
 						apiTesters["UpdateImageStream"] = apiTester
 					}
 
-					return NewImageStreamRegistryTester(imagestream.NewRegistry(s, status, internal), apiTesters)
+					return NewImageStreamRegistryTester(
+						imagestream.NewRegistry(s, status, internal, layers),
+						apiTesters,
+					)
 				},
 			)
 
@@ -759,7 +774,6 @@ func TestUpdateImageStreamTag(t *testing.T) {
 					t.Fatalf("%s: result contains unexpected ImageStreamTag name: %s, expected %s", name, resultTag.Tag.Name, istag.Name)
 				}
 			}
-
 		})
 	}
 }
@@ -796,11 +810,9 @@ func TestUpdateImageStreamTagMultipleConflicts(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-
 			client, server, storage := setup(t,
 
-				func(s imagestream.Storage, status, internal rest.Updater) imagestream.Registry {
-
+				func(s imagestream.Storage, status, internal rest.Updater, layers rest.Getter) imagestream.Registry {
 					apiTesters := make(map[string]*ApiTester)
 
 					if tc.stagedError != nil {
@@ -811,7 +823,7 @@ func TestUpdateImageStreamTagMultipleConflicts(t *testing.T) {
 
 						apiResponse.response["error"] = tc.stagedError
 
-						//same apiResponse for the first 3 update calls, 4th should succeed
+						// same apiResponse for the first 3 update calls, 4th should succeed
 						updateResponses[0] = apiResponse
 						updateResponses[1] = apiResponse
 						updateResponses[2] = apiResponse
@@ -821,7 +833,10 @@ func TestUpdateImageStreamTagMultipleConflicts(t *testing.T) {
 						apiTesters["UpdateImageStream"] = apiTester
 					}
 
-					return NewImageStreamRegistryTester(imagestream.NewRegistry(s, status, internal), apiTesters)
+					return NewImageStreamRegistryTester(
+						imagestream.NewRegistry(s, status, internal, layers),
+						apiTesters,
+					)
 				},
 			)
 
@@ -889,7 +904,6 @@ func TestUpdateImageStreamTagMultipleConflicts(t *testing.T) {
 					t.Fatalf("%s: result contains unexpected ImageStreamTag name: %s, expected %s", name, resultTag.Tag.Name, istag.Name)
 				}
 			}
-
 		})
 	}
 }
@@ -992,8 +1006,7 @@ func TestUpdateRetryImageStreamTag(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			client, server, storage := setup(t,
 
-				func(s imagestream.Storage, status, internal rest.Updater) imagestream.Registry {
-
+				func(s imagestream.Storage, status, internal rest.Updater, layers rest.Getter) imagestream.Registry {
 					apiTesters := make(map[string]*ApiTester)
 
 					if tc.stagedError != nil {
@@ -1009,7 +1022,10 @@ func TestUpdateRetryImageStreamTag(t *testing.T) {
 						apiTesters["UpdateImageStream"] = apiTester
 					}
 
-					return NewImageStreamRegistryTester(imagestream.NewRegistry(s, status, internal), apiTesters)
+					return NewImageStreamRegistryTester(
+						imagestream.NewRegistry(s, status, internal, layers),
+						apiTesters,
+					)
 				},
 			)
 
@@ -1081,7 +1097,6 @@ func TestUpdateRetryImageStreamTag(t *testing.T) {
 					t.Fatalf("%s: result contains unexpected ImageStreamTag name: %s, expected %s", name, resultTag.Tag.Name, istag.Name)
 				}
 			}
-
 		})
 	}
 }
@@ -1179,11 +1194,9 @@ func TestUpdateCreateImageStreamTag(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-
 			_, server, storage := setup(t,
 
-				func(s imagestream.Storage, status, internal rest.Updater) imagestream.Registry {
-
+				func(s imagestream.Storage, status, internal rest.Updater, layers rest.Getter) imagestream.Registry {
 					apiTesters := make(map[string]*ApiTester)
 
 					if tc.stagedError != nil {
@@ -1199,7 +1212,10 @@ func TestUpdateCreateImageStreamTag(t *testing.T) {
 						apiTesters["CreateImageStream"] = apiTester
 					}
 
-					return NewImageStreamRegistryTester(imagestream.NewRegistry(s, status, internal), apiTesters)
+					return NewImageStreamRegistryTester(
+						imagestream.NewRegistry(s, status, internal, layers),
+						apiTesters,
+					)
 				},
 			)
 
@@ -1251,7 +1267,6 @@ func TestUpdateCreateImageStreamTag(t *testing.T) {
 					t.Fatalf("%s: result contains unexpected ImageStreamTag name: %s, expected %s", name, resultTag.Tag.Name, istag.Name)
 				}
 			}
-
 		})
 	}
 }
@@ -1355,8 +1370,7 @@ func TestUpdateCreateRetryImageStreamTag(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			_, server, storage := setup(t,
 
-				func(s imagestream.Storage, status, internal rest.Updater) imagestream.Registry {
-
+				func(s imagestream.Storage, status, internal rest.Updater, layers rest.Getter) imagestream.Registry {
 					apiTesters := make(map[string]*ApiTester)
 
 					if tc.stagedError != nil {
@@ -1372,7 +1386,10 @@ func TestUpdateCreateRetryImageStreamTag(t *testing.T) {
 						apiTesters["CreateImageStream"] = apiTester
 					}
 
-					return NewImageStreamRegistryTester(imagestream.NewRegistry(s, status, internal), apiTesters)
+					return NewImageStreamRegistryTester(
+						imagestream.NewRegistry(s, status, internal, layers),
+						apiTesters,
+					)
 				},
 			)
 
@@ -1428,7 +1445,6 @@ func TestUpdateCreateRetryImageStreamTag(t *testing.T) {
 					t.Fatalf("%s: result contains unexpected ImageStreamTag name: %s, expected %s", name, resultTag.Tag.Name, istag.Name)
 				}
 			}
-
 		})
 	}
 }
