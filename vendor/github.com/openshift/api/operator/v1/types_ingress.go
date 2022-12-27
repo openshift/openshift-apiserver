@@ -251,6 +251,97 @@ type IngressControllerSpec struct {
 	//
 	// +optional
 	HTTPCompression HTTPCompressionPolicy `json:"httpCompression,omitempty"`
+
+	// httpSetHeaders defines HTTP headers that should be set(replace)/append.
+	// If this field is empty, no headers are added.
+	//
+	// Note that this option only applies to cleartext HTTP connections
+	// and to secure HTTP connections for which the ingress controller
+	// terminates encryption (that is, edge-terminated or reencrypt
+	// connections).  Headers cannot be set(replace)/append for TLS passthrough
+	// connections.
+	//
+	// +kubebuilder:validation:Optional
+	// +optional
+	HTTPSetHeaders IngressControllerSetHTTPHeaders `json:"httpSetHeaders,omitempty"`
+
+	// httpDeleteHeaders defines HTTP headers that should be deleted.
+	// If this field is empty, no headers are deleted.
+	//
+	// Note that this option only applies to cleartext HTTP connections
+	// and to secure HTTP connections for which the ingress controller
+	// terminates encryption (that is, edge-terminated or reencrypt
+	// connections).  Headers cannot be set(replace)/append for TLS passthrough
+	// connections.
+	//
+	// +kubebuilder:validation:Optional
+	// +optional
+	HTTPDeleteHeaders IngressControllerDeleteHTTPHeaders `json:"httpDeleteHeaders,omitempty"`
+}
+
+// The IngressControllerSetHTTPHeaders type has a Response field,
+// type []IngressControllerSetHTTPHeader, for specifying headers to set(replace) or append:
+type IngressControllerSetHTTPHeaders struct {
+	// response specifies which HTTP response headers to set(replace) or append.
+	// If this field is empty, no response headers are set(replace) or append.
+	// +nullable
+	// +optional
+	Response []IngressControllerSetHTTPHeader `json:"response,omitempty"`
+}
+
+type IngressControllerSetHTTPHeader struct {
+	// name specifies a header name.  Its value must be a valid HTTP header
+	// name as defined in RFC 2616 section 4.2.
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	// +kubebuilder:validation:Pattern="^[-!#$%&'*+.0-9A-Z^_`a-z|~]+$"
+	// +required
+	Name string `json:"name"`
+
+	// Value specifies a header value.
+	// +kubebuilder:validation:Required
+	// +required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=4096
+	Value string `json:"value"`
+
+	// Action specifies a header value.
+	// +kubebuilder:validation:Required
+	// +required
+	Action IngressControllerHTTPHeaderAction `json:"action"`
+}
+
+// IngressControllerHTTPHeaderAction is a policy for setting HTTP headers.
+// +kubebuilder:validation:Enum=Append;Replace
+type IngressControllerHTTPHeaderAction string
+
+const (
+	// AppendHTTPHeader appends the header, preserving any existing header.
+	AppendHTTPHeader IngressControllerHTTPHeaderAction = "Append"
+	// ReplaceHTTPHeader sets the header, removing any existing header.
+	ReplaceHTTPHeader IngressControllerHTTPHeaderAction = "Replace"
+)
+
+// The IngressControllerDeleteHTTPHeaders has a type Response field,
+// of type []IngressControllerDeleteHTTPHeader, for specifying headers to be deleted.
+type IngressControllerDeleteHTTPHeaders struct {
+	// response specifies which HTTP response headers to be deleted.
+	// If this field is empty, no response headers are to be deleted.
+	// +nullable
+	// +optional
+	Response []IngressControllerDeleteHTTPHeader `json:"response,omitempty"`
+}
+
+type IngressControllerDeleteHTTPHeader struct {
+	// name specifies a header name.  Its value must be a valid HTTP header
+	// name as defined in RFC 2616 section 4.2.
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	// +kubebuilder:validation:Pattern="^[-!#$%&'*+.0-9A-Z^_`a-z|~]+$"
+	// +required
+	Name string `json:"name"`
 }
 
 // httpCompressionPolicy turns on compression for the specified MIME types.
@@ -318,6 +409,11 @@ type NodePlacement struct {
 	//   node-role.kubernetes.io/master: ''
 	//
 	// These defaults are subject to change.
+	//
+	// Note that using nodeSelector.matchExpressions is not supported.  Only
+	// nodeSelector.matchLabels may be used.  This is a limitation of the
+	// Kubernetes API: the pod spec does not allow complex expressions for
+	// node selectors.
 	//
 	// +optional
 	NodeSelector *metav1.LabelSelector `json:"nodeSelector,omitempty"`
@@ -1499,7 +1595,7 @@ type IngressControllerTuningOptions struct {
 	// 2000-2000000.
 	//
 	// If this field is empty or 0, the IngressController will use
-	// the default value of 20000, but the default is subject to
+	// the default value of 50000, but the default is subject to
 	// change in future releases.
 	//
 	// If the value is -1 then HAProxy will dynamically compute a
@@ -1507,7 +1603,7 @@ type IngressControllerTuningOptions struct {
 	// container. Selecting -1 (i.e., auto) will result in a large
 	// value being computed (~520000 on OpenShift >=4.10 clusters)
 	// and therefore each HAProxy process will incur significant
-	// memory usage compared to the current default of 20000.
+	// memory usage compared to the current default of 50000.
 	//
 	// Setting a value that is greater than the current operating
 	// system limit will prevent the HAProxy process from
