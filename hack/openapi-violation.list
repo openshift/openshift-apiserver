@@ -160,6 +160,7 @@ API rule violation: list_type_missing,github.com/openshift/api/image/v1,Image,Do
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,Image,DockerImageSignatures
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,Image,Signatures
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,ImageBlobReferences,Layers
+API rule violation: list_type_missing,github.com/openshift/api/image/v1,ImageBlobReferences,Manifests
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,ImageImportStatus,Manifests
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,ImageSignature,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,ImageSignature,Content
@@ -326,6 +327,7 @@ API rule violation: list_type_missing,github.com/openshift/api/operator/v1,Ingre
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,IngressControllerCaptureHTTPHeaders,Response
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,IngressControllerHTTPHeaders,HeaderNameCaseAdjustments
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,IngressControllerStatus,Conditions
+API rule violation: list_type_missing,github.com/openshift/api/operator/v1,KubeAPIServerStatus,ServiceAccountIssuers
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,LoadBalancerStrategy,AllowedSourceRanges
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,NetFlowConfig,Collectors
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,NetworkSpec,AdditionalNetworks

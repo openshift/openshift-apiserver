@@ -547,6 +547,11 @@ type ImageBlobReferences struct {
 	// not have separate manifest blobs and this field will be set to nil if so.
 	// +optional
 	Config *string
+	// manifests is the list of other image names that this image points
+	// to. For a single architecture image, it is empty. For a multi-arch
+	// image, it consists of the digests of single architecture images.
+	// +optional
+	Manifests []string
 }
 
 // ImageLayerData contains metadata about an image layer.
