@@ -767,11 +767,29 @@ func (IngressControllerCaptureHTTPHeaders) SwaggerDoc() map[string]string {
 	return map_IngressControllerCaptureHTTPHeaders
 }
 
+var map_IngressControllerDeleteHTTPHeader = map[string]string{
+	"name": "name specifies a header name.  Its value must be a valid HTTP header name as defined in RFC 2616 section 4.2.",
+}
+
+func (IngressControllerDeleteHTTPHeader) SwaggerDoc() map[string]string {
+	return map_IngressControllerDeleteHTTPHeader
+}
+
+var map_IngressControllerDeleteHTTPHeaders = map[string]string{
+	"":         "The IngressControllerDeleteHTTPHeaders has a type Response field, of type []IngressControllerDeleteHTTPHeader, for specifying headers to be deleted.",
+	"response": "response specifies which HTTP response headers to be deleted. If this field is empty, no response headers are to be deleted.",
+}
+
+func (IngressControllerDeleteHTTPHeaders) SwaggerDoc() map[string]string {
+	return map_IngressControllerDeleteHTTPHeaders
+}
+
 var map_IngressControllerHTTPHeaders = map[string]string{
 	"":                          "IngressControllerHTTPHeaders specifies how the IngressController handles certain HTTP headers.",
 	"forwardedHeaderPolicy":     "forwardedHeaderPolicy specifies when and how the IngressController sets the Forwarded, X-Forwarded-For, X-Forwarded-Host, X-Forwarded-Port, X-Forwarded-Proto, and X-Forwarded-Proto-Version HTTP headers.  The value may be one of the following:\n\n* \"Append\", which specifies that the IngressController appends the\n  headers, preserving existing headers.\n\n* \"Replace\", which specifies that the IngressController sets the\n  headers, replacing any existing Forwarded or X-Forwarded-* headers.\n\n* \"IfNone\", which specifies that the IngressController sets the\n  headers if they are not already set.\n\n* \"Never\", which specifies that the IngressController never sets the\n  headers, preserving any existing headers.\n\nBy default, the policy is \"Append\".",
 	"uniqueId":                  "uniqueId describes configuration for a custom HTTP header that the ingress controller should inject into incoming HTTP requests. Typically, this header is configured to have a value that is unique to the HTTP request.  The header can be used by applications or included in access logs to facilitate tracing individual HTTP requests.\n\nIf this field is empty, no such header is injected into requests.",
 	"headerNameCaseAdjustments": "headerNameCaseAdjustments specifies case adjustments that can be applied to HTTP header names.  Each adjustment is specified as an HTTP header name with the desired capitalization.  For example, specifying \"X-Forwarded-For\" indicates that the \"x-forwarded-for\" HTTP header should be adjusted to have the specified capitalization.\n\nThese adjustments are only applied to cleartext, edge-terminated, and re-encrypt routes, and only when using HTTP/1.\n\nFor request headers, these adjustments are applied only for routes that have the haproxy.router.openshift.io/h1-adjust-case=true annotation.  For response headers, these adjustments are applied to all HTTP responses.\n\nIf this field is empty, no request headers are adjusted.",
+	"headersManipulation":       "headersManipulation specifies options for set/replace/append/delete headers.",
 }
 
 func (IngressControllerHTTPHeaders) SwaggerDoc() map[string]string {
@@ -786,6 +804,17 @@ var map_IngressControllerHTTPUniqueIdHeaderPolicy = map[string]string{
 
 func (IngressControllerHTTPUniqueIdHeaderPolicy) SwaggerDoc() map[string]string {
 	return map_IngressControllerHTTPUniqueIdHeaderPolicy
+}
+
+var map_IngressControllerHeadersManipulation = map[string]string{
+	"":       "IngressControllerHeadersManipulation specifies options for set/replace/append/delete headers.",
+	"action": "action lets you specify headers for Set or Delete.",
+	"set":    "Set defines HTTP headers that should be set or replaced or appended. If this field is empty, no headers are added.\n\nNote that this option only applies to cleartext HTTP connections and to secure HTTP connections for which the ingress controller terminates encryption (that is, edge-terminated or reencrypt connections).  Headers cannot be set(replace)/append for TLS passthrough connections.",
+	"delete": "delete defines HTTP headers that should be deleted. If this field is empty, no headers are deleted.\n\nNote that this option only applies to cleartext HTTP connections and to secure HTTP connections for which the ingress controller terminates encryption (that is, edge-terminated or reencrypt connections).  Headers cannot be set(replace)/append for TLS passthrough connections.",
+}
+
+func (IngressControllerHeadersManipulation) SwaggerDoc() map[string]string {
+	return map_IngressControllerHeadersManipulation
 }
 
 var map_IngressControllerList = map[string]string{
@@ -803,6 +832,25 @@ var map_IngressControllerLogging = map[string]string{
 
 func (IngressControllerLogging) SwaggerDoc() map[string]string {
 	return map_IngressControllerLogging
+}
+
+var map_IngressControllerSetHTTPHeader = map[string]string{
+	"name":   "name specifies a header name.  Its value must be a valid HTTP header name as defined in RFC 2616 section 4.2.",
+	"value":  "Value specifies a header value.",
+	"action": "Action specifies a header value.",
+}
+
+func (IngressControllerSetHTTPHeader) SwaggerDoc() map[string]string {
+	return map_IngressControllerSetHTTPHeader
+}
+
+var map_IngressControllerSetHTTPHeaders = map[string]string{
+	"":         "The IngressControllerSetHTTPHeaders type has a Response field, type []IngressControllerSetHTTPHeader, for specifying headers to set(replace) or append:",
+	"response": "response specifies which HTTP response headers to set(replace) or append. If this field is empty, no response headers are set(replace) or append.",
+}
+
+func (IngressControllerSetHTTPHeaders) SwaggerDoc() map[string]string {
+	return map_IngressControllerSetHTTPHeaders
 }
 
 var map_IngressControllerSpec = map[string]string{

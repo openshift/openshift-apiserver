@@ -342,7 +342,7 @@ github.com/opencontainers/runc/libcontainer/user
 # github.com/opencontainers/runtime-spec v1.0.3-0.20210326190908-1c3f411f0417
 ## explicit
 github.com/opencontainers/runtime-spec/specs-go
-# github.com/openshift/api v0.0.0-20230103161115-89c69eff5d56
+# github.com/openshift/api v0.0.0-20230103161115-89c69eff5d56 => github.com/miheer/api v0.0.0-20230106031129-cc880386714d
 ## explicit; go 1.18
 github.com/openshift/api
 github.com/openshift/api/annotations
@@ -2151,3 +2151,4 @@ sigs.k8s.io/yaml
 # k8s.io/mount-utils => k8s.io/mount-utils v0.25.2
 # k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.25.2
 # k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.25.2
+# github.com/openshift/api => github.com/miheer/api v0.0.0-20230106031129-cc880386714d

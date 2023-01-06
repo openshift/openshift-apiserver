@@ -206,3 +206,5 @@ replace (
 	k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.25.2
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.25.2
 )
+
+replace github.com/openshift/api => github.com/miheer/api v0.0.0-20230106031129-cc880386714d

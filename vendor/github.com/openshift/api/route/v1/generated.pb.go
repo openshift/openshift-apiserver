@@ -58,10 +58,122 @@ func (m *Route) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Route proto.InternalMessageInfo
 
+func (m *RouteDeleteHTTPHeader) Reset()      { *m = RouteDeleteHTTPHeader{} }
+func (*RouteDeleteHTTPHeader) ProtoMessage() {}
+func (*RouteDeleteHTTPHeader) Descriptor() ([]byte, []int) {
+	return fileDescriptor_373b8fa7ff738721, []int{1}
+}
+func (m *RouteDeleteHTTPHeader) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RouteDeleteHTTPHeader) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *RouteDeleteHTTPHeader) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RouteDeleteHTTPHeader.Merge(m, src)
+}
+func (m *RouteDeleteHTTPHeader) XXX_Size() int {
+	return m.Size()
+}
+func (m *RouteDeleteHTTPHeader) XXX_DiscardUnknown() {
+	xxx_messageInfo_RouteDeleteHTTPHeader.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RouteDeleteHTTPHeader proto.InternalMessageInfo
+
+func (m *RouteDeleteHTTPHeaders) Reset()      { *m = RouteDeleteHTTPHeaders{} }
+func (*RouteDeleteHTTPHeaders) ProtoMessage() {}
+func (*RouteDeleteHTTPHeaders) Descriptor() ([]byte, []int) {
+	return fileDescriptor_373b8fa7ff738721, []int{2}
+}
+func (m *RouteDeleteHTTPHeaders) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RouteDeleteHTTPHeaders) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *RouteDeleteHTTPHeaders) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RouteDeleteHTTPHeaders.Merge(m, src)
+}
+func (m *RouteDeleteHTTPHeaders) XXX_Size() int {
+	return m.Size()
+}
+func (m *RouteDeleteHTTPHeaders) XXX_DiscardUnknown() {
+	xxx_messageInfo_RouteDeleteHTTPHeaders.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RouteDeleteHTTPHeaders proto.InternalMessageInfo
+
+func (m *RouteHTTPHeaders) Reset()      { *m = RouteHTTPHeaders{} }
+func (*RouteHTTPHeaders) ProtoMessage() {}
+func (*RouteHTTPHeaders) Descriptor() ([]byte, []int) {
+	return fileDescriptor_373b8fa7ff738721, []int{3}
+}
+func (m *RouteHTTPHeaders) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RouteHTTPHeaders) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *RouteHTTPHeaders) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RouteHTTPHeaders.Merge(m, src)
+}
+func (m *RouteHTTPHeaders) XXX_Size() int {
+	return m.Size()
+}
+func (m *RouteHTTPHeaders) XXX_DiscardUnknown() {
+	xxx_messageInfo_RouteHTTPHeaders.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RouteHTTPHeaders proto.InternalMessageInfo
+
+func (m *RouteHeadersManipulation) Reset()      { *m = RouteHeadersManipulation{} }
+func (*RouteHeadersManipulation) ProtoMessage() {}
+func (*RouteHeadersManipulation) Descriptor() ([]byte, []int) {
+	return fileDescriptor_373b8fa7ff738721, []int{4}
+}
+func (m *RouteHeadersManipulation) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RouteHeadersManipulation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *RouteHeadersManipulation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RouteHeadersManipulation.Merge(m, src)
+}
+func (m *RouteHeadersManipulation) XXX_Size() int {
+	return m.Size()
+}
+func (m *RouteHeadersManipulation) XXX_DiscardUnknown() {
+	xxx_messageInfo_RouteHeadersManipulation.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RouteHeadersManipulation proto.InternalMessageInfo
+
 func (m *RouteIngress) Reset()      { *m = RouteIngress{} }
 func (*RouteIngress) ProtoMessage() {}
 func (*RouteIngress) Descriptor() ([]byte, []int) {
-	return fileDescriptor_373b8fa7ff738721, []int{1}
+	return fileDescriptor_373b8fa7ff738721, []int{5}
 }
 func (m *RouteIngress) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -89,7 +201,7 @@ var xxx_messageInfo_RouteIngress proto.InternalMessageInfo
 func (m *RouteIngressCondition) Reset()      { *m = RouteIngressCondition{} }
 func (*RouteIngressCondition) ProtoMessage() {}
 func (*RouteIngressCondition) Descriptor() ([]byte, []int) {
-	return fileDescriptor_373b8fa7ff738721, []int{2}
+	return fileDescriptor_373b8fa7ff738721, []int{6}
 }
 func (m *RouteIngressCondition) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -117,7 +229,7 @@ var xxx_messageInfo_RouteIngressCondition proto.InternalMessageInfo
 func (m *RouteList) Reset()      { *m = RouteList{} }
 func (*RouteList) ProtoMessage() {}
 func (*RouteList) Descriptor() ([]byte, []int) {
-	return fileDescriptor_373b8fa7ff738721, []int{3}
+	return fileDescriptor_373b8fa7ff738721, []int{7}
 }
 func (m *RouteList) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -145,7 +257,7 @@ var xxx_messageInfo_RouteList proto.InternalMessageInfo
 func (m *RoutePort) Reset()      { *m = RoutePort{} }
 func (*RoutePort) ProtoMessage() {}
 func (*RoutePort) Descriptor() ([]byte, []int) {
-	return fileDescriptor_373b8fa7ff738721, []int{4}
+	return fileDescriptor_373b8fa7ff738721, []int{8}
 }
 func (m *RoutePort) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -170,10 +282,66 @@ func (m *RoutePort) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RoutePort proto.InternalMessageInfo
 
+func (m *RouteSetHTTPHeader) Reset()      { *m = RouteSetHTTPHeader{} }
+func (*RouteSetHTTPHeader) ProtoMessage() {}
+func (*RouteSetHTTPHeader) Descriptor() ([]byte, []int) {
+	return fileDescriptor_373b8fa7ff738721, []int{9}
+}
+func (m *RouteSetHTTPHeader) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RouteSetHTTPHeader) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *RouteSetHTTPHeader) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RouteSetHTTPHeader.Merge(m, src)
+}
+func (m *RouteSetHTTPHeader) XXX_Size() int {
+	return m.Size()
+}
+func (m *RouteSetHTTPHeader) XXX_DiscardUnknown() {
+	xxx_messageInfo_RouteSetHTTPHeader.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RouteSetHTTPHeader proto.InternalMessageInfo
+
+func (m *RouteSetHTTPHeaders) Reset()      { *m = RouteSetHTTPHeaders{} }
+func (*RouteSetHTTPHeaders) ProtoMessage() {}
+func (*RouteSetHTTPHeaders) Descriptor() ([]byte, []int) {
+	return fileDescriptor_373b8fa7ff738721, []int{10}
+}
+func (m *RouteSetHTTPHeaders) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RouteSetHTTPHeaders) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *RouteSetHTTPHeaders) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RouteSetHTTPHeaders.Merge(m, src)
+}
+func (m *RouteSetHTTPHeaders) XXX_Size() int {
+	return m.Size()
+}
+func (m *RouteSetHTTPHeaders) XXX_DiscardUnknown() {
+	xxx_messageInfo_RouteSetHTTPHeaders.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RouteSetHTTPHeaders proto.InternalMessageInfo
+
 func (m *RouteSpec) Reset()      { *m = RouteSpec{} }
 func (*RouteSpec) ProtoMessage() {}
 func (*RouteSpec) Descriptor() ([]byte, []int) {
-	return fileDescriptor_373b8fa7ff738721, []int{5}
+	return fileDescriptor_373b8fa7ff738721, []int{11}
 }
 func (m *RouteSpec) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -201,7 +369,7 @@ var xxx_messageInfo_RouteSpec proto.InternalMessageInfo
 func (m *RouteStatus) Reset()      { *m = RouteStatus{} }
 func (*RouteStatus) ProtoMessage() {}
 func (*RouteStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_373b8fa7ff738721, []int{6}
+	return fileDescriptor_373b8fa7ff738721, []int{12}
 }
 func (m *RouteStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -229,7 +397,7 @@ var xxx_messageInfo_RouteStatus proto.InternalMessageInfo
 func (m *RouteTargetReference) Reset()      { *m = RouteTargetReference{} }
 func (*RouteTargetReference) ProtoMessage() {}
 func (*RouteTargetReference) Descriptor() ([]byte, []int) {
-	return fileDescriptor_373b8fa7ff738721, []int{7}
+	return fileDescriptor_373b8fa7ff738721, []int{13}
 }
 func (m *RouteTargetReference) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -257,7 +425,7 @@ var xxx_messageInfo_RouteTargetReference proto.InternalMessageInfo
 func (m *RouterShard) Reset()      { *m = RouterShard{} }
 func (*RouterShard) ProtoMessage() {}
 func (*RouterShard) Descriptor() ([]byte, []int) {
-	return fileDescriptor_373b8fa7ff738721, []int{8}
+	return fileDescriptor_373b8fa7ff738721, []int{14}
 }
 func (m *RouterShard) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -285,7 +453,7 @@ var xxx_messageInfo_RouterShard proto.InternalMessageInfo
 func (m *TLSConfig) Reset()      { *m = TLSConfig{} }
 func (*TLSConfig) ProtoMessage() {}
 func (*TLSConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_373b8fa7ff738721, []int{9}
+	return fileDescriptor_373b8fa7ff738721, []int{15}
 }
 func (m *TLSConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -312,10 +480,16 @@ var xxx_messageInfo_TLSConfig proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*Route)(nil), "github.com.openshift.api.route.v1.Route")
+	proto.RegisterType((*RouteDeleteHTTPHeader)(nil), "github.com.openshift.api.route.v1.RouteDeleteHTTPHeader")
+	proto.RegisterType((*RouteDeleteHTTPHeaders)(nil), "github.com.openshift.api.route.v1.RouteDeleteHTTPHeaders")
+	proto.RegisterType((*RouteHTTPHeaders)(nil), "github.com.openshift.api.route.v1.RouteHTTPHeaders")
+	proto.RegisterType((*RouteHeadersManipulation)(nil), "github.com.openshift.api.route.v1.RouteHeadersManipulation")
 	proto.RegisterType((*RouteIngress)(nil), "github.com.openshift.api.route.v1.RouteIngress")
 	proto.RegisterType((*RouteIngressCondition)(nil), "github.com.openshift.api.route.v1.RouteIngressCondition")
 	proto.RegisterType((*RouteList)(nil), "github.com.openshift.api.route.v1.RouteList")
 	proto.RegisterType((*RoutePort)(nil), "github.com.openshift.api.route.v1.RoutePort")
+	proto.RegisterType((*RouteSetHTTPHeader)(nil), "github.com.openshift.api.route.v1.RouteSetHTTPHeader")
+	proto.RegisterType((*RouteSetHTTPHeaders)(nil), "github.com.openshift.api.route.v1.RouteSetHTTPHeaders")
 	proto.RegisterType((*RouteSpec)(nil), "github.com.openshift.api.route.v1.RouteSpec")
 	proto.RegisterType((*RouteStatus)(nil), "github.com.openshift.api.route.v1.RouteStatus")
 	proto.RegisterType((*RouteTargetReference)(nil), "github.com.openshift.api.route.v1.RouteTargetReference")
@@ -328,80 +502,97 @@ func init() {
 }
 
 var fileDescriptor_373b8fa7ff738721 = []byte{
-	// 1168 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x57, 0xcf, 0x6f, 0x1b, 0xc5,
-	0x17, 0xcf, 0xfa, 0x57, 0xe2, 0x71, 0xdb, 0xef, 0xb7, 0x03, 0xa5, 0x6e, 0xa4, 0xd8, 0xc9, 0x1e,
-	0x50, 0x8a, 0xca, 0x2e, 0x09, 0x05, 0x2a, 0x21, 0x0e, 0x75, 0x8a, 0x4a, 0x1a, 0x27, 0x8d, 0xc6,
-	0x16, 0x15, 0x55, 0x0f, 0x4c, 0x76, 0xc7, 0xeb, 0xc1, 0xf6, 0xec, 0x32, 0x33, 0x4e, 0xf1, 0x05,
-	0x55, 0xe2, 0x1f, 0x28, 0xff, 0x0d, 0x77, 0x2e, 0x39, 0xf6, 0xd8, 0x03, 0xb2, 0x88, 0x39, 0xf2,
-	0x1f, 0xe4, 0x84, 0x66, 0x76, 0xec, 0x5d, 0x3b, 0x4e, 0xe2, 0xc2, 0xcd, 0xfb, 0xde, 0xe7, 0xf3,
-	0x79, 0x6f, 0xde, 0x7b, 0xf3, 0x46, 0x06, 0x5b, 0x01, 0x95, 0xed, 0xfe, 0x91, 0xe3, 0x85, 0x3d,
-	0x37, 0x8c, 0x08, 0x13, 0x6d, 0xda, 0x92, 0x2e, 0x8e, 0xa8, 0xcb, 0xc3, 0xbe, 0x24, 0xee, 0xf1,
-	0x96, 0x1b, 0x10, 0x46, 0x38, 0x96, 0xc4, 0x77, 0x22, 0x1e, 0xca, 0x10, 0x6e, 0x24, 0x14, 0x67,
-	0x42, 0x71, 0x70, 0x44, 0x1d, 0x4d, 0x71, 0x8e, 0xb7, 0x56, 0x3f, 0x4e, 0xa9, 0x06, 0x61, 0x10,
-	0xba, 0x9a, 0x79, 0xd4, 0x6f, 0xe9, 0x2f, 0xfd, 0xa1, 0x7f, 0xc5, 0x8a, 0xab, 0x76, 0xe7, 0x81,
-	0x70, 0x68, 0xa8, 0xc3, 0x7a, 0x21, 0x9f, 0x17, 0x75, 0xf5, 0x7e, 0x82, 0xe9, 0x61, 0xaf, 0x4d,
-	0x19, 0xe1, 0x03, 0x37, 0xea, 0x04, 0xca, 0x20, 0xdc, 0x1e, 0x91, 0x78, 0x1e, 0xeb, 0xf3, 0x8b,
-	0x58, 0xbc, 0xcf, 0x24, 0xed, 0x11, 0x57, 0x78, 0x6d, 0xd2, 0xc3, 0xe7, 0x78, 0x9f, 0x5e, 0xc4,
-	0xeb, 0x4b, 0xda, 0x75, 0x29, 0x93, 0x42, 0xf2, 0x59, 0x92, 0xfd, 0x6b, 0x06, 0xe4, 0x91, 0x2a,
-	0x01, 0xfc, 0x1e, 0xac, 0xa8, 0x8c, 0x7c, 0x2c, 0x71, 0xd9, 0x5a, 0xb7, 0x36, 0x4b, 0xdb, 0x9f,
-	0x38, 0xb1, 0xa2, 0x93, 0x56, 0x74, 0xa2, 0x4e, 0xa0, 0x0c, 0xc2, 0x51, 0x68, 0xe7, 0x78, 0xcb,
-	0x79, 0x7a, 0xf4, 0x03, 0xf1, 0xe4, 0x3e, 0x91, 0xb8, 0x06, 0x4f, 0x86, 0xd5, 0xa5, 0xd1, 0xb0,
-	0x0a, 0x12, 0x1b, 0x9a, 0xa8, 0xc2, 0x03, 0x90, 0x13, 0x11, 0xf1, 0xca, 0x19, 0xad, 0x7e, 0xcf,
-	0xb9, 0xb2, 0x27, 0x8e, 0xce, 0xac, 0x11, 0x11, 0xaf, 0x76, 0xcd, 0x28, 0xe7, 0xd4, 0x17, 0xd2,
-	0x3a, 0xf0, 0x5b, 0x50, 0x10, 0x12, 0xcb, 0xbe, 0x28, 0x67, 0xb5, 0xa2, 0xb3, 0xb0, 0xa2, 0x66,
-	0xd5, 0x6e, 0x18, 0xcd, 0x42, 0xfc, 0x8d, 0x8c, 0x9a, 0xfd, 0x4b, 0x16, 0x5c, 0xd3, 0xb8, 0x5d,
-	0x16, 0x70, 0x22, 0x04, 0x5c, 0x07, 0xb9, 0x76, 0x28, 0xa4, 0x2e, 0x4b, 0x31, 0x49, 0xe5, 0x9b,
-	0x50, 0x48, 0xa4, 0x3d, 0x70, 0x1b, 0x00, 0x1d, 0x82, 0x1f, 0xe0, 0x1e, 0xd1, 0x07, 0x2c, 0x26,
-	0xc5, 0x40, 0x13, 0x0f, 0x4a, 0xa1, 0x60, 0x17, 0x00, 0x2f, 0x64, 0x3e, 0x95, 0x34, 0x64, 0xea,
-	0x08, 0xd9, 0xcd, 0xd2, 0xf6, 0x83, 0x45, 0x8f, 0x60, 0x52, 0xdb, 0x19, 0x0b, 0x24, 0xd1, 0x26,
-	0x26, 0x81, 0x52, 0xfa, 0xb0, 0x09, 0x6e, 0xbc, 0xa4, 0x5d, 0xdf, 0xc3, 0xdc, 0x3f, 0x0c, 0xbb,
-	0xd4, 0x1b, 0x94, 0x73, 0x3a, 0xcb, 0x7b, 0x86, 0x77, 0xe3, 0xd9, 0x94, 0xf7, 0x6c, 0x58, 0x85,
-	0xd3, 0x96, 0xe6, 0x20, 0x22, 0x68, 0x46, 0x03, 0x7e, 0x07, 0x6e, 0xc7, 0x27, 0xda, 0xc1, 0x2c,
-	0x64, 0xd4, 0xc3, 0x5d, 0x55, 0x14, 0xa6, 0x8a, 0x90, 0xd7, 0xf2, 0x55, 0x23, 0x7f, 0x1b, 0xcd,
-	0x87, 0xa1, 0x8b, 0xf8, 0xf6, 0xdf, 0x19, 0x70, 0x6b, 0xee, 0x51, 0xe1, 0x57, 0x20, 0x27, 0x07,
-	0x11, 0x31, 0xed, 0xb8, 0x3b, 0x6e, 0x87, 0x4a, 0xf0, 0x6c, 0x58, 0xbd, 0x33, 0x97, 0xa4, 0xb3,
-	0xd7, 0x34, 0x58, 0x9f, 0x8c, 0x4d, 0xdc, 0xa7, 0xfb, 0xd3, 0x63, 0x70, 0x36, 0xac, 0xce, 0xb9,
-	0xdb, 0xce, 0x44, 0x69, 0x7a, 0x58, 0xe0, 0x87, 0xa0, 0xc0, 0x09, 0x16, 0x21, 0xd3, 0x43, 0x58,
-	0x4c, 0x86, 0x0a, 0x69, 0x2b, 0x32, 0x5e, 0x78, 0x17, 0x2c, 0xf7, 0x88, 0x10, 0x38, 0x20, 0xa6,
-	0xf0, 0xff, 0x33, 0xc0, 0xe5, 0xfd, 0xd8, 0x8c, 0xc6, 0x7e, 0xc8, 0x01, 0xec, 0x62, 0x21, 0x9b,
-	0x1c, 0x33, 0x11, 0x27, 0x4f, 0x4d, 0x3d, 0x4b, 0xdb, 0x1f, 0x2d, 0x76, 0x27, 0x15, 0xa3, 0xf6,
-	0xc1, 0x68, 0x58, 0x85, 0xf5, 0x73, 0x4a, 0x68, 0x8e, 0xba, 0xfd, 0x9b, 0x05, 0x8a, 0xba, 0x70,
-	0x75, 0x2a, 0x24, 0x7c, 0x71, 0x6e, 0x17, 0x38, 0x8b, 0xc5, 0x55, 0x6c, 0xbd, 0x09, 0xfe, 0x6f,
-	0x4e, 0xb7, 0x32, 0xb6, 0xa4, 0xf6, 0xc0, 0x3e, 0xc8, 0x53, 0x49, 0x7a, 0xaa, 0xfe, 0x6a, 0xe6,
-	0x37, 0x17, 0x9d, 0xf9, 0xda, 0x75, 0x23, 0x9a, 0xdf, 0x55, 0x74, 0x14, 0xab, 0xd8, 0x3f, 0x9a,
-	0xcc, 0x0f, 0x43, 0x2e, 0xa1, 0x0f, 0x80, 0xc4, 0x3c, 0x20, 0x52, 0x7d, 0x5d, 0xb9, 0xc7, 0xd4,
-	0x66, 0x74, 0xe2, 0xcd, 0xe8, 0xec, 0x32, 0xf9, 0x94, 0x37, 0x24, 0xa7, 0x2c, 0x48, 0x2e, 0x53,
-	0x73, 0xa2, 0x85, 0x52, 0xba, 0xf6, 0xef, 0x39, 0x13, 0x53, 0x6d, 0xa3, 0x05, 0xd6, 0x83, 0x0b,
-	0x8a, 0xa2, 0x7f, 0xe4, 0x87, 0x3d, 0x4c, 0x59, 0x79, 0x45, 0xc3, 0x6e, 0x1a, 0x58, 0xb1, 0x31,
-	0x76, 0xa0, 0x04, 0xa3, 0x24, 0x23, 0x2c, 0xdb, 0x66, 0x42, 0x27, 0x92, 0x87, 0x58, 0xb6, 0x91,
-	0xf6, 0xc0, 0x06, 0xc8, 0xc8, 0xd0, 0x2c, 0xbe, 0x2f, 0x16, 0xad, 0x60, 0x7c, 0x1c, 0x44, 0x5a,
-	0x84, 0x13, 0xe6, 0x91, 0x1a, 0x30, 0xc2, 0x99, 0x66, 0x88, 0x32, 0x32, 0x84, 0xaf, 0x2c, 0x70,
-	0x13, 0x77, 0x25, 0xe1, 0x0c, 0x4b, 0x52, 0xc3, 0x5e, 0x87, 0x30, 0x5f, 0x94, 0x73, 0xba, 0x4d,
-	0xff, 0x3a, 0xc8, 0x1d, 0x13, 0xe4, 0xe6, 0xc3, 0x59, 0x65, 0x74, 0x3e, 0x18, 0x7c, 0x02, 0x72,
-	0x91, 0x6a, 0x5d, 0xfe, 0xdd, 0x1e, 0x09, 0xd5, 0x96, 0xda, 0x8a, 0xae, 0x91, 0x6a, 0x96, 0xd6,
-	0x80, 0x8f, 0x41, 0x56, 0x76, 0x45, 0xb9, 0xb0, 0xb0, 0x54, 0xb3, 0xde, 0xd8, 0x09, 0x59, 0x8b,
-	0x06, 0xb5, 0xe5, 0xd1, 0xb0, 0x9a, 0x6d, 0xd6, 0x1b, 0x48, 0x29, 0xcc, 0x59, 0x9e, 0xcb, 0xff,
-	0x7d, 0x79, 0xda, 0x14, 0x94, 0x52, 0xcf, 0x11, 0x7c, 0x0e, 0x96, 0x69, 0xbc, 0xb5, 0xca, 0x96,
-	0xae, 0xb8, 0xfb, 0x8e, 0x8f, 0x41, 0xb2, 0x52, 0x8c, 0x01, 0x8d, 0x05, 0xed, 0x9f, 0xc1, 0xfb,
-	0xf3, 0x7a, 0xa3, 0xe6, 0xac, 0x43, 0x99, 0x3f, 0x3b, 0xba, 0x7b, 0x94, 0xf9, 0x48, 0x7b, 0x14,
-	0x82, 0x25, 0x6f, 0xda, 0x04, 0xa1, 0x5f, 0x33, 0xed, 0x81, 0x36, 0x28, 0xbc, 0x24, 0x34, 0x68,
-	0x4b, 0x3d, 0x8d, 0xf9, 0x1a, 0x50, 0xdb, 0xef, 0x99, 0xb6, 0x20, 0xe3, 0xb1, 0x43, 0x73, 0x54,
-	0xde, 0x68, 0x63, 0xee, 0xeb, 0xfb, 0xa0, 0x7e, 0xe8, 0xd7, 0xd2, 0x9a, 0xb9, 0x0f, 0x63, 0x07,
-	0x4a, 0x30, 0x8a, 0xe0, 0x33, 0xd1, 0xe8, 0xb7, 0x5a, 0xf4, 0x27, 0x93, 0xca, 0x84, 0xf0, 0xe8,
-	0xa0, 0x11, 0x3b, 0x50, 0x82, 0xb1, 0xff, 0xc8, 0x82, 0xe2, 0xa4, 0x9b, 0x70, 0x0f, 0x94, 0x24,
-	0xe1, 0x3d, 0xca, 0xb0, 0x5a, 0x78, 0x33, 0x0f, 0x47, 0xa9, 0x99, 0xb8, 0x54, 0xe7, 0x9a, 0xf5,
-	0x46, 0xca, 0xa2, 0x3b, 0x97, 0x66, 0xc3, 0xcf, 0x40, 0xc9, 0x23, 0x5c, 0xd2, 0x16, 0xf5, 0xb0,
-	0x1c, 0x17, 0xe6, 0xbd, 0xb1, 0xd8, 0x4e, 0xe2, 0x42, 0x69, 0x1c, 0x5c, 0x03, 0xd9, 0x0e, 0x19,
-	0x98, 0x57, 0xa2, 0x64, 0xe0, 0xd9, 0x3d, 0x32, 0x40, 0xca, 0x0e, 0xbf, 0x04, 0xd7, 0x3d, 0x9c,
-	0x22, 0x9b, 0x57, 0xe2, 0x96, 0x01, 0x5e, 0xdf, 0x79, 0x98, 0x56, 0x9e, 0xc6, 0xc2, 0x17, 0xa0,
-	0xec, 0x13, 0x21, 0x4d, 0x86, 0x53, 0x50, 0xf3, 0x0e, 0xaf, 0x1b, 0x9d, 0xf2, 0xa3, 0x0b, 0x70,
-	0xe8, 0x42, 0x05, 0xf8, 0xda, 0x02, 0x6b, 0x94, 0x09, 0xe2, 0xf5, 0x39, 0xf9, 0xda, 0x0f, 0x48,
-	0xaa, 0x3a, 0xe6, 0x36, 0x14, 0x74, 0x8c, 0x27, 0x26, 0xc6, 0xda, 0xee, 0x65, 0xe0, 0xb3, 0x61,
-	0x75, 0xe3, 0x52, 0x80, 0xae, 0xf8, 0xe5, 0x01, 0x6b, 0x8f, 0x4f, 0x4e, 0x2b, 0x4b, 0x6f, 0x4e,
-	0x2b, 0x4b, 0x6f, 0x4f, 0x2b, 0x4b, 0xaf, 0x46, 0x15, 0xeb, 0x64, 0x54, 0xb1, 0xde, 0x8c, 0x2a,
-	0xd6, 0xdb, 0x51, 0xc5, 0xfa, 0x73, 0x54, 0xb1, 0x5e, 0xff, 0x55, 0x59, 0x7a, 0xbe, 0x71, 0xe5,
-	0x1f, 0x85, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0x2a, 0x8e, 0xb3, 0x95, 0x4c, 0x0c, 0x00, 0x00,
+	// 1435 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x58, 0xcf, 0x6f, 0x13, 0xc7,
+	0x17, 0xcf, 0xda, 0xb1, 0x13, 0x3f, 0xf3, 0x73, 0xf2, 0x05, 0x0c, 0x5f, 0x61, 0xc3, 0x56, 0x6a,
+	0x01, 0xd1, 0x75, 0x13, 0x7e, 0x14, 0x84, 0xaa, 0x8a, 0x0d, 0x15, 0x09, 0x24, 0x21, 0x1a, 0xbb,
+	0xa0, 0x22, 0x0e, 0x9d, 0xec, 0x8e, 0xed, 0x69, 0xec, 0xdd, 0xed, 0xce, 0x38, 0x34, 0x3d, 0x54,
+	0x48, 0xbd, 0xf5, 0x44, 0x6f, 0x3d, 0x54, 0xea, 0x1f, 0xd0, 0x7f, 0xa0, 0x7f, 0x02, 0x47, 0x8e,
+	0x1c, 0x2a, 0xab, 0xb8, 0xc7, 0xfe, 0x07, 0x39, 0x55, 0x33, 0x3b, 0xde, 0xdd, 0xf8, 0x47, 0x62,
+	0x50, 0x6f, 0xde, 0xf7, 0xde, 0xe7, 0xf3, 0xde, 0xbc, 0x79, 0x3f, 0x46, 0x86, 0xc5, 0x26, 0x13,
+	0xad, 0xee, 0x96, 0xe5, 0xf8, 0x9d, 0xaa, 0x1f, 0x50, 0x8f, 0xb7, 0x58, 0x43, 0x54, 0x49, 0xc0,
+	0xaa, 0xa1, 0xdf, 0x15, 0xb4, 0xba, 0xb3, 0x58, 0x6d, 0x52, 0x8f, 0x86, 0x44, 0x50, 0xd7, 0x0a,
+	0x42, 0x5f, 0xf8, 0xe8, 0x62, 0x02, 0xb1, 0x62, 0x88, 0x45, 0x02, 0x66, 0x29, 0x88, 0xb5, 0xb3,
+	0x78, 0xee, 0xe3, 0x14, 0x6b, 0xd3, 0x6f, 0xfa, 0x55, 0x85, 0xdc, 0xea, 0x36, 0xd4, 0x97, 0xfa,
+	0x50, 0xbf, 0x22, 0xc6, 0x73, 0xe6, 0xf6, 0x2d, 0x6e, 0x31, 0x5f, 0xb9, 0x75, 0xfc, 0x70, 0x9c,
+	0xd7, 0x73, 0xd7, 0x13, 0x9b, 0x0e, 0x71, 0x5a, 0xcc, 0xa3, 0xe1, 0x6e, 0x35, 0xd8, 0x6e, 0x4a,
+	0x01, 0xaf, 0x76, 0xa8, 0x20, 0xe3, 0x50, 0x37, 0x27, 0xa1, 0xc2, 0xae, 0x27, 0x58, 0x87, 0x56,
+	0xb9, 0xd3, 0xa2, 0x1d, 0x32, 0x82, 0xbb, 0x36, 0x09, 0xd7, 0x15, 0xac, 0x5d, 0x65, 0x9e, 0xe0,
+	0x22, 0x1c, 0x06, 0x99, 0x3f, 0x67, 0x20, 0x87, 0x65, 0x0a, 0xd0, 0xd7, 0x30, 0x2f, 0x23, 0x72,
+	0x89, 0x20, 0x25, 0xe3, 0x82, 0x71, 0xa9, 0xb8, 0xf4, 0x89, 0x15, 0x31, 0x5a, 0x69, 0x46, 0x2b,
+	0xd8, 0x6e, 0x4a, 0x01, 0xb7, 0xa4, 0xb5, 0xb5, 0xb3, 0x68, 0x3d, 0xda, 0xfa, 0x86, 0x3a, 0x62,
+	0x9d, 0x0a, 0x62, 0xa3, 0x57, 0xbd, 0xca, 0x4c, 0xbf, 0x57, 0x81, 0x44, 0x86, 0x63, 0x56, 0xb4,
+	0x01, 0xb3, 0x3c, 0xa0, 0x4e, 0x29, 0xa3, 0xd8, 0xaf, 0x5a, 0x87, 0xde, 0x89, 0xa5, 0x22, 0xab,
+	0x05, 0xd4, 0xb1, 0x8f, 0x68, 0xe6, 0x59, 0xf9, 0x85, 0x15, 0x0f, 0x7a, 0x0c, 0x79, 0x2e, 0x88,
+	0xe8, 0xf2, 0x52, 0x56, 0x31, 0x5a, 0x53, 0x33, 0x2a, 0x94, 0x7d, 0x4c, 0x73, 0xe6, 0xa3, 0x6f,
+	0xac, 0xd9, 0xcc, 0xdb, 0x70, 0x4a, 0x99, 0xdd, 0xa3, 0x6d, 0x2a, 0xe8, 0x4a, 0xbd, 0xbe, 0xb9,
+	0x42, 0x89, 0x4b, 0x43, 0x74, 0x01, 0x66, 0x3d, 0xd2, 0xa1, 0x2a, 0x3d, 0x85, 0x24, 0xa4, 0x0d,
+	0xd2, 0xa1, 0x58, 0x69, 0xcc, 0x17, 0x06, 0x9c, 0x1e, 0x8b, 0xe5, 0xa8, 0x01, 0xf3, 0x21, 0xe5,
+	0x81, 0xef, 0x71, 0x49, 0x90, 0xbd, 0x54, 0x5c, 0xba, 0x35, 0x6d, 0xbc, 0xc3, 0x64, 0xf6, 0x09,
+	0xed, 0x7a, 0x1e, 0x6b, 0x46, 0x1c, 0x73, 0x9b, 0xbf, 0x19, 0x70, 0x42, 0xa1, 0xd2, 0xce, 0x7f,
+	0x32, 0x60, 0xa1, 0x15, 0xfd, 0x5e, 0x27, 0x1e, 0x0b, 0xba, 0x6d, 0x22, 0x98, 0xef, 0xe9, 0x8b,
+	0xbe, 0x33, 0x6d, 0x20, 0x2b, 0xa3, 0x14, 0xf6, 0xff, 0x75, 0x2c, 0x0b, 0x63, 0x94, 0x78, 0x9c,
+	0x53, 0xf3, 0x97, 0x0c, 0x94, 0x26, 0xd1, 0x21, 0x1b, 0xf2, 0xc4, 0x51, 0xb1, 0x15, 0x55, 0x96,
+	0xaf, 0x0c, 0x2e, 0xe9, 0xae, 0x92, 0xee, 0xf5, 0x2a, 0x11, 0xb6, 0x46, 0x45, 0x72, 0xc0, 0x48,
+	0x87, 0x35, 0x12, 0x7d, 0x09, 0x59, 0x4e, 0x45, 0xa9, 0xa0, 0x0e, 0x77, 0x73, 0xea, 0xaa, 0x48,
+	0x33, 0x72, 0xbb, 0xa8, 0x1d, 0x67, 0x6b, 0x54, 0x60, 0xc9, 0x87, 0x08, 0xe4, 0x5d, 0x75, 0x13,
+	0x25, 0x50, 0xcc, 0xb7, 0xdf, 0xf7, 0xfe, 0x52, 0xa5, 0x17, 0xa9, 0xb0, 0x26, 0x36, 0x7f, 0xcc,
+	0xc2, 0x11, 0x05, 0x59, 0xf5, 0x9a, 0x21, 0xe5, 0x5c, 0x96, 0x5c, 0xcb, 0xe7, 0x62, 0xb8, 0xe4,
+	0x56, 0x7c, 0x2e, 0xb0, 0xd2, 0xa0, 0x25, 0x00, 0xe5, 0x2d, 0x94, 0x65, 0xa8, 0x7a, 0xab, 0x90,
+	0xf4, 0x21, 0x8e, 0x35, 0x38, 0x65, 0x85, 0xda, 0x00, 0x8e, 0xef, 0xb9, 0x4c, 0x66, 0x4b, 0x76,
+	0xcf, 0x3b, 0x55, 0xa3, 0x0e, 0x6d, 0x79, 0x40, 0x90, 0x78, 0x8b, 0x45, 0x1c, 0xa7, 0xf8, 0x51,
+	0x1d, 0x8e, 0x3d, 0x67, 0x6d, 0xd7, 0x21, 0xa1, 0xbb, 0xe9, 0xb7, 0x99, 0xb3, 0x5b, 0x9a, 0x55,
+	0x51, 0x5e, 0xd5, 0xb8, 0x63, 0x4f, 0xf6, 0x69, 0xf7, 0x7a, 0x15, 0xb4, 0x5f, 0x52, 0xdf, 0x0d,
+	0x28, 0x1e, 0xe2, 0x40, 0x5f, 0xc1, 0x99, 0xe8, 0x44, 0xcb, 0xc4, 0xf3, 0x3d, 0xe6, 0x90, 0xb6,
+	0x4c, 0x8a, 0xea, 0xcf, 0x9c, 0xa2, 0xaf, 0x68, 0xfa, 0x33, 0x78, 0xbc, 0x19, 0x9e, 0x84, 0x37,
+	0xff, 0xc9, 0xe8, 0x09, 0x30, 0x7c, 0x54, 0xf4, 0x19, 0xcc, 0x8a, 0xdd, 0x60, 0x30, 0x01, 0x2e,
+	0x0f, 0xae, 0x43, 0x06, 0xb8, 0xd7, 0xab, 0x9c, 0x1d, 0x0b, 0x52, 0xd1, 0x2b, 0x18, 0x5a, 0x8b,
+	0x27, 0x56, 0x74, 0x4f, 0xd7, 0xf7, 0x4f, 0xa0, 0xbd, 0x5e, 0x65, 0xcc, 0x5a, 0xb1, 0x62, 0xa6,
+	0xfd, 0x73, 0x0a, 0x7d, 0x08, 0xf9, 0x90, 0x12, 0xee, 0x7b, 0x6a, 0xfe, 0x15, 0x92, 0xa2, 0xc2,
+	0x4a, 0x8a, 0xb5, 0x16, 0x5d, 0x86, 0xb9, 0x0e, 0xe5, 0x9c, 0x34, 0xa9, 0x4e, 0xfc, 0x71, 0x6d,
+	0x38, 0xb7, 0x1e, 0x89, 0xf1, 0x40, 0x8f, 0x42, 0x40, 0x6d, 0xc2, 0x45, 0x3d, 0x24, 0x1e, 0x8f,
+	0x82, 0x67, 0x3a, 0x9f, 0xc5, 0xa5, 0x2b, 0xd3, 0xad, 0x03, 0x89, 0xb0, 0x4f, 0xf7, 0x7b, 0x15,
+	0xb4, 0x36, 0xc2, 0x84, 0xc7, 0xb0, 0x9b, 0x7f, 0x18, 0x50, 0x50, 0x89, 0x5b, 0x63, 0x5c, 0xa0,
+	0x67, 0x23, 0x6b, 0xc8, 0x9a, 0xce, 0xaf, 0x44, 0xab, 0x25, 0x14, 0x0f, 0xc7, 0x81, 0x24, 0xb5,
+	0x82, 0xd6, 0x21, 0xc7, 0x04, 0xed, 0xc8, 0xfc, 0xcb, 0x9a, 0xbf, 0x34, 0x6d, 0xcd, 0xdb, 0x47,
+	0x35, 0x69, 0x6e, 0x55, 0xc2, 0x71, 0xc4, 0x62, 0x7e, 0xab, 0x23, 0xdf, 0xf4, 0x43, 0x81, 0x5c,
+	0x00, 0x41, 0xc2, 0x26, 0x15, 0xf2, 0xeb, 0xd0, 0x15, 0x2a, 0x97, 0xb2, 0x15, 0x2d, 0x65, 0x6b,
+	0xd5, 0x13, 0x8f, 0xc2, 0x9a, 0x08, 0x99, 0xd7, 0x4c, 0x9a, 0xa9, 0x1e, 0x73, 0xe1, 0x14, 0xaf,
+	0xf9, 0xab, 0x01, 0x68, 0x74, 0x5c, 0x1d, 0xbe, 0x9a, 0xd0, 0x07, 0x90, 0xdb, 0x21, 0xed, 0xee,
+	0x60, 0x44, 0xc4, 0x07, 0x7a, 0x2c, 0x85, 0x38, 0xd2, 0xa1, 0xcf, 0xe3, 0xe9, 0x1b, 0x95, 0xd4,
+	0x47, 0x23, 0xd3, 0xf7, 0xd4, 0xd0, 0x6e, 0xd9, 0x3f, 0x7a, 0xcd, 0xef, 0x61, 0x61, 0xcc, 0x30,
+	0x45, 0xce, 0xc8, 0xf2, 0xbb, 0xf1, 0x5e, 0x63, 0xf9, 0xc0, 0xcd, 0xf7, 0x7b, 0x4e, 0x5f, 0x87,
+	0x7c, 0x23, 0x4c, 0x31, 0x39, 0xab, 0x50, 0xe0, 0xdd, 0x2d, 0xd7, 0xef, 0x10, 0xe6, 0x95, 0xe6,
+	0x95, 0xd9, 0x49, 0x6d, 0x56, 0xa8, 0x0d, 0x14, 0x38, 0xb1, 0x91, 0x94, 0x01, 0x11, 0x2d, 0x9d,
+	0xc1, 0x98, 0x72, 0x93, 0x88, 0x16, 0x56, 0x1a, 0x54, 0x83, 0x8c, 0xf0, 0xf5, 0x73, 0xe4, 0xd3,
+	0x69, 0x4f, 0x18, 0xdd, 0x34, 0xa6, 0x0d, 0x1a, 0x52, 0xcf, 0xa1, 0x36, 0x68, 0xe2, 0x4c, 0xdd,
+	0xc7, 0x19, 0xe1, 0xa3, 0x17, 0x06, 0x9c, 0x24, 0x6d, 0x41, 0x43, 0x8f, 0x08, 0x6a, 0x13, 0x67,
+	0x9b, 0x7a, 0x2e, 0x2f, 0xcd, 0xaa, 0x34, 0xbe, 0xb7, 0x93, 0xb3, 0xda, 0xc9, 0xc9, 0xbb, 0xc3,
+	0xcc, 0x78, 0xd4, 0x19, 0x7a, 0x00, 0xb3, 0x81, 0xac, 0xea, 0xdc, 0xbb, 0x3d, 0xdd, 0x64, 0xc5,
+	0xda, 0xf3, 0x2a, 0x47, 0xb2, 0x8e, 0x15, 0x07, 0xba, 0x0f, 0x59, 0xd1, 0xe6, 0xa5, 0xfc, 0xd4,
+	0x54, 0xf5, 0xb5, 0xda, 0xb2, 0xef, 0x35, 0x58, 0xd3, 0x9e, 0x93, 0xfb, 0xb8, 0xbe, 0x56, 0xc3,
+	0x92, 0x61, 0xcc, 0x5e, 0x99, 0xfb, 0x0f, 0xf6, 0x4a, 0x03, 0x8a, 0x2d, 0x21, 0x02, 0x5d, 0xb9,
+	0xfa, 0x11, 0x71, 0x6d, 0xea, 0x17, 0x52, 0x6a, 0xc9, 0x1f, 0xef, 0xf7, 0x2a, 0xc5, 0x94, 0x00,
+	0xa7, 0x89, 0x4d, 0x06, 0xc5, 0xd4, 0x63, 0x14, 0x3d, 0x85, 0x39, 0x16, 0x2d, 0x0e, 0xdd, 0x20,
+	0xd5, 0x77, 0xdc, 0xc7, 0xc9, 0x54, 0xd7, 0x02, 0x3c, 0x20, 0x34, 0x7f, 0x80, 0xff, 0x8d, 0xab,
+	0x01, 0x59, 0xcf, 0xdb, 0xcc, 0x73, 0x87, 0x5b, 0xe4, 0x21, 0xf3, 0x5c, 0xac, 0x34, 0xf1, 0x58,
+	0xc9, 0x4c, 0x1c, 0x2b, 0x26, 0xe4, 0x9f, 0x53, 0xd6, 0x6c, 0x09, 0x55, 0xf5, 0x39, 0x1b, 0xe4,
+	0xb4, 0x78, 0xa2, 0x24, 0x58, 0x6b, 0x4c, 0x5f, 0x1f, 0x35, 0xac, 0xb5, 0x48, 0xe8, 0xaa, 0xbe,
+	0x93, 0x3f, 0x36, 0x92, 0x81, 0x95, 0xf4, 0xdd, 0x40, 0x81, 0x13, 0x1b, 0x09, 0x70, 0x3d, 0x5e,
+	0xeb, 0x36, 0x1a, 0xec, 0x3b, 0x1d, 0x4a, 0x0c, 0xb8, 0xb7, 0x51, 0x8b, 0x14, 0x38, 0xb1, 0x31,
+	0xff, 0xcc, 0x42, 0x21, 0xae, 0x1a, 0xf4, 0x10, 0x8a, 0x82, 0x86, 0x1d, 0xe6, 0x25, 0x6f, 0xde,
+	0x64, 0x77, 0x17, 0xeb, 0x89, 0x4a, 0x56, 0x48, 0x7d, 0xad, 0x96, 0x92, 0xa8, 0x0a, 0x49, 0xa3,
+	0xd1, 0x0d, 0x28, 0x3a, 0x34, 0x14, 0xac, 0xc1, 0x1c, 0x22, 0x06, 0x89, 0x59, 0x18, 0x90, 0x2d,
+	0x27, 0x2a, 0x9c, 0xb6, 0x43, 0xe7, 0x21, 0xbb, 0x4d, 0x77, 0xf5, 0x54, 0x8d, 0x9f, 0x96, 0x0f,
+	0xe9, 0x2e, 0x96, 0x72, 0x74, 0x07, 0x8e, 0x3a, 0x24, 0x05, 0xd6, 0x8b, 0xfa, 0x94, 0x36, 0x3c,
+	0xba, 0x7c, 0x37, 0xcd, 0xbc, 0xdf, 0x16, 0x3d, 0x83, 0x92, 0x4b, 0xb9, 0xd0, 0x11, 0xee, 0x33,
+	0xd5, 0x4f, 0xa1, 0x0b, 0x9a, 0xa7, 0x74, 0x6f, 0x82, 0x1d, 0x9e, 0xc8, 0x80, 0x5e, 0x1a, 0x70,
+	0x9e, 0x79, 0x9c, 0x3a, 0xdd, 0x90, 0x7e, 0xe1, 0x36, 0x69, 0x2a, 0x3b, 0xba, 0xeb, 0xf2, 0xca,
+	0xc7, 0x03, 0xed, 0xe3, 0xfc, 0xea, 0x41, 0xc6, 0x7b, 0xbd, 0xca, 0xc5, 0x03, 0x0d, 0x54, 0xc6,
+	0x0f, 0x76, 0x68, 0xdf, 0x7f, 0xf5, 0xb6, 0x3c, 0xf3, 0xfa, 0x6d, 0x79, 0xe6, 0xcd, 0xdb, 0xf2,
+	0xcc, 0x8b, 0x7e, 0xd9, 0x78, 0xd5, 0x2f, 0x1b, 0xaf, 0xfb, 0x65, 0xe3, 0x4d, 0xbf, 0x6c, 0xfc,
+	0xd5, 0x2f, 0x1b, 0x2f, 0xff, 0x2e, 0xcf, 0x3c, 0xbd, 0x78, 0xe8, 0xdf, 0x04, 0xff, 0x06, 0x00,
+	0x00, 0xff, 0xff, 0x1a, 0xa5, 0x88, 0xb3, 0x4a, 0x10, 0x00, 0x00,
 }
 
 func (m *Route) Marshal() (dAtA []byte, err error) {
@@ -454,6 +645,152 @@ func (m *Route) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *RouteDeleteHTTPHeader) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RouteDeleteHTTPHeader) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RouteDeleteHTTPHeader) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	i -= len(m.Name)
+	copy(dAtA[i:], m.Name)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Name)))
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *RouteDeleteHTTPHeaders) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RouteDeleteHTTPHeaders) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RouteDeleteHTTPHeaders) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Response) > 0 {
+		for iNdEx := len(m.Response) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Response[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenerated(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RouteHTTPHeaders) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RouteHTTPHeaders) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RouteHTTPHeaders) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.HeadersManipulation.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGenerated(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *RouteHeadersManipulation) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RouteHeadersManipulation) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RouteHeadersManipulation) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	i -= len(m.Action)
+	copy(dAtA[i:], m.Action)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Action)))
+	i--
+	dAtA[i] = 0x5a
+	{
+		size, err := m.Delete.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGenerated(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x52
+	{
+		size, err := m.Set.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGenerated(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x4a
 	return len(dAtA) - i, nil
 }
 
@@ -649,6 +986,81 @@ func (m *RoutePort) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *RouteSetHTTPHeader) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RouteSetHTTPHeader) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RouteSetHTTPHeader) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	i -= len(m.Action)
+	copy(dAtA[i:], m.Action)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Action)))
+	i--
+	dAtA[i] = 0x1a
+	i -= len(m.Value)
+	copy(dAtA[i:], m.Value)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Value)))
+	i--
+	dAtA[i] = 0x12
+	i -= len(m.Name)
+	copy(dAtA[i:], m.Name)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Name)))
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *RouteSetHTTPHeaders) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RouteSetHTTPHeaders) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RouteSetHTTPHeaders) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Response) > 0 {
+		for iNdEx := len(m.Response) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Response[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenerated(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *RouteSpec) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -669,6 +1081,18 @@ func (m *RouteSpec) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.HTTPHeaders != nil {
+		{
+			size, err := m.HTTPHeaders.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGenerated(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x4a
+	}
 	i -= len(m.Subdomain)
 	copy(dAtA[i:], m.Subdomain)
 	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Subdomain)))
@@ -927,6 +1351,58 @@ func (m *Route) Size() (n int) {
 	return n
 }
 
+func (m *RouteDeleteHTTPHeader) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	n += 1 + l + sovGenerated(uint64(l))
+	return n
+}
+
+func (m *RouteDeleteHTTPHeaders) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Response) > 0 {
+		for _, e := range m.Response {
+			l = e.Size()
+			n += 1 + l + sovGenerated(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *RouteHTTPHeaders) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.HeadersManipulation.Size()
+	n += 1 + l + sovGenerated(uint64(l))
+	return n
+}
+
+func (m *RouteHeadersManipulation) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.Set.Size()
+	n += 1 + l + sovGenerated(uint64(l))
+	l = m.Delete.Size()
+	n += 1 + l + sovGenerated(uint64(l))
+	l = len(m.Action)
+	n += 1 + l + sovGenerated(uint64(l))
+	return n
+}
+
 func (m *RouteIngress) Size() (n int) {
 	if m == nil {
 		return 0
@@ -999,6 +1475,36 @@ func (m *RoutePort) Size() (n int) {
 	return n
 }
 
+func (m *RouteSetHTTPHeader) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	n += 1 + l + sovGenerated(uint64(l))
+	l = len(m.Value)
+	n += 1 + l + sovGenerated(uint64(l))
+	l = len(m.Action)
+	n += 1 + l + sovGenerated(uint64(l))
+	return n
+}
+
+func (m *RouteSetHTTPHeaders) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Response) > 0 {
+		for _, e := range m.Response {
+			l = e.Size()
+			n += 1 + l + sovGenerated(uint64(l))
+		}
+	}
+	return n
+}
+
 func (m *RouteSpec) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1029,6 +1535,10 @@ func (m *RouteSpec) Size() (n int) {
 	n += 1 + l + sovGenerated(uint64(l))
 	l = len(m.Subdomain)
 	n += 1 + l + sovGenerated(uint64(l))
+	if m.HTTPHeaders != nil {
+		l = m.HTTPHeaders.Size()
+		n += 1 + l + sovGenerated(uint64(l))
+	}
 	return n
 }
 
@@ -1115,6 +1625,53 @@ func (this *Route) String() string {
 	}, "")
 	return s
 }
+func (this *RouteDeleteHTTPHeader) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RouteDeleteHTTPHeader{`,
+		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RouteDeleteHTTPHeaders) String() string {
+	if this == nil {
+		return "nil"
+	}
+	repeatedStringForResponse := "[]RouteDeleteHTTPHeader{"
+	for _, f := range this.Response {
+		repeatedStringForResponse += strings.Replace(strings.Replace(f.String(), "RouteDeleteHTTPHeader", "RouteDeleteHTTPHeader", 1), `&`, ``, 1) + ","
+	}
+	repeatedStringForResponse += "}"
+	s := strings.Join([]string{`&RouteDeleteHTTPHeaders{`,
+		`Response:` + repeatedStringForResponse + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RouteHTTPHeaders) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RouteHTTPHeaders{`,
+		`HeadersManipulation:` + strings.Replace(strings.Replace(this.HeadersManipulation.String(), "RouteHeadersManipulation", "RouteHeadersManipulation", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RouteHeadersManipulation) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RouteHeadersManipulation{`,
+		`Set:` + strings.Replace(strings.Replace(this.Set.String(), "RouteSetHTTPHeaders", "RouteSetHTTPHeaders", 1), `&`, ``, 1) + `,`,
+		`Delete:` + strings.Replace(strings.Replace(this.Delete.String(), "RouteDeleteHTTPHeaders", "RouteDeleteHTTPHeaders", 1), `&`, ``, 1) + `,`,
+		`Action:` + fmt.Sprintf("%v", this.Action) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func (this *RouteIngress) String() string {
 	if this == nil {
 		return "nil"
@@ -1174,6 +1731,33 @@ func (this *RoutePort) String() string {
 	}, "")
 	return s
 }
+func (this *RouteSetHTTPHeader) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RouteSetHTTPHeader{`,
+		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
+		`Action:` + fmt.Sprintf("%v", this.Action) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RouteSetHTTPHeaders) String() string {
+	if this == nil {
+		return "nil"
+	}
+	repeatedStringForResponse := "[]RouteSetHTTPHeader{"
+	for _, f := range this.Response {
+		repeatedStringForResponse += strings.Replace(strings.Replace(f.String(), "RouteSetHTTPHeader", "RouteSetHTTPHeader", 1), `&`, ``, 1) + ","
+	}
+	repeatedStringForResponse += "}"
+	s := strings.Join([]string{`&RouteSetHTTPHeaders{`,
+		`Response:` + repeatedStringForResponse + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func (this *RouteSpec) String() string {
 	if this == nil {
 		return "nil"
@@ -1192,6 +1776,7 @@ func (this *RouteSpec) String() string {
 		`TLS:` + strings.Replace(this.TLS.String(), "TLSConfig", "TLSConfig", 1) + `,`,
 		`WildcardPolicy:` + fmt.Sprintf("%v", this.WildcardPolicy) + `,`,
 		`Subdomain:` + fmt.Sprintf("%v", this.Subdomain) + `,`,
+		`HTTPHeaders:` + strings.Replace(this.HTTPHeaders.String(), "RouteHTTPHeaders", "RouteHTTPHeaders", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1384,6 +1969,403 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGenerated(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RouteDeleteHTTPHeader) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGenerated
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RouteDeleteHTTPHeader: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteDeleteHTTPHeader: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGenerated(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RouteDeleteHTTPHeaders) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGenerated
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RouteDeleteHTTPHeaders: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteDeleteHTTPHeaders: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Response", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Response = append(m.Response, RouteDeleteHTTPHeader{})
+			if err := m.Response[len(m.Response)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGenerated(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RouteHTTPHeaders) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGenerated
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RouteHTTPHeaders: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteHTTPHeaders: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HeadersManipulation", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.HeadersManipulation.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGenerated(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RouteHeadersManipulation) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGenerated
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RouteHeadersManipulation: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteHeadersManipulation: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Set", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Set.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Delete", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Delete.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Action", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Action = RouteSetHTTPHeaderAction(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2032,6 +3014,236 @@ func (m *RoutePort) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *RouteSetHTTPHeader) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGenerated
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RouteSetHTTPHeader: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteSetHTTPHeader: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Value = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Action", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Action = RouteHTTPHeaderAction(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGenerated(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RouteSetHTTPHeaders) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGenerated
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RouteSetHTTPHeaders: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteSetHTTPHeaders: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Response", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Response = append(m.Response, RouteSetHTTPHeader{})
+			if err := m.Response[len(m.Response)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGenerated(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *RouteSpec) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2327,6 +3539,42 @@ func (m *RouteSpec) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Subdomain = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HTTPHeaders", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.HTTPHeaders == nil {
+				m.HTTPHeaders = &RouteHTTPHeaders{}
+			}
+			if err := m.HTTPHeaders.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

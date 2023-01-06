@@ -253,6 +253,80 @@ type IngressControllerSpec struct {
 	HTTPCompression HTTPCompressionPolicy `json:"httpCompression,omitempty"`
 }
 
+// The IngressControllerSetHTTPHeaders type has a Response field,
+// type []IngressControllerSetHTTPHeader, for specifying headers to set(replace) or append:
+type IngressControllerSetHTTPHeaders struct {
+	// response specifies which HTTP response headers to set(replace) or append.
+	// If this field is empty, no response headers are set(replace) or append.
+	// +nullable
+	// +optional
+	Response []IngressControllerSetHTTPHeader `json:"response,omitempty"`
+}
+
+type IngressControllerSetHTTPHeader struct {
+	// name specifies a header name.  Its value must be a valid HTTP header
+	// name as defined in RFC 2616 section 4.2.
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	// +kubebuilder:validation:Pattern="^[-!#$%&'*+.0-9A-Z^_`a-z|~]+$"
+	// +required
+	Name string `json:"name"`
+
+	// Value specifies a header value.
+	// +kubebuilder:validation:Required
+	// +required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=4096
+	Value string `json:"value"`
+
+	// Action specifies a header value.
+	// +kubebuilder:validation:Required
+	// +required
+	Action IngressControllerHTTPHeaderAction `json:"action"`
+}
+
+// IngressControllerSetAction is used to understand what
+// +kubebuilder:validation:Enum=Set;Delete
+type IngressControllerSetHTTPHeaderAction string
+
+const (
+	Set    IngressControllerSetHTTPHeaderAction = "Set"
+	Delete IngressControllerSetHTTPHeaderAction = "Delete"
+)
+
+// IngressControllerHTTPHeaderAction is a policy for setting HTTP headers.
+// +kubebuilder:validation:Enum=Append;Replace
+type IngressControllerHTTPHeaderAction string
+
+const (
+	// AppendHTTPHeader appends the header, preserving any existing header.
+	AppendHTTPHeader IngressControllerHTTPHeaderAction = "Append"
+	// ReplaceHTTPHeader sets the header, removing any existing header.
+	ReplaceHTTPHeader IngressControllerHTTPHeaderAction = "Replace"
+)
+
+// The IngressControllerDeleteHTTPHeaders has a type Response field,
+// of type []IngressControllerDeleteHTTPHeader, for specifying headers to be deleted.
+type IngressControllerDeleteHTTPHeaders struct {
+	// response specifies which HTTP response headers to be deleted.
+	// If this field is empty, no response headers are to be deleted.
+	// +nullable
+	// +optional
+	Response []IngressControllerDeleteHTTPHeader `json:"response,omitempty"`
+}
+
+type IngressControllerDeleteHTTPHeader struct {
+	// name specifies a header name.  Its value must be a valid HTTP header
+	// name as defined in RFC 2616 section 4.2.
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	// +kubebuilder:validation:Pattern="^[-!#$%&'*+.0-9A-Z^_`a-z|~]+$"
+	// +required
+	Name string `json:"name"`
+}
+
 // httpCompressionPolicy turns on compression for the specified MIME types.
 //
 // This field is optional, and its absence implies that compression should not be enabled
@@ -280,18 +354,18 @@ type HTTPCompressionPolicy struct {
 //
 // The format should follow the Content-Type definition in RFC 1341:
 // Content-Type := type "/" subtype *[";" parameter]
-// - The type in Content-Type can be one of:
-//   application, audio, image, message, multipart, text, video, or a custom
-//   type preceded by "X-" and followed by a token as defined below.
-// - The token is a string of at least one character, and not containing white
-//   space, control characters, or any of the characters in the tspecials set.
-// - The tspecials set contains the characters ()<>@,;:\"/[]?.=
-// - The subtype in Content-Type is also a token.
-// - The optional parameter/s following the subtype are defined as:
-//   token "=" (token / quoted-string)
-// - The quoted-string, as defined in RFC 822, is surrounded by double quotes
-//   and can contain white space plus any character EXCEPT \, ", and CR.
-//   It can also contain any single ASCII character as long as it is escaped by \.
+//   - The type in Content-Type can be one of:
+//     application, audio, image, message, multipart, text, video, or a custom
+//     type preceded by "X-" and followed by a token as defined below.
+//   - The token is a string of at least one character, and not containing white
+//     space, control characters, or any of the characters in the tspecials set.
+//   - The tspecials set contains the characters ()<>@,;:\"/[]?.=
+//   - The subtype in Content-Type is also a token.
+//   - The optional parameter/s following the subtype are defined as:
+//     token "=" (token / quoted-string)
+//   - The quoted-string, as defined in RFC 822, is surrounded by double quotes
+//     and can contain white space plus any character EXCEPT \, ", and CR.
+//     It can also contain any single ASCII character as long as it is escaped by \.
 //
 // +kubebuilder:validation:Pattern=`^(?i)(x-[^][ ()\\<>@,;:"/?.=\x00-\x1F\x7F]+|application|audio|image|message|multipart|text|video)/[^][ ()\\<>@,;:"/?.=\x00-\x1F\x7F]+(; *[^][ ()\\<>@,;:"/?.=\x00-\x1F\x7F]+=([^][ ()\\<>@,;:"/?.=\x00-\x1F\x7F]+|"(\\[\x00-\x7F]|[^\x0D"\\])*"))*$`
 type CompressionMIMEType string
@@ -1346,6 +1420,45 @@ type IngressControllerHTTPHeaders struct {
 	// +nullable
 	// +optional
 	HeaderNameCaseAdjustments []IngressControllerHTTPHeaderNameCaseAdjustment `json:"headerNameCaseAdjustments,omitempty"`
+
+	// headersManipulation specifies options for set/replace/append/delete headers.
+	// +union
+	HeadersManipulation IngressControllerHeadersManipulation `json:"headersManipulation,omitempty"`
+}
+
+// IngressControllerHeadersManipulation specifies options for set/replace/append/delete headers.
+type IngressControllerHeadersManipulation struct {
+	// action lets you specify headers for Set or Delete.
+	// +unionDiscriminator
+	// +kubebuilder:validation:Enum:=Set;Delete
+	// +kubebuilder:validation:Required
+	Action IngressControllerSetHTTPHeaderAction `json:"action,omitempty"`
+
+	// Set defines HTTP headers that should be set or replaced or appended.
+	// If this field is empty, no headers are added.
+	//
+	// Note that this option only applies to cleartext HTTP connections
+	// and to secure HTTP connections for which the ingress controller
+	// terminates encryption (that is, edge-terminated or reencrypt
+	// connections).  Headers cannot be set(replace)/append for TLS passthrough
+	// connections.
+	//
+	// +kubebuilder:validation:Optional
+	// +optional
+	Set *IngressControllerSetHTTPHeaders `json:"set,omitempty"`
+
+	// delete defines HTTP headers that should be deleted.
+	// If this field is empty, no headers are deleted.
+	//
+	// Note that this option only applies to cleartext HTTP connections
+	// and to secure HTTP connections for which the ingress controller
+	// terminates encryption (that is, edge-terminated or reencrypt
+	// connections).  Headers cannot be set(replace)/append for TLS passthrough
+	// connections.
+	//
+	// +kubebuilder:validation:Optional
+	// +optional
+	Delete *IngressControllerDeleteHTTPHeaders `json:"delete,omitempty"`
 }
 
 // IngressControllerTuningOptions specifies options for tuning the performance
