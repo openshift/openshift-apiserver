@@ -15,6 +15,7 @@ func MakeDockerImageReference(ns, isName, imageID string) string {
 
 // 1 data layer of 128 B
 const BaseImageWith1LayerDigest = `sha256:c5207ce0f38da269ad2e58f143b5ea4b314c75ce1121384369f0db9015e10e82`
+
 const BaseImageWith1Layer = `{
    "schemaVersion": 1,
    "name": "miminar/baseImageWith1Layer",
@@ -40,6 +41,7 @@ const BaseImageWith1Layer = `{
 
 // 2 data layers, the first is shared with baseImageWith1Layer, total size of 240 B
 const BaseImageWith2LayersDigest = "sha256:77371f61c054608a4bb1a96b99f9be69f0868340f5c924ecd8813172f7cf853d"
+
 const BaseImageWith2Layers = `{
    "schemaVersion": 1,
    "name": "miminar/baseImageWith2Layers",
@@ -71,6 +73,7 @@ const BaseImageWith2Layers = `{
 
 // based on baseImageWith1Layer, it adds a new data layer of 126 B
 const ChildImageWith2LayersDigest = "sha256:a9f073fbf2c9835711acd09081d87f5b7129ac6269e0df834240000f48abecd4"
+
 const ChildImageWith2Layers = `{
    "schemaVersion": 1,
    "name": "miminar/childImageWith2Layers",
@@ -108,6 +111,7 @@ const ChildImageWith2Layers = `{
 
 // based on baseImageWith2Layers, it adds a new data layer of 70 B
 const ChildImageWith3LayersDigest = "sha256:2282a6d553353756fa43ba8672807d3fe81f8fdef54b0f6a360d64aaef2f243a"
+
 const ChildImageWith3Layers = `{
    "schemaVersion": 1,
    "name": "miminar/childImageWith3Layers",
@@ -151,6 +155,7 @@ const ChildImageWith3Layers = `{
 
 // another base image with unique data layer of 554 B
 const MiscImageDigest = "sha256:2643199e5ed5047eeed22da854748ed88b3a63ba0497601ba75852f7b92d4640"
+
 const MiscImage = `{
    "schemaVersion": 1,
    "name": "miminar/misc",
@@ -172,4 +177,47 @@ const MiscImage = `{
          "v1Compatibility": "{\"id\":\"9e77fef7a1c9f989988c06620dabc4020c607885b959a2cbd7c2283c91da3e33\",\"created\":\"2016-01-15T18:06:40.707908287Z\",\"container\":\"aded96b43f48d94eb80642c210b89f119ab2a233c1c7c7055104fb052937f12c\",\"container_config\":{\"Hostname\":\"aded96b43f48\",\"Domainname\":\"\",\"User\":\"\",\"AttachStdin\":false,\"AttachStdout\":false,\"AttachStderr\":false,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":null,\"Cmd\":[\"/bin/sh\",\"-c\",\"#(nop) ADD file:a62b361be92f978752150570261ddc6fc21b025e3a28418820a1f39b7db7498c in /\"],\"Image\":\"\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"OnBuild\":null,\"Labels\":null},\"docker_version\":\"1.8.3\",\"config\":{\"Hostname\":\"aded96b43f48\",\"Domainname\":\"\",\"User\":\"\",\"AttachStdin\":false,\"AttachStdout\":false,\"AttachStderr\":false,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":null,\"Cmd\":null,\"Image\":\"\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"OnBuild\":null,\"Labels\":null},\"architecture\":\"amd64\",\"os\":\"linux\",\"Size\":554}"
       }
    ]
+}`
+
+const ManifestList = `{
+  "manifests": [
+    {
+      "digest": "sha256:96a76fa48db5fca24271fe1565d88a4453e759b365dbaaeeb5a4e41049293e77",
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      "size": 429
+    },
+    {
+      "digest": "sha256:6c3d8fec1c50ff78997e13a8352b030d4b290f656081c974373753fd5a3496f1",
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "platform": {
+        "architecture": "arm64",
+        "os": "linux"
+      },
+      "size": 429
+    },
+    {
+      "digest": "sha256:520a368f78807947b96ea773cc62b14e380f4af08bbfd8ed18f0ebc70dedef68",
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "platform": {
+        "architecture": "ppc64le",
+        "os": "linux"
+      },
+      "size": 429
+    },
+    {
+      "digest": "sha256:50b0c55990fe1b48c4b026fb6b49b4377e36c52b291d434977793dc0c8998ba4",
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "platform": {
+        "architecture": "s390x",
+        "os": "linux"
+      },
+      "size": 429
+    }
+  ],
+  "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+  "schemaVersion": 2
 }`
