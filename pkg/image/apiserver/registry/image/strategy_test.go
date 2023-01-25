@@ -5,7 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/google/gofuzz"
+	"github.com/docker/distribution"
+	"github.com/docker/distribution/manifest/manifestlist"
+	fuzz "github.com/google/gofuzz"
 
 	"k8s.io/apimachinery/pkg/api/apitesting/fuzzer"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -16,6 +18,7 @@ import (
 	kapitesting "k8s.io/kubernetes/pkg/api/testing"
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/testutil"
 )
 
 func fuzzImage(t *testing.T, image *imageapi.Image, seed int64) *imageapi.Image {
@@ -66,7 +69,7 @@ func TestStrategyPrepareForCreate(t *testing.T) {
 		},
 	}
 
-	seed := int64(2703387474910584091) //rand.Int63()
+	seed := int64(2703387474910584091) // rand.Int63()
 	fuzzed := fuzzImage(t, &original, seed)
 	image := fuzzed.DeepCopy()
 
@@ -115,7 +118,7 @@ func TestStrategyPrepareForCreateSignature(t *testing.T) {
 		},
 	}
 
-	seed := int64(2703387474910584091) //rand.Int63()
+	seed := int64(2703387474910584091) // rand.Int63()
 	fuzzed := fuzzImage(t, &original, seed)
 
 	if len(fuzzed.Signatures) == 0 {
@@ -165,5 +168,98 @@ func TestStrategyPrepareForCreateSignature(t *testing.T) {
 				t.Errorf("unexpected signature annotations: %s", diff.ObjectGoPrintDiff(image.Annotations, tc.expected))
 			}
 		})
+	}
+}
+
+func TestStrategyPrepareForCreateDockerImageManifests(t *testing.T) {
+	image := &imageapi.Image{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "image1",
+		},
+		DockerImageManifestMediaType: manifestlist.MediaTypeManifestList,
+		DockerImageManifest:          testutil.ManifestList,
+	}
+
+	Strategy.PrepareForCreate(apirequest.NewDefaultContext(), image)
+
+	m, _, err := distribution.UnmarshalManifest(
+		image.DockerImageManifestMediaType,
+		[]byte(image.DockerImageManifest),
+	)
+	if err != nil {
+		t.Fatalf("failed to unmarshal manifest: %s", err)
+	}
+
+	mlist, ok := m.(*manifestlist.DeserializedManifestList)
+	if !ok {
+		t.Fatal("failed to cast to DeserializedManifestList")
+	}
+
+	if len(image.DockerImageManifests) != len(mlist.Manifests) {
+		t.Fatalf(
+			"wrong number of sub-image manifests in image. want %d, got %d",
+			len(mlist.Manifests),
+			len(image.DockerImageManifests),
+		)
+	}
+
+	for _, subManifest := range mlist.Manifests {
+		found := false
+		imageManifest := imageapi.ImageManifest{}
+
+		for _, im := range image.DockerImageManifests {
+			if subManifest.Digest.String() == im.Digest {
+				found = true
+				imageManifest = im
+				break
+			}
+		}
+
+		if !found {
+			t.Errorf(
+				"manifest with digest %q is missing from image.DockerImageManifests",
+				subManifest.Digest,
+			)
+		}
+
+		if imageManifest.MediaType != subManifest.MediaType {
+			t.Errorf(
+				"media types don't match, want %q, got %q",
+				subManifest.MediaType,
+				imageManifest.MediaType,
+			)
+		}
+
+		if imageManifest.ManifestSize != subManifest.Size {
+			t.Errorf(
+				"manifest sizes don't match, want %d, got %d",
+				subManifest.Size,
+				imageManifest.ManifestSize,
+			)
+		}
+
+		if imageManifest.Architecture != subManifest.Platform.Architecture {
+			t.Errorf(
+				"architectures don't match, want %q, got %q",
+				subManifest.Platform.Architecture,
+				imageManifest.Architecture,
+			)
+		}
+
+		if imageManifest.OS != subManifest.Platform.OS {
+			t.Errorf(
+				"OS'es don't match, want %q, got %q",
+				subManifest.Platform.OS,
+				imageManifest.OS,
+			)
+		}
+
+		if imageManifest.Variant != subManifest.Platform.Variant {
+			t.Errorf(
+				"OS'es don't match, want %q, got %q",
+				subManifest.Platform.Variant,
+				imageManifest.Variant,
+			)
+		}
 	}
 }
