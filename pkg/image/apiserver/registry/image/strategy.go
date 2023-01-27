@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
-
+	"github.com/docker/distribution"
+	"github.com/docker/distribution/manifest/manifestlist"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -16,6 +16,7 @@ import (
 	imagev1 "github.com/openshift/api/image/v1"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
 )
 
 // managedSignatureAnnotation used to be set by image signature import controller as a signature annotation.
@@ -48,8 +49,33 @@ func (s imageStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object)
 	newImage := obj.(*imageapi.Image)
 	// ignore errors, change in place
 	if err := internalimageutil.InternalImageWithMetadata(newImage); err != nil {
-		utilruntime.HandleError(fmt.Errorf("Unable to update image metadata for %q: %v", newImage.Name, err))
+		utilruntime.HandleError(fmt.Errorf("unable to update image metadata for %q: %v", newImage.Name, err))
 	}
+
+	manifest, _, err := distribution.UnmarshalManifest(
+		newImage.DockerImageManifestMediaType,
+		[]byte(newImage.DockerImageManifest),
+	)
+	if err != nil {
+		utilruntime.HandleError(fmt.Errorf("unable to parse manifest for %q: %v", newImage.Name, err))
+	}
+
+	if mlist, ok := manifest.(*manifestlist.DeserializedManifestList); ok {
+		subManifests := []imageapi.ImageManifest{}
+		for _, m := range mlist.Manifests {
+			im := imageapi.ImageManifest{
+				Digest:       m.Digest.String(),
+				MediaType:    m.MediaType,
+				ManifestSize: m.Size,
+				Architecture: m.Platform.Architecture,
+				OS:           m.Platform.OS,
+				Variant:      m.Platform.Variant,
+			}
+			subManifests = append(subManifests, im)
+		}
+		newImage.DockerImageManifests = subManifests
+	}
+
 	if newImage.Annotations[imagev1.ImageManifestBlobStoredAnnotation] == "true" {
 		newImage.DockerImageManifest = ""
 		newImage.DockerImageConfig = ""
