@@ -1559,6 +1559,7 @@ func autoConvert_v1_TagEvent_To_image_TagEvent(in *v1.TagEvent, out *image.TagEv
 	out.DockerImageReference = in.DockerImageReference
 	out.Image = in.Image
 	out.Generation = in.Generation
+	out.Platforms = *(*[]string)(unsafe.Pointer(&in.Platforms))
 	return nil
 }
 
@@ -1572,6 +1573,7 @@ func autoConvert_image_TagEvent_To_v1_TagEvent(in *image.TagEvent, out *v1.TagEv
 	out.DockerImageReference = in.DockerImageReference
 	out.Image = in.Image
 	out.Generation = in.Generation
+	out.Platforms = *(*[]string)(unsafe.Pointer(&in.Platforms))
 	return nil
 }
 

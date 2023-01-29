@@ -173,6 +173,7 @@ API rule violation: list_type_missing,github.com/openshift/api/image/v1,NamedTag
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,NamedTagEventList,Items
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,RepositoryImportStatus,AdditionalTags
 API rule violation: list_type_missing,github.com/openshift/api/image/v1,RepositoryImportStatus,Images
+API rule violation: list_type_missing,github.com/openshift/api/image/v1,TagEvent,Platforms
 API rule violation: list_type_missing,github.com/openshift/api/kubecontrolplane/v1,KubeAPIServerConfig,ServiceAccountPublicKeyFiles
 API rule violation: list_type_missing,github.com/openshift/api/kubecontrolplane/v1,KubeAPIServerImagePolicyConfig,ExternalRegistryHostnames
 API rule violation: list_type_missing,github.com/openshift/api/kubecontrolplane/v1,MasterAuthConfig,WebhookTokenAuthenticators

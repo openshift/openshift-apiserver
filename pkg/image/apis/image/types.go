@@ -368,6 +368,8 @@ type TagEvent struct {
 	Image string
 	// Generation is the spec tag generation that resulted in this tag being updated
 	Generation int64
+	// Platforms is all platforms supported by the image in this tag as a list of "os/architecture" strings
+	Platforms []string
 }
 
 type TagEventConditionType string
