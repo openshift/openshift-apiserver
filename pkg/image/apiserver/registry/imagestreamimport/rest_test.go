@@ -16,6 +16,8 @@ import (
 
 	"github.com/openshift/library-go/pkg/image/reference"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
+
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
 )
 
 func mockImage(digest string) *imageapi.Image {
@@ -263,6 +265,169 @@ func TestImportSuccessful(t *testing.T) {
 		actualRefType := test.stream.Spec.Tags[tag].ReferencePolicy.Type
 		if actualRefType != test.expectedReferencePolicyType {
 			t.Errorf("%s: expected %#v, got %#v", name, test.expectedReferencePolicyType, actualRefType)
+		}
+	}
+}
+
+func createTestDigest(index int) string {
+	return fmt.Sprintf("sha256:%064x", index)
+}
+
+func createTestReference(index int) string {
+	return "registry.com/namespace/image@" + createTestDigest(index)
+}
+
+func TestCreatePlatformStatusTags(t *testing.T) {
+	const (
+		tag = "mytag"
+	)
+
+	storage := REST{
+		images: &fakeImageCreater{},
+	}
+	imageCreater := newCachedImageCreater(nil, storage.images)
+	tests := map[string]struct {
+		image             *imageapi.Image
+		stream            *imageapi.ImageStream
+		expectedTagEvents map[string][]imageapi.TagEvent
+	}{
+		"import successful with valid platforms": {
+			image: &imageapi.Image{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: createTestDigest(16),
+				},
+				DockerImageReference: createTestReference(1),
+				DockerImageManifests: []imageapi.ImageManifest{
+					{
+						Digest:       createTestDigest(17),
+						Architecture: "amd64",
+						OS:           "linux",
+					},
+					{
+						Digest:       createTestDigest(18),
+						Architecture: "arm",
+						OS:           "linux",
+					},
+				},
+			},
+			stream: &imageapi.ImageStream{},
+			expectedTagEvents: map[string][]imageapi.TagEvent{
+				tag: {
+					{
+						Image: createTestDigest(16),
+						Platforms: []string{
+							"linux/amd64",
+							"linux/arm",
+						},
+					},
+				},
+			},
+		},
+		"import successful without submanifests": {
+			image: &imageapi.Image{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: createTestDigest(16),
+				},
+				DockerImageReference: createTestReference(1),
+				DockerImageManifests: []imageapi.ImageManifest{},
+			},
+			stream: &imageapi.ImageStream{},
+			expectedTagEvents: map[string][]imageapi.TagEvent{
+				tag: {
+					{
+						Image:     createTestDigest(16),
+						Platforms: []string{},
+					},
+				},
+			},
+		},
+		"import successful for existing equal tag": {
+			image: &imageapi.Image{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: createTestDigest(16),
+				},
+				DockerImageReference: createTestReference(1),
+				DockerImageManifests: []imageapi.ImageManifest{
+					{
+						Digest:       createTestDigest(17),
+						Architecture: "amd64",
+						OS:           "linux",
+					},
+					{
+						Digest:       createTestDigest(18),
+						Architecture: "s390x",
+						OS:           "linux",
+					},
+				},
+			},
+			stream: &imageapi.ImageStream{
+				Status: imageapi.ImageStreamStatus{
+					Tags: map[string]imageapi.TagEventList{
+						tag: {
+							Items: []imageapi.TagEvent{
+								{
+									Image: createTestDigest(16),
+									Platforms: []string{
+										"linux/amd64",
+										"linux/arm",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedTagEvents: map[string][]imageapi.TagEvent{
+				tag: {
+					{
+						Image: createTestDigest(16),
+						Platforms: []string{
+							"linux/amd64",
+							"linux/s390x",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for name, test := range tests {
+		ref, err := reference.Parse(test.image.DockerImageReference)
+		if err != nil {
+			t.Errorf("%s: error parsing image ref: %v", name, err)
+		}
+		importPolicy := imageapi.TagImportPolicy{}
+		referencePolicy := imageapi.TagReferencePolicy{Type: imageapi.SourceTagReferencePolicy}
+		_, _, err = storage.importSuccessful(apirequest.NewDefaultContext(), test.image, nil, test.stream,
+			tag, ref.Exact(), int64(1), metav1.Now(), importPolicy, referencePolicy, imageCreater)
+		if err != nil {
+			t.Errorf("%s: error importing: %v", name, err)
+		}
+
+		if len(test.expectedTagEvents) != len(test.stream.Status.Tags) {
+			t.Errorf("%s: unexpected number of tags for result stream. expected: %d, got: %d", name, len(test.expectedTagEvents), len(test.stream.Status.Tags))
+			continue
+		}
+
+		for tag, expectedTagEvents := range test.expectedTagEvents {
+			tagEvents, found := test.stream.Status.Tags[tag]
+			if !found {
+				t.Errorf("%s: expected tag %s not found in result stream", name, tag)
+				continue
+			}
+			if len(expectedTagEvents) != len(tagEvents.Items) {
+				t.Errorf("%s: tag %s: unexpected number of tag events. expected: %d, got: %d", name, tag, len(expectedTagEvents), len(tagEvents.Items))
+				continue
+			}
+			for idx, expectedTagEvent := range expectedTagEvents {
+				tagEvent := tagEvents.Items[idx]
+				if expectedTagEvent.Image != tagEvent.Image {
+					t.Errorf("%s: tag %s: tag event %d: unexpected image. expected: %s, got: %s", name, tag, idx, expectedTagEvent.Image, tagEvent.Image)
+				}
+				if !internalimageutil.TagEventPlatformsEqual(expectedTagEvent, tagEvent) {
+					t.Errorf("%s: tag %s: tag event %d: platforms do not match. expected: %s, got: %s", name, tag, idx, expectedTagEvent.Platforms, tagEvent.Platforms)
+				}
+			}
 		}
 	}
 }

@@ -1508,6 +1508,18 @@ func TestTagsChangedHelper(t *testing.T) {
 			changed: true,
 			deleted: false,
 		},
+		"platforms changed": {
+			new:     []imageapi.TagEvent{{Platforms: []string{"linux/arm", "linux/amd64"}}},
+			old:     []imageapi.TagEvent{{Platforms: []string{"linux/arm", "linux/s390x"}}},
+			changed: true,
+			deleted: false,
+		},
+		"platforms order changed": {
+			new:     []imageapi.TagEvent{{Platforms: []string{"linux/arm", "linux/amd64"}}},
+			old:     []imageapi.TagEvent{{Platforms: []string{"linux/amd64", "linux/arm"}}},
+			changed: false,
+			deleted: false,
+		},
 	}
 	for name, test := range tests {
 		changed, deleted := tagsChanged(test.new, test.old)

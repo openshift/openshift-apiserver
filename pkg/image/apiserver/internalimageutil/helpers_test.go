@@ -759,6 +759,7 @@ func TestAddTagEventToImageStream(t *testing.T) {
 		tags           map[string]imageapi.TagEventList
 		nextRef        string
 		nextImage      string
+		nextPlatforms  []string
 		expectedTags   map[string]imageapi.TagEventList
 		expectedUpdate bool
 	}{
@@ -902,12 +903,83 @@ func TestAddTagEventToImageStream(t *testing.T) {
 			},
 			expectedUpdate: true,
 		},
+		"same ref, same image, different platforms": {
+			tags: map[string]imageapi.TagEventList{
+				"latest": {
+					Items: []imageapi.TagEvent{
+						{
+							DockerImageReference: "ref",
+							Image:                "image",
+							Platforms: []string{
+								"linux/arm",
+							},
+						},
+					},
+				},
+			},
+			nextRef:       "ref",
+			nextImage:     "image",
+			nextPlatforms: []string{"linux/amd64"},
+			expectedTags: map[string]imageapi.TagEventList{
+				"latest": {
+					Items: []imageapi.TagEvent{
+						{
+							DockerImageReference: "ref",
+							Image:                "image",
+							Platforms: []string{
+								"linux/amd64",
+							},
+						},
+					},
+				},
+			},
+			expectedUpdate: true,
+		},
+		"different ref, different image, different platforms": {
+			tags: map[string]imageapi.TagEventList{
+				"latest": {
+					Items: []imageapi.TagEvent{
+						{
+							DockerImageReference: "ref",
+							Image:                "image",
+							Platforms: []string{
+								"linux/arm",
+							},
+						},
+					},
+				},
+			},
+			nextRef:       "newref",
+			nextImage:     "newimage",
+			nextPlatforms: []string{"linux/amd64"},
+			expectedTags: map[string]imageapi.TagEventList{
+				"latest": {
+					Items: []imageapi.TagEvent{
+						{
+							DockerImageReference: "newref",
+							Image:                "newimage",
+							Platforms: []string{
+								"linux/amd64",
+							},
+						},
+						{
+							DockerImageReference: "ref",
+							Image:                "image",
+							Platforms: []string{
+								"linux/arm",
+							},
+						},
+					},
+				},
+			},
+			expectedUpdate: true,
+		},
 	}
 
 	for name, test := range tests {
 		stream := &imageapi.ImageStream{}
 		stream.Status.Tags = test.tags
-		updated := AddTagEventToImageStream(stream, "latest", imageapi.TagEvent{DockerImageReference: test.nextRef, Image: test.nextImage})
+		updated := AddTagEventToImageStream(stream, "latest", imageapi.TagEvent{DockerImageReference: test.nextRef, Image: test.nextImage, Platforms: test.nextPlatforms})
 		if e, a := test.expectedUpdate, updated; e != a {
 			t.Errorf("%s: expected updated=%t, got %t", name, e, a)
 		}

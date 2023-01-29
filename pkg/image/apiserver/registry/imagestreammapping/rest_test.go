@@ -735,6 +735,101 @@ func TestCreateRetryConflictTagDiff(t *testing.T) {
 	}
 }
 
+func TestStatusContainsPlatformsCreateWithSubmanifests(t *testing.T) {
+	const (
+		imageDigest = "sha256:0000000000000000000000000000000000000000000000000000000000000010"
+		sub1Digest  = "sha256:0000000000000000000000000000000000000000000000000000000000000011"
+		sub2Digest  = "sha256:0000000000000000000000000000000000000000000000000000000000000012"
+	)
+
+	existingRepo := &imageapi.ImageStream{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "somerepo",
+			Namespace: "default",
+		},
+		Spec: imageapi.ImageStreamSpec{
+			DockerImageRepository: "localhost:5000/default/somerepo",
+		},
+	}
+
+	existingImage := &imageapi.Image{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: imageDigest,
+		},
+		DockerImageManifestMediaType: "application/vnd.oci.image.index.v1+json",
+		DockerImageReference:         "localhost:5000/somens/somerepo@" + imageDigest,
+		DockerImageManifests: []imageapi.ImageManifest{
+			{
+				MediaType:    "application/vnd.oci.image.manifest.v1+json",
+				Digest:       sub1Digest,
+				OS:           "linux",
+				Architecture: "amd64",
+			},
+			{
+				MediaType:    "application/vnd.oci.image.manifest.v1+json",
+				Digest:       sub2Digest,
+				OS:           "linux",
+				Architecture: "arm",
+			},
+		},
+	}
+
+	expectedTagEventPlatforms := &imageapi.TagEvent{
+		Platforms: []string{
+			"linux/arm",
+			"linux/amd64",
+		},
+	}
+
+	client, server, storage := setup(t)
+	defer server.Terminate(t)
+
+	_, err := client.Put(
+		context.TODO(),
+		etcdtesting.AddPrefix("/imagestreams/default/somerepo"),
+		runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), existingRepo),
+	)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	_, err = client.Put(
+		context.TODO(),
+		etcdtesting.AddPrefix("/images/"+imageDigest), runtime.EncodeOrDie(legacyscheme.Codecs.LegacyCodec(imagev1.SchemeGroupVersion), existingImage),
+	)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	mapping := imageapi.ImageStreamMapping{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "somerepo",
+		},
+		Image: *existingImage,
+		Tag:   "latest",
+	}
+	ctx := apirequest.NewDefaultContext()
+	_, err = storage.Create(ctx, &mapping, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
+	if err != nil {
+		t.Errorf("Unexpected error creating image stream mapping%v", err)
+	}
+
+	imageStream, err := storage.imageStreamRegistry.GetImageStream(ctx, "somerepo", &metav1.GetOptions{})
+	if err != nil {
+		t.Fatalf("Unexpected non-nil err: %#v", err)
+	}
+	if e, a := imageDigest, imageStream.Status.Tags["latest"].Items[0].Image; e != a {
+		t.Errorf("Expected %s, got %s", e, a)
+	}
+	tagEvent := internalimageutil.LatestTaggedImage(imageStream, "latest")
+	if tagEvent.Image != imageDigest {
+		t.Errorf("Unexpected image for latest tag event. Expected: %s, got: %s", imageDigest, tagEvent.Image)
+	}
+	if !internalimageutil.TagEventPlatformsEqual(*tagEvent, *expectedTagEventPlatforms) {
+		t.Errorf("Unexpected platforms for latest tag event. Expected: %s, got: %s", expectedTagEventPlatforms.Platforms, tagEvent.Platforms)
+	}
+}
+
 type fakeImageRegistry struct {
 	listImages  func(ctx context.Context, options *metainternal.ListOptions) (*imageapi.ImageList, error)
 	getImage    func(ctx context.Context, id string, options *metav1.GetOptions) (*imageapi.Image, error)
