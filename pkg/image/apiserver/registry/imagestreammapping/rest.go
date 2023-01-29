@@ -117,6 +117,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		Created:              metav1.Now(),
 		DockerImageReference: ref,
 		Image:                image.Name,
+		Platforms:            internalimageutil.CreatePlatformsFromManifests(&image.DockerImageManifests),
 	}
 
 	err = wait.ExponentialBackoff(wait.Backoff{Steps: maxRetriesOnConflict}, func() (bool, error) {

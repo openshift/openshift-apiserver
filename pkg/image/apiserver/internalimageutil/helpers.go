@@ -378,13 +378,13 @@ func AddTagEventToImageStream(stream *imageapi.ImageStream, tag string, next ima
 	sameRef := previous.DockerImageReference == next.DockerImageReference
 	sameImage := previous.Image == next.Image
 	sameGen := previous.Generation == next.Generation
+	samePlatforms := TagEventPlatformsEqual(*previous, next)
 
 	switch {
 	// shouldn't change the tag
-	case sameRef && sameImage && sameGen:
+	case sameRef && sameImage && sameGen && samePlatforms:
 		return false
-
-	case sameImage && sameRef:
+	case sameImage && sameRef && samePlatforms:
 		// collapse the tag
 	case sameRef:
 		previous.Image = next.Image
@@ -398,6 +398,7 @@ func AddTagEventToImageStream(stream *imageapi.ImageStream, tag string, next ima
 		return true
 	}
 	previous.Generation = next.Generation
+	previous.Platforms = next.Platforms
 	tags.Conditions = nil
 	stream.Status.Tags[tag] = tags
 	return true
@@ -501,6 +502,7 @@ func ResolveImageID(stream *imageapi.ImageStream, imageID string) (*imageapi.Tag
 			Created:              metav1.Now(),
 			DockerImageReference: event.DockerImageReference,
 			Image:                event.Image,
+			Platforms:            event.Platforms,
 		}, nil
 	case 0:
 		return nil, errors.NewNotFound(image.Resource("imagestreamimage"), imageID)
@@ -518,4 +520,41 @@ func HasTagCondition(stream *imageapi.ImageStream, tag string, condition imageap
 		}
 	}
 	return false
+}
+
+// CreatePlatformsFromManifests returns a slice of strings of all platforms in manifests.
+// The platforms are represented as strings of the form "os/architecture".
+// Returns an empty slice if manifests is nil.
+func CreatePlatformsFromManifests(manifests *[]imageapi.ImageManifest) []string {
+	platforms := make([]string, 0)
+	if manifests == nil {
+		return platforms
+	}
+
+	for _, manifest := range *manifests {
+		platform := fmt.Sprintf("%s/%s", manifest.OS, manifest.Architecture)
+		platforms = append(platforms, platform)
+	}
+	return platforms
+}
+
+// TagEventPlatformsEqual returns true if the Platforms of tagEventA and tagEventB
+// have the same length and contain the same strings, independent of order.
+func TagEventPlatformsEqual(tagEventA, tagEventB imageapi.TagEvent) bool {
+	if len(tagEventA.Platforms) != len(tagEventB.Platforms) {
+		return false
+	}
+	for _, platformA := range tagEventA.Platforms {
+		platformFound := false
+		for _, platformB := range tagEventB.Platforms {
+			if platformA == platformB {
+				platformFound = true
+				break
+			}
+		}
+		if !platformFound {
+			return false
+		}
+	}
+	return true
 }

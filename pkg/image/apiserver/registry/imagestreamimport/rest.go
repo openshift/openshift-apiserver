@@ -559,6 +559,7 @@ func (r *REST) importSuccessful(
 		DockerImageReference: pullSpec,
 		Image:                image.Name,
 		Generation:           nextGeneration,
+		Platforms:            internalimageutil.CreatePlatformsFromManifests(&image.DockerImageManifests),
 	}
 
 	if stream.Spec.Tags == nil {
@@ -626,7 +627,8 @@ func hasTagChanged(stream *imageapi.ImageStream, tag string, newEvent imageapi.T
 	previousEvent := tagEvent.Items[0]
 	sameRef := previousEvent.DockerImageReference == newEvent.DockerImageReference
 	sameImage := previousEvent.Image == newEvent.Image
-	return !sameRef || !sameImage || *specTag.Generation > previousEvent.Generation
+	samePlatforms := internalimageutil.TagEventPlatformsEqual(previousEvent, newEvent)
+	return !sameRef || !sameImage || !samePlatforms || *specTag.Generation > previousEvent.Generation
 }
 
 // clearManifests unsets the manifest for each object that does not request it

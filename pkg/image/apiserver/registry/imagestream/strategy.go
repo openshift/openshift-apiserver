@@ -334,6 +334,14 @@ func updateChangedTrackingTags(new, old *imageapi.ImageStream) int {
 	return changes
 }
 
+func tagEventExactlyEqual(old, next imageapi.TagEvent) bool {
+	return old.Created == next.Created &&
+		old.DockerImageReference == next.DockerImageReference &&
+		old.Image == next.Image &&
+		old.Generation == next.Generation &&
+		internalimageutil.TagEventPlatformsEqual(old, next)
+}
+
 // tagsChanged returns true if the two lists differ, and if the newer list is empty
 // then deleted is returned true as well.
 func tagsChanged(new, old []imageapi.TagEvent) (changed bool, deleted bool) {
@@ -345,7 +353,7 @@ func tagsChanged(new, old []imageapi.TagEvent) (changed bool, deleted bool) {
 	case len(old) == 0:
 		return true, false
 	default:
-		return new[0] != old[0], false
+		return !tagEventExactlyEqual(new[0], old[0]), false
 	}
 }
 
@@ -432,7 +440,7 @@ func tagRefGenerationChanged(old, next imageapi.TagReference) bool {
 }
 
 func tagEventChanged(old, next imageapi.TagEvent) bool {
-	return old.Image != next.Image || old.DockerImageReference != next.DockerImageReference || old.Generation > next.Generation
+	return old.Image != next.Image || old.DockerImageReference != next.DockerImageReference || !internalimageutil.TagEventPlatformsEqual(old, next) || old.Generation > next.Generation
 }
 
 // updateSpecTagGenerationsForUpdate ensures that new spec updates always have a generation set, and that the value
