@@ -2,6 +2,8 @@ module github.com/openshift/openshift-apiserver
 
 go 1.19
 
+replace github.com/openshift/api => github.com/werled/api v0.0.0-20230130190108-6e16855dcb4d
+
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/containers/image/v5 v5.22.0
@@ -12,7 +14,7 @@ require (
 	github.com/emicklei/go-restful/v3 v3.8.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-openapi/errors v0.19.2
-	github.com/google/go-cmp v0.5.8
+	github.com/google/go-cmp v0.5.9
 	github.com/google/gofuzz v1.2.0
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
@@ -27,9 +29,9 @@ require (
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd/client/v3 v3.5.4
-	k8s.io/api v0.25.2
+	k8s.io/api v0.26.1
 	k8s.io/apiextensions-apiserver v0.25.2
-	k8s.io/apimachinery v0.25.2
+	k8s.io/apimachinery v0.26.1
 	k8s.io/apiserver v0.25.2
 	k8s.io/client-go v0.25.2
 	k8s.io/cloud-provider v0.25.2
@@ -41,7 +43,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20230109183929-3758b55a6596
 	k8s.io/kubectl v0.25.2
 	k8s.io/kubernetes v1.25.2
-	k8s.io/utils v0.0.0-20220823124924-e9cbc92d1a73
+	k8s.io/utils v0.0.0-20221107191617-1a15be271d1d
 )
 
 require (
@@ -158,7 +160,7 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220624142145-8cd45d7dbd1f // indirect
 	google.golang.org/grpc v1.47.0 // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -171,7 +173,7 @@ require (
 	sigs.k8s.io/kustomize/api v0.12.1 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.13.9 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
-	sigs.k8s.io/yaml v1.2.0 // indirect
+	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
 replace (
