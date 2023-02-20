@@ -289,11 +289,6 @@ func (h *binaryInstantiateHandler) handle(r io.Reader) (runtime.Object, error) {
 		Stdin:     true,
 		Container: apiserverbuildutil.GitCloneContainer,
 	}
-	// Custom builds don't have a gitclone container, so we inject the source
-	// directly into the main container.
-	if build.Spec.Strategy.CustomStrategy != nil {
-		opts.Container = apiserverbuildutil.CustomBuild
-	}
 
 	restClient, err := restclient.RESTClientFor(h.r.ClientConfig)
 	if err != nil {
