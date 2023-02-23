@@ -2,7 +2,9 @@ package internalversion
 
 import (
 	"context"
+	"fmt"
 	"reflect"
+	"runtime"
 	"testing"
 	"time"
 
@@ -10,6 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/diff"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/printers"
+	kprinters "k8s.io/kubernetes/pkg/printers"
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
@@ -222,5 +225,74 @@ func TestImageTag(t *testing.T) {
 	}
 	if !reflect.DeepEqual(expected, table.Rows) {
 		t.Fatalf("%s", diff.ObjectReflectDiff(expected, table.Rows))
+	}
+}
+
+func TestPrintersWithDeepCopy(t *testing.T) {
+	tests := []struct {
+		name    string
+		printer func() ([]metav1.TableRow, error)
+	}{
+		{
+			name: "Image",
+			printer: func() ([]metav1.TableRow, error) {
+				return printImage(&imageapi.Image{}, kprinters.GenerateOptions{})
+			},
+		},
+		{
+			name: "ImageStream",
+			printer: func() ([]metav1.TableRow, error) {
+				return printImageStream(&imageapi.ImageStream{}, kprinters.GenerateOptions{})
+			},
+		},
+		{
+			name: "ImageStreamTag",
+			printer: func() ([]metav1.TableRow, error) {
+				return printImageStreamTag(&imageapi.ImageStreamTag{}, kprinters.GenerateOptions{})
+			},
+		},
+		{
+			name: "ImageTag",
+			printer: func() ([]metav1.TableRow, error) {
+				return printImageTag(&imageapi.ImageTag{}, kprinters.GenerateOptions{})
+			},
+		},
+		{
+			name: "ImageStreamImage",
+			printer: func() ([]metav1.TableRow, error) {
+				return printImageStreamImage(&imageapi.ImageStreamImage{}, kprinters.GenerateOptions{})
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rows, err := test.printer()
+			if err != nil {
+				t.Fatalf("expected no error, but got: %#v", err)
+			}
+			if len(rows) <= 0 {
+				t.Fatalf("expected to have at least one TableRow, but got: %d", len(rows))
+			}
+
+			func() {
+				defer func() {
+					if err := recover(); err != nil {
+						// Same as stdlib http server code. Manually allocate stack
+						// trace buffer size to prevent excessively large logs
+						const size = 64 << 10
+						buf := make([]byte, size)
+						buf = buf[:runtime.Stack(buf, false)]
+						err = fmt.Errorf("%q stack:\n%s", err, buf)
+
+						t.Errorf("Expected no panic, but got: %v", err)
+					}
+				}()
+
+				// should not panic
+				rows[0].DeepCopy()
+			}()
+
+		})
 	}
 }
