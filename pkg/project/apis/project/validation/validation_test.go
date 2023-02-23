@@ -314,7 +314,7 @@ func TestValidateProjectUpdate(t *testing.T) {
 			T: field.ErrorTypeInvalid,
 			F: "metadata.annotations[openshift.io/node-selector]",
 		},
-		"updating label": {
+		"modifying label": {
 			A: projectapi.Project{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:            "project-name",
@@ -325,6 +325,30 @@ func TestValidateProjectUpdate(t *testing.T) {
 			},
 			T: field.ErrorTypeInvalid,
 			F: "metadata.labels[label-name]",
+		},
+		"adding label with empty value": {
+			A: projectapi.Project{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:            "project-name",
+					ResourceVersion: "1",
+					Annotations:     project.Annotations,
+					Labels:          map[string]string{"label-name": "value", "label-test": ""},
+				},
+			},
+			T: field.ErrorTypeInvalid,
+			F: "metadata.labels[label-test]",
+		},
+		"adding label with non-empty value": {
+			A: projectapi.Project{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:            "project-name",
+					ResourceVersion: "1",
+					Annotations:     project.Annotations,
+					Labels:          map[string]string{"label-name": "value", "label-test": "test"},
+				},
+			},
+			T: field.ErrorTypeInvalid,
+			F: "metadata.labels[label-test]",
 		},
 		"deleting label": {
 			A: projectapi.Project{

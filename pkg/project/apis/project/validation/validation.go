@@ -80,9 +80,10 @@ func ValidateProjectUpdate(newProject *projectapi.Project, oldProject *projectap
 		}
 	}
 
+	// Check to ensure no new labels are added or existing one being deleted or modified
 	for name, value := range newProject.Labels {
-		if value != oldProject.Labels[name] {
-			allErrs = append(allErrs, field.Invalid(field.NewPath("metadata", "labels").Key(name), value, "field is immutable, , try updating the namespace"))
+		if oldValue, ok := oldProject.Labels[name]; !ok || oldValue != value {
+			allErrs = append(allErrs, field.Invalid(field.NewPath("metadata", "labels").Key(name), value, "field is immutable, try updating the namespace"))
 		}
 	}
 	for name, value := range oldProject.Labels {
