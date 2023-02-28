@@ -11,7 +11,7 @@ import (
 	"k8s.io/apiserver/pkg/authorization/authorizer"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
-	"k8s.io/client-go/kubernetes/fake"
+	corev1listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
 
@@ -48,7 +48,7 @@ func TestPodSecurityPolicySelfSubjectReview(t *testing.T) {
 	}
 	for testName, testcase := range testcases {
 		namespace := admissionttesting.CreateNamespaceForTest()
-		serviceAccount := admissionttesting.CreateSAForTest()
+		_ = admissionttesting.CreateSAForTest()
 		reviewRequest := &securityapi.PodSecurityPolicySelfSubjectReview{
 			Spec: securityapi.PodSecurityPolicySelfSubjectReviewSpec{
 				Template: coreapi.PodTemplateSpec{
@@ -80,8 +80,10 @@ func TestPodSecurityPolicySelfSubjectReview(t *testing.T) {
 			}
 		}
 
-		csf := fake.NewSimpleClientset(namespace, serviceAccount)
-		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), csf}
+		nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+		nsLister := corev1listers.NewNamespaceLister(nsIndexer)
+		nsIndexer.Add(namespace)
+		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), nsLister}
 		ctx := apirequest.WithUser(apirequest.WithNamespace(apirequest.NewContext(), metav1.NamespaceDefault), &user.DefaultInfo{Name: "foo", Groups: []string{"bar", "baz"}})
 		obj, err := storage.Create(ctx, reviewRequest, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
 		if err != nil {

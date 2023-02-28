@@ -16,7 +16,7 @@ import (
 	"k8s.io/apiserver/pkg/authentication/user"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
-	"k8s.io/client-go/kubernetes"
+	corev1listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/klog/v2"
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
 )
@@ -24,7 +24,7 @@ import (
 // REST implements the RESTStorage interface in terms of an Registry.
 type REST struct {
 	sccMatcher sccmatching.SCCMatcher
-	client     kubernetes.Interface
+	nsLister   corev1listers.NamespaceLister
 }
 
 var _ rest.Creater = &REST{}
@@ -32,8 +32,8 @@ var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
 
 // NewREST creates a new REST for policies..
-func NewREST(m sccmatching.SCCMatcher, c kubernetes.Interface) *REST {
-	return &REST{sccMatcher: m, client: c}
+func NewREST(m sccmatching.SCCMatcher, nsLister corev1listers.NamespaceLister) *REST {
+	return &REST{sccMatcher: m, nsLister: nsLister}
 }
 
 // New creates a new PodSecurityPolicySelfSubjectReview object
@@ -76,7 +76,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 		return nil, apierrors.NewBadRequest(fmt.Sprintf("unable to find SecurityContextConstraints: %v", err))
 	}
 
-	providers, errs := sccmatching.CreateProvidersFromConstraints(ctx, ns, matchedConstraints, r.client)
+	providers, errs := sccmatching.CreateProvidersFromConstraints(ctx, ns, matchedConstraints, r.nsLister)
 	if len(errs) > 0 {
 		return nil, kutilerrors.NewAggregate(errs)
 	}

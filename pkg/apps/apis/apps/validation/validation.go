@@ -10,6 +10,7 @@ import (
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	unversionedvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/apimachinery/pkg/util/sets"
 	kvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
@@ -250,7 +251,14 @@ func validateDeploymentStrategy(strategy *appsapi.DeploymentStrategy, pod *kapi.
 		errs = append(errs, validation.ValidateAnnotations(strategy.Annotations, fldPath.Child("annotations"))...)
 	}
 
-	errs = append(errs, validation.ValidateResourceRequirements(&strategy.Resources, fldPath.Child("resources"), kapivalidation.PodValidationOptions{})...)
+	podClaimNames := sets.NewString()
+	for _, claim := range pod.ResourceClaims {
+		if claim.Name != "" {
+			podClaimNames.Insert(claim.Name)
+		}
+	}
+
+	errs = append(errs, validation.ValidateResourceRequirements(&strategy.Resources, podClaimNames, fldPath.Child("resources"), kapivalidation.PodValidationOptions{})...)
 
 	if strategy.ActiveDeadlineSeconds != nil {
 		errs = append(errs, kapivalidation.ValidateNonnegativeField(*strategy.ActiveDeadlineSeconds, fldPath.Child("activeDeadlineSeconds"))...)

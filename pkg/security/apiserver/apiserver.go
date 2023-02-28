@@ -10,7 +10,6 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/client-go/informers"
-	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 
 	securityapiv1 "github.com/openshift/api/security/v1"
@@ -101,25 +100,21 @@ func (c *completedConfig) V1RESTStorage() (map[string]rest.Storage, error) {
 }
 
 func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
-	kubeClient, err := kubernetes.NewForConfig(c.ExtraConfig.KubeAPIServerClientConfig)
-	if err != nil {
-		return nil, err
-	}
-
+	nsLister := c.ExtraConfig.KubeInformers.Core().V1().Namespaces().Lister()
 	sccStorage := sccstorage.NewREST()
 	sccMatcher := sccmatching.NewDefaultSCCMatcher(c.ExtraConfig.SecurityInformers.Security().V1().SecurityContextConstraints().Lister(), c.ExtraConfig.Authorizer)
 	podSecurityPolicyReviewStorage := podsecuritypolicyreview.NewREST(
 		sccMatcher,
 		c.ExtraConfig.KubeInformers.Core().V1().ServiceAccounts().Lister(),
-		kubeClient,
+		nsLister,
 	)
 	podSecurityPolicySubjectStorage := podsecuritypolicysubjectreview.NewREST(
 		sccMatcher,
-		kubeClient,
+		nsLister,
 	)
 	podSecurityPolicySelfSubjectReviewStorage := podsecuritypolicyselfsubjectreview.NewREST(
 		sccMatcher,
-		kubeClient,
+		nsLister,
 	)
 	uidRangeStorage := rangeallocations.NewREST(c.GenericConfig.RESTOptionsGetter)
 

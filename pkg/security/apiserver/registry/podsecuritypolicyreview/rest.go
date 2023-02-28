@@ -17,7 +17,6 @@ import (
 	authserviceaccount "k8s.io/apiserver/pkg/authentication/serviceaccount"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
-	"k8s.io/client-go/kubernetes"
 	corev1listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/klog/v2"
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
@@ -27,7 +26,7 @@ import (
 type REST struct {
 	sccMatcher sccmatching.SCCMatcher
 	saCache    corev1listers.ServiceAccountLister
-	client     kubernetes.Interface
+	nsLister   corev1listers.NamespaceLister
 }
 
 var _ rest.Creater = &REST{}
@@ -35,8 +34,8 @@ var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
 
 // NewREST creates a new REST for policies..
-func NewREST(m sccmatching.SCCMatcher, saCache corev1listers.ServiceAccountLister, c kubernetes.Interface) *REST {
-	return &REST{sccMatcher: m, saCache: saCache, client: c}
+func NewREST(m sccmatching.SCCMatcher, saCache corev1listers.ServiceAccountLister, nsLister corev1listers.NamespaceLister) *REST {
+	return &REST{sccMatcher: m, saCache: saCache, nsLister: nsLister}
 }
 
 // New creates a new PodSecurityPolicyReview object
@@ -83,7 +82,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 			continue
 		}
 
-		providers, errs := sccmatching.CreateProvidersFromConstraints(ctx, ns, saConstraints, r.client)
+		providers, errs := sccmatching.CreateProvidersFromConstraints(ctx, ns, saConstraints, r.nsLister)
 		if len(errs) > 0 {
 			errs = append(errs, fmt.Errorf("unable to create SecurityContextConstraints provider for ServiceAccount %s: %v", sa.Name, kutilerrors.NewAggregate(errs)))
 			continue

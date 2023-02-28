@@ -16,6 +16,7 @@ import (
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
 	cacheddiscovery "k8s.io/client-go/discovery/cached"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/restmapper"
@@ -44,14 +45,13 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	if err != nil {
 		return nil, err
 	}
-	kubeInformers := informers.NewSharedInformerFactory(kubeClient, 10*time.Minute)
-
-	openshiftVersion := version.Get()
-
-	restOptsGetter, err := NewRESTOptionsGetter(config.APIServerArguments, config.StorageConfig)
+	dynamicClient, err := dynamic.NewForConfig(kubeClientConfig)
 	if err != nil {
 		return nil, err
 	}
+	kubeInformers := informers.NewSharedInformerFactory(kubeClient, 10*time.Minute)
+
+	openshiftVersion := version.Get()
 
 	genericConfig := genericapiserver.NewRecommendedConfig(legacyscheme.Codecs)
 	// Current default values
@@ -97,13 +97,24 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	genericConfig.BuildHandlerChainFunc = OpenshiftHandlerChain
 	genericConfig.RequestInfoResolver = apiserverconfig.OpenshiftRequestInfoResolver()
 	genericConfig.OpenAPIConfig = configprocessing.DefaultOpenAPIConfig()
-	genericConfig.RESTOptionsGetter = restOptsGetter
 	// previously overwritten.  I don't know why
 	genericConfig.RequestTimeout = time.Duration(60) * time.Second
 	genericConfig.MinRequestTimeout = int(config.ServingInfo.RequestTimeoutSeconds)
 	genericConfig.MaxRequestsInFlight = int(config.ServingInfo.MaxRequestsInFlight)
 	genericConfig.MaxMutatingRequestsInFlight = int(config.ServingInfo.MaxRequestsInFlight / 2)
 	genericConfig.LongRunningFunc = apiserverconfig.IsLongRunningRequest
+
+	etcdOptions, err := ToEtcdOptions(config.APIServerArguments, config.StorageConfig)
+	if err != nil {
+		return nil, err
+	}
+	if err := etcdOptions.Complete(genericConfig.Config.StorageObjectCountTracker, genericConfig.Config.DrainedNotify(), genericConfig.Config.AddPostStartHook); err != nil {
+		return nil, err
+	}
+	storageFactory := NewStorageFactory(etcdOptions)
+	if err := etcdOptions.ApplyWithStorageFactoryTo(storageFactory, &genericConfig.Config); err != nil {
+		return nil, err
+	}
 
 	// It is not worse than it was before. This code deserves refactoring.
 	// Instead of having a dedicated configuration file, we should pass flags directly.
@@ -162,7 +173,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	clusterQuotaMappingController := NewClusterQuotaMappingController(informers.kubernetesInformers.Core().V1().Namespaces(), informers.quotaInformers.Quota().V1().ClusterResourceQuotas())
 	discoveryClient := cacheddiscovery.NewMemCacheClient(kubeClient.Discovery())
 	restMapper := restmapper.NewDeferredDiscoveryRESTMapper(discoveryClient)
-	admissionInitializer, err := openshiftadmission.NewPluginInitializer(config, genericConfig, kubeClientConfig, informers, feature.DefaultFeatureGate, restMapper, clusterQuotaMappingController)
+	admissionInitializer, err := openshiftadmission.NewPluginInitializer(config, genericConfig, dynamicClient, kubeClientConfig, informers, feature.DefaultFeatureGate, restMapper, clusterQuotaMappingController)
 	if err != nil {
 		return nil, err
 	}

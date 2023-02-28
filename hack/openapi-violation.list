@@ -70,6 +70,7 @@ API rule violation: list_type_missing,github.com/openshift/api/config/v1,AWSPlat
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AdmissionConfig,DisabledAdmissionPlugins
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AdmissionConfig,EnabledAdmissionPlugins
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AuthenticationSpec,WebhookTokenAuthenticators
+API rule violation: list_type_missing,github.com/openshift/api/config/v1,AzurePlatformStatus,ResourceTags
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,BareMetalPlatformStatus,APIServerInternalIPs
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,BareMetalPlatformStatus,IngressIPs
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,BuildDefaults,Env
@@ -423,10 +424,6 @@ API rule violation: list_type_missing,github.com/openshift/api/user/v1,User,Iden
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,MutatingWebhook,AdmissionReviewVersions
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,MutatingWebhook,Rules
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,MutatingWebhookConfiguration,Webhooks
-API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,Rule,APIGroups
-API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,Rule,APIVersions
-API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,Rule,Resources
-API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,RuleWithOperations,Operations
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,ValidatingWebhook,AdmissionReviewVersions
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,ValidatingWebhook,Rules
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,ValidatingWebhookConfiguration,Webhooks
@@ -434,10 +431,6 @@ API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1,Webhoo
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1beta1,MutatingWebhook,AdmissionReviewVersions
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1beta1,MutatingWebhook,Rules
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1beta1,MutatingWebhookConfiguration,Webhooks
-API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1beta1,Rule,APIGroups
-API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1beta1,Rule,APIVersions
-API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1beta1,Rule,Resources
-API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1beta1,RuleWithOperations,Operations
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1beta1,ValidatingWebhook,AdmissionReviewVersions
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1beta1,ValidatingWebhook,Rules
 API rule violation: list_type_missing,k8s.io/api/admissionregistration/v1beta1,ValidatingWebhookConfiguration,Webhooks
@@ -588,6 +581,7 @@ API rule violation: list_type_missing,k8s.io/api/extensions/v1beta1,DeploymentSt
 API rule violation: list_type_missing,k8s.io/api/extensions/v1beta1,FSGroupStrategyOptions,Ranges
 API rule violation: list_type_missing,k8s.io/api/extensions/v1beta1,HTTPIngressRuleValue,Paths
 API rule violation: list_type_missing,k8s.io/api/extensions/v1beta1,IPBlock,Except
+API rule violation: list_type_missing,k8s.io/api/extensions/v1beta1,IngressLoadBalancerStatus,Ingress
 API rule violation: list_type_missing,k8s.io/api/extensions/v1beta1,IngressSpec,Rules
 API rule violation: list_type_missing,k8s.io/api/extensions/v1beta1,IngressSpec,TLS
 API rule violation: list_type_missing,k8s.io/api/extensions/v1beta1,IngressTLS,Hosts
@@ -616,6 +610,7 @@ API rule violation: list_type_missing,k8s.io/api/extensions/v1beta1,RuntimeClass
 API rule violation: list_type_missing,k8s.io/api/extensions/v1beta1,SupplementalGroupsStrategyOptions,Ranges
 API rule violation: list_type_missing,k8s.io/api/imagepolicy/v1alpha1,ImageReviewSpec,Containers
 API rule violation: list_type_missing,k8s.io/api/networking/v1,IPBlock,Except
+API rule violation: list_type_missing,k8s.io/api/networking/v1,IngressLoadBalancerStatus,Ingress
 API rule violation: list_type_missing,k8s.io/api/networking/v1,NetworkPolicyEgressRule,Ports
 API rule violation: list_type_missing,k8s.io/api/networking/v1,NetworkPolicyEgressRule,To
 API rule violation: list_type_missing,k8s.io/api/networking/v1,NetworkPolicyIngressRule,From
@@ -624,6 +619,7 @@ API rule violation: list_type_missing,k8s.io/api/networking/v1,NetworkPolicySpec
 API rule violation: list_type_missing,k8s.io/api/networking/v1,NetworkPolicySpec,Ingress
 API rule violation: list_type_missing,k8s.io/api/networking/v1,NetworkPolicySpec,PolicyTypes
 API rule violation: list_type_missing,k8s.io/api/networking/v1beta1,HTTPIngressRuleValue,Paths
+API rule violation: list_type_missing,k8s.io/api/networking/v1beta1,IngressLoadBalancerStatus,Ingress
 API rule violation: list_type_missing,k8s.io/api/networking/v1beta1,IngressSpec,Rules
 API rule violation: list_type_missing,k8s.io/api/networking/v1beta1,IngressSpec,TLS
 API rule violation: list_type_missing,k8s.io/api/networking/v1beta1,IngressTLS,Hosts
@@ -1018,10 +1014,12 @@ API rule violation: names_match,k8s.io/apimachinery/pkg/util/intstr,IntOrString,
 API rule violation: names_match,k8s.io/apimachinery/pkg/util/intstr,IntOrString,StrVal
 API rule violation: names_match,k8s.io/apimachinery/pkg/util/intstr,IntOrString,Type
 API rule violation: names_match,k8s.io/client-go/pkg/apis/clientauthentication/v1,Cluster,CertificateAuthorityData
+API rule violation: names_match,k8s.io/client-go/pkg/apis/clientauthentication/v1,Cluster,DisableCompression
 API rule violation: names_match,k8s.io/client-go/pkg/apis/clientauthentication/v1,Cluster,InsecureSkipTLSVerify
 API rule violation: names_match,k8s.io/client-go/pkg/apis/clientauthentication/v1,Cluster,ProxyURL
 API rule violation: names_match,k8s.io/client-go/pkg/apis/clientauthentication/v1,Cluster,TLSServerName
 API rule violation: names_match,k8s.io/client-go/pkg/apis/clientauthentication/v1beta1,Cluster,CertificateAuthorityData
+API rule violation: names_match,k8s.io/client-go/pkg/apis/clientauthentication/v1beta1,Cluster,DisableCompression
 API rule violation: names_match,k8s.io/client-go/pkg/apis/clientauthentication/v1beta1,Cluster,InsecureSkipTLSVerify
 API rule violation: names_match,k8s.io/client-go/pkg/apis/clientauthentication/v1beta1,Cluster,ProxyURL
 API rule violation: names_match,k8s.io/client-go/pkg/apis/clientauthentication/v1beta1,Cluster,TLSServerName

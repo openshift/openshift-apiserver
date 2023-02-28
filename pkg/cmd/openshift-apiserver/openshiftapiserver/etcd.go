@@ -4,9 +4,7 @@ import (
 	"strconv"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	genericregistry "k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/server/options"
-	"k8s.io/apiserver/pkg/server/options/encryptionconfig"
 	apiserverstorage "k8s.io/apiserver/pkg/server/storage"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
@@ -15,8 +13,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver/configprocessing"
 )
 
-// NewConfigGetter returns a restoptions.Getter implemented using information from the provided master config.
-func NewRESTOptionsGetter(startingFlags map[string][]string, storageConfig configv1.EtcdStorageConfig) (genericregistry.RESTOptionsGetter, error) {
+func ToEtcdOptions(startingFlags map[string][]string, storageConfig configv1.EtcdStorageConfig) (*options.EtcdOptions, error) {
 	var err error
 	targetRAMMB := 0
 	if targetRamString := startingFlags["target-ram-mb"]; len(targetRamString) == 1 {
@@ -26,13 +23,15 @@ func NewRESTOptionsGetter(startingFlags map[string][]string, storageConfig confi
 		}
 	}
 
-	etcdOptions, err := configprocessing.GetEtcdOptions(
+	return configprocessing.GetEtcdOptions(
 		startingFlags,
 		storageConfig,
 		newHeuristicWatchCacheSizes(targetRAMMB),
 	)
+}
 
-	storageFactory := apiserverstorage.NewDefaultStorageFactory(
+func NewStorageFactory(etcdOptions *options.EtcdOptions) serverstorage.StorageFactory {
+	return apiserverstorage.NewDefaultStorageFactory(
 		etcdOptions.StorageConfig,
 		etcdOptions.DefaultStorageMediaType,
 		legacyscheme.Codecs,
@@ -40,22 +39,6 @@ func NewRESTOptionsGetter(startingFlags map[string][]string, storageConfig confi
 		&serverstorage.ResourceConfig{},
 		specialDefaultResourcePrefixes,
 	)
-
-	if len(etcdOptions.EncryptionProviderConfigFilepath) != 0 {
-		transformerOverrides, err := encryptionconfig.GetTransformerOverrides(etcdOptions.EncryptionProviderConfigFilepath)
-		if err != nil {
-			return nil, err
-		}
-		for groupResource, transformer := range transformerOverrides {
-			storageFactory.SetTransformer(groupResource, transformer)
-		}
-	}
-
-	restOptionsGetter := &options.StorageFactoryRestOptionsFactory{
-		Options:        *etcdOptions,
-		StorageFactory: storageFactory,
-	}
-	return restOptionsGetter, nil
 }
 
 // newHeuristicWatchCacheSizes returns a map of suggested watch cache sizes based on total

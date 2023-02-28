@@ -10,7 +10,6 @@ import (
 	"k8s.io/apiserver/pkg/authorization/authorizer"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
-	"k8s.io/client-go/kubernetes/fake"
 	corev1listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
@@ -150,8 +149,10 @@ func TestNoErrors(t *testing.T) {
 		serviceAccount := admissionttesting.CreateSAForTest()
 		serviceAccount.Namespace = namespace.Name
 		saIndexer.Add(serviceAccount)
-		csf := fake.NewSimpleClientset(namespace)
-		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), saCache, csf}
+		nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+		nsIndexer.Add(namespace)
+		nsLister := corev1listers.NewNamespaceLister(nsIndexer)
+		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), saCache, nsLister}
 		ctx := apirequest.WithNamespace(apirequest.NewContext(), namespace.Name)
 		obj, err := storage.Create(ctx, testcase.request, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
 		if err != nil {
@@ -246,9 +247,10 @@ func TestErrors(t *testing.T) {
 			serviceAccount.Namespace = namespace.Name
 			saIndexer.Add(serviceAccount)
 		}
-		csf := fake.NewSimpleClientset(namespace)
+		nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+		nsLister := corev1listers.NewNamespaceLister(nsIndexer)
 
-		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), saCache, csf}
+		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), saCache, nsLister}
 		ctx := apirequest.WithNamespace(apirequest.NewContext(), namespace.Name)
 		_, err := storage.Create(ctx, testcase.request, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
 		if err == nil {
@@ -404,8 +406,9 @@ func TestSpecificSAs(t *testing.T) {
 		for i := range testcase.serviceAccounts {
 			saIndexer.Add(testcase.serviceAccounts[i])
 		}
-		csf := fake.NewSimpleClientset(namespace)
-		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), saCache, csf}
+		nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+		nsLister := corev1listers.NewNamespaceLister(nsIndexer)
+		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), saCache, nsLister}
 		ctx := apirequest.WithNamespace(apirequest.NewContext(), namespace.Name)
 		_, err := storage.Create(ctx, testcase.request, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
 		switch {
