@@ -9,7 +9,6 @@ import (
 	"k8s.io/apiserver/pkg/authorization/authorizer"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
-	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/cache"
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
 
@@ -18,6 +17,7 @@ import (
 	securityv1listers "github.com/openshift/client-go/security/listers/security/v1"
 	securityapi "github.com/openshift/openshift-apiserver/pkg/security/apis/security"
 	admissionttesting "github.com/openshift/openshift-apiserver/pkg/security/apiserver/admission/testing"
+	corev1listers "k8s.io/client-go/listers/core/v1"
 )
 
 func saSCC() *securityv1.SecurityContextConstraints {
@@ -99,7 +99,7 @@ func TestAllowed(t *testing.T) {
 
 	namespace := admissionttesting.CreateNamespaceForTest()
 	for testName, testcase := range testcases {
-		serviceAccount := admissionttesting.CreateSAForTest()
+		_ = admissionttesting.CreateSAForTest()
 		reviewRequest := &securityapi.PodSecurityPolicySubjectReview{
 			Spec: securityapi.PodSecurityPolicySubjectReviewSpec{
 				Template: coreapi.PodTemplateSpec{
@@ -136,8 +136,10 @@ func TestAllowed(t *testing.T) {
 			}
 		}
 
-		csf := fake.NewSimpleClientset(namespace, serviceAccount)
-		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), csf}
+		nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+		nsIndexer.Add(namespace)
+		nsLister := corev1listers.NewNamespaceLister(nsIndexer)
+		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), nsLister}
 		ctx := apirequest.WithNamespace(apirequest.NewContext(), metav1.NamespaceDefault)
 		obj, err := storage.Create(ctx, reviewRequest, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
 		if err != nil {
@@ -254,7 +256,7 @@ func TestRequests(t *testing.T) {
 		},
 	}
 	namespace := admissionttesting.CreateNamespaceForTest()
-	serviceAccount := admissionttesting.CreateSAForTest()
+	_ = admissionttesting.CreateSAForTest()
 	for testName, testcase := range testcases {
 		sccIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 		sccCache := securityv1listers.NewSecurityContextConstraintsLister(sccIndexer)
@@ -263,8 +265,11 @@ func TestRequests(t *testing.T) {
 				t.Fatalf("error adding sccs to store: %v", err)
 			}
 		}
-		csf := fake.NewSimpleClientset(namespace, serviceAccount)
-		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), csf}
+
+		nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+		nsIndexer.Add(namespace)
+		nsLister := corev1listers.NewNamespaceLister(nsIndexer)
+		storage := REST{sccmatching.NewDefaultSCCMatcher(sccCache, &noopTestAuthorizer{}), nsLister}
 		ctx := apirequest.WithNamespace(apirequest.NewContext(), metav1.NamespaceDefault)
 		_, err := storage.Create(ctx, testcase.request, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
 		switch {

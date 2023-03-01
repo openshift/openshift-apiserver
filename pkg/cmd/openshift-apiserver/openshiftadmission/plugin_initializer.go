@@ -13,6 +13,7 @@ import (
 	"k8s.io/apiserver/pkg/quota/v1/generic"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/util/webhook"
+	"k8s.io/client-go/dynamic"
 	kexternalinformers "k8s.io/client-go/informers"
 	kubeclientgoclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -50,6 +51,7 @@ type InformerAccess interface {
 func NewPluginInitializer(
 	config *openshiftcontrolplanev1.OpenShiftAPIServerConfig,
 	genericConfig *genericapiserver.RecommendedConfig,
+	dynamicClient dynamic.Interface,
 	privilegedLoopbackConfig *rest.Config,
 	informers InformerAccess,
 	featureGates featuregate.FeatureGate,
@@ -88,6 +90,7 @@ func NewPluginInitializer(
 	// note: we are passing a combined quota registry here...
 	genericInitializer := initializer.New(
 		kubeClient,
+		dynamicClient,
 		informers.GetKubernetesInformers(),
 		genericConfig.Authorization.Authorizer,
 		featureGates,
