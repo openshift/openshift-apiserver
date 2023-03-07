@@ -11,6 +11,7 @@ import (
 
 	projectapi "github.com/openshift/openshift-apiserver/pkg/project/apis/project"
 	"github.com/openshift/openshift-apiserver/pkg/project/apis/project/validation"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // projectStrategy implements behavior for projects
@@ -45,6 +46,7 @@ func (projectStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object)
 			project.Spec.Finalizers = append(project.Spec.Finalizers, projectapi.FinalizerOrigin)
 		}
 	}
+	project.SetNamespace(metav1.NamespaceNone)
 }
 
 // PrepareForUpdate clears fields that are not allowed to be set by end users on update.
@@ -53,6 +55,7 @@ func (projectStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 	oldProject := old.(*projectapi.Project)
 	newProject.Spec.Finalizers = oldProject.Spec.Finalizers
 	newProject.Status = oldProject.Status
+	newProject.SetNamespace(metav1.NamespaceNone)
 }
 
 // Validate validates a new project.
