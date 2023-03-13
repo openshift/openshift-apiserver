@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"regexp"
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
@@ -16,10 +17,21 @@ import (
 	kvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
+	"github.com/google/go-cmp/cmp"
 	routev1 "github.com/openshift/api/route/v1"
 )
 
 var validateRouteName = apimachineryvalidation.NameIsDNSSubdomain
+
+// Any changes made to this regex shall be reflected in openshift/api for spec.httpHeaders.actions.response[*] of the Route API used for microshift and vice-versa.
+var (
+	permittedHeaderValueTemplate   = `^(?:%(?:%|(?:\{[-+]?[QXE](?:,[-+]?[QXE])*\})?\[(?:XYZ\.hdr\([0-9A-Za-z-]+\)|ssl_c_der)(?:,(?:lower|base64))*\])|[^%[:cntrl:]])+$`
+	permittedRequestHeaderValueRE  = regexp.MustCompile(strings.Replace(permittedHeaderValueTemplate, "XYZ", "req", 1))
+	permittedResponseHeaderValueRE = regexp.MustCompile(strings.Replace(permittedHeaderValueTemplate, "XYZ", "res", 1))
+	specResponseString             = "spec.httpHeaders.actions.response"
+	specRequestString              = "spec.httpHeaders.actions.request"
+	specTLSTerminationString       = "spec.tls.termination"
+)
 
 func ValidateRoute(route *routev1.Route) field.ErrorList {
 	return validateRoute(route, true)
@@ -90,6 +102,33 @@ func validateRoute(route *routev1.Route, checkHostname bool) field.ErrorList {
 		result = append(result, err)
 	}
 
+	if len(route.Spec.HTTPHeaders.Actions.Response) != 0 || len(route.Spec.HTTPHeaders.Actions.Request) != 0 {
+		if route.Spec.TLS != nil && route.Spec.TLS.Termination == routev1.TLSTerminationPassthrough {
+			specTLS := field.NewPath(specTLSTerminationString)
+			result = append(result, field.NotSupported(specTLS, route.Spec.TLS.Termination, []string{"Only edge and re-encrypt routes are supported for providing customized headers."}))
+		}
+	}
+	if len(route.Spec.HTTPHeaders.Actions.Response) != 0 && len(route.Spec.HTTPHeaders.Actions.Response) > 64 {
+		result = append(result, field.Invalid(specPath.Child(specResponseString), route.Spec.HTTPHeaders.Actions.Response, "http response headers list can't exceed more than 64 items."))
+	}
+
+	if len(route.Spec.HTTPHeaders.Actions.Request) != 0 && len(route.Spec.HTTPHeaders.Actions.Request) > 64 {
+		result = append(result, field.Invalid(specPath.Child(specRequestString), route.Spec.HTTPHeaders.Actions.Request, "http request headers list can't exceed more than 64 items."))
+	}
+
+	if len(route.Spec.HTTPHeaders.Actions.Response) != 0 {
+		specResponse := field.NewPath(specResponseString)
+		if err := validateHeaders(specResponse, route.Spec.HTTPHeaders.Actions.Response); err != nil {
+			result = append(result, err)
+		}
+	}
+	if len(route.Spec.HTTPHeaders.Actions.Request) != 0 {
+		specRequest := field.NewPath(specRequestString)
+		if err := validateHeaders(specRequest, route.Spec.HTTPHeaders.Actions.Request); err != nil {
+			result = append(result, err)
+		}
+	}
+
 	if len(route.Spec.Path) > 0 && !strings.HasPrefix(route.Spec.Path, "/") {
 		result = append(result, field.Invalid(specPath.Child("path"), route.Spec.Path, "path must begin with /"))
 	}
@@ -141,10 +180,16 @@ func validateRoute(route *routev1.Route, checkHostname bool) field.ErrorList {
 }
 
 func ValidateRouteUpdate(route *routev1.Route, older *routev1.Route) field.ErrorList {
+	var headersUpdated bool
 	allErrs := validateObjectMetaUpdate(&route.ObjectMeta, &older.ObjectMeta, field.NewPath("metadata"))
 	allErrs = append(allErrs, apimachineryvalidation.ValidateImmutableField(route.Spec.WildcardPolicy, older.Spec.WildcardPolicy, field.NewPath("spec", "wildcardPolicy"))...)
 	hostnameUpdated := route.Spec.Host != older.Spec.Host
-	allErrs = append(allErrs, validateRoute(route, hostnameUpdated && validLabels(older.Spec.Host))...)
+	if route.Spec.HTTPHeaders.Actions.Response != nil || route.Spec.HTTPHeaders.Actions.Request != nil {
+		headersUpdated = cmp.Equal(route.Spec.HTTPHeaders, older.Spec.HTTPHeaders)
+		allErrs = append(allErrs, validateRoute(route, headersUpdated && hostnameUpdated && validLabels(older.Spec.Host))...)
+	} else {
+		allErrs = append(allErrs, validateRoute(route, hostnameUpdated && validLabels(older.Spec.Host))...)
+	}
 	return allErrs
 }
 
@@ -339,6 +384,37 @@ func validateWildcardPolicy(host string, policy routev1.WildcardPolicyType, fldP
 		return field.Invalid(fldPath, policy, "host name not specified for wildcard policy")
 	}
 
+	return nil
+}
+
+var (
+	notAllowedHTTPHeaders   = []string{"strict-transport-security", "proxy"}
+	notAllowedHTTPHeaderSet = sets.NewString(notAllowedHTTPHeaders...)
+)
+
+func validateHeaders(path *field.Path, headerValues []routev1.RouteHTTPHeader) *field.Error {
+	for key, value := range headerValues {
+		if value.Action.Set != nil && len(value.Action.Set.Value) != 0 && len(value.Action.Set.Value) > 4096 {
+			return field.Invalid(path.Index(key).Child("action.set.value"), value.Name, fmt.Sprintf("value exceeds the maximum length which is 4096"))
+		}
+		if value.Action.Set != nil && len(value.Action.Set.Value) == 0 {
+			return field.Invalid(path.Index(key).Child("action.set.value"), value.Name, fmt.Sprintf("value must be present"))
+		}
+		if path.String() == specResponseString && value.Action.Set != nil && len(value.Action.Set.Value) != 0 {
+			if !permittedResponseHeaderValueRE.MatchString(value.Action.Set.Value) {
+				return field.Invalid(path.Index(key).Child("action.set.value"), value.Name, "Either header value provided is not in correct format or the converter specified is not allowed. The dynamic header value  may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2 Sample fetchers allowed are res.hdr, ssl_c_der. Converters allowed are lower, base64.")
+			}
+		}
+		if path.String() == specRequestString && value.Action.Set != nil && len(value.Action.Set.Value) != 0 {
+			if !permittedRequestHeaderValueRE.MatchString(value.Action.Set.Value) {
+				return field.Invalid(path.Index(key).Child("action.set.value"), value.Name, "Either header value provided is not in correct format or the converter specified is not allowed. The dynamic header value  may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2 Sample fetchers allowed are req.hdr, ssl_c_der. Converters allowed are lower, base64.")
+			}
+		}
+		if len(value.Name) != 0 && value.Action.Set != nil && notAllowedHTTPHeaderSet.Has(strings.ToLower(value.Name)) {
+			return field.NotSupported(path.Index(key).Child("name"), value.Name, []string{fmt.Sprintf("All headers except %v", strings.Join(notAllowedHTTPHeaders, ","))})
+		}
+
+	}
 	return nil
 }
 

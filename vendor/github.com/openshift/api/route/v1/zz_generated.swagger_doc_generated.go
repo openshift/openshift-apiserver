@@ -12,13 +12,53 @@ package v1
 
 // AUTO-GENERATED FUNCTIONS START HERE
 var map_Route = map[string]string{
-	"":       "A route allows developers to expose services through an HTTP(S) aware load balancing and proxy layer via a public DNS entry. The route may further specify TLS options and a certificate, or specify a public CNAME that the router should also accept for HTTP and HTTPS traffic. An administrator typically configures their router to be visible outside the cluster firewall, and may also add additional security, caching, or traffic controls on the service content. Routers usually talk directly to the service endpoints.\n\nOnce a route is created, the `host` field may not be changed. Generally, routers use the oldest route with a given host when resolving conflicts.\n\nRouters are subject to additional customization and may support additional controls via the annotations field.\n\nBecause administrators may configure multiple routers, the route status field is used to return information to clients about the names and states of the route under each router. If a client chooses a duplicate name, for instance, the route status conditions are used to indicate the route cannot be chosen.\n\nTo enable HTTP/2 ALPN on a route it requires a custom (non-wildcard) certificate. This prevents connection coalescing by clients, notably web browsers. We do not support HTTP/2 ALPN on routes that use the default certificate because of the risk of connection re-use/coalescing. Routes that do not have their own custom certificate will not be HTTP/2 ALPN-enabled on either the frontend or the backend.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
-	"spec":   "spec is the desired state of the route",
-	"status": "status is the current state of the route",
+	"":         "A route allows developers to expose services through an HTTP(S) aware load balancing and proxy layer via a public DNS entry. The route may further specify TLS options and a certificate, or specify a public CNAME that the router should also accept for HTTP and HTTPS traffic. An administrator typically configures their router to be visible outside the cluster firewall, and may also add additional security, caching, or traffic controls on the service content. Routers usually talk directly to the service endpoints.\n\nOnce a route is created, the `host` field may not be changed. Generally, routers use the oldest route with a given host when resolving conflicts.\n\nRouters are subject to additional customization and may support additional controls via the annotations field.\n\nBecause administrators may configure multiple routers, the route status field is used to return information to clients about the names and states of the route under each router. If a client chooses a duplicate name, for instance, the route status conditions are used to indicate the route cannot be chosen.\n\nTo enable HTTP/2 ALPN on a route it requires a custom (non-wildcard) certificate. This prevents connection coalescing by clients, notably web browsers. We do not support HTTP/2 ALPN on routes that use the default certificate because of the risk of connection re-use/coalescing. Routes that do not have their own custom certificate will not be HTTP/2 ALPN-enabled on either the frontend or the backend.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+	"metadata": "metadata is the standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+	"spec":     "spec is the desired state of the route",
+	"status":   "status is the current state of the route",
 }
 
 func (Route) SwaggerDoc() map[string]string {
 	return map_Route
+}
+
+var map_RouteHTTPHeader = map[string]string{
+	"":       "RouteHTTPHeader specifies configuration for setting or deleting an HTTP header.",
+	"name":   "name specifies a header name to be set or deleted.  Its value must be a valid HTTP header. name as defined in RFC 2616 section 4.2.",
+	"action": "action specifies actions to perform on headers, such as setting or deleting headers.",
+}
+
+func (RouteHTTPHeader) SwaggerDoc() map[string]string {
+	return map_RouteHTTPHeader
+}
+
+var map_RouteHTTPHeaderActionUnion = map[string]string{
+	"":     "RouteHTTPHeaderActionUnion specifies an action to take on an HTTP header.",
+	"type": "type defines the type of the action to be applied on the header. Possible values are Set and Delete. Set allows you to set http request and response headers. Delete allows you to delete http request and response headers",
+	"set":  "set defines the HTTP header that should be set: added if doesn't exist or replaced if does. If this field is empty, no header is added or replaced.",
+}
+
+func (RouteHTTPHeaderActionUnion) SwaggerDoc() map[string]string {
+	return map_RouteHTTPHeaderActionUnion
+}
+
+var map_RouteHTTPHeaderActions = map[string]string{
+	"":         "RouteHTTPHeaderActions defines configuration for actions on HTTP request and response headers.",
+	"response": "response is a list of HTTP response headers to set or delete. The actions either Set or Delete will be performed on the headers in sequence as defined in the list of response headers. A maximum of 64 response header actions may be configured. You can use this field to specify HTTP response headers that should be set or deleted when forwarding responses from your application to the client. Sample fetchers allowed are \"req.hdr\" and \"ssl_c_der\". Converters allowed are \"lower\" and \"base64\". Examples of header value - \"%[res.hdr(X-target),lower]\", \"%[res.hdr(X-client),base64]\", \"{+Q}[ssl_c_der,base64]\", \"{+Q}[ssl_c_der,lower]\" Note: This field cannot be used if your route uses TLS passthrough.",
+	"request":  "request is a list of HTTP request headers to set or delete. The actions either Set or Delete will be performed on the headers in sequence as defined in the list of request headers. A maximum of 64 request header actions may be configured. You can use this field to specify HTTP request headers that should be set or deleted when forwarding connections from the client to your application. Sample fetchers allowed are \"req.hdr\" and \"ssl_c_der\". Converters allowed are \"lower\" and \"base64\". Examples of header value - \"%[req.hdr(host),lower]\", \"%[req.hdr(host),base64]\", \"{+Q}[ssl_c_der,base64]\", \"{+Q}[ssl_c_der,lower]\" Note: This field cannot be used if your route uses TLS passthrough.",
+}
+
+func (RouteHTTPHeaderActions) SwaggerDoc() map[string]string {
+	return map_RouteHTTPHeaderActions
+}
+
+var map_RouteHTTPHeaders = map[string]string{
+	"":        "RouteHTTPHeaders defines policy for HTTP headers.",
+	"actions": "actions specifies actions to take on headers. Note that this option only applies to cleartext HTTP connections and to secure HTTP connections for which the ingress controller terminates encryption (that is, edge-terminated or reencrypt connections).  Headers cannot be set or deleted for TLS passthrough connections. Setting HSTS header is supported via another mechanism in Ingress.Spec.RequiredHSTSPolicies. Setting httpCaptureHeaders for the headers set via this API will not work. If spec.clientTLS, spec.httpHeaders.forwardedHeaderPolicy, spec.httpHeaders.uniqueId, spec.httpHeaders.headerNameCaseAdjustments is set and if you set the same header via this API then that header will get replaced with the value specified via this API. If cache-control is set using this API then the existing value of cache-control will get replaced. The header set using route will over-ride the header set in ingress controller if the headers defined both were same.",
+}
+
+func (RouteHTTPHeaders) SwaggerDoc() map[string]string {
+	return map_RouteHTTPHeaders
 }
 
 var map_RouteIngress = map[string]string{
@@ -48,8 +88,9 @@ func (RouteIngressCondition) SwaggerDoc() map[string]string {
 }
 
 var map_RouteList = map[string]string{
-	"":      "RouteList is a collection of Routes.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
-	"items": "items is a list of routes",
+	"":         "RouteList is a collection of Routes.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+	"metadata": "metadata is the standard list's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+	"items":    "items is a list of routes",
 }
 
 func (RouteList) SwaggerDoc() map[string]string {
@@ -65,6 +106,15 @@ func (RoutePort) SwaggerDoc() map[string]string {
 	return map_RoutePort
 }
 
+var map_RouteSetHTTPHeader = map[string]string{
+	"":      "RouteSetHTTPHeader specifies what value needs to be set on an HTTP header.",
+	"value": "value specifies a header value. Dynamic values can be added. The value will be interpreted as an HAProxy format string as defined in https://cbonte.github.io/haproxy-dconv/2.4/configuration.html#8.2.4 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2 Note: Any change to regex mentioned below shall be reflected in the crd validation of route in library-go or vice-versa.",
+}
+
+func (RouteSetHTTPHeader) SwaggerDoc() map[string]string {
+	return map_RouteSetHTTPHeader
+}
+
 var map_RouteSpec = map[string]string{
 	"":                  "RouteSpec describes the hostname or path the route exposes, any security information, and one to four backends (services) the route points to. Requests are distributed among the backends depending on the weights assigned to each backend. When using roundrobin scheduling the portion of requests that go to each backend is the backend weight divided by the sum of all of the backend weights. When the backend has more than one endpoint the requests that end up on the backend are roundrobin distributed among the endpoints. Weights are between 0 and 256 with default 100. Weight 0 causes no requests to the backend. If all weights are zero the route will be considered to have no backends and return a standard 503 response.\n\nThe `tls` field is optional and allows specific certificates or behavior for the route. Routers typically configure a default certificate on a wildcard domain to terminate routes without explicit certificates, but custom hostnames usually must choose passthrough (send traffic directly to the backend via the TLS Server-Name- Indication field) or provide a certificate.",
 	"host":              "host is an alias/DNS that points to the service. Optional. If not specified a route name will typically be automatically chosen. Must follow DNS952 subdomain conventions.",
@@ -75,6 +125,7 @@ var map_RouteSpec = map[string]string{
 	"port":              "If specified, the port to be used by the router. Most routers will use all endpoints exposed by the service by default - set this value to instruct routers which port to use.",
 	"tls":               "The tls field provides the ability to configure certificates and termination for the route.",
 	"wildcardPolicy":    "Wildcard policy if any for the route. Currently only 'Subdomain' or 'None' is allowed.",
+	"httpHeaders":       "httpHeaders defines policy for HTTP headers.\n\nIf this field is empty, the default values are used.",
 }
 
 func (RouteSpec) SwaggerDoc() map[string]string {
@@ -113,12 +164,12 @@ func (RouterShard) SwaggerDoc() map[string]string {
 
 var map_TLSConfig = map[string]string{
 	"":                              "TLSConfig defines config used to secure a route and provide termination",
-	"termination":                   "termination indicates termination type.\n\n* edge - TLS termination is done by the router and http is used to communicate with the backend (default) * passthrough - Traffic is sent straight to the destination without the router providing TLS termination * reencrypt - TLS termination is done by the router and https is used to communicate with the backend",
+	"termination":                   "termination indicates termination type.\n\n* edge - TLS termination is done by the router and http is used to communicate with the backend (default) * passthrough - Traffic is sent straight to the destination without the router providing TLS termination * reencrypt - TLS termination is done by the router and https is used to communicate with the backend\n\nNote: passthrough termination is incompatible with httpHeader.actions",
 	"certificate":                   "certificate provides certificate contents. This should be a single serving certificate, not a certificate chain. Do not include a CA certificate.",
 	"key":                           "key provides key file contents",
 	"caCertificate":                 "caCertificate provides the cert authority certificate contents",
 	"destinationCACertificate":      "destinationCACertificate provides the contents of the ca certificate of the final destination.  When using reencrypt termination this file should be provided in order to have routers use it for health checks on the secure connection. If this field is not specified, the router may provide its own destination CA and perform hostname validation using the short service name (service.namespace.svc), which allows infrastructure generated certificates to automatically verify.",
-	"insecureEdgeTerminationPolicy": "insecureEdgeTerminationPolicy indicates the desired behavior for insecure connections to a route. While each router may make its own decisions on which ports to expose, this is normally port 80.\n\n* Allow - traffic is sent to the server on the insecure port (default) * Disable - no traffic is allowed on the insecure port. * Redirect - clients are redirected to the secure port.",
+	"insecureEdgeTerminationPolicy": "insecureEdgeTerminationPolicy indicates the desired behavior for insecure connections to a route. While each router may make its own decisions on which ports to expose, this is normally port 80.\n\n* Allow - traffic is sent to the server on the insecure port (edge/reencrypt terminations only) (default). * None - no traffic is allowed on the insecure port. * Redirect - clients are redirected to the secure port.",
 }
 
 func (TLSConfig) SwaggerDoc() map[string]string {
