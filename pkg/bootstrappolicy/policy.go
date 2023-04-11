@@ -51,6 +51,7 @@ var (
 	coordinationGroup          = coordination.GroupName
 	extensionsGroup            = extensions.GroupName
 	networkingGroup            = "networking.k8s.io"
+	networkingOVNGroup         = "k8s.ovn.org"
 	nodeGroup                  = "node.k8s.io"
 	policyGroup                = policy.GroupName
 	rbacGroup                  = rbac.GroupName
@@ -216,6 +217,8 @@ func GetOpenshiftBootstrapClusterRoles() []rbacv1.ClusterRole {
 
 				rbacv1helpers.NewRule(read...).Groups(networkGroup, legacyNetworkGroup).Resources("clusternetworks", "egressnetworkpolicies", "hostsubnets",
 					"netnamespaces").RuleOrDie(),
+
+				rbacv1helpers.NewRule(read...).Groups(networkingOVNGroup).Resources("egressfirewalls", "egressips", "egressqoses").RuleOrDie(),
 
 				rbacv1helpers.NewRule(read...).Groups(securityGroup, legacySecurityGroup).Resources("securitycontextconstraints").RuleOrDie(),
 				rbacv1helpers.NewRule(read...).Groups(securityGroup).Resources("rangeallocations").RuleOrDie(),
