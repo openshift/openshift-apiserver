@@ -14,6 +14,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericmux "k8s.io/apiserver/pkg/server/mux"
@@ -57,6 +58,11 @@ import (
 	_ "github.com/openshift/openshift-apiserver/pkg/api/install"
 )
 
+var configurableAPIList = sets.New[openshiftcontrolplanev1.OpenShiftAPIserverName](
+	openshiftcontrolplanev1.OpenShiftAppsAPIserver,
+	openshiftcontrolplanev1.OpenShiftBuildAPIserver,
+)
+
 type OpenshiftAPIExtraConfig struct {
 	// we phrase it like this so we can build the post-start-hook, but no one can take more indirect dependencies on informers
 	InformerStart func(stopCh <-chan struct{})
@@ -89,6 +95,9 @@ type OpenshiftAPIExtraConfig struct {
 	RESTMapper                *restmapper.DeferredDiscoveryRESTMapper
 
 	ClusterQuotaMappingController *clusterquotamapping.ClusterQuotaMappingController
+
+	// apiServers holds information about enabled/disabled API servers
+	APIServers openshiftcontrolplanev1.APIServers
 }
 
 // Validate helps ensure that we build this config correctly, because there are lots of bits to remember for now
@@ -416,15 +425,59 @@ func addAPIServerOrDie(delegateAPIServer genericapiserver.DelegationTarget, apiS
 func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget) (*OpenshiftAPIServer, error) {
 	delegateAPIServer := delegationTarget
 
-	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withAppsAPIServer)
-	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withAuthorizationAPIServer)
-	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withBuildAPIServer)
-	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withImageAPIServer)
-	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withProjectAPIServer)
-	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withQuotaAPIServer)
-	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withRouteAPIServer)
-	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withSecurityAPIServer)
-	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withTemplateAPIServer)
+	var apiServerInitializers = map[openshiftcontrolplanev1.OpenShiftAPIserverName]apiServerAppenderFunc{
+		openshiftcontrolplanev1.OpenShiftAppsAPIserver:          c.withAppsAPIServer,
+		openshiftcontrolplanev1.OpenShiftAuthorizationAPIserver: c.withAuthorizationAPIServer,
+		openshiftcontrolplanev1.OpenShiftBuildAPIserver:         c.withBuildAPIServer,
+		openshiftcontrolplanev1.OpenShiftImageAPIserver:         c.withImageAPIServer,
+		openshiftcontrolplanev1.OpenShiftProjectAPIserver:       c.withProjectAPIServer,
+		openshiftcontrolplanev1.OpenShiftQuotaAPIserver:         c.withQuotaAPIServer,
+		openshiftcontrolplanev1.OpenShiftRouteAPIserver:         c.withRouteAPIServer,
+		openshiftcontrolplanev1.OpenShiftSecurityAPIserver:      c.withSecurityAPIServer,
+		openshiftcontrolplanev1.OpenShiftTemplateAPIserver:      c.withTemplateAPIServer,
+	}
+
+	apiServers := make(map[openshiftcontrolplanev1.OpenShiftAPIserverName]openshiftcontrolplanev1.PerGroupOptions)
+
+	// At the moment only Builds and DeploymentConfig API can be disabled.
+	// Other APIs will be added to the list as needed.
+	for _, group := range c.ExtraConfig.APIServers.PerGroupOptions {
+		if !configurableAPIList.Has(group.Name) {
+			return nil, fmt.Errorf("only %v APIs can be configured, %q is not supported", sets.List[openshiftcontrolplanev1.OpenShiftAPIserverName](configurableAPIList), group.Name)
+		}
+		if _, exists := apiServers[group.Name]; exists {
+			return nil, fmt.Errorf("list of enabled/disabled API servers contains a duplicated entry for %v", group.Name)
+		}
+		enabledVersions := sets.NewString(group.EnabledVersions...)
+		disabledVersions := sets.NewString(group.DisabledVersions...)
+
+		if enabledVersions.Intersection(disabledVersions).Len() > 0 {
+			return nil, fmt.Errorf("list of enabled and disabled versions for %q is not allowed to intersect: %v are in both lists", group.Name, enabledVersions.Intersection(disabledVersions).List())
+		}
+		// Only v1 version is supported
+		for _, version := range enabledVersions.List() {
+			if version != "v1" {
+				return nil, fmt.Errorf("only v1 version is currently supported for %q: %v is not", group.Name, version)
+			}
+		}
+		for _, version := range disabledVersions.List() {
+			if version != "v1" {
+				return nil, fmt.Errorf("only v1 version is currently supported for %q: %v is not", group.Name, version)
+			}
+		}
+		apiServers[group.Name] = group
+	}
+
+	// All API servers are enabled by default (nothing new to enable -> ignore the list of enabled versions)
+	for name, initFnc := range apiServerInitializers {
+		if _, exists := apiServers[name]; exists {
+			// All API servers are serving v1 resources
+			if sets.NewString(apiServers[name].DisabledVersions...).Has("v1") {
+				continue
+			}
+		}
+		delegateAPIServer = addAPIServerOrDie(delegateAPIServer, initFnc)
+	}
 
 	genericServer, err := c.GenericConfig.New("openshift-apiserver", delegateAPIServer)
 	if err != nil {
