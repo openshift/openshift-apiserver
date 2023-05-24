@@ -22,9 +22,10 @@ var _ rest.StandardStorage = &REST{}
 
 func NewREST(optsGetter generic.RESTOptionsGetter) *REST {
 	store := &genericregistry.Store{
-		NewFunc:                  func() runtime.Object { return &securityapi.RangeAllocation{} },
-		NewListFunc:              func() runtime.Object { return &securityapi.RangeAllocationList{} },
-		DefaultQualifiedResource: security.Resource("rangeallocations"),
+		NewFunc:                   func() runtime.Object { return &securityapi.RangeAllocation{} },
+		NewListFunc:               func() runtime.Object { return &securityapi.RangeAllocationList{} },
+		DefaultQualifiedResource:  security.Resource("rangeallocations"),
+		SingularQualifiedResource: security.Resource("rangeallocation"),
 
 		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(securityprinters.AddSecurityOpenShiftHandler)},
 

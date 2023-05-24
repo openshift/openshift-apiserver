@@ -30,6 +30,7 @@ var _ rest.CreaterUpdater = &REST{}
 var _ rest.GracefulDeleter = &REST{}
 var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 func NewREST(client restclient.Interface) utilregistry.NoWatchStorage {
 	return utilregistry.WrapNoWatchStorageError(&REST{
@@ -50,6 +51,10 @@ func (s *REST) NewList() runtime.Object {
 
 func (s *REST) NamespaceScoped() bool {
 	return false
+}
+
+func (s *REST) GetSingularName() string {
+	return "clusterrole"
 }
 
 func (s *REST) List(ctx context.Context, options *metainternal.ListOptions) (runtime.Object, error) {

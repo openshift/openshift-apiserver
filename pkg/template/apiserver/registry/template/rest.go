@@ -29,6 +29,7 @@ type REST struct {
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 // NewREST creates new RESTStorage interface for processing Template objects. If
 // legacyReturn is used, a Config object is returned. Otherwise, a List is returned
@@ -48,6 +49,10 @@ func (s *REST) Destroy() {}
 
 func (s *REST) NamespaceScoped() bool {
 	return true
+}
+
+func (s *REST) GetSingularName() string {
+	return "processedtemplate"
 }
 
 // Create processes a Template and creates a new list of objects

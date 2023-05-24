@@ -33,9 +33,10 @@ func (r *REST) Categories() []string {
 // NewREST returns a RESTStorage object that will work against Build objects.
 func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, *DetailsREST, error) {
 	store := &registry.Store{
-		NewFunc:                  func() runtime.Object { return &buildapi.Build{} },
-		NewListFunc:              func() runtime.Object { return &buildapi.BuildList{} },
-		DefaultQualifiedResource: build.Resource("builds"),
+		NewFunc:                   func() runtime.Object { return &buildapi.Build{} },
+		NewListFunc:               func() runtime.Object { return &buildapi.BuildList{} },
+		DefaultQualifiedResource:  build.Resource("builds"),
+		SingularQualifiedResource: build.Resource("build"),
 
 		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(buildprinters.AddBuildOpenShiftHandlers)},
 

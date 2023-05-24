@@ -61,6 +61,7 @@ var _ rest.Lister = &REST{}
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 func NewREST(message, templateNamespace, templateName string,
 	projectClient projectv1typedclient.ProjectsGetter,
@@ -94,6 +95,10 @@ func (r *REST) NewList() runtime.Object {
 
 func (s *REST) NamespaceScoped() bool {
 	return false
+}
+
+func (s *REST) GetSingularName() string {
+	return "projectrequest"
 }
 
 var _ = rest.Creater(&REST{})
