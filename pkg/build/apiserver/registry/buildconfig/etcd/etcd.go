@@ -35,9 +35,10 @@ func (r *REST) ShortNames() []string {
 // NewREST returns a RESTStorage object that will work against BuildConfig.
 func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, error) {
 	store := &registry.Store{
-		NewFunc:                  func() runtime.Object { return &buildapi.BuildConfig{} },
-		NewListFunc:              func() runtime.Object { return &buildapi.BuildConfigList{} },
-		DefaultQualifiedResource: build.Resource("buildconfigs"),
+		NewFunc:                   func() runtime.Object { return &buildapi.BuildConfig{} },
+		NewListFunc:               func() runtime.Object { return &buildapi.BuildConfigList{} },
+		DefaultQualifiedResource:  build.Resource("buildconfigs"),
+		SingularQualifiedResource: build.Resource("buildconfig"),
 
 		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(buildprinters.AddBuildOpenShiftHandlers)},
 

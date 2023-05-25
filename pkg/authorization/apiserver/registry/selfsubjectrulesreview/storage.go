@@ -28,6 +28,7 @@ type REST struct {
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 func NewREST(ruleResolver rbacregistryvalidation.AuthorizationRuleResolver, clusterRoleGetter rbaclisters.ClusterRoleLister) *REST {
 	return &REST{ruleResolver: ruleResolver, clusterRoleGetter: clusterRoleGetter}
@@ -41,6 +42,10 @@ func (r *REST) Destroy() {}
 
 func (r *REST) NamespaceScoped() bool {
 	return true
+}
+
+func (s *REST) GetSingularName() string {
+	return "selfsubjectrulesreview"
 }
 
 // Create registers a given new ResourceAccessReview instance to r.registry.

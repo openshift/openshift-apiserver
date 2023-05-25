@@ -49,6 +49,7 @@ var _ rest.GracefulDeleter = &REST{}
 var _ rest.Watcher = &REST{}
 var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 // NewREST returns a RESTStorage object that will work against Project resources
 func NewREST(client corev1client.NamespaceInterface, lister projectauth.Lister, authCache *projectauth.AuthorizationCache, projectCache *projectcache.ProjectCache) *REST {
@@ -79,6 +80,10 @@ func (*REST) NewList() runtime.Object {
 
 func (s *REST) NamespaceScoped() bool {
 	return false
+}
+
+func (s *REST) GetSingularName() string {
+	return "project"
 }
 
 // List retrieves a list of Projects that match label.

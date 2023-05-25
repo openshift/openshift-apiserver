@@ -53,9 +53,10 @@ func (r *REST) ShortNames() []string {
 // and a scaleREST containing the REST storage for the Scale subresources of DeploymentConfigs.
 func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, *StatusREST, *ScaleREST, error) {
 	store := &registry.Store{
-		NewFunc:                  func() runtime.Object { return &appsapi.DeploymentConfig{} },
-		NewListFunc:              func() runtime.Object { return &appsapi.DeploymentConfigList{} },
-		DefaultQualifiedResource: apps.Resource("deploymentconfigs"),
+		NewFunc:                   func() runtime.Object { return &appsapi.DeploymentConfig{} },
+		NewListFunc:               func() runtime.Object { return &appsapi.DeploymentConfigList{} },
+		DefaultQualifiedResource:  apps.Resource("deploymentconfigs"),
+		SingularQualifiedResource: apps.Resource("deploymentconfig"),
 
 		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(appsprinters.AddAppsOpenShiftHandlers)},
 
