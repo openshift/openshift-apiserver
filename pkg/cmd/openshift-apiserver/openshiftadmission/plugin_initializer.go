@@ -96,10 +96,11 @@ func NewPluginInitializer(
 		featureGates,
 		genericConfig.DrainedNotify(),
 	)
+
 	kubePluginInitializer := kubeapiserveradmission.NewPluginInitializer(
 		cloudConfig,
 		restMapper,
-		generic.NewConfiguration(quotaRegistry.List(), map[schema.GroupResource]struct{}{}))
+		generic.NewConfiguration(quotaRegistry.List(), map[schema.GroupResource]struct{}{}), nil)
 
 	openshiftPluginInitializer := openshiftapiserveradmission.NewOpenShiftInformersInitializer(informers.GetOpenshiftConfigInformers(), informers.GetOpenshiftRouteInformers())
 
