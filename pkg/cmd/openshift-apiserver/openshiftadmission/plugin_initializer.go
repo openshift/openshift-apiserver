@@ -96,10 +96,15 @@ func NewPluginInitializer(
 		featureGates,
 		genericConfig.DrainedNotify(),
 	)
+
+	// For the `NewConfiguration`, a new `schemaResolver` parameter is added in 1.27.
+	// It's used for informational type checking of Validating Admission Policy
+	// expressions which are disabled by default.
+	// Injecting a nil SchemaResolver only disables the type checker status warnings.
 	kubePluginInitializer := kubeapiserveradmission.NewPluginInitializer(
 		cloudConfig,
 		restMapper,
-		generic.NewConfiguration(quotaRegistry.List(), map[schema.GroupResource]struct{}{}))
+		generic.NewConfiguration(quotaRegistry.List(), map[schema.GroupResource]struct{}{}), nil)
 
 	openshiftPluginInitializer := openshiftapiserveradmission.NewOpenShiftInformersInitializer(informers.GetOpenshiftConfigInformers(), informers.GetOpenshiftRouteInformers())
 
