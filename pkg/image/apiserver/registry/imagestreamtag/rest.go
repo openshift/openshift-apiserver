@@ -55,6 +55,7 @@ var _ rest.GracefulDeleter = &REST{}
 var _ rest.ShortNamesProvider = &REST{}
 var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 // ShortNames implements the ShortNamesProvider interface. Returns a list of short names for a resource.
 func (r *REST) ShortNames() []string {
@@ -75,6 +76,10 @@ func (r *REST) NewList() runtime.Object {
 
 func (r *REST) NamespaceScoped() bool {
 	return true
+}
+
+func (r *REST) GetSingularName() string {
+	return "imagestreamtag"
 }
 
 // nameAndTag splits a string into its name component and tag component, and returns an error

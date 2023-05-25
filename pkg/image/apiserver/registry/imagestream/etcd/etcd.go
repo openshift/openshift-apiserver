@@ -75,9 +75,10 @@ func NewRESTWithLimitVerifier(
 	imageLayerIndex ImageLayerIndex,
 ) (*REST, *LayersREST, *StatusREST, *InternalREST, error) {
 	store := registry.Store{
-		NewFunc:                  func() runtime.Object { return &imageapi.ImageStream{} },
-		NewListFunc:              func() runtime.Object { return &imageapi.ImageStreamList{} },
-		DefaultQualifiedResource: image.Resource("imagestreams"),
+		NewFunc:                   func() runtime.Object { return &imageapi.ImageStream{} },
+		NewListFunc:               func() runtime.Object { return &imageapi.ImageStreamList{} },
+		DefaultQualifiedResource:  image.Resource("imagestreams"),
+		SingularQualifiedResource: image.Resource("imagestream"),
 
 		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(imageprinters.AddImageOpenShiftHandlers)},
 	}

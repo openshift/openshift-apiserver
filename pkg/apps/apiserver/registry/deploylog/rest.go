@@ -56,6 +56,7 @@ type REST struct {
 // REST implements GetterWithOptions
 var _ rest.GetterWithOptions = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 // NewREST creates a new REST for DeploymentLogs. It uses three clients: one for configs,
 // one for deployments (replication controllers) and one for pods to get the necessary
@@ -85,6 +86,10 @@ func (r *REST) New() runtime.Object {
 }
 
 func (r *REST) Destroy() {}
+
+func (r *REST) GetSingularName() string {
+	return "deploymentlog"
+}
 
 // Get returns a streamer resource with the contents of the deployment log
 func (r *REST) Get(ctx context.Context, name string, opts runtime.Object) (runtime.Object, error) {

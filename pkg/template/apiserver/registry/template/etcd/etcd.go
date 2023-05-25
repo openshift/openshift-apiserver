@@ -25,9 +25,10 @@ var _ rest.StandardStorage = &REST{}
 // NewREST returns a RESTStorage object that will work against templates.
 func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, error) {
 	store := &registry.Store{
-		NewFunc:                  func() runtime.Object { return &templateapi.Template{} },
-		NewListFunc:              func() runtime.Object { return &templateapi.TemplateList{} },
-		DefaultQualifiedResource: templategroup.Resource("templates"),
+		NewFunc:                   func() runtime.Object { return &templateapi.Template{} },
+		NewListFunc:               func() runtime.Object { return &templateapi.TemplateList{} },
+		DefaultQualifiedResource:  templategroup.Resource("templates"),
+		SingularQualifiedResource: templategroup.Resource("template"),
 
 		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(templateprinters.AddTemplateOpenShiftHandlers)},
 

@@ -64,6 +64,7 @@ type REST struct {
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 // NewREST returns a REST storage implementation that handles importing images.
 // Insecure transport is optional, and both transports should not include
@@ -102,6 +103,10 @@ func (r *REST) Destroy() {}
 
 func (r *REST) NamespaceScoped() bool {
 	return true
+}
+
+func (r *REST) GetSingularName() string {
+	return "imagestreamimport"
 }
 
 // createImages creates image objects in etcd and update related conditions
