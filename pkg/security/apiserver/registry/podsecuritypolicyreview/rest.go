@@ -32,6 +32,7 @@ type REST struct {
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 // NewREST creates a new REST for policies..
 func NewREST(m sccmatching.SCCMatcher, saCache corev1listers.ServiceAccountLister, nsLister corev1listers.NamespaceLister) *REST {
@@ -45,8 +46,12 @@ func (r *REST) New() runtime.Object {
 
 func (r *REST) Destroy() {}
 
-func (s *REST) NamespaceScoped() bool {
+func (r *REST) NamespaceScoped() bool {
 	return true
+}
+
+func (r *REST) GetSingularName() string {
+	return "podsecuritypolicyreview"
 }
 
 // Create registers a given new PodSecurityPolicyReview instance to r.registry.

@@ -32,10 +32,11 @@ type REST struct {
 }
 
 var (
-	_ rest.Getter             = &REST{}
-	_ rest.ShortNamesProvider = &REST{}
-	_ rest.Scoper             = &REST{}
-	_ rest.Storage            = &REST{}
+	_ rest.Getter               = &REST{}
+	_ rest.ShortNamesProvider   = &REST{}
+	_ rest.Scoper               = &REST{}
+	_ rest.Storage              = &REST{}
+	_ rest.SingularNameProvider = &REST{}
 )
 
 // ShortNames implements the ShortNamesProvider interface. Returns a list of short names for a resource.
@@ -61,6 +62,10 @@ func (r *REST) Destroy() {}
 
 func (r *REST) NamespaceScoped() bool {
 	return true
+}
+
+func (r *REST) GetSingularName() string {
+	return "imagestreamimage"
 }
 
 // parseNameAndID splits a string into its name component and ID component, and returns an error

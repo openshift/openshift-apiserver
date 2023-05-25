@@ -23,6 +23,7 @@ type REST struct {
 
 var _ rest.GetterWithOptions = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 // NewREST returns a new REST.
 func NewREST(secrets corev1client.SecretsGetter) *REST {
@@ -37,6 +38,10 @@ func (r *REST) Destroy() {}
 
 func (r *REST) NewGetOptions() (runtime.Object, bool, string) {
 	return &metav1.ListOptions{}, false, ""
+}
+
+func (r *REST) GetSingularName() string {
+	return "imagesecret"
 }
 
 // Get retrieves all pull type secrets in the current namespace. Name is currently ignored and

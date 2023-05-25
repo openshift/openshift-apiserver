@@ -29,6 +29,7 @@ var _ rest.Creater = &REST{}
 var _ rest.GracefulDeleter = &REST{}
 var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 // NewREST returns a new REST.
 func NewREST(imageClient imagev1typedclient.ImagesGetter) *REST {
@@ -44,6 +45,10 @@ func (r *REST) Destroy() {}
 
 func (r *REST) NamespaceScoped() bool {
 	return false
+}
+
+func (r *REST) GetSingularName() string {
+	return "imagesignature"
 }
 
 func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {

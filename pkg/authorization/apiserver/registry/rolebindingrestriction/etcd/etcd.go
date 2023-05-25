@@ -22,6 +22,7 @@ type REST struct {
 var _ rest.StandardStorage = &REST{}
 var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 // NewREST returns a RESTStorage object that will work against nodes.
 func NewREST() (*REST, error) {
@@ -30,6 +31,10 @@ func NewREST() (*REST, error) {
 
 func (r *REST) NamespaceScoped() bool {
 	return true
+}
+
+func (s *REST) GetSingularName() string {
+	return "rolebindingrestriction"
 }
 
 func (r *REST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {

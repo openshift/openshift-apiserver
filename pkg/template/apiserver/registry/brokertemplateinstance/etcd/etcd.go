@@ -24,9 +24,10 @@ var _ rest.StandardStorage = &REST{}
 // NewREST returns a RESTStorage object that will work against brokertemplateinstances.
 func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, error) {
 	store := &registry.Store{
-		NewFunc:                  func() runtime.Object { return &templateapi.BrokerTemplateInstance{} },
-		NewListFunc:              func() runtime.Object { return &templateapi.BrokerTemplateInstanceList{} },
-		DefaultQualifiedResource: template.Resource("brokertemplateinstances"),
+		NewFunc:                   func() runtime.Object { return &templateapi.BrokerTemplateInstance{} },
+		NewListFunc:               func() runtime.Object { return &templateapi.BrokerTemplateInstanceList{} },
+		DefaultQualifiedResource:  template.Resource("brokertemplateinstances"),
+		SingularQualifiedResource: template.Resource("brokertemplateinstance"),
 
 		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(templateprinters.AddTemplateOpenShiftHandlers)},
 

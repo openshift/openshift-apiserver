@@ -25,6 +25,7 @@ type REST struct {
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 func NewREST(clusterRARRegistry resourceaccessreview.Registry) *REST {
 	return &REST{clusterRARRegistry}
@@ -38,6 +39,10 @@ func (r *REST) Destroy() {}
 
 func (s *REST) NamespaceScoped() bool {
 	return true
+}
+
+func (s *REST) GetSingularName() string {
+	return "localresourceaccessreview"
 }
 
 // Create transforms a LocalRAR into an ClusterRAR that is requesting a namespace.  That collapses the code paths.

@@ -44,6 +44,7 @@ var _ rest.Getter = &AppliedClusterResourceQuotaREST{}
 var _ rest.Lister = &AppliedClusterResourceQuotaREST{}
 var _ rest.Scoper = &AppliedClusterResourceQuotaREST{}
 var _ rest.Storage = &AppliedClusterResourceQuotaREST{}
+var _ rest.SingularNameProvider = &AppliedClusterResourceQuotaREST{}
 
 func (r *AppliedClusterResourceQuotaREST) New() runtime.Object {
 	return &quotaapi.AppliedClusterResourceQuota{}
@@ -51,8 +52,12 @@ func (r *AppliedClusterResourceQuotaREST) New() runtime.Object {
 
 func (r *AppliedClusterResourceQuotaREST) Destroy() {}
 
-func (s *AppliedClusterResourceQuotaREST) NamespaceScoped() bool {
+func (r *AppliedClusterResourceQuotaREST) NamespaceScoped() bool {
 	return true
+}
+
+func (r *AppliedClusterResourceQuotaREST) GetSingularName() string {
+	return "appliedclusterresourcequota"
 }
 
 func (r *AppliedClusterResourceQuotaREST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
