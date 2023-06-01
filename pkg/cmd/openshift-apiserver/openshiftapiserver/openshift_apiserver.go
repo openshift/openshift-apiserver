@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	imagev1client "github.com/openshift/client-go/image/clientset/versioned"
 	"net/http"
 	"time"
 
@@ -371,6 +372,31 @@ func (c *completedConfig) WithOpenAPIAggregationController(delegatedAPIServer *g
 	return nil
 }
 
+func (c *completedConfig) WithImageStreamsGetter(delegatedAPIServer *genericapiserver.GenericAPIServer) error {
+	imageClient, err := imagev1client.NewForConfig(delegatedAPIServer.LoopbackClientConfig)
+	if err != nil {
+		return err
+	}
+	delegatedAPIServer.AddPostStartHook("run-get-image-streams-in-a-loop", func(ctx genericapiserver.PostStartHookContext) error {
+		go func() {
+			for {
+				newCtx, newCtxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer newCtxCancel()
+				klog.Infof("Listing ImageStreams from openshift ns")
+				ret, err := imageClient.ImageV1().ImageStreams("openshift").List(newCtx, metav1.ListOptions{})
+				if err != nil {
+					klog.Errorf("Failed listing ImageStreams from openshift ns, err = %v", err)
+				} else {
+					klog.Infof("Got %s ImageStreams from openshift ns", len(ret.Items))
+				}
+				time.Sleep(500 * time.Millisecond)
+			}
+		}()
+		return nil
+	})
+	return nil
+}
+
 type apiServerAppenderFunc func(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error)
 
 func addAPIServerOrDie(delegateAPIServer genericapiserver.DelegationTarget, apiServerAppenderFn apiServerAppenderFunc) genericapiserver.DelegationTarget {
@@ -438,6 +464,29 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 	})
 	s.GenericAPIServer.AddPostStartHookOrDie("quota.openshift.io-clusterquotamapping", func(context genericapiserver.PostStartHookContext) error {
 		go c.ExtraConfig.ClusterQuotaMappingController.Run(5, context.StopCh)
+		return nil
+	})
+
+	imageClient, err := imagev1client.NewForConfig(c.GenericConfig.LoopbackClientConfig)
+	if err != nil {
+		return nil, err
+	}
+	klog.Infof("Registering run-get-image-streams-in-a-loop-2")
+	s.GenericAPIServer.AddPostStartHook("run-get-image-streams-in-a-loop-2", func(ctx genericapiserver.PostStartHookContext) error {
+		go func() {
+			for {
+				newCtx, newCtxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer newCtxCancel()
+				klog.Infof("Listing ImageStreams from openshift ns")
+				ret, err := imageClient.ImageV1().ImageStreams("openshift").List(newCtx, metav1.ListOptions{})
+				if err != nil {
+					klog.Errorf("Failed listing ImageStreams from openshift ns, err = %v", err)
+				} else {
+					klog.Infof("Got %s ImageStreams from openshift ns", len(ret.Items))
+				}
+				time.Sleep(500 * time.Millisecond)
+			}
+		}()
 		return nil
 	})
 
