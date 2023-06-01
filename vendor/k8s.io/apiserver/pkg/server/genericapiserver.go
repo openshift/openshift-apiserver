@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"os"
 	gpath "path"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -763,6 +764,7 @@ func (s *GenericAPIServer) installAPIResources(apiPrefix string, apiGroupInfo *A
 	var resourceInfos []*storageversion.ResourceInfo
 	for _, groupVersion := range apiGroupInfo.PrioritizedVersions {
 		if len(apiGroupInfo.VersionedResourcesStorageMap[groupVersion.Version]) == 0 {
+			debug.PrintStack()
 			klog.Warningf("Skipping API %v because it has no resources.", groupVersion)
 			continue
 		}

@@ -16,5 +16,5 @@ func init() {
 // Install registers the API group and adds types to a scheme
 func Install(scheme *runtime.Scheme) {
 	utilruntime.Must(imageapiv1.Install(scheme))
-	utilruntime.Must(scheme.SetVersionPriority(imagev1.SchemeGroupVersion))
+	utilruntime.Must(scheme.SetVersionPriority(imagev1.GroupVersion))
 }

@@ -110,8 +110,11 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 		return nil, err
 	}
 
+	klog.Warningf("###>>> v1Storage in new is %#v", v1Storage)
+
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(imagev1.GroupName, c.ExtraConfig.Scheme, metav1.ParameterCodec, c.ExtraConfig.Codecs)
 	apiGroupInfo.VersionedResourcesStorageMap[imagev1.SchemeGroupVersion.Version] = v1Storage
+	klog.Warningf("###>>> installing apiGroup %#v", apiGroupInfo)
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {
 		return nil, err
 	}
@@ -137,6 +140,7 @@ func (c *completedConfig) V1RESTStorage() (map[string]rest.Storage, error) {
 }
 
 func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
+	klog.Warningf("###>>> about to create storage for image")
 	cfg := restclient.Config{}
 
 	tlsConfig := &tls.Config{}
@@ -149,6 +153,8 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	if tlsConfig.RootCAs == nil {
 		tlsConfig.RootCAs = x509.NewCertPool()
 	}
+
+	klog.Warningf("###>>> reading certs for storage")
 
 	err = filepath.Walk("/var/run/configmaps/image-import-ca", func(path string, info os.FileInfo, err error) error {
 		klog.V(2).Infof("reading image import ca path: %s, incoming err: %v", path, err)
@@ -175,6 +181,8 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 		klog.Errorf("unable to process additional image import certificates: %v", err)
 	}
 
+	klog.Warningf("###>>> creatig transport etc...")
+
 	transport := knet.SetTransportDefaults(&http.Transport{
 		TLSClientConfig: tlsConfig,
 	})
@@ -192,6 +200,8 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to configure a default transport for importing: %v", err)
 	}
+
+	klog.Warningf("###>>> creating clients")
 
 	kubeClient, err := kubernetes.NewForConfig(c.ExtraConfig.KubeAPIServerClientConfig)
 	if err != nil {
@@ -215,6 +225,8 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	klog.Warningf("###>>> build rests")
 
 	imageStorage, err := imageetcd.NewREST(c.GenericConfig.RESTOptionsGetter)
 	if err != nil {
@@ -293,5 +305,8 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	v1Storage["imagestreammappings"] = imageStreamMappingStorage
 	v1Storage["imagestreamtags"] = imageStreamTagStorage
 	v1Storage["imagetags"] = imageTagStorage
+
+	klog.Warningf("###>>> v1Storage is done %#v", v1Storage)
+
 	return v1Storage, nil
 }
