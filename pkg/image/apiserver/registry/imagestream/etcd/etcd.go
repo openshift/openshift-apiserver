@@ -36,6 +36,7 @@ type REST struct {
 var _ rest.StandardStorage = &REST{}
 var _ rest.ShortNamesProvider = &REST{}
 var _ rest.CategoriesProvider = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 // Categories implements the CategoriesProvider interface. Returns a list of categories a resource is part of.
 func (r *REST) Categories() []string {
@@ -45,6 +46,10 @@ func (r *REST) Categories() []string {
 // ShortNames implements the ShortNamesProvider interface. Returns a list of short names for a resource.
 func (r *REST) ShortNames() []string {
 	return []string{"is"}
+}
+
+func (r *REST) GetSingularName() string {
+	return "imagestream"
 }
 
 func NewREST(
