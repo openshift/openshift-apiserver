@@ -622,10 +622,11 @@ func (DNSTransportConfig) SwaggerDoc() map[string]string {
 }
 
 var map_ForwardPlugin = map[string]string{
-	"":                "ForwardPlugin defines a schema for configuring the CoreDNS forward plugin.",
-	"upstreams":       "upstreams is a list of resolvers to forward name queries for subdomains of Zones. Each instance of CoreDNS performs health checking of Upstreams. When a healthy upstream returns an error during the exchange, another resolver is tried from Upstreams. The Upstreams are selected in the order specified in Policy. Each upstream is represented by an IP address or IP:port if the upstream listens on a port other than 53.\n\nA maximum of 15 upstreams is allowed per ForwardPlugin.",
-	"policy":          "policy is used to determine the order in which upstream servers are selected for querying. Any one of the following values may be specified:\n\n* \"Random\" picks a random upstream server for each query. * \"RoundRobin\" picks upstream servers in a round-robin order, moving to the next server for each new query. * \"Sequential\" tries querying upstream servers in a sequential order until one responds, starting with the first server for each new query.\n\nThe default value is \"Random\"",
-	"transportConfig": "transportConfig is used to configure the transport type, server name, and optional custom CA or CA bundle to use when forwarding DNS requests to an upstream resolver.\n\nThe default value is \"\" (empty) which results in a standard cleartext connection being used when forwarding DNS requests to an upstream resolver.",
+	"":                 "ForwardPlugin defines a schema for configuring the CoreDNS forward plugin.",
+	"upstreams":        "upstreams is a list of resolvers to forward name queries for subdomains of Zones. Each instance of CoreDNS performs health checking of Upstreams. When a healthy upstream returns an error during the exchange, another resolver is tried from Upstreams. The Upstreams are selected in the order specified in Policy. Each upstream is represented by an IP address or IP:port if the upstream listens on a port other than 53.\n\nA maximum of 15 upstreams is allowed per ForwardPlugin.",
+	"policy":           "policy is used to determine the order in which upstream servers are selected for querying. Any one of the following values may be specified:\n\n* \"Random\" picks a random upstream server for each query. * \"RoundRobin\" picks upstream servers in a round-robin order, moving to the next server for each new query. * \"Sequential\" tries querying upstream servers in a sequential order until one responds, starting with the first server for each new query.\n\nThe default value is \"Random\"",
+	"transportConfig":  "transportConfig is used to configure the transport type, server name, and optional custom CA or CA bundle to use when forwarding DNS requests to an upstream resolver.\n\nThe default value is \"\" (empty) which results in a standard cleartext connection being used when forwarding DNS requests to an upstream resolver.",
+	"protocolStrategy": "protocolStrategy specifies the protocol to use for upstream DNS requests. Valid values for protocolStrategy are \"TCP\" and omitted. When omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time. The current default is to use the protocol of the original client request. \"TCP\" specifies that the platform should use TCP for all upstream DNS requests, even if the client request uses UDP. \"TCP\" is useful for UDP-specific issues such as those created by non-compliant upstream resolvers, but may consume more bandwidth or increase DNS response time. Note that protocolStrategy only affects the protocol of DNS requests that CoreDNS makes to upstream resolvers. It does not affect the protocol of DNS requests between clients and CoreDNS.",
 }
 
 func (ForwardPlugin) SwaggerDoc() map[string]string {
@@ -655,10 +656,11 @@ func (Upstream) SwaggerDoc() map[string]string {
 }
 
 var map_UpstreamResolvers = map[string]string{
-	"":                "UpstreamResolvers defines a schema for configuring the CoreDNS forward plugin in the specific case of the default (\".\") server. It defers from ForwardPlugin in the default values it accepts: * At least one upstream should be specified. * the default policy is Sequential",
-	"upstreams":       "Upstreams is a list of resolvers to forward name queries for the \".\" domain. Each instance of CoreDNS performs health checking of Upstreams. When a healthy upstream returns an error during the exchange, another resolver is tried from Upstreams. The Upstreams are selected in the order specified in Policy.\n\nA maximum of 15 upstreams is allowed per ForwardPlugin. If no Upstreams are specified, /etc/resolv.conf is used by default",
-	"policy":          "Policy is used to determine the order in which upstream servers are selected for querying. Any one of the following values may be specified:\n\n* \"Random\" picks a random upstream server for each query. * \"RoundRobin\" picks upstream servers in a round-robin order, moving to the next server for each new query. * \"Sequential\" tries querying upstream servers in a sequential order until one responds, starting with the first server for each new query.\n\nThe default value is \"Sequential\"",
-	"transportConfig": "transportConfig is used to configure the transport type, server name, and optional custom CA or CA bundle to use when forwarding DNS requests to an upstream resolver.\n\nThe default value is \"\" (empty) which results in a standard cleartext connection being used when forwarding DNS requests to an upstream resolver.",
+	"":                 "UpstreamResolvers defines a schema for configuring the CoreDNS forward plugin in the specific case of the default (\".\") server. It defers from ForwardPlugin in the default values it accepts: * At least one upstream should be specified. * the default policy is Sequential",
+	"upstreams":        "Upstreams is a list of resolvers to forward name queries for the \".\" domain. Each instance of CoreDNS performs health checking of Upstreams. When a healthy upstream returns an error during the exchange, another resolver is tried from Upstreams. The Upstreams are selected in the order specified in Policy.\n\nA maximum of 15 upstreams is allowed per ForwardPlugin. If no Upstreams are specified, /etc/resolv.conf is used by default",
+	"policy":           "Policy is used to determine the order in which upstream servers are selected for querying. Any one of the following values may be specified:\n\n* \"Random\" picks a random upstream server for each query. * \"RoundRobin\" picks upstream servers in a round-robin order, moving to the next server for each new query. * \"Sequential\" tries querying upstream servers in a sequential order until one responds, starting with the first server for each new query.\n\nThe default value is \"Sequential\"",
+	"transportConfig":  "transportConfig is used to configure the transport type, server name, and optional custom CA or CA bundle to use when forwarding DNS requests to an upstream resolver.\n\nThe default value is \"\" (empty) which results in a standard cleartext connection being used when forwarding DNS requests to an upstream resolver.",
+	"protocolStrategy": "protocolStrategy specifies the protocol to use for upstream DNS requests. Valid values for protocolStrategy are \"TCP\" and omitted. When omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time. The current default is to use the protocol of the original client request. \"TCP\" specifies that the platform should use TCP for all upstream DNS requests, even if the client request uses UDP. \"TCP\" is useful for UDP-specific issues such as those created by non-compliant upstream resolvers, but may consume more bandwidth or increase DNS response time. Note that protocolStrategy only affects the protocol of DNS requests that CoreDNS makes to upstream resolvers. It does not affect the protocol of DNS requests between clients and CoreDNS.",
 }
 
 func (UpstreamResolvers) SwaggerDoc() map[string]string {
@@ -737,7 +739,8 @@ func (ClientTLS) SwaggerDoc() map[string]string {
 }
 
 var map_ContainerLoggingDestinationParameters = map[string]string{
-	"": "ContainerLoggingDestinationParameters describes parameters for the Container logging destination type.",
+	"":          "ContainerLoggingDestinationParameters describes parameters for the Container logging destination type.",
+	"maxLength": "maxLength is the maximum length of the log message.\n\nValid values are integers in the range 480 to 8192, inclusive.\n\nWhen omitted, the default value is 1024.",
 }
 
 func (ContainerLoggingDestinationParameters) SwaggerDoc() map[string]string {
@@ -847,11 +850,42 @@ func (IngressControllerCaptureHTTPHeaders) SwaggerDoc() map[string]string {
 	return map_IngressControllerCaptureHTTPHeaders
 }
 
+var map_IngressControllerHTTPHeader = map[string]string{
+	"":       "IngressControllerHTTPHeader specifies configuration for setting or deleting an HTTP header.",
+	"name":   "name specifies the name of a header to set or delete.  Its value must be a valid HTTP header. name as defined in RFC 2616 section 4.2.",
+	"action": "action specifies actions to perform on headers, such as setting or deleting headers.",
+}
+
+func (IngressControllerHTTPHeader) SwaggerDoc() map[string]string {
+	return map_IngressControllerHTTPHeader
+}
+
+var map_IngressControllerHTTPHeaderActionUnion = map[string]string{
+	"":     "IngressControllerHTTPHeaderActionUnion specifies an action to take on an HTTP header.",
+	"type": "type defines the type of the action to be applied on the header. Possible values are Set and Delete. Set allows you to set http request and response headers. Delete allows you to delete http request and response headers",
+	"set":  "set specifies how the HTTP header should be set. If this field is empty, no action is taken.",
+}
+
+func (IngressControllerHTTPHeaderActionUnion) SwaggerDoc() map[string]string {
+	return map_IngressControllerHTTPHeaderActionUnion
+}
+
+var map_IngressControllerHTTPHeaderActions = map[string]string{
+	"":         "IngressControllerHTTPHeaderActions defines configuration for actions on HTTP request and response headers.",
+	"response": "response is a list of HTTP response headers to set or delete. The actions either Set or Delete will be performed on the headers in sequence as defined in the list of response headers. A maximum of 64 response header actions may be configured. Enable the cluster administrator to specify HTTP response headers in the IngressController CR spec that should be set or deleted at the global level when forwarding responses from an application to the client, i.e. for all routes. Sample fetchers allowed are \"res.hdr\" and \"ssl_c_der\". Converters allowed are \"lower\" and \"base64\". Examples of header value - \"%[res.hdr(X-target),lower]\", \"%[res.hdr(X-client),base64]\", \"{+Q}[ssl_c_der,base64]\", \"{+Q}[ssl_c_der,lower]\" ",
+	"request":  "request is a list of HTTP request headers to set or delete. The actions either Set or Delete will be performed on the headers in sequence as defined in the list of request headers. A maximum of 64 request header actions may be configured. Enable the cluster administrator to specify HTTP request headers in the IngressController CR spec that should be set or deleted at the global level when forwarding responses to your application from the client, i.e. all routes. Sample fetchers allowed are \"req.hdr\" and \"ssl_c_der\". Converters allowed are \"lower\" and \"base64\". Examples of header value - \"%[req.hdr(host),lower]\", \"%[req.hdr(host),base64]\", \"{+Q}[ssl_c_der,base64]\", \"{+Q}[ssl_c_der,lower]\" ",
+}
+
+func (IngressControllerHTTPHeaderActions) SwaggerDoc() map[string]string {
+	return map_IngressControllerHTTPHeaderActions
+}
+
 var map_IngressControllerHTTPHeaders = map[string]string{
 	"":                          "IngressControllerHTTPHeaders specifies how the IngressController handles certain HTTP headers.",
 	"forwardedHeaderPolicy":     "forwardedHeaderPolicy specifies when and how the IngressController sets the Forwarded, X-Forwarded-For, X-Forwarded-Host, X-Forwarded-Port, X-Forwarded-Proto, and X-Forwarded-Proto-Version HTTP headers.  The value may be one of the following:\n\n* \"Append\", which specifies that the IngressController appends the\n  headers, preserving existing headers.\n\n* \"Replace\", which specifies that the IngressController sets the\n  headers, replacing any existing Forwarded or X-Forwarded-* headers.\n\n* \"IfNone\", which specifies that the IngressController sets the\n  headers if they are not already set.\n\n* \"Never\", which specifies that the IngressController never sets the\n  headers, preserving any existing headers.\n\nBy default, the policy is \"Append\".",
 	"uniqueId":                  "uniqueId describes configuration for a custom HTTP header that the ingress controller should inject into incoming HTTP requests. Typically, this header is configured to have a value that is unique to the HTTP request.  The header can be used by applications or included in access logs to facilitate tracing individual HTTP requests.\n\nIf this field is empty, no such header is injected into requests.",
 	"headerNameCaseAdjustments": "headerNameCaseAdjustments specifies case adjustments that can be applied to HTTP header names.  Each adjustment is specified as an HTTP header name with the desired capitalization.  For example, specifying \"X-Forwarded-For\" indicates that the \"x-forwarded-for\" HTTP header should be adjusted to have the specified capitalization.\n\nThese adjustments are only applied to cleartext, edge-terminated, and re-encrypt routes, and only when using HTTP/1.\n\nFor request headers, these adjustments are applied only for routes that have the haproxy.router.openshift.io/h1-adjust-case=true annotation.  For response headers, these adjustments are applied to all HTTP responses.\n\nIf this field is empty, no request headers are adjusted.",
+	"actions":                   "actions specifies options for performing action on headers. Note that this option only applies to cleartext HTTP connections and to secure HTTP connections for which the ingress controller terminates encryption (that is, edge-terminated or reencrypt connections).  Headers cannot be set or deleted for TLS passthrough connections. Setting HSTS header is supported via another mechanism in Ingress.Spec.RequiredHSTSPolicies. Setting httpCaptureHeaders for the headers set via this API will not work. If spec.clientTLS, spec.httpHeaders.forwardedHeaderPolicy, spec.httpHeaders.uniqueId, spec.httpHeaders.headerNameCaseAdjustments is set and if you set the same header via this API then that header will get replaced with the value specified via this API. If cache-control is set using this API then the existing value of cache-control will get replaced. The header set using route will over-ride the header set in ingress controller if the headers defined in both were same.",
 }
 
 func (IngressControllerHTTPHeaders) SwaggerDoc() map[string]string {
@@ -884,6 +918,15 @@ var map_IngressControllerLogging = map[string]string{
 
 func (IngressControllerLogging) SwaggerDoc() map[string]string {
 	return map_IngressControllerLogging
+}
+
+var map_IngressControllerSetHTTPHeader = map[string]string{
+	"":      "IngressControllerSetHTTPHeader defines the value which needs to be set on an HTTP header.",
+	"value": "value specifies a header value. Dynamic values can be added. The value will be interpreted as an HAProxy format string as defined in https://cbonte.github.io/haproxy-dconv/2.4/configuration.html#8.2.4 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2",
+}
+
+func (IngressControllerSetHTTPHeader) SwaggerDoc() map[string]string {
+	return map_IngressControllerSetHTTPHeader
 }
 
 var map_IngressControllerSpec = map[string]string{
@@ -1026,7 +1069,7 @@ var map_SyslogLoggingDestinationParameters = map[string]string{
 	"address":   "address is the IP address of the syslog endpoint that receives log messages.",
 	"port":      "port is the UDP port number of the syslog endpoint that receives log messages.",
 	"facility":  "facility specifies the syslog facility of log messages.\n\nIf this field is empty, the facility is \"local1\".",
-	"maxLength": "maxLength is the maximum length of the syslog message\n\nIf this field is empty, the maxLength is set to \"1024\".",
+	"maxLength": "maxLength is the maximum length of the log message.\n\nValid values are integers in the range 480 to 4096, inclusive.\n\nWhen omitted, the default value is 1024.",
 }
 
 func (SyslogLoggingDestinationParameters) SwaggerDoc() map[string]string {
@@ -1257,6 +1300,7 @@ func (FeaturesMigration) SwaggerDoc() map[string]string {
 var map_GatewayConfig = map[string]string{
 	"":               "GatewayConfig holds node gateway-related parsed config file parameters and command-line overrides",
 	"routingViaHost": "RoutingViaHost allows pod egress traffic to exit via the ovn-k8s-mp0 management port into the host before sending it out. If this is not set, traffic will always egress directly from OVN to outside without touching the host stack. Setting this to true means hardware offload will not be supported. Default is false if GatewayConfig is specified.",
+	"ipForwarding":   "IPForwarding controls IP forwarding for all traffic on OVN-Kubernetes managed interfaces (such as br-ex). By default this is set to Restricted, and Kubernetes related traffic is still forwarded appropriately, but other IP traffic will not be routed by the OCP node. If there is a desire to allow the host to forward traffic across OVN-Kubernetes managed interfaces, then set this field to \"Global\". The supported values are \"Restricted\" and \"Global\".",
 }
 
 func (GatewayConfig) SwaggerDoc() map[string]string {

@@ -22,6 +22,45 @@ func (Route) SwaggerDoc() map[string]string {
 	return map_Route
 }
 
+var map_RouteHTTPHeader = map[string]string{
+	"":       "RouteHTTPHeader specifies configuration for setting or deleting an HTTP header.",
+	"name":   "name specifies a header name to be set or deleted.  Its value must be a valid HTTP header. name as defined in RFC 2616 section 4.2.",
+	"action": "action specifies actions to perform on headers, such as setting or deleting headers.",
+}
+
+func (RouteHTTPHeader) SwaggerDoc() map[string]string {
+	return map_RouteHTTPHeader
+}
+
+var map_RouteHTTPHeaderActionUnion = map[string]string{
+	"":     "RouteHTTPHeaderActionUnion specifies an action to take on an HTTP header.",
+	"type": "type defines the type of the action to be applied on the header. Possible values are Set and Delete. Set allows you to set http request and response headers. Delete allows you to delete http request and response headers",
+	"set":  "set defines the HTTP header that should be set: added if doesn't exist or replaced if does. If this field is empty, no header is added or replaced.",
+}
+
+func (RouteHTTPHeaderActionUnion) SwaggerDoc() map[string]string {
+	return map_RouteHTTPHeaderActionUnion
+}
+
+var map_RouteHTTPHeaderActions = map[string]string{
+	"":         "RouteHTTPHeaderActions defines configuration for actions on HTTP request and response headers.",
+	"response": "response is a list of HTTP response headers to set or delete. The actions either Set or Delete will be performed on the headers in sequence as defined in the list of response headers. A maximum of 64 response header actions may be configured. You can use this field to specify HTTP response headers that should be set or deleted when forwarding responses from your application to the client. Sample fetchers allowed are \"req.hdr\" and \"ssl_c_der\". Converters allowed are \"lower\" and \"base64\". Examples of header value - \"%[res.hdr(X-target),lower]\", \"%[res.hdr(X-client),base64]\", \"{+Q}[ssl_c_der,base64]\", \"{+Q}[ssl_c_der,lower]\" Note: This field cannot be used if your route uses TLS passthrough. ",
+	"request":  "request is a list of HTTP request headers to set or delete. The actions either Set or Delete will be performed on the headers in sequence as defined in the list of request headers. A maximum of 64 request header actions may be configured. You can use this field to specify HTTP request headers that should be set or deleted when forwarding connections from the client to your application. Sample fetchers allowed are \"req.hdr\" and \"ssl_c_der\". Converters allowed are \"lower\" and \"base64\". Examples of header value - \"%[req.hdr(host),lower]\", \"%[req.hdr(host),base64]\", \"{+Q}[ssl_c_der,base64]\", \"{+Q}[ssl_c_der,lower]\" Note: This field cannot be used if your route uses TLS passthrough. ",
+}
+
+func (RouteHTTPHeaderActions) SwaggerDoc() map[string]string {
+	return map_RouteHTTPHeaderActions
+}
+
+var map_RouteHTTPHeaders = map[string]string{
+	"":        "RouteHTTPHeaders defines policy for HTTP headers.",
+	"actions": "actions specifies actions to take on headers. Note that this option only applies to cleartext HTTP connections and to secure HTTP connections for which the ingress controller terminates encryption (that is, edge-terminated or reencrypt connections).  Headers cannot be set or deleted for TLS passthrough connections. Setting HSTS header is supported via another mechanism in Ingress.Spec.RequiredHSTSPolicies. Setting httpCaptureHeaders for the headers set via this API will not work. If spec.clientTLS, spec.httpHeaders.forwardedHeaderPolicy, spec.httpHeaders.uniqueId, spec.httpHeaders.headerNameCaseAdjustments is set and if you set the same header via this API then that header will get replaced with the value specified via this API. If cache-control is set using this API then the existing value of cache-control will get replaced. The header set using route will over-ride the header set in ingress controller if the headers defined both were same.",
+}
+
+func (RouteHTTPHeaders) SwaggerDoc() map[string]string {
+	return map_RouteHTTPHeaders
+}
+
 var map_RouteIngress = map[string]string{
 	"":                        "RouteIngress holds information about the places where a route is exposed.",
 	"host":                    "Host is the host string under which the route is exposed; this value is required",
@@ -67,6 +106,15 @@ func (RoutePort) SwaggerDoc() map[string]string {
 	return map_RoutePort
 }
 
+var map_RouteSetHTTPHeader = map[string]string{
+	"":      "RouteSetHTTPHeader specifies what value needs to be set on an HTTP header.",
+	"value": "value specifies a header value. Dynamic values can be added. The value will be interpreted as an HAProxy format string as defined in https://cbonte.github.io/haproxy-dconv/2.4/configuration.html#8.2.4 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2",
+}
+
+func (RouteSetHTTPHeader) SwaggerDoc() map[string]string {
+	return map_RouteSetHTTPHeader
+}
+
 var map_RouteSpec = map[string]string{
 	"":                  "RouteSpec describes the hostname or path the route exposes, any security information, and one to four backends (services) the route points to. Requests are distributed among the backends depending on the weights assigned to each backend. When using roundrobin scheduling the portion of requests that go to each backend is the backend weight divided by the sum of all of the backend weights. When the backend has more than one endpoint the requests that end up on the backend are roundrobin distributed among the endpoints. Weights are between 0 and 256 with default 100. Weight 0 causes no requests to the backend. If all weights are zero the route will be considered to have no backends and return a standard 503 response.\n\nThe `tls` field is optional and allows specific certificates or behavior for the route. Routers typically configure a default certificate on a wildcard domain to terminate routes without explicit certificates, but custom hostnames usually must choose passthrough (send traffic directly to the backend via the TLS Server-Name- Indication field) or provide a certificate.",
 	"host":              "host is an alias/DNS that points to the service. Optional. If not specified a route name will typically be automatically chosen. Must follow DNS952 subdomain conventions.",
@@ -77,6 +125,7 @@ var map_RouteSpec = map[string]string{
 	"port":              "If specified, the port to be used by the router. Most routers will use all endpoints exposed by the service by default - set this value to instruct routers which port to use.",
 	"tls":               "The tls field provides the ability to configure certificates and termination for the route.",
 	"wildcardPolicy":    "Wildcard policy if any for the route. Currently only 'Subdomain' or 'None' is allowed.",
+	"httpHeaders":       "httpHeaders defines policy for HTTP headers.\n\nIf this field is empty, the default values are used.",
 }
 
 func (RouteSpec) SwaggerDoc() map[string]string {
@@ -115,7 +164,7 @@ func (RouterShard) SwaggerDoc() map[string]string {
 
 var map_TLSConfig = map[string]string{
 	"":                              "TLSConfig defines config used to secure a route and provide termination",
-	"termination":                   "termination indicates termination type.\n\n* edge - TLS termination is done by the router and http is used to communicate with the backend (default) * passthrough - Traffic is sent straight to the destination without the router providing TLS termination * reencrypt - TLS termination is done by the router and https is used to communicate with the backend",
+	"termination":                   "termination indicates termination type.\n\n* edge - TLS termination is done by the router and http is used to communicate with the backend (default) * passthrough - Traffic is sent straight to the destination without the router providing TLS termination * reencrypt - TLS termination is done by the router and https is used to communicate with the backend\n\nNote: passthrough termination is incompatible with httpHeader.actions",
 	"certificate":                   "certificate provides certificate contents. This should be a single serving certificate, not a certificate chain. Do not include a CA certificate.",
 	"key":                           "key provides key file contents",
 	"caCertificate":                 "caCertificate provides the cert authority certificate contents",

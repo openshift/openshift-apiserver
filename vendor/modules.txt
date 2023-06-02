@@ -73,6 +73,23 @@ github.com/coreos/go-systemd/v22/journal
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
 github.com/davecgh/go-spew/spew
+# github.com/distribution/distribution/v3 v3.0.0-20230511163743-f7717b7855ca
+## explicit; go 1.18
+github.com/distribution/distribution/v3
+github.com/distribution/distribution/v3/context
+github.com/distribution/distribution/v3/manifest
+github.com/distribution/distribution/v3/manifest/schema1
+github.com/distribution/distribution/v3/metrics
+github.com/distribution/distribution/v3/reference
+github.com/distribution/distribution/v3/registry/api/errcode
+github.com/distribution/distribution/v3/registry/api/v2
+github.com/distribution/distribution/v3/registry/client
+github.com/distribution/distribution/v3/registry/client/auth
+github.com/distribution/distribution/v3/registry/client/auth/challenge
+github.com/distribution/distribution/v3/registry/client/transport
+github.com/distribution/distribution/v3/registry/storage/cache
+github.com/distribution/distribution/v3/registry/storage/cache/memory
+github.com/distribution/distribution/v3/uuid
 # github.com/docker/distribution v2.8.1+incompatible => github.com/openshift/docker-distribution v0.0.0-20180925154709-d4c35485a70d
 ## explicit
 github.com/docker/distribution
@@ -349,7 +366,7 @@ github.com/opencontainers/runc/libcontainer/user
 # github.com/opencontainers/runtime-spec v1.0.3-0.20220909204839-494a5a6aca78
 ## explicit
 github.com/opencontainers/runtime-spec/specs-go
-# github.com/openshift/api v0.0.0-20230509100629-894b49f57a15
+# github.com/openshift/api v0.0.0-20230613151523-ba04973d3ed1 => github.com/miheer/api v0.0.0-20230701010835-2aaab98e2bd0
 ## explicit; go 1.20
 github.com/openshift/api
 github.com/openshift/api/annotations
@@ -580,7 +597,7 @@ github.com/openshift/client-go/user/informers/externalversions/internalinterface
 github.com/openshift/client-go/user/informers/externalversions/user
 github.com/openshift/client-go/user/informers/externalversions/user/v1
 github.com/openshift/client-go/user/listers/user/v1
-# github.com/openshift/library-go v0.0.0-20230503173034-95ca3c14e50a
+# github.com/openshift/library-go v0.0.0-20230503173034-95ca3c14e50a => github.com/miheer/library-go v0.0.0-20230701014556-8cc933fcf157
 ## explicit; go 1.20
 github.com/openshift/library-go/pkg/apiserver/admission/admissionregistrationtesting
 github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig
@@ -656,7 +673,7 @@ github.com/sirupsen/logrus
 # github.com/soheilhy/cmux v0.1.5
 ## explicit; go 1.11
 github.com/soheilhy/cmux
-# github.com/spf13/cobra v1.6.0
+# github.com/spf13/cobra v1.6.1
 ## explicit; go 1.15
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
@@ -2233,3 +2250,5 @@ sigs.k8s.io/yaml
 # k8s.io/mount-utils => k8s.io/mount-utils v0.27.2
 # k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.27.2
 # k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.27.2
+# github.com/openshift/library-go => github.com/miheer/library-go v0.0.0-20230701014556-8cc933fcf157
+# github.com/openshift/api => github.com/miheer/api v0.0.0-20230701010835-2aaab98e2bd0

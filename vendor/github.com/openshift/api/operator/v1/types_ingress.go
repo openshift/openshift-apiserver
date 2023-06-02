@@ -1022,14 +1022,16 @@ type SyslogLoggingDestinationParameters struct {
 	// +optional
 	Facility string `json:"facility,omitempty"`
 
-	// maxLength is the maximum length of the syslog message
+	// maxLength is the maximum length of the log message.
 	//
-	// If this field is empty, the maxLength is set to "1024".
+	// Valid values are integers in the range 480 to 4096, inclusive.
 	//
-	// +kubebuilder:validation:Optional
+	// When omitted, the default value is 1024.
+	//
 	// +kubebuilder:validation:Maximum=4096
 	// +kubebuilder:validation:Minimum=480
 	// +kubebuilder:default=1024
+	// +default:=1024
 	// +optional
 	MaxLength uint32 `json:"maxLength,omitempty"`
 }
@@ -1037,6 +1039,18 @@ type SyslogLoggingDestinationParameters struct {
 // ContainerLoggingDestinationParameters describes parameters for the Container
 // logging destination type.
 type ContainerLoggingDestinationParameters struct {
+	// maxLength is the maximum length of the log message.
+	//
+	// Valid values are integers in the range 480 to 8192, inclusive.
+	//
+	// When omitted, the default value is 1024.
+	//
+	// +kubebuilder:validation:Maximum=8192
+	// +kubebuilder:validation:Minimum=480
+	// +kubebuilder:default=1024
+	// +default:=1024
+	// +optional
+	MaxLength int32 `json:"maxLength,omitempty"`
 }
 
 // LoggingDestination describes a destination for log messages.
@@ -1385,6 +1399,115 @@ type IngressControllerHTTPHeaders struct {
 	// +nullable
 	// +optional
 	HeaderNameCaseAdjustments []IngressControllerHTTPHeaderNameCaseAdjustment `json:"headerNameCaseAdjustments,omitempty"`
+
+	// actions specifies options for performing action on headers.
+	// Note that this option only applies to cleartext HTTP connections
+	// and to secure HTTP connections for which the ingress controller
+	// terminates encryption (that is, edge-terminated or reencrypt
+	// connections).  Headers cannot be set or deleted for TLS passthrough
+	// connections.
+	// Setting HSTS header is supported via another mechanism in Ingress.Spec.RequiredHSTSPolicies.
+	// Setting httpCaptureHeaders for the headers set via this API will not work.
+	// If spec.clientTLS, spec.httpHeaders.forwardedHeaderPolicy, spec.httpHeaders.uniqueId, spec.httpHeaders.headerNameCaseAdjustments is set
+	// and if you set the same header via this API then that header will get replaced with the value specified via this API.
+	// If cache-control is set using this API then the existing value of cache-control will get replaced.
+	// The header set using route will over-ride the header set in ingress controller if the headers defined in both were same.
+	// +optional
+	Actions IngressControllerHTTPHeaderActions `json:"actions,omitempty"`
+}
+
+// IngressControllerHTTPHeaderActions defines configuration for actions on HTTP request and response headers.
+type IngressControllerHTTPHeaderActions struct {
+	// response is a list of HTTP response headers to set or delete.
+	// The actions either Set or Delete will be performed on the headers in sequence as defined in the list of response headers.
+	// A maximum of 64 response header actions may be configured.
+	// Enable the cluster administrator to specify HTTP response headers in the IngressController CR spec that should be set or
+	// deleted at the global level when forwarding responses from an application to the client, i.e. for all routes.
+	// Sample fetchers allowed are "res.hdr" and "ssl_c_der".
+	// Converters allowed are "lower" and "base64".
+	// Examples of header value - "%[res.hdr(X-target),lower]", "%[res.hdr(X-client),base64]", "{+Q}[ssl_c_der,base64]", "{+Q}[ssl_c_der,lower]"
+	// + ---
+	// Note: Any change to regex mentioned below must be reflected in the crd validation of route in https://github.com/openshift/library-go/blob/master/pkg/route/validation/validation.go) and vice-versa.
+	// +listType=map
+	// +listMapKey=name
+	// +optional
+	// +kubebuilder:validation:MaxItems=64
+	// +kubebuilder:validation:XValidation:rule=`self.all(key, key.action.type == "Delete" || (has(key.action.set) && key.action.set.value.matches('^(?:%(?:%|(?:\\{[-+]?[QXE](?:,[-+]?[QXE])*\\})?\\[(?:res\\.hdr\\([0-9A-Za-z-]+\\)|ssl_c_der)(?:,(?:lower|base64))*\\])|[^%[:cntrl:]])+$')))`,message="Either the header value provided is not in correct format or the sample fetcher/converter specified is not allowed. The dynamic header value will be interpreted as an HAProxy format string as defined in https://cbonte.github.io/haproxy-dconv/2.4/configuration.html#8.2.4 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2 Sample fetchers allowed are res.hdr, ssl_c_der. Converters allowed are lower, base64."
+	Response []IngressControllerHTTPHeader `json:"response,omitempty"`
+	// request is a list of HTTP request headers to set or delete.
+	// The actions either Set or Delete will be performed on the headers in sequence as defined in the list of request headers.
+	// A maximum of 64 request header actions may be configured.
+	// Enable the cluster administrator to specify HTTP request headers in the IngressController CR spec that should be set or
+	// deleted at the global level when forwarding responses to your application from the client, i.e. all routes.
+	// Sample fetchers allowed are "req.hdr" and "ssl_c_der".
+	// Converters allowed are "lower" and "base64".
+	// Examples of header value - "%[req.hdr(host),lower]", "%[req.hdr(host),base64]", "{+Q}[ssl_c_der,base64]", "{+Q}[ssl_c_der,lower]"
+	// + ---
+	// + Note: Any change to regex mentioned below must be reflected in the crd validation of route in https://github.com/openshift/library-go/blob/master/pkg/route/validation/validation.go) and vice-versa.
+	// +listType=map
+	// +listMapKey=name
+	// +optional
+	// +kubebuilder:validation:MaxItems=64
+	// +kubebuilder:validation:XValidation:rule=`self.all(key, key.action.type == "Delete" || (has(key.action.set) && key.action.set.value.matches('^(?:%(?:%|(?:\\{[-+]?[QXE](?:,[-+]?[QXE])*\\})?\\[(?:req\\.hdr\\([0-9A-Za-z-]+\\)|ssl_c_der)(?:,(?:lower|base64))*\\])|[^%[:cntrl:]])+$')))`,message="Either the header value provided is not in correct format or the sample fetcher/converter specified is not allowed. The dynamic header value will be interpreted as an HAProxy format string as defined in https://cbonte.github.io/haproxy-dconv/2.4/configuration.html#8.2.4 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2 Sample fetchers allowed are req.hdr, ssl_c_der. Converters allowed are lower, base64."
+	Request []IngressControllerHTTPHeader `json:"request,omitempty"`
+}
+
+// IngressControllerHTTPHeader specifies configuration for setting or deleting an HTTP header.
+type IngressControllerHTTPHeader struct {
+	// name specifies the name of a header to set or delete.  Its value must be a valid HTTP header.
+	// name as defined in RFC 2616 section 4.2.
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	// +kubebuilder:validation:Pattern="^[-!#$%&'*+.0-9A-Z^_`a-z|~]+$"
+	// +kubebuilder:validation:XValidation:rule="self.lowerAscii() != 'strict-transport-security'",message="strict-transport-security may not be set/delete via header actions"
+	// +kubebuilder:validation:XValidation:rule="self.lowerAscii() != 'proxy'",message="proxy may not be set/delete via header actions"
+	// +kubebuilder:validation:XValidation:rule="self.lowerAscii() != 'host'",message="host may not be set/delete via header actions"
+	Name string `json:"name"`
+	// action specifies actions to perform on headers, such as setting or deleting headers.
+	// +kubebuilder:validation:Required
+	Action IngressControllerHTTPHeaderActionUnion `json:"action"`
+}
+
+// IngressControllerHTTPHeaderActionUnion specifies an action to take on an HTTP header.
+// +union
+type IngressControllerHTTPHeaderActionUnion struct {
+	// type defines the type of the action to be applied on the header.
+	// Possible values are Set and Delete.
+	// Set allows you to set http request and response headers.
+	// Delete allows you to delete http request and response headers
+	// +unionDiscriminator
+	// +kubebuilder:validation:Enum:=Set;Delete
+	// +kubebuilder:validation:Required
+	Type IngressControllerHTTPHeaderActionType `json:"type"`
+
+	// set specifies how the HTTP header should be set.
+	// If this field is empty, no action is taken.
+	// +optional
+	// +unionMember
+	Set *IngressControllerSetHTTPHeader `json:"set,omitempty"`
+}
+
+// IngressControllerHTTPHeaderActionType defines actions that can be performed on HTTP headers.
+type IngressControllerHTTPHeaderActionType string
+
+const (
+	// Set specifies that an HTTP header should be set.
+	Set IngressControllerHTTPHeaderActionType = "Set"
+	// Delete specifies that an HTTP header should be deleted.
+	Delete IngressControllerHTTPHeaderActionType = "Delete"
+)
+
+// IngressControllerSetHTTPHeader defines the value which needs to be set on an HTTP header.
+type IngressControllerSetHTTPHeader struct {
+	// value specifies a header value.
+	// Dynamic values can be added. The value will be interpreted as an HAProxy format string as defined in
+	// https://cbonte.github.io/haproxy-dconv/2.4/configuration.html#8.2.4 and may use HAProxy's %[] syntax and
+	// otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=4096
+	Value string `json:"value"`
 }
 
 // IngressControllerTuningOptions specifies options for tuning the performance

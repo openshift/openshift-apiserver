@@ -18,13 +18,13 @@ require (
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.0.3-0.20220114050600-8b9d41f48198
-	github.com/openshift/api v0.0.0-20230509100629-894b49f57a15
+	github.com/openshift/api v0.0.0-20230613151523-ba04973d3ed1
 	github.com/openshift/apiserver-library-go v0.0.0-20230503174907-d9b2bf6185e9
 	github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d
 	github.com/openshift/client-go v0.0.0-20230503144108-75015d2347cb
 	github.com/openshift/library-go v0.0.0-20230503173034-95ca3c14e50a
 	github.com/openshift/runtime-utils v0.0.0-20220926190846-5c488b20a19f
-	github.com/spf13/cobra v1.6.0
+	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd/client/v3 v3.5.7
 	k8s.io/api v0.27.2
@@ -61,6 +61,7 @@ require (
 	github.com/containers/storage v1.42.0 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.4.0 // indirect
+	github.com/distribution/distribution/v3 v3.0.0-20230511163743-f7717b7855ca // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7 // indirect
@@ -210,3 +211,7 @@ replace (
 	k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.27.2
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.27.2
 )
+
+replace github.com/openshift/library-go => github.com/miheer/library-go v0.0.0-20230701014556-8cc933fcf157
+
+replace github.com/openshift/api => github.com/miheer/api v0.0.0-20230701010835-2aaab98e2bd0
