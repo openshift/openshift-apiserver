@@ -3,6 +3,7 @@ package openshiftapiserver
 import (
 	"fmt"
 	"io/ioutil"
+	"k8s.io/apiserver/pkg/endpoints/discovery/aggregated"
 	"net/http"
 	"time"
 
@@ -97,12 +98,15 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	genericConfig.BuildHandlerChainFunc = OpenshiftHandlerChain
 	genericConfig.RequestInfoResolver = apiserverconfig.OpenshiftRequestInfoResolver()
 	genericConfig.OpenAPIConfig = configprocessing.DefaultOpenAPIConfig()
+	genericConfig.OpenAPIV3Config = configprocessing.DefaultOpenAPIConfig()
 	// previously overwritten.  I don't know why
 	genericConfig.RequestTimeout = time.Duration(60) * time.Second
 	genericConfig.MinRequestTimeout = int(config.ServingInfo.RequestTimeoutSeconds)
 	genericConfig.MaxRequestsInFlight = int(config.ServingInfo.MaxRequestsInFlight)
 	genericConfig.MaxMutatingRequestsInFlight = int(config.ServingInfo.MaxRequestsInFlight / 2)
 	genericConfig.LongRunningFunc = apiserverconfig.IsLongRunningRequest
+
+	genericConfig.AggregatedDiscoveryGroupManager = aggregated.NewResourceManager("apis").WithSource(aggregated.AggregatorSource)
 
 	etcdOptions, err := ToEtcdOptions(config.APIServerArguments, config.StorageConfig)
 	if err != nil {

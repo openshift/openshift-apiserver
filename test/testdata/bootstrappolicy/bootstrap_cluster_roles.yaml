@@ -1354,6 +1354,7 @@ items:
     - /oapi
     - /oapi/*
     - /openapi/v2
+    - /openapi/v3
     - /swaggerapi
     - /swaggerapi/*
     - /swagger.json

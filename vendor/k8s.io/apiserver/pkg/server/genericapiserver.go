@@ -427,19 +427,25 @@ type preparedGenericAPIServer struct {
 func (s *GenericAPIServer) PrepareRun() preparedGenericAPIServer {
 	s.delegationTarget.PrepareRun()
 
+	klog.Infof("PREPARE -1")
 	if s.openAPIConfig != nil && !s.skipOpenAPIInstallation {
+		klog.Infof("PREPARE 0")
 		s.OpenAPIVersionedService, s.StaticOpenAPISpec = routes.OpenAPI{
 			Config: s.openAPIConfig,
 		}.InstallV2(s.Handler.GoRestfulContainer, s.Handler.NonGoRestfulMux)
 	}
 
+	klog.Infof("PREPARE 1")
 	if s.openAPIV3Config != nil && !s.skipOpenAPIInstallation {
+		klog.Infof("PREPARE 2")
 		if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPIV3) {
+			klog.Infof("PREPARE 3")
 			s.OpenAPIV3VersionedService = routes.OpenAPI{
 				Config: s.openAPIV3Config,
 			}.InstallV3(s.Handler.GoRestfulContainer, s.Handler.NonGoRestfulMux)
 		}
 	}
+	klog.Infof("PREPARE 4")
 
 	s.installHealthz()
 	s.installLivez()
@@ -857,10 +863,13 @@ func (s *GenericAPIServer) InstallLegacyAPIGroup(apiPrefix string, apiGroupInfo 
 // The <apiGroupInfos> passed into this function shouldn't be used elsewhere as the
 // underlying storage will be destroyed on this servers shutdown.
 func (s *GenericAPIServer) InstallAPIGroups(apiGroupInfos ...*APIGroupInfo) error {
+	klog.Infof("TEST 1")
 	for _, apiGroupInfo := range apiGroupInfos {
+		klog.Infof("TEST 2")
 		// Do not register empty group or empty version.  Doing so claims /apis/ for the wrong entity to be returned.
 		// Catching these here places the error  much closer to its origin
 		if len(apiGroupInfo.PrioritizedVersions[0].Group) == 0 {
+			klog.Infof("TEST 15")
 			return fmt.Errorf("cannot register handler with an empty group for %#v", *apiGroupInfo)
 		}
 		if len(apiGroupInfo.PrioritizedVersions[0].Version) == 0 {
@@ -869,11 +878,14 @@ func (s *GenericAPIServer) InstallAPIGroups(apiGroupInfos ...*APIGroupInfo) erro
 	}
 
 	openAPIModels, err := s.getOpenAPIModels(APIGroupPrefix, apiGroupInfos...)
+	klog.Infof("TEST 3 %v", openAPIModels)
 	if err != nil {
+		klog.Infof("TEST 4")
 		return fmt.Errorf("unable to get openapi models: %v", err)
 	}
 
 	for _, apiGroupInfo := range apiGroupInfos {
+		klog.Infof("TEST 5 %v", apiGroupInfo)
 		if err := s.installAPIResources(APIGroupPrefix, apiGroupInfo, openAPIModels); err != nil {
 			return fmt.Errorf("unable to install api resources: %v", err)
 		}
@@ -971,8 +983,10 @@ func (s *GenericAPIServer) getOpenAPIModels(apiPrefix string, apiGroupInfos ...*
 	if s.openAPIV3Config == nil {
 		//!TODO: A future work should add a requirement that
 		// OpenAPIV3 config is required. May require some refactoring of tests.
+		klog.Infof("TEST OPENAPIV3 IS NIL")
 		return nil, nil
 	}
+	klog.Infof("TEST OPENAPIV3 IS NOT NIL")
 	pathsToIgnore := openapiutil.NewTrie(s.openAPIConfig.IgnorePrefixes)
 	resourceNames := make([]string, 0)
 	for _, apiGroupInfo := range apiGroupInfos {

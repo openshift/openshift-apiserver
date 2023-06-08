@@ -50,7 +50,6 @@ import (
 	securityapiserver "github.com/openshift/openshift-apiserver/pkg/security/apiserver"
 	templateapiserver "github.com/openshift/openshift-apiserver/pkg/template/apiserver"
 	"github.com/openshift/openshift-apiserver/pkg/version"
-
 	// register api groups
 	_ "github.com/openshift/openshift-apiserver/pkg/api/install"
 )
@@ -368,6 +367,7 @@ func (c *completedConfig) WithOpenAPIAggregationController(delegatedAPIServer *g
 		go openAPIAggregationController.Run(context.StopCh)
 		return nil
 	})
+
 	return nil
 }
 

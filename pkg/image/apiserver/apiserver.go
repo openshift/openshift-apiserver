@@ -112,6 +112,7 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(imagev1.GroupName, c.ExtraConfig.Scheme, metav1.ParameterCodec, c.ExtraConfig.Codecs)
 	apiGroupInfo.VersionedResourcesStorageMap[imagev1.SchemeGroupVersion.Version] = v1Storage
+	klog.Infof("TEST install api group %v", apiGroupInfo)
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {
 		return nil, err
 	}
