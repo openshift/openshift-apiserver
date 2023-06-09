@@ -13,8 +13,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apiserver/pkg/admission"
 	admissionmetrics "k8s.io/apiserver/pkg/admission/metrics"
+	"k8s.io/apiserver/pkg/endpoints/discovery/aggregated"
+	genericfeatures "k8s.io/apiserver/pkg/features"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	cacheddiscovery "k8s.io/client-go/discovery/cached"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/informers"
@@ -97,12 +100,16 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	genericConfig.BuildHandlerChainFunc = OpenshiftHandlerChain
 	genericConfig.RequestInfoResolver = apiserverconfig.OpenshiftRequestInfoResolver()
 	genericConfig.OpenAPIConfig = configprocessing.DefaultOpenAPIConfig()
+	genericConfig.OpenAPIV3Config = configprocessing.DefaultOpenAPIConfig()
 	// previously overwritten.  I don't know why
 	genericConfig.RequestTimeout = time.Duration(60) * time.Second
 	genericConfig.MinRequestTimeout = int(config.ServingInfo.RequestTimeoutSeconds)
 	genericConfig.MaxRequestsInFlight = int(config.ServingInfo.MaxRequestsInFlight)
 	genericConfig.MaxMutatingRequestsInFlight = int(config.ServingInfo.MaxRequestsInFlight / 2)
 	genericConfig.LongRunningFunc = apiserverconfig.IsLongRunningRequest
+	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.AggregatedDiscoveryEndpoint) {
+		genericConfig.AggregatedDiscoveryGroupManager = aggregated.NewResourceManager("apis").WithSource(aggregated.AggregatorSource)
+	}
 
 	etcdOptions, err := ToEtcdOptions(config.APIServerArguments, config.StorageConfig)
 	if err != nil {
