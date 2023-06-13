@@ -804,13 +804,17 @@ func (c completedConfig) New(name string, delegationTarget DelegationTarget) (*G
 		eventSink: c.EventSink,
 	}
 
+	klog.Infof("DBG: Checking if AggregatedDiscovery is enabled")
 	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.AggregatedDiscoveryEndpoint) {
+		klog.Infof("DBG: AggregatedDiscovery is enabled")
 		manager := c.AggregatedDiscoveryGroupManager
 		if manager == nil {
+			klog.Infof("DBG: manager is nil creating a new one")
 			manager = discoveryendpoint.NewResourceManager("apis")
 		}
 		s.AggregatedDiscoveryGroupManager = manager
 		s.AggregatedLegacyDiscoveryGroupManager = discoveryendpoint.NewResourceManager("api")
+		klog.Infof("DBG: AggregatedDiscovery initialised")
 	}
 
 	ref, err := eventReference()

@@ -156,6 +156,7 @@ type CompletedConfig struct {
 
 // Complete fills in any fields not set that are required to have valid data. It's mutating the receiver.
 func (c *OpenshiftAPIConfig) Complete() completedConfig {
+	klog.Info("DBG: Calling OpenshiftAPIConfig.Complete()")
 	cfg := completedConfig{
 		c.GenericConfig.Complete(),
 		&c.ExtraConfig,
@@ -383,6 +384,7 @@ func addAPIServerOrDie(delegateAPIServer genericapiserver.DelegationTarget, apiS
 }
 
 func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget) (*OpenshiftAPIServer, error) {
+	klog.Info("DBG: Calling completedConfig.New method")
 	delegateAPIServer := delegationTarget
 
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withAppsAPIServer)
@@ -395,6 +397,7 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withSecurityAPIServer)
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withTemplateAPIServer)
 
+	klog.Info("DBG: Calling c.GenericConfig.New method")
 	genericServer, err := c.GenericConfig.New("openshift-apiserver", delegateAPIServer)
 	if err != nil {
 		return nil, err
