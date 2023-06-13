@@ -15,6 +15,7 @@ import (
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
+	discoveryendpoint "k8s.io/apiserver/pkg/endpoints/discovery/aggregated"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericmux "k8s.io/apiserver/pkg/server/mux"
 	kubeinformers "k8s.io/client-go/informers"
@@ -385,6 +386,8 @@ func addAPIServerOrDie(delegateAPIServer genericapiserver.DelegationTarget, apiS
 
 func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget) (*OpenshiftAPIServer, error) {
 	klog.Info("DBG: Calling completedConfig.New method")
+	manager := discoveryendpoint.NewResourceManager("apis").WithSource(discoveryendpoint.AggregatorSource)
+	c.GenericConfig.Config.AggregatedDiscoveryGroupManager = manager
 	delegateAPIServer := delegationTarget
 
 	delegateAPIServer = addAPIServerOrDie(delegateAPIServer, c.withAppsAPIServer)
