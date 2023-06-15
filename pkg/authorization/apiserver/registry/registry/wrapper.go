@@ -21,6 +21,7 @@ type NoWatchStorage interface {
 	rest.GracefulDeleter
 	rest.Scoper
 	rest.Storage
+	rest.SingularNameProvider
 }
 
 // WrapNoWatchStorageError uses syncStatusError to inject the correct group
@@ -76,6 +77,10 @@ func (s *noWatchStorageErrWrapper) Destroy() {}
 
 func (s *noWatchStorageErrWrapper) NewList() runtime.Object {
 	return s.delegate.NewList()
+}
+
+func (s *noWatchStorageErrWrapper) GetSingularName() string {
+	return s.delegate.GetSingularName()
 }
 
 // syncStatusError makes a best effort attempt to replace the GroupResource

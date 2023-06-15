@@ -24,6 +24,7 @@ import (
 	builder2 "k8s.io/kube-openapi/pkg/builder"
 	"k8s.io/kube-openapi/pkg/builder3"
 	"k8s.io/kube-openapi/pkg/common"
+	"k8s.io/kube-openapi/pkg/common/restfuladapter"
 	"k8s.io/kube-openapi/pkg/handler"
 	"k8s.io/kube-openapi/pkg/handler3"
 	"k8s.io/kube-openapi/pkg/validation/spec"
@@ -47,16 +48,12 @@ func (oa OpenAPI) InstallV2(c *restful.Container, mux *mux.PathRecorderMux) (*ha
 		"/apis/authorization.openshift.io/v1/namespaces/{namespace}/rolebindingrestrictions",
 		"/apis/authorization.openshift.io/v1/watch/namespaces/{namespace}/rolebindingrestrictions",
 		"/apis/authorization.openshift.io/v1/watch/rolebindingrestrictions")
-	spec, err := builder2.BuildOpenAPISpec(c.RegisteredWebServices(), oa.Config)
+	spec, err := builder2.BuildOpenAPISpecFromRoutes(restfuladapter.AdaptWebServices(c.RegisteredWebServices()), oa.Config)
 	if err != nil {
 		klog.Fatalf("Failed to build open api spec for root: %v", err)
 	}
 	spec.Definitions = handler.PruneDefaults(spec.Definitions)
-	openAPIVersionedService, err := handler.NewOpenAPIService(spec)
-	if err != nil {
-		klog.Fatalf("Failed to create OpenAPIService: %v", err)
-	}
-
+	openAPIVersionedService := handler.NewOpenAPIService(spec)
 	err = openAPIVersionedService.RegisterOpenAPIVersionedService("/openapi/v2", mux)
 	if err != nil {
 		klog.Fatalf("Failed to register versioned open api spec for root: %v", err)
@@ -67,12 +64,8 @@ func (oa OpenAPI) InstallV2(c *restful.Container, mux *mux.PathRecorderMux) (*ha
 
 // InstallV3 adds the static group/versions defined in the RegisteredWebServices to the OpenAPI v3 spec
 func (oa OpenAPI) InstallV3(c *restful.Container, mux *mux.PathRecorderMux) *handler3.OpenAPIService {
-	openAPIVersionedService, err := handler3.NewOpenAPIService(nil)
-	if err != nil {
-		klog.Fatalf("Failed to create OpenAPIService: %v", err)
-	}
-
-	err = openAPIVersionedService.RegisterOpenAPIV3VersionedService("/openapi/v3", mux)
+	openAPIVersionedService := handler3.NewOpenAPIService()
+	err := openAPIVersionedService.RegisterOpenAPIV3VersionedService("/openapi/v3", mux)
 	if err != nil {
 		klog.Fatalf("Failed to register versioned open api spec for root: %v", err)
 	}
@@ -86,7 +79,7 @@ func (oa OpenAPI) InstallV3(c *restful.Container, mux *mux.PathRecorderMux) *han
 	}
 
 	for gv, ws := range grouped {
-		spec, err := builder3.BuildOpenAPISpec(ws, oa.Config)
+		spec, err := builder3.BuildOpenAPISpecFromRoutes(restfuladapter.AdaptWebServices(ws), oa.Config)
 		if err != nil {
 			klog.Errorf("Failed to build OpenAPI v3 for group %s, %q", gv, err)
 

@@ -41,9 +41,10 @@ func NewREST(optsGetter generic.RESTOptionsGetter, allocator HostnameGenerator, 
 	strategy := routeregistry.NewStrategy(allocator, sarClient)
 
 	store := &registry.Store{
-		NewFunc:                  func() runtime.Object { return &routeapi.Route{} },
-		NewListFunc:              func() runtime.Object { return &routeapi.RouteList{} },
-		DefaultQualifiedResource: routegroup.Resource("routes"),
+		NewFunc:                   func() runtime.Object { return &routeapi.Route{} },
+		NewListFunc:               func() runtime.Object { return &routeapi.RouteList{} },
+		DefaultQualifiedResource:  routegroup.Resource("routes"),
+		SingularQualifiedResource: routegroup.Resource("route"),
 
 		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(routeprinters.AddRouteOpenShiftHandlers)},
 

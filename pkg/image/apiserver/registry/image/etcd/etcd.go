@@ -25,9 +25,10 @@ var _ rest.StandardStorage = &REST{}
 // NewREST returns a new REST.
 func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, error) {
 	store := &registry.Store{
-		NewFunc:                  func() runtime.Object { return &imageapi.Image{} },
-		NewListFunc:              func() runtime.Object { return &imageapi.ImageList{} },
-		DefaultQualifiedResource: image.Resource("images"),
+		NewFunc:                   func() runtime.Object { return &imageapi.Image{} },
+		NewListFunc:               func() runtime.Object { return &imageapi.ImageList{} },
+		DefaultQualifiedResource:  image.Resource("images"),
+		SingularQualifiedResource: image.Resource("image"),
 
 		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(imageprinters.AddImageOpenShiftHandlers)},
 

@@ -31,9 +31,10 @@ func NewREST(optsGetter generic.RESTOptionsGetter, authorizationClient authoriza
 	strategy := templateinstance.NewStrategy(authorizationClient)
 
 	store := &registry.Store{
-		NewFunc:                  func() runtime.Object { return &templateapi.TemplateInstance{} },
-		NewListFunc:              func() runtime.Object { return &templateapi.TemplateInstanceList{} },
-		DefaultQualifiedResource: template.Resource("templateinstances"),
+		NewFunc:                   func() runtime.Object { return &templateapi.TemplateInstance{} },
+		NewListFunc:               func() runtime.Object { return &templateapi.TemplateInstanceList{} },
+		DefaultQualifiedResource:  template.Resource("templateinstances"),
+		SingularQualifiedResource: template.Resource("templateinstance"),
 
 		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(templateprinters.AddTemplateOpenShiftHandlers)},
 

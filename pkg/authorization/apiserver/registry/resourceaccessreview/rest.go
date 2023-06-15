@@ -31,6 +31,7 @@ type REST struct {
 var _ rest.Creater = &REST{}
 var _ rest.Scoper = &REST{}
 var _ rest.Storage = &REST{}
+var _ rest.SingularNameProvider = &REST{}
 
 // NewREST creates a new REST for policies.
 func NewREST(authorizer kauthorizer.Authorizer, subjectLocator rbac.SubjectLocator) *REST {
@@ -46,6 +47,10 @@ func (r *REST) Destroy() {}
 
 func (s *REST) NamespaceScoped() bool {
 	return false
+}
+
+func (s *REST) GetSingularName() string {
+	return "localresourceaccessreview"
 }
 
 // Create registers a given new ResourceAccessReview instance to r.registry.
