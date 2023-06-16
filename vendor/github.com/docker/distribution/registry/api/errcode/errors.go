@@ -81,9 +81,6 @@ func (ec ErrorCode) WithMessage(message string) Error {
 // WithDetail creates a new Error struct based on the passed-in info and
 // set the Detail property appropriately
 func (ec ErrorCode) WithDetail(detail interface{}) Error {
-	if err, ok := detail.(Error); ok {
-		return err
-	}
 	return Error{
 		Code:    ec,
 		Message: ec.Message(),
@@ -210,11 +207,11 @@ func (errs Errors) MarshalJSON() ([]byte, error) {
 	for _, daErr := range errs {
 		var err Error
 
-		switch daErr.(type) {
+		switch daErr := daErr.(type) {
 		case ErrorCode:
-			err = daErr.(ErrorCode).WithDetail(nil)
+			err = daErr.WithDetail(nil)
 		case Error:
-			err = daErr.(Error)
+			err = daErr
 		default:
 			err = ErrorCodeUnknown.WithDetail(daErr)
 
