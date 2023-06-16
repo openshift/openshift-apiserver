@@ -4,6 +4,6 @@
 // +k8s:defaulter-gen-input=../../../../../../../../github.com/openshift/api/image/docker10
 
 // +groupName=image.openshift.io
-// Package docker10 provides types used by docker/distribution and moby/moby.
+// Package docker10 provides types used by distribution/distribution/v3 and moby/moby.
 // This package takes no dependency on external types.
 package docker10

@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/docker/distribution"
-	"github.com/docker/distribution/manifest/manifestlist"
+	"github.com/distribution/distribution/v3"
+	"github.com/distribution/distribution/v3/manifest/manifestlist"
 	fuzz "github.com/google/gofuzz"
 
 	"k8s.io/apimachinery/pkg/api/apitesting/fuzzer"

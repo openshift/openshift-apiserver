@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/docker/distribution/manifest/schema2"
+	"github.com/distribution/distribution/v3/manifest/schema2"
 	imgspecv1 "github.com/opencontainers/image-spec/specs-go/v1"
 
 	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
