@@ -24,6 +24,8 @@ import (
 	"k8s.io/klog/v2"
 	openapicontroller "k8s.io/kube-aggregator/pkg/controllers/openapi"
 	"k8s.io/kube-aggregator/pkg/controllers/openapi/aggregator"
+	openapiv3controller "k8s.io/kube-aggregator/pkg/controllers/openapiv3"
+	openapiv3aggregator "k8s.io/kube-aggregator/pkg/controllers/openapiv3/aggregator"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	rbacrest "k8s.io/kubernetes/pkg/registry/rbac/rest"
 	rbacregistryvalidation "k8s.io/kubernetes/pkg/registry/rbac/validation"
@@ -173,6 +175,8 @@ func (c *completedConfig) withAppsAPIServer(delegateAPIServer genericapiserver.D
 			Scheme:                    legacyscheme.Scheme,
 		},
 	}
+	// server is required to install OpenAPI to register and serve openapi spec for its types
+	cfg.GenericConfig.SkipOpenAPIInstallation = false
 	config := cfg.Complete()
 	server, err := config.New(delegateAPIServer)
 	if err != nil {
@@ -194,6 +198,8 @@ func (c *completedConfig) withAuthorizationAPIServer(delegateAPIServer genericap
 			Scheme:                    legacyscheme.Scheme,
 		},
 	}
+	// server is required to install OpenAPI to register and serve openapi spec for its types
+	cfg.GenericConfig.SkipOpenAPIInstallation = false
 	config := cfg.Complete()
 	server, err := config.New(delegateAPIServer)
 	if err != nil {
@@ -212,6 +218,8 @@ func (c *completedConfig) withBuildAPIServer(delegateAPIServer genericapiserver.
 			Scheme:                    legacyscheme.Scheme,
 		},
 	}
+	// server is required to install OpenAPI to register and serve openapi spec for its types
+	cfg.GenericConfig.SkipOpenAPIInstallation = false
 	config := cfg.Complete()
 	server, err := config.New(delegateAPIServer)
 	if err != nil {
@@ -235,6 +243,8 @@ func (c *completedConfig) withImageAPIServer(delegateAPIServer genericapiserver.
 			OperatorInformers:                  c.ExtraConfig.OperatorInformers,
 		},
 	}
+	// server is required to install OpenAPI to register and serve openapi spec for its types
+	cfg.GenericConfig.SkipOpenAPIInstallation = false
 	config := cfg.Complete()
 	server, err := config.New(delegateAPIServer)
 	if err != nil {
@@ -258,6 +268,8 @@ func (c *completedConfig) withProjectAPIServer(delegateAPIServer genericapiserve
 			Scheme:                    legacyscheme.Scheme,
 		},
 	}
+	// server is required to install OpenAPI to register and serve openapi spec for its types
+	cfg.GenericConfig.SkipOpenAPIInstallation = false
 	config := cfg.Complete()
 	server, err := config.New(delegateAPIServer)
 	if err != nil {
@@ -277,6 +289,8 @@ func (c *completedConfig) withQuotaAPIServer(delegateAPIServer genericapiserver.
 			Scheme:                        legacyscheme.Scheme,
 		},
 	}
+	// server is required to install OpenAPI to register and serve openapi spec for its types
+	cfg.GenericConfig.SkipOpenAPIInstallation = false
 	config := cfg.Complete()
 	server, err := config.New(delegateAPIServer)
 	if err != nil {
@@ -296,6 +310,8 @@ func (c *completedConfig) withRouteAPIServer(delegateAPIServer genericapiserver.
 			Scheme:                    legacyscheme.Scheme,
 		},
 	}
+	// server is required to install OpenAPI to register and serve openapi spec for its types
+	cfg.GenericConfig.SkipOpenAPIInstallation = false
 	config := cfg.Complete()
 	server, err := config.New(delegateAPIServer)
 	if err != nil {
@@ -317,6 +333,8 @@ func (c *completedConfig) withSecurityAPIServer(delegateAPIServer genericapiserv
 			Scheme:                    legacyscheme.Scheme,
 		},
 	}
+	// server is required to install OpenAPI to register and serve openapi spec for its types
+	cfg.GenericConfig.SkipOpenAPIInstallation = false
 	config := cfg.Complete()
 	server, err := config.New(delegateAPIServer)
 	if err != nil {
@@ -335,6 +353,8 @@ func (c *completedConfig) withTemplateAPIServer(delegateAPIServer genericapiserv
 			Scheme:                    legacyscheme.Scheme,
 		},
 	}
+	// server is required to install OpenAPI to register and serve openapi spec for its types
+	cfg.GenericConfig.SkipOpenAPIInstallation = false
 	config := cfg.Complete()
 	server, err := config.New(delegateAPIServer)
 	if err != nil {
@@ -345,17 +365,10 @@ func (c *completedConfig) withTemplateAPIServer(delegateAPIServer genericapiserv
 }
 
 func (c *completedConfig) WithOpenAPIAggregationController(delegatedAPIServer *genericapiserver.GenericAPIServer) error {
-	// We must remove openapi config-related fields from the head of the delegation chain that we pass to the OpenAPI aggregation controller.
-	// This is necessary in order to prevent conflicts with the aggregation controller, as it expects the apiserver passed to it to have
-	// no openapi config previously set. An alternative to stripping this data away would be to create and append a new apiserver to the head
-	// of the delegation chain altogether, then pass that to the controller. But in the spirit of simplicity, we'll just strip default
-	// openapi fields that may have been previously set.
-	delegatedAPIServer.RemoveOpenAPIData()
-
 	specDownloader := aggregator.NewDownloader()
 	openAPIAggregator, err := aggregator.BuildAndRegisterAggregator(
 		&specDownloader,
-		delegatedAPIServer,
+		delegatedAPIServer.NextDelegate(),
 		delegatedAPIServer.Handler.GoRestfulContainer.RegisteredWebServices(),
 		configprocessing.DefaultOpenAPIConfig(),
 		delegatedAPIServer.Handler.NonGoRestfulMux)
@@ -366,6 +379,24 @@ func (c *completedConfig) WithOpenAPIAggregationController(delegatedAPIServer *g
 
 	delegatedAPIServer.AddPostStartHook("apiservice-openapi-controller", func(context genericapiserver.PostStartHookContext) error {
 		go openAPIAggregationController.Run(context.StopCh)
+		return nil
+	})
+	return nil
+}
+
+func (c *completedConfig) WithOpenAPIV3AggregationController(delegatedAPIServer *genericapiserver.GenericAPIServer) error {
+	specDownloaderV3 := openapiv3aggregator.NewDownloader()
+	openAPIV3Aggregator, err := openapiv3aggregator.BuildAndRegisterAggregator(
+		specDownloaderV3,
+		delegatedAPIServer.NextDelegate(),
+		delegatedAPIServer.Handler.NonGoRestfulMux)
+	if err != nil {
+		return err
+	}
+	openAPIV3AggregationController := openapiv3controller.NewAggregationController(openAPIV3Aggregator)
+
+	delegatedAPIServer.AddPostStartHook("apiservice-openapiv3-controller", func(context genericapiserver.PostStartHookContext) error {
+		go openAPIV3AggregationController.Run(context.StopCh)
 		return nil
 	})
 	return nil

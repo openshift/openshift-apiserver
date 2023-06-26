@@ -106,6 +106,10 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	genericConfig.MaxMutatingRequestsInFlight = int(config.ServingInfo.MaxRequestsInFlight / 2)
 	genericConfig.LongRunningFunc = apiserverconfig.IsLongRunningRequest
 	genericConfig.AggregatedDiscoveryGroupManager = aggregated.NewResourceManager("apis")
+	// do not to install the default OpenAPI handler in the aggregated apiserver
+	// as it will be handled by openapi aggregator (both v2 and v3)
+	// non-root apiservers must set this value to false
+	genericConfig.Config.SkipOpenAPIInstallation = true
 
 	etcdOptions, err := ToEtcdOptions(config.APIServerArguments, config.StorageConfig)
 	if err != nil {
