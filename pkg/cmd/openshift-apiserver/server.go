@@ -43,6 +43,9 @@ func RunOpenShiftAPIServer(serverConfig *openshiftcontrolplanev1.OpenShiftAPISer
 	if err := completedOpenshiftAPIServer.WithOpenAPIAggregationController(preparedOpenshiftAPIServer.GenericAPIServer); err != nil {
 		return err
 	}
+	if err := completedOpenshiftAPIServer.WithOpenAPIV3AggregationController(preparedOpenshiftAPIServer.GenericAPIServer); err != nil {
+		return err
+	}
 
 	klog.Infof("Starting master on %s (%s)", serverConfig.ServingInfo.BindAddress, version.Get().String())
 
