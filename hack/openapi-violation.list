@@ -279,6 +279,9 @@ API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,G
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,MachineHealthCheckSpec,UnhealthyConditions
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,MachineSpec,Taints
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,MachineStatus,Addresses
+API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,NetworkDeviceSpec,AddressesFromPools
+API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,NetworkDeviceSpec,IPAddrs
+API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,NetworkDeviceSpec,Nameservers
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,NetworkSpec,Devices
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,ObjectMeta,OwnerReferences
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,VSphereMachineProviderStatus,Conditions
