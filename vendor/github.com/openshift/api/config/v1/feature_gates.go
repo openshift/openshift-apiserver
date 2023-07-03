@@ -143,16 +143,6 @@ var (
 		OwningProduct:       ocpSpecific,
 	}
 
-	FeatureGateMatchLabelKeysInPodTopologySpread = FeatureGateName("MatchLabelKeysInPodTopologySpread")
-	matchLabelKeysInPodTopologySpread            = FeatureGateDescription{
-		FeatureGateAttributes: FeatureGateAttributes{
-			Name: FeatureGateMatchLabelKeysInPodTopologySpread,
-		},
-		OwningJiraComponent: "scheduling",
-		ResponsiblePerson:   "ingvagabund",
-		OwningProduct:       kubernetes,
-	}
-
 	FeatureGatePDBUnhealthyPodEvictionPolicy = FeatureGateName("PDBUnhealthyPodEvictionPolicy")
 	pdbUnhealthyPodEvictionPolicy            = FeatureGateDescription{
 		FeatureGateAttributes: FeatureGateAttributes{
@@ -187,6 +177,16 @@ var (
 	azureWorkloadIdentity            = FeatureGateDescription{
 		FeatureGateAttributes: FeatureGateAttributes{
 			Name: FeatureGateAzureWorkloadIdentity,
+		},
+		OwningJiraComponent: "cloud-credential-operator",
+		ResponsiblePerson:   "abutcher",
+		OwningProduct:       ocpSpecific,
+	}
+
+	FeatureGateAWSSecurityTokenService = FeatureGateName("AWSSecurityTokenService")
+	awsSecurityTokenService            = FeatureGateDescription{
+		FeatureGateAttributes: FeatureGateAttributes{
+			Name: FeatureGateAWSSecurityTokenService,
 		},
 		OwningJiraComponent: "cloud-credential-operator",
 		ResponsiblePerson:   "abutcher",
@@ -261,5 +261,14 @@ var (
 		OwningJiraComponent: "machine-config-operator/platform-baremetal",
 		ResponsiblePerson:   "mkowalsk",
 		OwningProduct:       kubernetes,
+	}
+	FeatureGateVSphereStaticIPs = FeatureGateName("VSphereStaticIPs")
+	vSphereStaticIPs            = FeatureGateDescription{
+		FeatureGateAttributes: FeatureGateAttributes{
+			Name: FeatureGateVSphereStaticIPs,
+		},
+		OwningJiraComponent: "splat",
+		ResponsiblePerson:   "rvanderp3",
+		OwningProduct:       ocpSpecific,
 	}
 )
