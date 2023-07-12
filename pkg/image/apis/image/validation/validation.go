@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/docker/distribution/reference"
+	"github.com/distribution/distribution/v3/reference"
 
 	kmeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/validation/path"
@@ -30,17 +30,17 @@ import (
 // RepositoryNameComponentRegexp restricts registry path component names to
 // start with at least one letter or number, with following parts able to
 // be separated by one period, dash or underscore.
-// Copied from github.com/docker/distribution/registry/api/v2/names.go v2.1.1
+// Copied from github.com/distribution/distribution/v3/registry/api/v2/names.go v2.1.1
 var RepositoryNameComponentRegexp = regexp.MustCompile(`[a-z0-9]+(?:[._-][a-z0-9]+)*`)
 
 // RepositoryNameComponentAnchoredRegexp is the version of
 // RepositoryNameComponentRegexp which must completely match the content
-// Copied from github.com/docker/distribution/registry/api/v2/names.go v2.1.1
+// Copied from github.com/distribution/distribution/v3/registry/api/v2/names.go v2.1.1
 var RepositoryNameComponentAnchoredRegexp = regexp.MustCompile(`^` + RepositoryNameComponentRegexp.String() + `$`)
 
 // RepositoryNameRegexp builds on RepositoryNameComponentRegexp to allow
 // multiple path components, separated by a forward slash.
-// Copied from github.com/docker/distribution/registry/api/v2/names.go v2.1.1
+// Copied from github.com/distribution/distribution/v3/registry/api/v2/names.go v2.1.1
 var RepositoryNameRegexp = regexp.MustCompile(`(?:` + RepositoryNameComponentRegexp.String() + `/)*` + RepositoryNameComponentRegexp.String())
 
 var imageDigestRegexp = regexp.MustCompile(`[A-Za-z][A-Za-z0-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*[:][[:xdigit:]]{32,}`)
