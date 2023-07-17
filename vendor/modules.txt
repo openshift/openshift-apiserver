@@ -373,7 +373,7 @@ github.com/opencontainers/runc/libcontainer/user
 # github.com/opencontainers/runtime-spec v1.0.3-0.20220909204839-494a5a6aca78
 ## explicit
 github.com/opencontainers/runtime-spec/specs-go
-# github.com/openshift/api v0.0.0-20230714214528-de6ad7979b00
+# github.com/openshift/api v0.0.0-20230718161610-2a3e8b481cec
 ## explicit; go 1.20
 github.com/openshift/api
 github.com/openshift/api/annotations
@@ -604,7 +604,7 @@ github.com/openshift/client-go/user/informers/externalversions/internalinterface
 github.com/openshift/client-go/user/informers/externalversions/user
 github.com/openshift/client-go/user/informers/externalversions/user/v1
 github.com/openshift/client-go/user/listers/user/v1
-# github.com/openshift/library-go v0.0.0-20230614142803-865e70cc6b32
+# github.com/openshift/library-go v0.0.0-20230714173235-d8d3f3f8a9e4
 ## explicit; go 1.20
 github.com/openshift/library-go/pkg/apiserver/admission/admissionregistrationtesting
 github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig
@@ -621,6 +621,7 @@ github.com/openshift/library-go/pkg/config/configdefaults
 github.com/openshift/library-go/pkg/config/helpers
 github.com/openshift/library-go/pkg/config/serving
 github.com/openshift/library-go/pkg/crypto
+github.com/openshift/library-go/pkg/features
 github.com/openshift/library-go/pkg/image/imageutil
 github.com/openshift/library-go/pkg/image/internal/digest
 github.com/openshift/library-go/pkg/image/internal/reference
