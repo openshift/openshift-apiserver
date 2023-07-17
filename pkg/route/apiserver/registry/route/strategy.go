@@ -3,7 +3,10 @@ package route
 import (
 	"context"
 	"fmt"
-
+	routev1 "github.com/openshift/api/route/v1"
+	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
+	"github.com/openshift/openshift-apiserver/pkg/route/apis/route/validation"
+	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/routehostassignment"
 	authorizationapi "k8s.io/api/authorization/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -11,11 +14,6 @@ import (
 	"k8s.io/apiserver/pkg/storage/names"
 	authorizationclient "k8s.io/client-go/kubernetes/typed/authorization/v1"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
-
-	routev1 "github.com/openshift/api/route/v1"
-	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
-	"github.com/openshift/openshift-apiserver/pkg/route/apis/route/validation"
-	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/routehostassignment"
 )
 
 // Registry is an interface for performing subject access reviews
@@ -32,23 +30,31 @@ type HostnameGenerator interface {
 type routeStrategy struct {
 	runtime.ObjectTyper
 	names.NameGenerator
-	hostnameGenerator HostnameGenerator
-	sarClient         SubjectAccessReviewInterface
+	hostnameGenerator         HostnameGenerator
+	sarClient                 SubjectAccessReviewInterface
+	allowExternalCertificates bool
 }
 
 // NewStrategy initializes the default logic that applies when creating and updating
 // Route objects via the REST API.
-func NewStrategy(allocator HostnameGenerator, sarClient SubjectAccessReviewInterface) routeStrategy {
+func NewStrategy(allocator HostnameGenerator, sarClient SubjectAccessReviewInterface, allowExternalCertificates bool) routeStrategy {
 	return routeStrategy{
-		ObjectTyper:       legacyscheme.Scheme,
-		NameGenerator:     names.SimpleNameGenerator,
-		hostnameGenerator: allocator,
-		sarClient:         sarClient,
+		ObjectTyper:               legacyscheme.Scheme,
+		NameGenerator:             names.SimpleNameGenerator,
+		hostnameGenerator:         allocator,
+		sarClient:                 sarClient,
+		allowExternalCertificates: allowExternalCertificates,
 	}
 }
 
 func (routeStrategy) NamespaceScoped() bool {
 	return true
+}
+
+func (s routeStrategy) routeValidationOptions() validation.RouteValidationOptions {
+	return validation.RouteValidationOptions{
+		AllowExternalCertificates: s.allowExternalCertificates,
+	}
 }
 
 func (s routeStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
@@ -73,7 +79,7 @@ func (s routeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 func (s routeStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	route := obj.(*routeapi.Route)
 	errs := routehostassignment.AllocateHost(ctx, route, s.sarClient, s.hostnameGenerator)
-	errs = append(errs, validation.ValidateRoute(route)...)
+	errs = append(errs, validation.ValidateRoute(route, s.routeValidationOptions())...)
 	return errs
 }
 
@@ -94,7 +100,7 @@ func (s routeStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Obje
 	oldRoute := old.(*routeapi.Route)
 	objRoute := obj.(*routeapi.Route)
 	errs := routehostassignment.ValidateHostUpdate(ctx, objRoute, oldRoute, s.sarClient)
-	errs = append(errs, validation.ValidateRouteUpdate(objRoute, oldRoute)...)
+	errs = append(errs, validation.ValidateRouteUpdate(objRoute, oldRoute, s.routeValidationOptions())...)
 	return errs
 }
 
@@ -111,7 +117,7 @@ type routeStatusStrategy struct {
 	routeStrategy
 }
 
-var StatusStrategy = routeStatusStrategy{NewStrategy(nil, nil)}
+var StatusStrategy = routeStatusStrategy{NewStrategy(nil, nil, false)}
 
 func (routeStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
 	newRoute := obj.(*routeapi.Route)

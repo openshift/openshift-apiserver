@@ -37,8 +37,8 @@ type HostnameGenerator interface {
 }
 
 // NewREST returns a RESTStorage object that will work against routes.
-func NewREST(optsGetter generic.RESTOptionsGetter, allocator HostnameGenerator, sarClient routeregistry.SubjectAccessReviewInterface) (*REST, *StatusREST, error) {
-	strategy := routeregistry.NewStrategy(allocator, sarClient)
+func NewREST(optsGetter generic.RESTOptionsGetter, allocator HostnameGenerator, sarClient routeregistry.SubjectAccessReviewInterface, allowExternalCertificates bool) (*REST, *StatusREST, error) {
+	strategy := routeregistry.NewStrategy(allocator, sarClient, allowExternalCertificates)
 
 	store := &registry.Store{
 		NewFunc:                   func() runtime.Object { return &routeapi.Route{} },

@@ -17,17 +17,22 @@ func toRouteV1(internal *routeapi.Route) (*routev1.Route, field.ErrorList) {
 	return &external, nil
 }
 
+// move to library-go for plumbing
+type RouteValidationOptions struct {
+	AllowExternalCertificates bool
+}
+
 // ValidateRoute tests if required fields in the route are set.
-func ValidateRoute(route *routeapi.Route) field.ErrorList {
+func ValidateRoute(route *routeapi.Route, opts RouteValidationOptions) field.ErrorList {
 	external, errs := toRouteV1(route)
 	if len(errs) > 0 {
 		return errs
 	}
 
-	return routevalidation.ValidateRoute(external)
+	return routevalidation.ValidateRoute(external /*, opts*/)
 }
 
-func ValidateRouteUpdate(route *routeapi.Route, oldRoute *routeapi.Route) field.ErrorList {
+func ValidateRouteUpdate(route *routeapi.Route, oldRoute *routeapi.Route, opts RouteValidationOptions) field.ErrorList {
 	external, errs := toRouteV1(route)
 	if len(errs) > 0 {
 		return errs
@@ -38,7 +43,7 @@ func ValidateRouteUpdate(route *routeapi.Route, oldRoute *routeapi.Route) field.
 		return errs
 	}
 
-	return routevalidation.ValidateRouteUpdate(external, oldExternal)
+	return routevalidation.ValidateRouteUpdate(external, oldExternal /*, opts*/)
 }
 
 // ValidateRouteStatusUpdate validates status updates for routes.
