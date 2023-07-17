@@ -178,6 +178,13 @@ type TLSConfig struct {
 	// insecure connections to an edge-terminated route:
 	//   disable, allow or redirect
 	InsecureEdgeTerminationPolicy InsecureEdgeTerminationPolicyType
+
+	// externalCertificate provides certificate contents as a secret reference.
+	// This should be a single serving certificate, not a certificate
+	// chain. Do not include a CA certificate. The secret referenced should
+	// be present in the same namespace as that of the Route.
+	// Forbidden when `certificate` is set.
+	ExternalCertificate LocalObjectReference
 }
 
 // TLSTerminationType dictates where the secure communication will stop
@@ -219,3 +226,11 @@ const (
 	//          Note that this will not match acme.test only *.acme.test
 	WildcardPolicySubdomain WildcardPolicyType = "Subdomain"
 )
+
+// LocalObjectReference contains enough information to let you locate the
+// referenced object inside the same namespace.
+type LocalObjectReference struct {
+	// name of the referent.
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+	Name string
+}
