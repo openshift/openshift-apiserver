@@ -28,6 +28,7 @@ import (
 	imagev1 "github.com/openshift/api/image/v1"
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	configv1client "github.com/openshift/client-go/config/clientset/versioned"
+	configinformers "github.com/openshift/client-go/config/informers/externalversions"
 	imagev1client "github.com/openshift/client-go/image/clientset/versioned"
 	operatorinformers "github.com/openshift/client-go/operator/informers/externalversions"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
@@ -54,6 +55,7 @@ type ExtraConfig struct {
 	MaxImagesBulkImportedPerRepository int
 	AdditionalTrustedCA                []byte
 	OperatorInformers                  operatorinformers.SharedInformerFactory
+	ConfigInformers                    configinformers.SharedInformerFactory
 
 	// TODO these should all become local eventually
 	Scheme *runtime.Scheme
@@ -277,6 +279,8 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 		whitelister,
 		authorizationClient.SubjectAccessReviews(),
 		c.ExtraConfig.OperatorInformers.Operator().V1alpha1().ImageContentSourcePolicies().Lister(),
+		c.ExtraConfig.ConfigInformers.Config().V1().ImageDigestMirrorSets().Lister(),
+		c.ExtraConfig.ConfigInformers.Config().V1().ImageTagMirrorSets().Lister(),
 		configV1Client.ConfigV1(),
 	)
 	imageStreamImageStorage := imagestreamimage.NewREST(imageRegistry, imageStreamRegistry)

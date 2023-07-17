@@ -248,6 +248,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 			QuotaInformers:                     informers.quotaInformers,
 			SecurityInformers:                  informers.securityInformers,
 			OperatorInformers:                  informers.operatorInformers,
+			ConfigInformers:                    informers.configInformers,
 			RuleResolver:                       ruleResolver,
 			SubjectLocator:                     subjectLocator,
 			RegistryHostnameRetriever:          registryHostnameRetriever,
