@@ -279,6 +279,9 @@ API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,G
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,MachineHealthCheckSpec,UnhealthyConditions
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,MachineSpec,Taints
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,MachineStatus,Addresses
+API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,NetworkDeviceSpec,AddressesFromPools
+API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,NetworkDeviceSpec,IPAddrs
+API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,NetworkDeviceSpec,Nameservers
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,NetworkSpec,Devices
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,ObjectMeta,OwnerReferences
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,VSphereMachineProviderStatus,Conditions
@@ -302,6 +305,7 @@ API rule violation: list_type_missing,github.com/openshift/api/oauth/v1,OAuthCli
 API rule violation: list_type_missing,github.com/openshift/api/oauth/v1,OAuthClientAuthorization,Scopes
 API rule violation: list_type_missing,github.com/openshift/api/oauth/v1,ScopeRestriction,ExactValues
 API rule violation: list_type_missing,github.com/openshift/api/oauth/v1,UserOAuthAccessToken,Scopes
+API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,APIServers,PerGroupOptions
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,BuildDefaultsConfig,Env
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,BuildDefaultsConfig,ImageLabels
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,BuildOverridesConfig,ImageLabels
@@ -315,6 +319,8 @@ API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolp
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,NetworkControllerConfig,ClusterNetworks
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,OpenShiftControllerManagerConfig,Controllers
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,OpenShiftControllerManagerConfig,FeatureGates
+API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,PerGroupOptions,DisabledVersions
+API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,PerGroupOptions,EnabledVersions
 API rule violation: list_type_missing,github.com/openshift/api/openshiftcontrolplane/v1,ServiceAccountControllerConfig,ManagedNames
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,AccessLogging,HTTPCaptureCookies
 API rule violation: list_type_missing,github.com/openshift/api/operator/v1,AddPage,DisabledActions
@@ -808,6 +814,7 @@ API rule violation: names_match,github.com/openshift/api/config/v1,VSpherePlatfo
 API rule violation: names_match,github.com/openshift/api/config/v1,VSpherePlatformSpec,VCenters
 API rule violation: names_match,github.com/openshift/api/config/v1,featureSetBuilder,forceOff
 API rule violation: names_match,github.com/openshift/api/config/v1,featureSetBuilder,forceOn
+API rule violation: names_match,github.com/openshift/api/config/v1alpha1,BackupSpec,EtcdBackupSpec
 API rule violation: names_match,github.com/openshift/api/helm/v1beta1,HelmChartRepositorySpec,DisplayName
 API rule violation: names_match,github.com/openshift/api/helm/v1beta1,ProjectHelmChartRepositorySpec,DisplayName
 API rule violation: names_match,github.com/openshift/api/helm/v1beta1,ProjectHelmChartRepositorySpec,ProjectConnectionConfig
