@@ -40,7 +40,7 @@ func (t *testSAR) Create(_ context.Context, subjectAccessReview *authorizationap
 
 func TestEmptyHostDefaulting(t *testing.T) {
 	ctx := apirequest.NewContext()
-	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true})
+	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, true)
 
 	hostlessCreatedRoute := &routeapi.Route{}
 	strategy.Validate(ctx, hostlessCreatedRoute)
@@ -69,7 +69,7 @@ func TestEmptyHostDefaulting(t *testing.T) {
 
 func TestEmptyHostDefaultingWhenSubdomainSet(t *testing.T) {
 	ctx := apirequest.NewContext()
-	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true})
+	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, true)
 
 	hostlessCreatedRoute := &routeapi.Route{}
 	strategy.Validate(ctx, hostlessCreatedRoute)
@@ -431,7 +431,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			sar := &testSAR{allow: tc.allow}
-			strategy := NewStrategy(testAllocator{}, sar)
+			strategy := NewStrategy(testAllocator{}, sar, true)
 
 			route := &routeapi.Route{
 				ObjectMeta: metav1.ObjectMeta{
@@ -487,5 +487,52 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 				t.Fatalf("unexpected errors: %v %#v", errs, sar)
 			}
 		})
+	}
+}
+
+func TestExternalCertRemoval(t *testing.T) {
+	ctx := apirequest.NewContext()
+	ctx = apirequest.WithUser(ctx, &user.DefaultInfo{Name: "bob"})
+
+	withExternalCert := &routeapi.Route{
+		Spec: routeapi.RouteSpec{
+			TLS: &routeapi.TLSConfig{
+				ExternalCertificate: routeapi.LocalObjectReference{
+					Name: "serving-cert",
+				},
+			},
+		},
+	}
+
+	{
+		noExternalCertificates := NewStrategy(nil, nil, false)
+
+		freshRoute := withExternalCert.DeepCopy()
+		noExternalCertificates.PrepareForCreate(ctx, freshRoute)
+		if len(freshRoute.Spec.TLS.ExternalCertificate.Name) != 0 {
+			t.Errorf("still has external cert")
+		}
+
+		freshRoute = withExternalCert.DeepCopy()
+		noExternalCertificates.PrepareForUpdate(ctx, freshRoute, freshRoute)
+		if len(freshRoute.Spec.TLS.ExternalCertificate.Name) != 0 {
+			t.Errorf("still has external cert")
+		}
+	}
+
+	{
+		allowExternalCertificates := NewStrategy(nil, nil, true)
+
+		freshRoute := withExternalCert.DeepCopy()
+		allowExternalCertificates.PrepareForCreate(ctx, freshRoute)
+		if len(freshRoute.Spec.TLS.ExternalCertificate.Name) == 0 {
+			t.Errorf("should have external cert")
+		}
+
+		freshRoute = withExternalCert.DeepCopy()
+		allowExternalCertificates.PrepareForUpdate(ctx, freshRoute, freshRoute)
+		if len(freshRoute.Spec.TLS.ExternalCertificate.Name) == 0 {
+			t.Errorf("should have external cert")
+		}
 	}
 }

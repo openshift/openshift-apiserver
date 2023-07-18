@@ -61,6 +61,10 @@ func (s routeStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object)
 	route := obj.(*routeapi.Route)
 	route.Status = routeapi.RouteStatus{}
 	stripEmptyDestinationCACertificate(route)
+
+	if !s.allowExternalCertificates && route.Spec.TLS != nil {
+		route.Spec.TLS.ExternalCertificate.Name = ""
+	}
 }
 
 func (s routeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
@@ -73,6 +77,10 @@ func (s routeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 	// Prevents "immutable field" errors when applying the same route definition used to create
 	if len(route.Spec.Host) == 0 {
 		route.Spec.Host = oldRoute.Spec.Host
+	}
+
+	if !s.allowExternalCertificates && route.Spec.TLS != nil {
+		route.Spec.TLS.ExternalCertificate.Name = ""
 	}
 }
 
