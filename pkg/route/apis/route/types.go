@@ -184,7 +184,7 @@ type TLSConfig struct {
 	// chain. Do not include a CA certificate. The secret referenced should
 	// be present in the same namespace as that of the Route.
 	// Forbidden when `certificate` is set.
-	ExternalCertificate LocalObjectReference
+	ExternalCertificate *LocalObjectReference
 }
 
 // TLSTerminationType dictates where the secure communication will stop

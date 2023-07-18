@@ -62,8 +62,8 @@ func (s routeStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object)
 	route.Status = routeapi.RouteStatus{}
 	stripEmptyDestinationCACertificate(route)
 
-	if !s.allowExternalCertificates && route.Spec.TLS != nil {
-		route.Spec.TLS.ExternalCertificate.Name = ""
+	if !s.allowExternalCertificates && route.Spec.TLS != nil && route.Spec.TLS.ExternalCertificate != nil {
+		route.Spec.TLS.ExternalCertificate = nil
 	}
 }
 
@@ -79,8 +79,8 @@ func (s routeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 		route.Spec.Host = oldRoute.Spec.Host
 	}
 
-	if !s.allowExternalCertificates && route.Spec.TLS != nil {
-		route.Spec.TLS.ExternalCertificate.Name = ""
+	if !s.allowExternalCertificates && route.Spec.TLS != nil && route.Spec.TLS.ExternalCertificate != nil {
+		route.Spec.TLS.ExternalCertificate = nil
 	}
 }
 

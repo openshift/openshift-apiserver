@@ -497,7 +497,7 @@ func TestExternalCertRemoval(t *testing.T) {
 	withExternalCert := &routeapi.Route{
 		Spec: routeapi.RouteSpec{
 			TLS: &routeapi.TLSConfig{
-				ExternalCertificate: routeapi.LocalObjectReference{
+				ExternalCertificate: &routeapi.LocalObjectReference{
 					Name: "serving-cert",
 				},
 			},
@@ -509,13 +509,13 @@ func TestExternalCertRemoval(t *testing.T) {
 
 		freshRoute := withExternalCert.DeepCopy()
 		noExternalCertificates.PrepareForCreate(ctx, freshRoute)
-		if len(freshRoute.Spec.TLS.ExternalCertificate.Name) != 0 {
+		if freshRoute.Spec.TLS.ExternalCertificate != nil {
 			t.Errorf("still has external cert")
 		}
 
 		freshRoute = withExternalCert.DeepCopy()
 		noExternalCertificates.PrepareForUpdate(ctx, freshRoute, freshRoute)
-		if len(freshRoute.Spec.TLS.ExternalCertificate.Name) != 0 {
+		if freshRoute.Spec.TLS.ExternalCertificate != nil {
 			t.Errorf("still has external cert")
 		}
 	}
@@ -525,13 +525,13 @@ func TestExternalCertRemoval(t *testing.T) {
 
 		freshRoute := withExternalCert.DeepCopy()
 		allowExternalCertificates.PrepareForCreate(ctx, freshRoute)
-		if len(freshRoute.Spec.TLS.ExternalCertificate.Name) == 0 {
+		if freshRoute.Spec.TLS.ExternalCertificate == nil {
 			t.Errorf("should have external cert")
 		}
 
 		freshRoute = withExternalCert.DeepCopy()
 		allowExternalCertificates.PrepareForUpdate(ctx, freshRoute, freshRoute)
-		if len(freshRoute.Spec.TLS.ExternalCertificate.Name) == 0 {
+		if freshRoute.Spec.TLS.ExternalCertificate == nil {
 			t.Errorf("should have external cert")
 		}
 	}
