@@ -17,7 +17,8 @@ func toRouteV1(internal *routeapi.Route) (*routev1.Route, field.ErrorList) {
 	return &external, nil
 }
 
-// move to library-go for plumbing
+// TODO this needs to move to library-go.  The network-edge team owns moving this as part of these PRs https://issues.redhat.com//browse/CFE-815 and https://github.com/openshift/enhancements/pull/1307
+// TODO @thejas in particular comes to mind since I coded this as an example at his request.
 type RouteValidationOptions struct {
 	AllowExternalCertificates bool
 }
