@@ -82,7 +82,8 @@ type OpenshiftAPIExtraConfig struct {
 	MaxImagesBulkImportedPerRepository int
 	AdditionalTrustedCA                []byte
 
-	RouteAllocator *routehostassignment.SimpleAllocationPlugin
+	RouteAllocator                 *routehostassignment.SimpleAllocationPlugin
+	AllowRouteExternalCertificates bool
 
 	ProjectAuthorizationCache *projectauth.AuthorizationCache
 	ProjectCache              *projectcache.ProjectCache
@@ -312,6 +313,7 @@ func (c *completedConfig) withRouteAPIServer(delegateAPIServer genericapiserver.
 		ExtraConfig: routeapiserver.ExtraConfig{
 			KubeAPIServerClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
 			RouteAllocator:            c.ExtraConfig.RouteAllocator,
+			AllowExternalCertificates: c.ExtraConfig.AllowRouteExternalCertificates,
 			Codecs:                    legacyscheme.Codecs,
 			Scheme:                    legacyscheme.Scheme,
 		},

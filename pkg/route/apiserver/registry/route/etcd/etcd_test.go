@@ -55,7 +55,7 @@ func newStorage(t *testing.T, allocator HostnameGenerator) (*REST, *etcdtesting.
 	etcdStorage.Codec = legacyscheme.Codecs.LegacyCodec(schema.GroupVersion{Group: "route.openshift.io", Version: "v1"})
 	etcdStorageConfigForRoutes := &storagebackend.ConfigForResource{Config: *etcdStorage, GroupResource: schema.GroupResource{Group: "route.openshift.io", Resource: "routes"}}
 	restOptions := generic.RESTOptions{StorageConfig: etcdStorageConfigForRoutes, Decorator: generic.UndecoratedStorage, DeleteCollectionWorkers: 1, ResourcePrefix: "routes"}
-	storage, _, err := NewREST(restOptions, allocator, &testSAR{allow: true})
+	storage, _, err := NewREST(restOptions, allocator, &testSAR{allow: true}, true)
 	if err != nil {
 		t.Fatal(err)
 	}

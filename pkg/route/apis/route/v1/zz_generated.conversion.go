@@ -398,9 +398,7 @@ func autoConvert_v1_TLSConfig_To_route_TLSConfig(in *v1.TLSConfig, out *route.TL
 	out.CACertificate = in.CACertificate
 	out.DestinationCACertificate = in.DestinationCACertificate
 	out.InsecureEdgeTerminationPolicy = route.InsecureEdgeTerminationPolicyType(in.InsecureEdgeTerminationPolicy)
-	if err := Convert_v1_LocalObjectReference_To_route_LocalObjectReference(&in.ExternalCertificate, &out.ExternalCertificate, s); err != nil {
-		return err
-	}
+	out.ExternalCertificate = (*route.LocalObjectReference)(unsafe.Pointer(in.ExternalCertificate))
 	return nil
 }
 
@@ -416,9 +414,7 @@ func autoConvert_route_TLSConfig_To_v1_TLSConfig(in *route.TLSConfig, out *v1.TL
 	out.CACertificate = in.CACertificate
 	out.DestinationCACertificate = in.DestinationCACertificate
 	out.InsecureEdgeTerminationPolicy = v1.InsecureEdgeTerminationPolicyType(in.InsecureEdgeTerminationPolicy)
-	if err := Convert_route_LocalObjectReference_To_v1_LocalObjectReference(&in.ExternalCertificate, &out.ExternalCertificate, s); err != nil {
-		return err
-	}
+	out.ExternalCertificate = (*v1.LocalObjectReference)(unsafe.Pointer(in.ExternalCertificate))
 	return nil
 }
 

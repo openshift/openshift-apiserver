@@ -18,11 +18,11 @@ require (
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.0.3-0.20220114050600-8b9d41f48198
-	github.com/openshift/api v0.0.0-20230714214528-de6ad7979b00
+	github.com/openshift/api v0.0.0-20230718161610-2a3e8b481cec
 	github.com/openshift/apiserver-library-go v0.0.0-20230503174907-d9b2bf6185e9
 	github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d
 	github.com/openshift/client-go v0.0.0-20230503144108-75015d2347cb
-	github.com/openshift/library-go v0.0.0-20230614142803-865e70cc6b32
+	github.com/openshift/library-go v0.0.0-20230714173235-d8d3f3f8a9e4
 	github.com/openshift/runtime-utils v0.0.0-20220926190846-5c488b20a19f
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5

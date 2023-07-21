@@ -10,6 +10,7 @@ import (
 	routevalidation "github.com/openshift/openshift-apiserver/pkg/route/apis/route/validation"
 	securityvalidation "github.com/openshift/openshift-apiserver/pkg/security/apis/security/validation"
 	templatevalidation "github.com/openshift/openshift-apiserver/pkg/template/apis/template/validation"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	appsapi "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
@@ -60,7 +61,7 @@ func registerAll() {
 	Validator.MustRegister(&projectapi.Project{}, false, projectvalidation.ValidateProject, projectvalidation.ValidateProjectUpdate)
 	Validator.MustRegister(&projectapi.ProjectRequest{}, false, projectvalidation.ValidateProjectRequest, nil)
 
-	Validator.MustRegister(&routeapi.Route{}, true, routevalidation.ValidateRoute, routevalidation.ValidateRouteUpdate)
+	Validator.MustRegister(&routeapi.Route{}, true, routeOptionsAdapter, routeUpdateOptionsAdapter)
 
 	Validator.MustRegister(&templateapi.Template{}, true, templatevalidation.ValidateTemplate, templatevalidation.ValidateTemplateUpdate)
 	Validator.MustRegister(&templateapi.TemplateInstance{}, true, templatevalidation.ValidateTemplateInstance, templatevalidation.ValidateTemplateInstanceUpdate)
@@ -72,4 +73,12 @@ func registerAll() {
 	Validator.MustRegister(&securityapi.PodSecurityPolicyReview{}, true, securityvalidation.ValidatePodSecurityPolicyReview, nil)
 
 	Validator.MustRegister(&quotaapi.ClusterResourceQuota{}, false, quotavalidation.ValidateClusterResourceQuota, quotavalidation.ValidateClusterResourceQuotaUpdate)
+}
+
+func routeOptionsAdapter(route *routeapi.Route) field.ErrorList {
+	return routevalidation.ValidateRoute(route, routevalidation.RouteValidationOptions{})
+}
+
+func routeUpdateOptionsAdapter(route *routeapi.Route, oldRoute *routeapi.Route) field.ErrorList {
+	return routevalidation.ValidateRouteUpdate(route, oldRoute, routevalidation.RouteValidationOptions{})
 }

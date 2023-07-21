@@ -8,26 +8,26 @@ import (
 	"os"
 	"path"
 
+	configv1 "github.com/openshift/api/config/v1"
+	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
+	"github.com/openshift/library-go/pkg/config/helpers"
+	"github.com/openshift/library-go/pkg/features"
+	"github.com/openshift/library-go/pkg/serviceability"
+	"github.com/openshift/openshift-apiserver/pkg/api/legacy"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
+	"k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/klog/v2"
 	kcmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"k8s.io/kubectl/pkg/util/templates"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
-
-	configv1 "github.com/openshift/api/config/v1"
-	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
-	"github.com/openshift/library-go/pkg/config/helpers"
-	"github.com/openshift/library-go/pkg/serviceability"
-	"github.com/openshift/openshift-apiserver/pkg/api/legacy"
 )
 
 type OpenShiftAPIServer struct {
@@ -101,6 +101,10 @@ func (o *OpenShiftAPIServer) Validate() error {
 
 // RunAPIServer takes the options, starts the API server and waits until stopCh is closed or initial listening fails.
 func (o *OpenShiftAPIServer) RunAPIServer(stopCh <-chan struct{}) error {
+	if err := features.InitializeFeatureGates(feature.DefaultMutableFeatureGate, configv1.FeatureGateRouteExternalCertificate); err != nil {
+		return err
+	}
+
 	// try to decode into our new types first.  right now there is no validation, no file path resolution.  this unsticks the operator to start.
 	// TODO add those things
 	configContent, err := ioutil.ReadFile(o.ConfigFile)

@@ -6,9 +6,20 @@ import (
 	"net/http"
 	"time"
 
+	configv1 "github.com/openshift/api/config/v1"
+	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
+	"github.com/openshift/apiserver-library-go/pkg/configflags"
+	"github.com/openshift/library-go/pkg/apiserver/admission/admissiontimeout"
+	"github.com/openshift/library-go/pkg/apiserver/apiserverconfig"
+	"github.com/openshift/library-go/pkg/config/helpers"
+	"github.com/openshift/library-go/pkg/config/serving"
+	"github.com/openshift/library-go/pkg/features"
+	routehostassignment "github.com/openshift/library-go/pkg/route/hostassignment"
+	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftadmission"
+	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver/configprocessing"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
+	"github.com/openshift/openshift-apiserver/pkg/version"
 	"github.com/spf13/pflag"
-	"k8s.io/apiserver/pkg/util/feature"
-
 	"k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apiserver/pkg/admission"
@@ -16,25 +27,15 @@ import (
 	"k8s.io/apiserver/pkg/endpoints/discovery/aggregated"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
+	"k8s.io/apiserver/pkg/util/feature"
 	cacheddiscovery "k8s.io/client-go/discovery/cached"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/restmapper"
+	"k8s.io/component-base/featuregate"
 	"k8s.io/klog/v2"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
-
-	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
-	"github.com/openshift/apiserver-library-go/pkg/configflags"
-	"github.com/openshift/library-go/pkg/apiserver/admission/admissiontimeout"
-	"github.com/openshift/library-go/pkg/apiserver/apiserverconfig"
-	"github.com/openshift/library-go/pkg/config/helpers"
-	"github.com/openshift/library-go/pkg/config/serving"
-	routehostassignment "github.com/openshift/library-go/pkg/route/hostassignment"
-	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftadmission"
-	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver/configprocessing"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
-	"github.com/openshift/openshift-apiserver/pkg/version"
 )
 
 func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerConfig, authenticationOptions *genericapiserveroptions.DelegatingAuthenticationOptions, authorizationOptions *genericapiserveroptions.DelegatingAuthorizationOptions) (*OpenshiftAPIConfig, error) {
@@ -110,6 +111,15 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	// as it will be handled by openapi aggregator (both v2 and v3)
 	// non-root apiservers must set this value to false
 	genericConfig.Config.SkipOpenAPIInstallation = true
+
+	// set the global featuregates.`
+	warnings, err := features.SetFeatureGates(config.APIServerArguments, feature.DefaultMutableFeatureGate)
+	if err != nil {
+		return nil, err
+	}
+	for _, warning := range warnings {
+		klog.Warning(warning)
+	}
 
 	etcdOptions, err := ToEtcdOptions(config.APIServerArguments, config.StorageConfig)
 	if err != nil {
@@ -256,6 +266,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 			MaxImagesBulkImportedPerRepository: config.ImagePolicyConfig.MaxImagesBulkImportedPerRepository,
 			AdditionalTrustedCA:                caData,
 			RouteAllocator:                     routeAllocator,
+			AllowRouteExternalCertificates:     feature.DefaultFeatureGate.Enabled(featuregate.Feature(configv1.FeatureGateRouteExternalCertificate)),
 			ProjectAuthorizationCache:          projectAuthorizationCache,
 			ProjectCache:                       projectCache,
 			ProjectRequestTemplate:             config.ProjectConfig.ProjectRequestTemplate,
