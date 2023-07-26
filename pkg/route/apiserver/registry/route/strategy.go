@@ -62,6 +62,9 @@ func (s routeStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object)
 	route.Status = routeapi.RouteStatus{}
 	stripEmptyDestinationCACertificate(route)
 
+	// In kube APIs, disabled fields are stripped from inbound objects.
+	// This provides parity with prior releases and other unknown fields in kube.
+	// Example of stripping these values in pods: https://github.com/kubernetes/kubernetes/blob/master/pkg/registry/core/pod/strategy.go#L108
 	if !s.allowExternalCertificates && route.Spec.TLS != nil && route.Spec.TLS.ExternalCertificate != nil {
 		route.Spec.TLS.ExternalCertificate = nil
 	}
@@ -79,8 +82,13 @@ func (s routeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 		route.Spec.Host = oldRoute.Spec.Host
 	}
 
-	if !s.allowExternalCertificates && route.Spec.TLS != nil && route.Spec.TLS.ExternalCertificate != nil {
-		route.Spec.TLS.ExternalCertificate = nil
+	// strip the field if it wasn't previously set and it was disabled.
+	// I didn't bother to do this in the initial PR since OCP doesn't allow featuregates to transition back to disabled
+	// but since I'm in the code adding comments, this an easy thing to fix up now and future-us may allow the transition.
+	if !s.allowExternalCertificates && (oldRoute.Spec.TLS == nil || oldRoute.Spec.TLS.ExternalCertificate == nil) {
+		if route.Spec.TLS != nil && route.Spec.TLS.ExternalCertificate != nil {
+			route.Spec.TLS.ExternalCertificate = nil
+		}
 	}
 }
 

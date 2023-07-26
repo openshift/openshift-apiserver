@@ -513,10 +513,19 @@ func TestExternalCertRemoval(t *testing.T) {
 			t.Errorf("still has external cert")
 		}
 
+		// cannot add external certs to routes that don't have them.
+		freshNoCertRoute := &routeapi.Route{}
 		freshRoute = withExternalCert.DeepCopy()
-		noExternalCertificates.PrepareForUpdate(ctx, freshRoute, freshRoute)
+		noExternalCertificates.PrepareForUpdate(ctx, freshRoute, freshNoCertRoute)
 		if freshRoute.Spec.TLS.ExternalCertificate != nil {
 			t.Errorf("still has external cert")
+		}
+
+		// routes with existing external certificates are allowed to keep them
+		freshRoute = withExternalCert.DeepCopy()
+		noExternalCertificates.PrepareForUpdate(ctx, freshRoute, freshRoute)
+		if freshRoute.Spec.TLS.ExternalCertificate == nil {
+			t.Errorf("should have external cert")
 		}
 	}
 
