@@ -1,77 +1,31 @@
 package validation
 
 import (
-	"crypto/ecdsa"
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
+	"context"
 	"fmt"
-	"regexp"
 	"strings"
 
+	authorizationv1 "k8s.io/api/authorization/v1"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
 	kvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/apiserver/pkg/authentication/user"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 
 	routev1 "github.com/openshift/api/route/v1"
+	"github.com/openshift/library-go/pkg/authorization/authorizationutil"
+	routecommon "github.com/openshift/library-go/pkg/route"
 )
 
-const (
-	// maxHeaderNameSize is the maximum allowed length of an HTTP header
-	// name.
-	maxHeaderNameSize = 255
-	// maxHeaderValueSize is the maximum allowed length of an HTTP header
-	// value.
-	maxHeaderValueSize = 16384
-	// maxResponseHeaderList is the maximum allowed number of HTTP response
-	// header actions.
-	maxResponseHeaderList = 20
-	// maxRequestHeaderList is the maximum allowed number of HTTP request
-	// header actions.
-	maxRequestHeaderList = 20
-	// permittedHeaderNameErrorMessage is the API validation message for an
-	// invalid HTTP header name.
-	permittedHeaderNameErrorMessage = "name must be a valid HTTP header name as defined in RFC 2616 section 4.2"
-	// permittedHeaderValueTemplate is used in the definitions of
-	// permittedRequestHeaderValueRE and permittedResponseHeaderValueRE.
-	// Any changes made to these regex patterns must be reflected in the
-	// corresponding regexps in
-	// https://github.com/openshift/api/blob/master/route/v1/types.go and
-	// https://github.com/openshift/api/blob/master/operator/v1/types_ingress.go
-	// for the Route.spec.httpHeaders.actions[*].response,
-	// Route.spec.httpHeaders.actions[*].request,
-	// IngressController.spec.httpHeaders.actions[*].response, and
-	// IngressController.spec.httpHeaders.actions[*].request fields for the
-	// benefit of client-side validation.
-	permittedHeaderValueTemplate = `^(?:%(?:%|(?:\{[-+]?[QXE](?:,[-+]?[QXE])*\})?\[(?:XYZ\.hdr\([0-9A-Za-z-]+\)|ssl_c_der)(?:,(?:lower|base64))*\])|[^%[:cntrl:]])+$`
-	// permittedRequestHeaderValueErrorMessage is the API validation message
-	// for an invalid HTTP request header value.
-	permittedRequestHeaderValueErrorMessage = "Either header value provided is not in correct format or the converter specified is not allowed. The dynamic header value  may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2 Sample fetchers allowed are req.hdr, ssl_c_der. Converters allowed are lower, base64."
-	// permittedResponseHeaderValueErrorMessage is the API validation
-	// message for an invalid HTTP response header value.
-	permittedResponseHeaderValueErrorMessage = "Either header value provided is not in correct format or the converter specified is not allowed. The dynamic header value  may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2 Sample fetchers allowed are res.hdr, ssl_c_der. Converters allowed are lower, base64."
-)
+var validateRouteName = apimachineryvalidation.NameIsDNSSubdomain
 
-var (
-	// validateRouteName is a ValidateNameFunc for validating a route name.
-	validateRouteName = apimachineryvalidation.NameIsDNSSubdomain
-	// permittedHeaderNameRE is a compiled regexp for validating an HTTP
-	// header name.
-	permittedHeaderNameRE = regexp.MustCompile("^[-!#$%&'*+.0-9A-Z^_`a-z|~]+$")
-	// permittedRequestHeaderValueRE is a compiled regexp for validating an
-	// HTTP request header value.
-	permittedRequestHeaderValueRE = regexp.MustCompile(strings.Replace(permittedHeaderValueTemplate, "XYZ", "req", 1))
-	// permittedResponseHeaderValueRE is a compiled regexp for validating an
-	// HTTP response header value.
-	permittedResponseHeaderValueRE = regexp.MustCompile(strings.Replace(permittedHeaderValueTemplate, "XYZ", "res", 1))
-)
-
-func ValidateRoute(route *routev1.Route) field.ErrorList {
-	return validateRoute(route, true)
+func ValidateRoute(ctx context.Context, route *routev1.Route, sarc routecommon.SubjectAccessReviewCreator, secrets corev1client.SecretsGetter, opts routecommon.RouteValidationOptions) field.ErrorList {
+	return validateRoute(ctx, route, true, sarc, secrets, opts)
 }
 
 // validLabels - used in the ValidateRouteUpdate function to check if "older" routes conform to DNS1123Labels or not
@@ -95,7 +49,7 @@ func checkLabelSegments(host string) bool {
 }
 
 // validateRoute - private function to validate route
-func validateRoute(route *routev1.Route, checkHostname bool) field.ErrorList {
+func validateRoute(ctx context.Context, route *routev1.Route, checkHostname bool, sarc routecommon.SubjectAccessReviewCreator, secrets corev1client.SecretsGetter, opts routecommon.RouteValidationOptions) field.ErrorList {
 	//ensure meta is set properly
 	result := validateObjectMeta(&route.ObjectMeta, true, validateRouteName, field.NewPath("metadata"))
 
@@ -137,26 +91,6 @@ func validateRoute(route *routev1.Route, checkHostname bool) field.ErrorList {
 
 	if err := validateWildcardPolicy(route.Spec.Host, route.Spec.WildcardPolicy, specPath.Child("wildcardPolicy")); err != nil {
 		result = append(result, err)
-	}
-
-	if route.Spec.HTTPHeaders != nil {
-		if len(route.Spec.HTTPHeaders.Actions.Response) != 0 || len(route.Spec.HTTPHeaders.Actions.Request) != 0 {
-			if route.Spec.TLS != nil && route.Spec.TLS.Termination == routev1.TLSTerminationPassthrough {
-				result = append(result, field.Invalid(field.NewPath("spec", "tls", "termination"), route.Spec.TLS.Termination, "only edge and re-encrypt routes are supported for providing customized headers."))
-			}
-		}
-		actionsPath := field.NewPath("spec", "httpHeaders", "actions")
-		if len(route.Spec.HTTPHeaders.Actions.Response) > maxResponseHeaderList {
-			result = append(result, field.Invalid(actionsPath.Child("response"), route.Spec.HTTPHeaders.Actions.Response, fmt.Sprintf("response headers list can't exceed %d items", maxResponseHeaderList)))
-		} else {
-			result = append(result, validateHeaders(actionsPath.Child("response"), route.Spec.HTTPHeaders.Actions.Response, permittedResponseHeaderValueRE, permittedResponseHeaderValueErrorMessage)...)
-		}
-
-		if len(route.Spec.HTTPHeaders.Actions.Request) > maxRequestHeaderList {
-			result = append(result, field.Invalid(actionsPath.Child("request"), route.Spec.HTTPHeaders.Actions.Request, fmt.Sprintf("request headers list can't exceed %d items", maxRequestHeaderList)))
-		} else {
-			result = append(result, validateHeaders(actionsPath.Child("request"), route.Spec.HTTPHeaders.Actions.Request, permittedRequestHeaderValueRE, permittedRequestHeaderValueErrorMessage)...)
-		}
 	}
 
 	if len(route.Spec.Path) > 0 && !strings.HasPrefix(route.Spec.Path, "/") {
@@ -202,18 +136,18 @@ func validateRoute(route *routev1.Route, checkHostname bool) field.ErrorList {
 		}
 	}
 
-	if errs := validateTLS(route, specPath.Child("tls")); len(errs) != 0 {
+	if errs := validateTLS(ctx, route, specPath.Child("tls"), sarc, secrets, opts); len(errs) != 0 {
 		result = append(result, errs...)
 	}
 
 	return result
 }
 
-func ValidateRouteUpdate(route *routev1.Route, older *routev1.Route) field.ErrorList {
+func ValidateRouteUpdate(ctx context.Context, route *routev1.Route, older *routev1.Route, sarc routecommon.SubjectAccessReviewCreator, secrets corev1client.SecretsGetter, opts routecommon.RouteValidationOptions) field.ErrorList {
 	allErrs := validateObjectMetaUpdate(&route.ObjectMeta, &older.ObjectMeta, field.NewPath("metadata"))
 	allErrs = append(allErrs, apimachineryvalidation.ValidateImmutableField(route.Spec.WildcardPolicy, older.Spec.WildcardPolicy, field.NewPath("spec", "wildcardPolicy"))...)
 	hostnameUpdated := route.Spec.Host != older.Spec.Host
-	allErrs = append(allErrs, validateRoute(route, hostnameUpdated && validLabels(older.Spec.Host))...)
+	allErrs = append(allErrs, validateRoute(ctx, route, hostnameUpdated && validLabels(older.Spec.Host), sarc, secrets, opts)...)
 	return allErrs
 }
 
@@ -228,85 +162,9 @@ func ValidateRouteStatusUpdate(route *routev1.Route, older *routev1.Route) field
 	return allErrs
 }
 
-type blockVerifierFunc func(block *pem.Block) (*pem.Block, error)
-
-func publicKeyBlockVerifier(block *pem.Block) (*pem.Block, error) {
-	key, err := x509.ParsePKIXPublicKey(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-	block = &pem.Block{
-		Type: "PUBLIC KEY",
-	}
-	if block.Bytes, err = x509.MarshalPKIXPublicKey(key); err != nil {
-		return nil, err
-	}
-	return block, nil
-}
-
-func certificateBlockVerifier(block *pem.Block) (*pem.Block, error) {
-	cert, err := x509.ParseCertificate(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-	block = &pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: cert.Raw,
-	}
-	return block, nil
-}
-
-func privateKeyBlockVerifier(block *pem.Block) (*pem.Block, error) {
-	key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
-	if err != nil {
-		key, err = x509.ParsePKCS1PrivateKey(block.Bytes)
-		if err != nil {
-			key, err = x509.ParseECPrivateKey(block.Bytes)
-			if err != nil {
-				return nil, fmt.Errorf("block %s is not valid", block.Type)
-			}
-		}
-	}
-	switch t := key.(type) {
-	case *rsa.PrivateKey:
-		block = &pem.Block{
-			Type:  "RSA PRIVATE KEY",
-			Bytes: x509.MarshalPKCS1PrivateKey(t),
-		}
-	case *ecdsa.PrivateKey:
-		block = &pem.Block{
-			Type: "ECDSA PRIVATE KEY",
-		}
-		if block.Bytes, err = x509.MarshalECPrivateKey(t); err != nil {
-			return nil, err
-		}
-	default:
-		return nil, fmt.Errorf("block private key %T is not valid", key)
-	}
-	return block, nil
-}
-
-func ignoreBlockVerifier(block *pem.Block) (*pem.Block, error) {
-	return nil, nil
-}
-
-var knownBlockDecoders = map[string]blockVerifierFunc{
-	"RSA PRIVATE KEY":   privateKeyBlockVerifier,
-	"ECDSA PRIVATE KEY": privateKeyBlockVerifier,
-	"PRIVATE KEY":       privateKeyBlockVerifier,
-	"PUBLIC KEY":        publicKeyBlockVerifier,
-	// Potential "in the wild" PEM encoded blocks that can be normalized
-	"RSA PUBLIC KEY":   publicKeyBlockVerifier,
-	"DSA PUBLIC KEY":   publicKeyBlockVerifier,
-	"ECDSA PUBLIC KEY": publicKeyBlockVerifier,
-	"CERTIFICATE":      certificateBlockVerifier,
-	// Blocks that should be dropped
-	"EC PARAMETERS": ignoreBlockVerifier,
-}
-
 // validateTLS tests fields for different types of TLS combinations are set.  Called
 // by ValidateRoute.
-func validateTLS(route *routev1.Route, fldPath *field.Path) field.ErrorList {
+func validateTLS(ctx context.Context, route *routev1.Route, fldPath *field.Path, sarc routecommon.SubjectAccessReviewCreator, secrets corev1client.SecretsGetter, opts routecommon.RouteValidationOptions) field.ErrorList {
 	result := field.ErrorList{}
 	tls := route.Spec.TLS
 
@@ -317,8 +175,13 @@ func validateTLS(route *routev1.Route, fldPath *field.Path) field.ErrorList {
 
 	switch tls.Termination {
 	// reencrypt may specify destination ca cert
-	// cert, key, cacert may not be specified because the route may be a wildcard
+	// externalCert, cert, key, cacert may not be specified because the route may be a wildcard
 	case routev1.TLSTerminationReencrypt:
+		if opts.AllowExternalCertificates && tls.ExternalCertificate != nil {
+			if len(tls.Certificate) > 0 && len(tls.ExternalCertificate.Name) > 0 {
+				result = append(result, field.Invalid(fldPath.Child("externalCertificate"), tls.ExternalCertificate.Name, "cannot specify both tls.certificate and tls.externalCertificate"))
+			}
+		}
 	//passthrough term should not specify any cert
 	case routev1.TLSTerminationPassthrough:
 		if len(tls.Certificate) > 0 {
@@ -327,6 +190,12 @@ func validateTLS(route *routev1.Route, fldPath *field.Path) field.ErrorList {
 
 		if len(tls.Key) > 0 {
 			result = append(result, field.Invalid(fldPath.Child("key"), "redacted key data", "passthrough termination does not support certificates"))
+		}
+
+		if opts.AllowExternalCertificates && tls.ExternalCertificate != nil {
+			if len(tls.ExternalCertificate.Name) > 0 {
+				result = append(result, field.Invalid(fldPath.Child("externalCertificate"), tls.ExternalCertificate.Name, "passthrough termination does not support certificates"))
+			}
 		}
 
 		if len(tls.CACertificate) > 0 {
@@ -342,6 +211,17 @@ func validateTLS(route *routev1.Route, fldPath *field.Path) field.ErrorList {
 		if len(tls.DestinationCACertificate) > 0 {
 			result = append(result, field.Invalid(fldPath.Child("destinationCACertificate"), "redacted destination ca certificate data", "edge termination does not support destination certificates"))
 		}
+
+		if opts.AllowExternalCertificates && tls.ExternalCertificate != nil {
+			if len(tls.Certificate) > 0 && len(tls.ExternalCertificate.Name) > 0 {
+				result = append(result, field.Invalid(fldPath.Child("externalCertificate"), tls.ExternalCertificate.Name, "cannot specify both tls.certificate and tls.externalCertificate"))
+				break
+			} else if len(tls.ExternalCertificate.Name) > 0 {
+				errs := validateTLSExternalCertificate(ctx, route, fldPath.Child("externalCertificate"), sarc, secrets)
+				result = append(result, errs...)
+			}
+		}
+
 	default:
 		validValues := []string{string(routev1.TLSTerminationEdge), string(routev1.TLSTerminationPassthrough), string(routev1.TLSTerminationReencrypt)}
 		result = append(result, field.NotSupported(fldPath.Child("termination"), tls.Termination, validValues))
@@ -352,6 +232,58 @@ func validateTLS(route *routev1.Route, fldPath *field.Path) field.ErrorList {
 	}
 
 	return result
+}
+
+func validateTLSExternalCertificate(ctx context.Context, route *routev1.Route, fldPath *field.Path, sarc routecommon.SubjectAccessReviewCreator, secrets corev1client.SecretsGetter) field.ErrorList {
+	tls := route.Spec.TLS
+	var errs field.ErrorList
+
+	errs = append(errs, routecommon.CheckRouteCustomHostSAR(ctx, fldPath, sarc)...)
+
+	if err := authorizationutil.Authorize(sarc, &user.DefaultInfo{Name: "system:serviceaccount:openshift-ingress:router"},
+		&authorizationv1.ResourceAttributes{
+			Namespace: route.Namespace,
+			Verb:      "get",
+			Resource:  "secrets",
+			Name:      tls.ExternalCertificate.Name,
+		}); err != nil {
+		errs = append(errs, field.Forbidden(fldPath, "router serviceaccount does not have permission to get this secret"))
+	}
+
+	if err := authorizationutil.Authorize(sarc, &user.DefaultInfo{Name: "system:serviceaccount:openshift-ingress:router"},
+		&authorizationv1.ResourceAttributes{
+			Namespace: route.Namespace,
+			Verb:      "watch",
+			Resource:  "secrets",
+			Name:      tls.ExternalCertificate.Name,
+		}); err != nil {
+		errs = append(errs, field.Forbidden(fldPath, "router serviceaccount does not have permission to watch this secret"))
+	}
+
+	if err := authorizationutil.Authorize(sarc, &user.DefaultInfo{Name: "system:serviceaccount:openshift-ingress:router"},
+		&authorizationv1.ResourceAttributes{
+			Namespace: route.Namespace,
+			Verb:      "list",
+			Resource:  "secrets",
+			Name:      tls.ExternalCertificate.Name,
+		}); err != nil {
+		errs = append(errs, field.Forbidden(fldPath, "router serviceaccount does not have permission to list this secret"))
+	}
+
+	secret, err := secrets.Secrets(route.Namespace).Get(ctx, tls.ExternalCertificate.Name, metav1.GetOptions{})
+	if err != nil && apierrors.IsNotFound(err) {
+		errs = append(errs, field.NotFound(fldPath, err))
+		return errs
+	} else if err != nil {
+		errs = append(errs, field.InternalError(fldPath, err))
+		return errs
+	}
+
+	if secret.Type != corev1.SecretTypeTLS {
+		errs = append(errs, field.Invalid(fldPath, tls.ExternalCertificate.Name, "secret of type 'kubernetes/tls' required"))
+	}
+
+	return errs
 }
 
 // validateInsecureEdgeTerminationPolicy tests fields for different types of
@@ -409,69 +341,6 @@ func validateWildcardPolicy(host string, policy routev1.WildcardPolicyType, fldP
 	}
 
 	return nil
-}
-
-var (
-	notAllowedHTTPHeaders        = []string{"strict-transport-security", "proxy", "cookie", "set-cookie"}
-	notAllowedHTTPHeaderSet      = sets.NewString(notAllowedHTTPHeaders...)
-	notAllowedHTTPHeadersMessage = fmt.Sprintf("the following headers may not be modified using this API: %v", strings.Join(notAllowedHTTPHeaders, ", "))
-)
-
-// validateHeaders verifies that the given slice of request or response headers
-// is valid using the given regexp.
-func validateHeaders(fldPath *field.Path, headers []routev1.RouteHTTPHeader, valueRegexpForHeaderValue *regexp.Regexp, valueErrorMessage string) field.ErrorList {
-	allErrs := field.ErrorList{}
-	headersMap := map[string]struct{}{}
-	for i, header := range headers {
-		idxPath := fldPath.Index(i)
-
-		// Each action must specify a unique header.
-		_, alreadyExists := headersMap[header.Name]
-		if alreadyExists {
-			err := field.Duplicate(idxPath.Child("name"), header.Name)
-			allErrs = append(allErrs, err)
-		}
-		headersMap[header.Name] = struct{}{}
-
-		switch nameLength := len(header.Name); {
-		case nameLength == 0:
-			err := field.Required(idxPath.Child("name"), "")
-			allErrs = append(allErrs, err)
-		case nameLength > maxHeaderNameSize:
-			err := field.Invalid(idxPath.Child("name"), header.Name, fmt.Sprintf("name exceeds the maximum length, which is %d", maxHeaderNameSize))
-			allErrs = append(allErrs, err)
-		case notAllowedHTTPHeaderSet.Has(strings.ToLower(header.Name)):
-			err := field.Forbidden(idxPath.Child("name"), notAllowedHTTPHeadersMessage)
-			allErrs = append(allErrs, err)
-		case !permittedHeaderNameRE.MatchString(header.Name):
-			err := field.Invalid(idxPath.Child("name"), header.Name, permittedHeaderNameErrorMessage)
-			allErrs = append(allErrs, err)
-		}
-
-		if header.Action.Type != routev1.Set && header.Action.Type != routev1.Delete {
-			err := field.Invalid(idxPath.Child("action", "type"), header.Action.Type, fmt.Sprintf("type must be %q or %q", routev1.Set, routev1.Delete))
-			allErrs = append(allErrs, err)
-		}
-
-		if header.Action.Type == routev1.Set && header.Action.Set == nil || header.Action.Type != routev1.Set && header.Action.Set != nil {
-			err := field.Required(idxPath.Child("action", "set"), "set is required when type is Set, and forbidden otherwise")
-			allErrs = append(allErrs, err)
-		}
-		if header.Action.Set != nil {
-			switch valueLength := len(header.Action.Set.Value); {
-			case valueLength == 0:
-				err := field.Required(idxPath.Child("action", "set", "value"), "")
-				allErrs = append(allErrs, err)
-			case valueLength > maxHeaderValueSize:
-				err := field.Invalid(idxPath.Child("action", "set", "value"), header.Action.Set.Value, fmt.Sprintf("value exceeds the maximum length, which is %d", maxHeaderValueSize))
-				allErrs = append(allErrs, err)
-			case !valueRegexpForHeaderValue.MatchString(header.Action.Set.Value):
-				err := field.Invalid(idxPath.Child("action", "set", "value"), header.Action.Set.Value, valueErrorMessage)
-				allErrs = append(allErrs, err)
-			}
-		}
-	}
-	return allErrs
 }
 
 // The special finalizer name validations were copied from k8s.io/kubernetes to eliminate that

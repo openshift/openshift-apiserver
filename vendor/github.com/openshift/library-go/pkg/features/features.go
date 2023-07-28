@@ -69,9 +69,9 @@ func setFeatureGates(featureGatesMap map[string]bool, featureGates featuregate.M
 	// ideally we filter these at the operator level, but that isn't trivial to do and this is.
 	// We don't allow users to set values, so hopefully we have e2e test that prevent invalid values.
 	allowedFeatureGates := map[string]bool{}
-	knownFeatures := featureGates.GetAll()
+	knownFeatures := sets.NewString(featureGates.KnownFeatures()...)
 	for featureGateName, val := range featureGatesMap {
-		if _, exists := knownFeatures[featuregate.Feature(featureGateName)]; !exists {
+		if !knownFeatures.Has(featureGateName) {
 			warnings = append(warnings, fmt.Sprintf("Ignoring unknown FeatureGate %q", featureGateName))
 			continue
 		}
