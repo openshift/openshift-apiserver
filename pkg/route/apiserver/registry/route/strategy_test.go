@@ -6,11 +6,13 @@ import (
 	"testing"
 
 	authorizationapi "k8s.io/api/authorization/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/authentication/user"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
+	"k8s.io/client-go/kubernetes/fake"
 
 	routev1 "github.com/openshift/api/route/v1"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
@@ -40,7 +42,8 @@ func (t *testSAR) Create(_ context.Context, subjectAccessReview *authorizationap
 
 func TestEmptyHostDefaulting(t *testing.T) {
 	ctx := apirequest.NewContext()
-	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, true)
+	fake := fake.NewSimpleClientset(&corev1.SecretList{})
+	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, fake.CoreV1(), true)
 
 	hostlessCreatedRoute := &routeapi.Route{}
 	strategy.Validate(ctx, hostlessCreatedRoute)
@@ -69,7 +72,8 @@ func TestEmptyHostDefaulting(t *testing.T) {
 
 func TestEmptyHostDefaultingWhenSubdomainSet(t *testing.T) {
 	ctx := apirequest.NewContext()
-	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, true)
+	fake := fake.NewSimpleClientset(&corev1.SecretList{})
+	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, fake.CoreV1(), true)
 
 	hostlessCreatedRoute := &routeapi.Route{}
 	strategy.Validate(ctx, hostlessCreatedRoute)
@@ -140,6 +144,7 @@ func TestEmptyDefaultCACertificate(t *testing.T) {
 func TestHostWithWildcardPolicies(t *testing.T) {
 	ctx := apirequest.NewContext()
 	ctx = apirequest.WithUser(ctx, &user.DefaultInfo{Name: "bob"})
+	testNamespace := "wildcard"
 
 	tests := []struct {
 		name          string
@@ -149,6 +154,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 
 		wildcardPolicy routeapi.WildcardPolicyType
 		tls, oldTLS    *routeapi.TLSConfig
+		fakesecrets    corev1.SecretList
 
 		expected          string
 		expectedSubdomain string
@@ -306,6 +312,75 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 			errs:           0,
 		},
 		{
+			name:           "external-certificate-unchanged-without-permissions",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          false,
+			errs:           6,
+		},
+		{
+			name:     "external-certificate-unchanged-with-permissions",
+			host:     "host",
+			expected: "host",
+			oldHost:  "host",
+			tls:      &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:   &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			fakesecrets: corev1.SecretList{
+				Items: []corev1.Secret{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "a",
+							Namespace: testNamespace,
+						},
+						Data: map[string][]byte{},
+						Type: corev1.SecretTypeTLS,
+					},
+				},
+			},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           0,
+		},
+		{
+			name:           "external-certificate-unchanged-with-permissions-but-missing-secret",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			fakesecrets:    corev1.SecretList{},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           1,
+		},
+		{
+			name:     "external-certificate-unchanged-with-permissions-but-incorrect-secret",
+			host:     "host",
+			expected: "host",
+			oldHost:  "host",
+			tls:      &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:   &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			fakesecrets: corev1.SecretList{
+				Items: []corev1.Secret{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "a",
+							Namespace: testNamespace,
+						},
+						Data: map[string][]byte{},
+						Type: corev1.SecretTypeBasicAuth,
+					},
+				},
+			},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           1,
+		},
+		{
 			name:           "certificate-changed",
 			host:           "host",
 			expected:       "host",
@@ -315,6 +390,40 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 			wildcardPolicy: routeapi.WildcardPolicyNone,
 			allow:          false,
 			errs:           1,
+		},
+		{
+			name:           "external-certificate-changed",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          false,
+			errs:           7,
+		},
+		{
+			name:           "external-certificate-changed-with-permission",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			fakesecrets: corev1.SecretList{
+				Items: []corev1.Secret{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "a",
+							Namespace: testNamespace,
+						},
+						Data: map[string][]byte{},
+						Type: corev1.SecretTypeTLS,
+					},
+				},
+			},
+			allow: true,
+			errs:  0,
 		},
 		{
 			name:           "ca-certificate-unchanged",
@@ -416,6 +525,17 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 			errs:           0,
 		},
 		{
+			name:           "removed-external-certificate",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          false,
+			errs:           0,
+		},
+		{
 			name:           "added-certificate-and-fails",
 			host:           "host",
 			expected:       "host",
@@ -426,16 +546,25 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 			allow:          false,
 			errs:           1,
 		},
+		{
+			name:           "added-external-certificate-and-fails",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationReencrypt, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         nil,
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          false,
+			errs:           1,
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			sar := &testSAR{allow: tc.allow}
-			strategy := NewStrategy(testAllocator{}, sar, true)
 
 			route := &routeapi.Route{
 				ObjectMeta: metav1.ObjectMeta{
-					Namespace:       "wildcard",
+					Namespace:       testNamespace,
 					Name:            tc.name,
 					UID:             types.UID("wild"),
 					ResourceVersion: "1",
@@ -452,11 +581,15 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 				},
 			}
 
+			sar := &testSAR{allow: tc.allow}
+			fake := fake.NewSimpleClientset(&tc.fakesecrets)
+			strategy := NewStrategy(testAllocator{}, sar, fake.CoreV1(), true)
+
 			var errs field.ErrorList
 			if len(tc.oldHost) > 0 || len(tc.oldSubdomain) > 0 || tc.oldTLS != nil {
 				oldRoute := &routeapi.Route{
 					ObjectMeta: metav1.ObjectMeta{
-						Namespace:       "wildcard",
+						Namespace:       testNamespace,
 						Name:            tc.name,
 						UID:             types.UID("wild"),
 						ResourceVersion: "1",
@@ -484,6 +617,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 				t.Fatalf("expected subdomain %s, got %s", tc.expectedSubdomain, route.Spec.Subdomain)
 			}
 			if len(errs) != tc.errs {
+				t.Logf("wanted %d errors bug got %d", tc.errs, len(errs))
 				t.Fatalf("unexpected errors: %v %#v", errs, sar)
 			}
 		})
@@ -505,7 +639,7 @@ func TestExternalCertRemoval(t *testing.T) {
 	}
 
 	{
-		noExternalCertificates := NewStrategy(nil, nil, false)
+		noExternalCertificates := NewStrategy(nil, nil, nil, false)
 
 		freshRoute := withExternalCert.DeepCopy()
 		noExternalCertificates.PrepareForCreate(ctx, freshRoute)
@@ -530,7 +664,7 @@ func TestExternalCertRemoval(t *testing.T) {
 	}
 
 	{
-		allowExternalCertificates := NewStrategy(nil, nil, true)
+		allowExternalCertificates := NewStrategy(nil, nil, nil, true)
 
 		freshRoute := withExternalCert.DeepCopy()
 		allowExternalCertificates.PrepareForCreate(ctx, freshRoute)
