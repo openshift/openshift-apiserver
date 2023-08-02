@@ -422,9 +422,7 @@ func addAPIServerOrDie(delegateAPIServer genericapiserver.DelegationTarget, apiS
 	return delegateAPIServer
 }
 
-func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget) (*OpenshiftAPIServer, error) {
-	delegateAPIServer := delegationTarget
-
+func (c completedConfig) buildDelegateAPIServer(delegateAPIServer genericapiserver.DelegationTarget, apiServersConfig openshiftcontrolplanev1.APIServers) (genericapiserver.DelegationTarget, error) {
 	var apiServerInitializers = map[openshiftcontrolplanev1.OpenShiftAPIserverName]apiServerAppenderFunc{
 		openshiftcontrolplanev1.OpenShiftAppsAPIserver:          c.withAppsAPIServer,
 		openshiftcontrolplanev1.OpenShiftAuthorizationAPIserver: c.withAuthorizationAPIServer,
@@ -441,7 +439,7 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 
 	// At the moment only Builds and DeploymentConfig API can be disabled.
 	// Other APIs will be added to the list as needed.
-	for _, group := range c.ExtraConfig.APIServers.PerGroupOptions {
+	for _, group := range apiServersConfig.PerGroupOptions {
 		if !configurableAPIList.Has(group.Name) {
 			return nil, fmt.Errorf("only %v APIs can be configured, %q is not supported", sets.List[openshiftcontrolplanev1.OpenShiftAPIserverName](configurableAPIList), group.Name)
 		}
@@ -477,6 +475,15 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 			}
 		}
 		delegateAPIServer = addAPIServerOrDie(delegateAPIServer, initFnc)
+	}
+
+	return delegateAPIServer, nil
+}
+
+func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget) (*OpenshiftAPIServer, error) {
+	delegateAPIServer, err := c.buildDelegateAPIServer(delegationTarget, c.ExtraConfig.APIServers)
+	if err != nil {
+		return nil, err
 	}
 
 	genericServer, err := c.GenericConfig.New("openshift-apiserver", delegateAPIServer)
