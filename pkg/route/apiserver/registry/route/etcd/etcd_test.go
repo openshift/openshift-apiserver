@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	authorizationapi "k8s.io/api/authorization/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -18,7 +19,6 @@ import (
 	"k8s.io/apiserver/pkg/storage/storagebackend"
 	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
-	corev1 "k8s.io/api/core/v1"
 
 	routev1 "github.com/openshift/api/route/v1"
 	routehostassignment "github.com/openshift/library-go/pkg/route/hostassignment"

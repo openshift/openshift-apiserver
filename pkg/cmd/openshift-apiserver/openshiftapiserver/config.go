@@ -263,7 +263,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 			MaxImagesBulkImportedPerRepository: config.ImagePolicyConfig.MaxImagesBulkImportedPerRepository,
 			AdditionalTrustedCA:                caData,
 			RouteAllocator:                     routeAllocator,
-			AllowRouteExternalCertificates:     feature.DefaultFeatureGate.Enabled(featuregate.Feature(configv1.FeatureGateRouteExternalCertificate)),
+			AllowRouteExternalCertificates:     feature.DefaultMutableFeatureGate.Enabled(featuregate.Feature(configv1.FeatureGateRouteExternalCertificate)),
 			ProjectAuthorizationCache:          projectAuthorizationCache,
 			ProjectCache:                       projectCache,
 			ProjectRequestTemplate:             config.ProjectConfig.ProjectRequestTemplate,
