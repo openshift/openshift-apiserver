@@ -61,7 +61,126 @@ type RouteSpec struct {
 	// Wildcard policy if any for the route.
 	// Currently only 'Subdomain' or 'None' is allowed.
 	WildcardPolicy WildcardPolicyType
+
+	// HTTPHeaders defines policy for HTTP headers.
+	HTTPHeaders *RouteHTTPHeaders
 }
+
+// RouteHTTPHeaders defines policy for HTTP headers.
+type RouteHTTPHeaders struct {
+	// Actions specifies options for modifying headers and their values.
+	// Note that this option only applies to cleartext HTTP connections
+	// and to secure HTTP connections for which the ingress controller
+	// terminates encryption (that is, edge-terminated or reencrypt
+	// connections).  Headers cannot be modified for TLS passthrough
+	// connections.
+	// Setting the HSTS (`Strict-Transport-Security`) header is not supported via actions.
+	// `Strict-Transport-Security` may only be configured using the "haproxy.router.openshift.io/hsts_header"
+	// route annotation, and only in accordance with the policy specified in Ingress.Spec.RequiredHSTSPolicies.
+	// In case of HTTP request headers, the actions specified in spec.httpHeaders.actions on the Route will be executed after
+	// the actions specified in the IngressController's spec.httpHeaders.actions field.
+	// In case of HTTP response headers, the actions specified in spec.httpHeaders.actions on the IngressController will be
+	// executed after the actions specified in the Route's spec.httpHeaders.actions field.
+	// The headers set via this API will not appear in access logs.
+	// Any actions defined here are applied after any actions related to the following other fields:
+	// cache-control, spec.clientTLS,
+	// spec.httpHeaders.forwardedHeaderPolicy, spec.httpHeaders.uniqueId,
+	// and spec.httpHeaders.headerNameCaseAdjustments.
+	// The following header names are reserved and may not be modified via this API:
+	// Strict-Transport-Security, Proxy, Cookie, Set-Cookie.
+	// Note that the total size of all net added headers *after* interpolating dynamic values
+	// must not exceed the value of spec.tuningOptions.headerBufferMaxRewriteBytes on the
+	// IngressController. Please refer to the documentation
+	// for that API field for more details.
+	Actions RouteHTTPHeaderActions
+}
+
+// RouteHTTPHeaderActions defines configuration for actions on HTTP request and response headers.
+type RouteHTTPHeaderActions struct {
+	// Response is a list of HTTP response headers to modify.
+	// Currently, actions may define to either `Set` or `Delete` headers values.
+	// Actions defined here will modify the response headers of all requests made through a route.
+	// These actions are applied to a specific Route defined within a cluster i.e. connections made through a route.
+	// Route actions will be executed before IngressController actions for response headers.
+	// Actions are applied in sequence as defined in this list.
+	// A maximum of 20 response header actions may be configured.
+	// You can use this field to specify HTTP response headers that should be set or deleted
+	// when forwarding responses from your application to the client.
+	// Sample fetchers allowed are "res.hdr" and "ssl_c_der".
+	// Converters allowed are "lower" and "base64".
+	// Example header values: "%[res.hdr(X-target),lower]", "%{+Q}[ssl_c_der,base64]".
+	// Note: This field cannot be used if your route uses TLS passthrough.
+	Response []RouteHTTPHeader
+	// Request is a list of HTTP request headers to modify.
+	// Currently, actions may define to either `Set` or `Delete` headers values.
+	// Actions defined here will modify the request headers of all requests made through a route.
+	// These actions are applied to a specific Route defined within a cluster i.e. connections made through a route.
+	// Currently, actions may define to either `Set` or `Delete` headers values.
+	// Route actions will be executed after IngressController actions for request headers.
+	// Actions are applied in sequence as defined in this list.
+	// A maximum of 20 request header actions may be configured.
+	// You can use this field to specify HTTP request headers that should be set or deleted
+	// when forwarding connections from the client to your application.
+	// Sample fetchers allowed are "req.hdr" and "ssl_c_der".
+	// Converters allowed are "lower" and "base64".
+	// Example header values: "%[req.hdr(X-target),lower]", "%{+Q}[ssl_c_der,base64]".
+	// Any request header configuration applied directly via a Route resource using this API
+	// will override header configuration for a header of the same name applied via
+	// spec.httpHeaders.actions on the IngressController or route annotation.
+	// Note: This field cannot be used if your route uses TLS passthrough.
+	Request []RouteHTTPHeader
+}
+
+// RouteHTTPHeader specifies configuration for setting or deleting an HTTP header.
+type RouteHTTPHeader struct {
+	// Name specifies the name of a header on which to perform an action. Its value must be a valid HTTP header
+	// name as defined in RFC 2616 section 4.2.
+	// The name must consist only of alphanumeric and the following special characters, "-!#$%&'*+.^_`".
+	// The following header names are reserved and may not be modified via this API:
+	// Strict-Transport-Security, Proxy, Cookie, Set-Cookie.
+	// It must be no more than 255 characters in length.
+	// Header name must be unique.
+	Name string
+
+	// Action specifies actions to perform on headers, such as setting or deleting headers.
+	Action RouteHTTPHeaderActionUnion
+}
+
+// RouteHTTPHeaderActionUnion specifies an action to take on an HTTP header.
+type RouteHTTPHeaderActionUnion struct {
+	// Type defines the type of the action to be applied on the header.
+	// Possible values are Set or Delete.
+	// Set allows you to set HTTP request and response headers.
+	// Delete allows you to delete HTTP request and response headers.
+	Type RouteHTTPHeaderActionType
+
+	// Set defines the HTTP header that should be set: added if it doesn't exist or replaced if it does.
+	// This field is required when type is Set and forbidden otherwise.
+	Set *RouteSetHTTPHeader
+}
+
+// RouteSetHTTPHeader specifies what value needs to be set on an HTTP header.
+type RouteSetHTTPHeader struct {
+	// Value specifies a header value.
+	// Dynamic values can be added. The value will be interpreted as an HAProxy format string as defined in
+	// http://cbonte.github.io/haproxy-dconv/2.6/configuration.html#8.2.6 and may use HAProxy's %[] syntax and
+	// otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.
+	// The value of this field must be no more than 16384 characters in length.
+	// Note that the total size of all net added headers *after* interpolating dynamic values
+	// must not exceed the value of spec.tuningOptions.headerBufferMaxRewriteBytes on the
+	// IngressController.
+	Value string
+}
+
+// RouteHTTPHeaderActionType defines actions that can be performed on HTTP headers.
+type RouteHTTPHeaderActionType string
+
+const (
+	// Set specifies that an HTTP header should be set.
+	Set RouteHTTPHeaderActionType = "Set"
+	// Delete specifies that an HTTP header should be deleted.
+	Delete RouteHTTPHeaderActionType = "Delete"
+)
 
 // RouteTargetReference specifies the target that resolve into endpoints. Only the 'Service'
 // kind is allowed. Use 'weight' field to emphasize one over others.
