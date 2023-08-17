@@ -199,7 +199,7 @@ func (imp *ImageStreamImporter) importImages(ctx context.Context, isi *imageapi.
 		}
 
 		if len(defaultRef.ID) > 0 {
-			id := manifestKey{repositoryKey: key}
+			id := manifestKey{repositoryKey: key, importMode: spec.ImportPolicy.ImportMode}
 			id.value = defaultRef.ID
 			ids[id] = append(ids[id], i)
 			if len(ids[id]) == 1 {
@@ -221,7 +221,12 @@ func (imp *ImageStreamImporter) importImages(ctx context.Context, isi *imageapi.
 			preferArch := tagReference.Annotations[imagev1.ImporterPreferArchAnnotation]
 			preferOS := tagReference.Annotations[imagev1.ImporterPreferOSAnnotation]
 
-			tag := manifestKey{repositoryKey: key, preferArch: preferArch, preferOS: preferOS}
+			tag := manifestKey{
+				repositoryKey: key,
+				preferArch:    preferArch,
+				preferOS:      preferOS,
+				importMode:    spec.ImportPolicy.ImportMode,
+			}
 			tag.value = defaultRef.Tag
 			tags[tag] = append(tags[tag], i)
 			if len(tags[tag]) == 1 {
@@ -240,7 +245,12 @@ func (imp *ImageStreamImporter) importImages(ctx context.Context, isi *imageapi.
 	for key, repo := range repositories {
 		imp.importRepositoryFromDocker(ctx, repo)
 		for _, tag := range repo.Tags {
-			j := manifestKey{repositoryKey: key, preferArch: tag.PreferArch, preferOS: tag.PreferOS}
+			j := manifestKey{
+				repositoryKey: key,
+				preferArch:    tag.PreferArch,
+				preferOS:      tag.PreferOS,
+				importMode:    tag.ImportMode,
+			}
 			j.value = tag.Name
 			if tag.Image != nil {
 				cache[j] = tag.Image
@@ -262,7 +272,7 @@ func (imp *ImageStreamImporter) importImages(ctx context.Context, isi *imageapi.
 			}
 		}
 		for _, digest := range repo.Digests {
-			j := manifestKey{repositoryKey: key}
+			j := manifestKey{repositoryKey: key, importMode: digest.ImportMode}
 			j.value = digest.Name
 			if digest.Image != nil {
 				cache[j] = digest.Image
@@ -344,7 +354,7 @@ func (imp *ImageStreamImporter) importFromRepository(ctx context.Context, isi *i
 	}
 
 	additional := []string{}
-	tagKey := manifestKey{repositoryKey: key}
+	tagKey := manifestKey{repositoryKey: key, importMode: spec.ImportPolicy.ImportMode}
 	for _, s := range repo.AdditionalTags {
 		tagKey.value = s
 		if image, ok := cache[tagKey]; ok {
@@ -947,6 +957,8 @@ type manifestKey struct {
 	preferArch string
 	// An operation system of the image which should be selected from a manifest list.
 	preferOS string
+	// the import mode of the manifest
+	importMode imageapi.ImportModeType
 }
 
 func imageImportStatus(err error, kind, position string) metav1.Status {
