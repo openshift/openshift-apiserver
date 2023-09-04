@@ -36,8 +36,6 @@ import (
 	_ "github.com/openshift/openshift-apiserver/pkg/api/install"
 )
 
-var testDefaultRegistry = func(_ context.Context) (string, bool) { return "defaultregistry:5000", true }
-
 type fakeSubjectAccessReviewRegistry struct{}
 
 func (f *fakeSubjectAccessReviewRegistry) Create(_ context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationapi.SubjectAccessReview, error) {
@@ -82,7 +80,7 @@ func setup(t *testing.T) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	registry := registryhostname.TestingRegistryHostnameRetriever(testDefaultRegistry, "", "")
+	registry := registryhostname.DefaultRegistryHostnameRetriever("", "defaultregistry:5000")
 	imageStreamStorage, imageStreamLayersStorage, imageStreamStatus, internalStorage, err := imagestreametcd.NewRESTWithLimitVerifier(
 		imagestreamRESTOptions,
 		registry,
