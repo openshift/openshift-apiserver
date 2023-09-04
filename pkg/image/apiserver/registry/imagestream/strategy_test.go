@@ -33,8 +33,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/testutil"
 )
 
-type fakeUser struct {
-}
+type fakeUser struct{}
 
 var _ user.Info = &fakeUser{}
 
@@ -54,14 +53,6 @@ func (u *fakeUser) GetExtra() map[string][]string {
 	return map[string][]string{
 		oauthorizationapi.ScopesKey: {"a", "b"},
 	}
-}
-
-type fakeDefaultRegistry struct {
-	registry string
-}
-
-func (f *fakeDefaultRegistry) DefaultRegistry(_ context.Context) (string, bool) {
-	return f.registry, len(f.registry) > 0
 }
 
 type subjectAccessReviewRecord struct {
@@ -149,7 +140,7 @@ func TestPublicDockerImageRepository(t *testing.T) {
 	}
 
 	for testName, test := range tests {
-		strategy := NewStrategy(registryhostname.TestingRegistryHostnameRetriever(nil, test.publicRegistry, ""), &fakeSubjectAccessReviewRegistry{}, &admfake.ImageStreamLimitVerifier{}, nil, nil)
+		strategy := NewStrategy(registryhostname.DefaultRegistryHostnameRetriever(test.publicRegistry, ""), &fakeSubjectAccessReviewRegistry{}, &admfake.ImageStreamLimitVerifier{}, nil, nil)
 		value := strategy.publicDockerImageRepository(test.stream)
 		if e, a := test.expected, value; e != a {
 			t.Errorf("%s: expected %q, got %q", testName, e, a)
@@ -219,8 +210,7 @@ func TestDockerImageRepository(t *testing.T) {
 	}
 
 	for testName, test := range tests {
-		fakeRegistry := &fakeDefaultRegistry{test.defaultRegistry}
-		strategy := NewStrategy(registryhostname.TestingRegistryHostnameRetriever(fakeRegistry.DefaultRegistry, "", ""), &fakeSubjectAccessReviewRegistry{}, &admfake.ImageStreamLimitVerifier{}, nil, nil)
+		strategy := NewStrategy(registryhostname.DefaultRegistryHostnameRetriever("", test.defaultRegistry), &fakeSubjectAccessReviewRegistry{}, &admfake.ImageStreamLimitVerifier{}, nil, nil)
 		value := strategy.dockerImageRepository(context.TODO(), test.stream, true)
 		if e, a := test.expected, value; e != a {
 			t.Errorf("%s: expected %q, got %q", testName, e, a)
@@ -694,14 +684,13 @@ func TestLimitVerifier(t *testing.T) {
 		sar := &fakeSubjectAccessReviewRegistry{}
 		sar.allow = true
 		tagVerifier := &TagVerifier{sar}
-		fakeRegistry := &fakeDefaultRegistry{}
 		s := &Strategy{
 			tagVerifier: tagVerifier,
 			limitVerifier: &admfake.ImageStreamLimitVerifier{
 				ImageStreamEvaluator: tc.isEvaluator,
 			},
 			registryWhitelister:       &fake.RegistryWhitelister{},
-			registryHostnameRetriever: registryhostname.TestingRegistryHostnameRetriever(fakeRegistry.DefaultRegistry, "", ""),
+			registryHostnameRetriever: registryhostname.DefaultRegistryHostnameRetriever("", ""),
 		}
 
 		ctx := apirequest.WithUser(apirequest.NewDefaultContext(), &fakeUser{})
@@ -1239,7 +1228,7 @@ func TestTagsChanged(t *testing.T) {
 			},
 		}
 		// we can't reuse the same map twice, it causes both to be modified during updates
-		var previousTagHistory = test.existingTagHistory
+		previousTagHistory := test.existingTagHistory
 		if previousTagHistory != nil {
 			previousTagHistoryCopy := map[string]imageapi.TagEventList{}
 			for k, v := range previousTagHistory {
@@ -1263,9 +1252,8 @@ func TestTagsChanged(t *testing.T) {
 			previousStream = nil
 		}
 
-		fakeRegistry := &fakeDefaultRegistry{}
 		s := &Strategy{
-			registryHostnameRetriever: registryhostname.TestingRegistryHostnameRetriever(fakeRegistry.DefaultRegistry, "", ""),
+			registryHostnameRetriever: registryhostname.DefaultRegistryHostnameRetriever("", ""),
 			imageStreamGetter:         &fakeImageStreamGetter{test.otherStream},
 		}
 		err := s.tagsChanged(context.TODO(), previousStream, stream)
