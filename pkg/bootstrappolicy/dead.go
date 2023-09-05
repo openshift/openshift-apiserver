@@ -83,4 +83,8 @@ func init() {
 
 	// this was replaced by an openshift specific role and binding
 	addDeadClusterRoleBinding("system:discovery-binding", "system:discovery")
+
+	// these are set up by the service-ca operator
+	addDeadClusterRole("system:openshift:controller:service-serving-cert-controller")
+	addDeadClusterRoleBinding("system:openshift:controller:service-serving-cert-controller", "system:openshift:controller:service-serving-cert-controller")
 }

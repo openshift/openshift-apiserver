@@ -16,7 +16,6 @@ const (
 	InfraOriginNamespaceServiceAccountName                      = "origin-namespace-controller"
 	InfraServiceAccountControllerServiceAccountName             = "serviceaccount-controller"
 	InfraServiceAccountPullSecretsControllerServiceAccountName  = "serviceaccount-pull-secrets-controller"
-	InfraServiceServingCertServiceAccountName                   = "service-serving-cert-controller"
 	InfraBuildControllerServiceAccountName                      = "build-controller"
 	InfraBuildConfigChangeControllerServiceAccountName          = "build-config-change-controller"
 	InfraDeploymentConfigControllerServiceAccountName           = "deploymentconfig-controller"
@@ -229,16 +228,6 @@ func init() {
 				JenkinsPipelineBuildResource,
 			).RuleOrDie(),
 
-			eventsRule(),
-		},
-	})
-
-	// service-serving-cert-controller
-	addControllerRole(rbacv1.ClusterRole{
-		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + InfraServiceServingCertServiceAccountName},
-		Rules: []rbacv1.PolicyRule{
-			rbacv1helpers.NewRule("list", "watch", "update").Groups(kapiGroup).Resources("services").RuleOrDie(),
-			rbacv1helpers.NewRule("get", "list", "watch", "create", "update", "delete").Groups(kapiGroup).Resources("secrets").RuleOrDie(),
 			eventsRule(),
 		},
 	})
