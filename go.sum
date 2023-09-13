@@ -368,6 +368,8 @@ github.com/denis-tingajkin/go-header v0.4.2/go.mod h1:eLRHAVXzE5atsKAnNRDB90WHCF
 github.com/denverdino/aliyungo v0.0.0-20190125010748-a747050bb1ba/go.mod h1:dV8lFg6daOBZbT6/BDGIz6Y3WFGn8juu6G+CQ6LHtl0=
 github.com/dgrijalva/jwt-go v0.0.0-20170104182250-a601269ab70c/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
+github.com/dgrisonnet/kubernetes-apiserver v0.0.0-20230914152731-60999d3d3073 h1:gB98lefwUsdvsAyDSXJ8AWNMIfFmBhtxryZybBgVYV8=
+github.com/dgrisonnet/kubernetes-apiserver v0.0.0-20230914152731-60999d3d3073/go.mod h1:EsOf39d75rMivgvvwjJ3OW/u9n1/BmUMK5otEOJrb1Y=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
 github.com/dnaeon/go-vcr v1.0.1/go.mod h1:aBB1+wY4s93YsC3HHjMBMrwTj2R9FHDzUr9KyGc8n1E=
 github.com/dnaeon/go-vcr v1.2.0/go.mod h1:R4UdLID7HZT3taECzJs4YgbbH6PIGXB6W/sc5OLb6RQ=
@@ -1019,8 +1021,6 @@ github.com/openshift/client-go v0.0.0-20230503144108-75015d2347cb h1:Nij5OnaECrk
 github.com/openshift/client-go v0.0.0-20230503144108-75015d2347cb/go.mod h1:Rhb3moCqeiTuGHAbXBOlwPubUMlOZEkrEWTRjIF3jzs=
 github.com/openshift/docker-distribution/v3 v3.0.0-20230613095533-f65dc997445a h1:Ysxjnmqr80Q9ZDEJrEAthXQJmRscb0vZCm9/WTRQ+Dk=
 github.com/openshift/docker-distribution/v3 v3.0.0-20230613095533-f65dc997445a/go.mod h1:+fqBJ4vPYo4Uu1ZE4d+bUtTLRXfdSL3NvCZIZ9GHv58=
-github.com/openshift/kubernetes-apiserver v0.0.0-20230525090225-51d24b204b3b h1:DBl3L9OsP3Z0d7+htBomUgwUz/xxmtg3gfNL25sqFvU=
-github.com/openshift/kubernetes-apiserver v0.0.0-20230525090225-51d24b204b3b/go.mod h1:EsOf39d75rMivgvvwjJ3OW/u9n1/BmUMK5otEOJrb1Y=
 github.com/openshift/library-go v0.0.0-20230808150704-ce4395c85e8c h1:UJjxHFSTcasHxRXtDc3od9p7UJUBJxUKjhZHFyp2uUQ=
 github.com/openshift/library-go v0.0.0-20230808150704-ce4395c85e8c/go.mod h1:ZFwNwC3opc/7aOvzUbU95zp33Lbxet48h80ryH3p6DY=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d h1:fLITXDjxMSvUDjnXs/zljIWktbST9+Om8XbrmmM7T4I=
