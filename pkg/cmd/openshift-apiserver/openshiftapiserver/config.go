@@ -57,41 +57,41 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 
 	genericConfig := genericapiserver.NewRecommendedConfig(legacyscheme.Codecs)
 	// Current default values
-	//Serializer:                   codecs,
-	//ReadWritePort:                443,
-	//BuildHandlerChainFunc:        DefaultBuildHandlerChain,
-	//HandlerChainWaitGroup:        new(utilwaitgroup.SafeWaitGroup),
-	//LegacyAPIGroupPrefixes:       sets.NewString(DefaultLegacyAPIPrefix),
-	//DisabledPostStartHooks:       sets.NewString(),
-	//HealthzChecks:                []healthz.HealthzChecker{healthz.PingHealthz, healthz.LogHealthz},
-	//EnableIndex:                  true,
-	//EnableDiscovery:              true,
-	//EnableProfiling:              true,
-	//EnableMetrics:                true,
-	//MaxRequestsInFlight:          400,
-	//MaxMutatingRequestsInFlight:  200,
-	//RequestTimeout:               time.Duration(60) * time.Second,
-	//MinRequestTimeout:            1800,
-	//EnableAPIResponseCompression: utilfeature.DefaultFeatureGate.Enabled(features.APIResponseCompression),
-	//LongRunningFunc: genericfilters.BasicLongRunningRequestCheck(sets.NewString("watch"), sets.NewString()),
+	// Serializer:                   codecs,
+	// ReadWritePort:                443,
+	// BuildHandlerChainFunc:        DefaultBuildHandlerChain,
+	// HandlerChainWaitGroup:        new(utilwaitgroup.SafeWaitGroup),
+	// LegacyAPIGroupPrefixes:       sets.NewString(DefaultLegacyAPIPrefix),
+	// DisabledPostStartHooks:       sets.NewString(),
+	// HealthzChecks:                []healthz.HealthzChecker{healthz.PingHealthz, healthz.LogHealthz},
+	// EnableIndex:                  true,
+	// EnableDiscovery:              true,
+	// EnableProfiling:              true,
+	// EnableMetrics:                true,
+	// MaxRequestsInFlight:          400,
+	// MaxMutatingRequestsInFlight:  200,
+	// RequestTimeout:               time.Duration(60) * time.Second,
+	// MinRequestTimeout:            1800,
+	// EnableAPIResponseCompression: utilfeature.DefaultFeatureGate.Enabled(features.APIResponseCompression),
+	// LongRunningFunc: genericfilters.BasicLongRunningRequestCheck(sets.NewString("watch"), sets.NewString()),
 
 	// TODO this is actually specific to the kubeapiserver
-	//RuleResolver authorizer.RuleResolver
+	// RuleResolver authorizer.RuleResolver
 	genericConfig.SharedInformerFactory = kubeInformers
 	genericConfig.ClientConfig = kubeClientConfig
 
 	// these are set via options
-	//SecureServing *SecureServingInfo
-	//Authentication AuthenticationInfo
-	//Authorization AuthorizationInfo
-	//LoopbackClientConfig *restclient.Config
+	// SecureServing *SecureServingInfo
+	// Authentication AuthenticationInfo
+	// Authorization AuthorizationInfo
+	// LoopbackClientConfig *restclient.Config
 	// this is set after the options are overlayed to get the authorizer we need.
-	//AdmissionControl      admission.Interface
-	//ReadWritePort int
-	//PublicAddress net.IP
+	// AdmissionControl      admission.Interface
+	// ReadWritePort int
+	// PublicAddress net.IP
 
 	// these are defaulted sanely during complete
-	//DiscoveryAddresses discovery.Addresses
+	// DiscoveryAddresses discovery.Addresses
 
 	genericConfig.CorsAllowedOriginList = config.CORSAllowedOrigins
 	genericConfig.Version = &openshiftVersion
@@ -146,7 +146,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	}
 
 	// I'm just hoping this works.  I don't think we use it.
-	//MergedResourceConfig *serverstore.ResourceConfig
+	// MergedResourceConfig *serverstore.ResourceConfig
 
 	servingOptions, err := serving.ToServingOptions(config.ServingInfo)
 	if err != nil {
@@ -220,10 +220,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	if len(config.ImagePolicyConfig.ExternalRegistryHostnames) > 0 {
 		externalRegistryHostname = config.ImagePolicyConfig.ExternalRegistryHostnames[0]
 	}
-	registryHostnameRetriever, err := registryhostname.DefaultRegistryHostnameRetriever(kubeClientConfig, externalRegistryHostname, config.ImagePolicyConfig.InternalRegistryHostname)
-	if err != nil {
-		return nil, err
-	}
+	registryHostnameRetriever := registryhostname.DefaultRegistryHostnameRetriever(externalRegistryHostname, config.ImagePolicyConfig.InternalRegistryHostname)
 
 	var caData []byte
 	if len(config.ImagePolicyConfig.AdditionalTrustedCA) != 0 {
