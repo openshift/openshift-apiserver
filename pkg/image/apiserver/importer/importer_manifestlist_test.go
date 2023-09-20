@@ -128,8 +128,7 @@ func TestImportManifestList(t *testing.T) {
 
 	testCases := []struct {
 		name             string
-		importMode       imageapi.ImportModeType
-		importFromName   string
+		isImport         imageapi.ImageStreamImport
 		manifestList     *manifestlist.DeserializedManifestList
 		importEntireRepo bool
 		// the sub manifests that will be imported, as listed in importPlatforms
@@ -142,9 +141,20 @@ func TestImportManifestList(t *testing.T) {
 		expectedRequests []godigest.Digest
 	}{
 		{
-			name:             "ImportRepository",
-			importMode:       imageapi.ImportModePreserveOriginal,
-			importFromName:   "test",
+			name: "ImportRepository",
+			isImport: imageapi.ImageStreamImport{
+				Spec: imageapi.ImageStreamImportSpec{
+					Repository: &imageapi.RepositoryImportSpec{
+						ImportPolicy: imageapi.TagImportPolicy{
+							ImportMode: imageapi.ImportModePreserveOriginal,
+						},
+						From: kapi.ObjectReference{
+							Kind: "DockerImage",
+							Name: "test",
+						},
+					},
+				},
+			},
 			importEntireRepo: true,
 			manifestList:     manifestList,
 			manifests: []struct {
@@ -176,10 +186,23 @@ func TestImportManifestList(t *testing.T) {
 			},
 		},
 		{
-			name:           "ImportByTag",
-			importMode:     imageapi.ImportModePreserveOriginal,
-			importFromName: "test:latest",
-			manifestList:   manifestList,
+			name: "ImportByTag",
+			isImport: imageapi.ImageStreamImport{
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							ImportPolicy: imageapi.TagImportPolicy{
+								ImportMode: imageapi.ImportModePreserveOriginal,
+							},
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "test:latest",
+							},
+						},
+					},
+				},
+			},
+			manifestList: manifestList,
 			manifests: []struct {
 				raw              []byte
 				digest           godigest.Digest
@@ -209,10 +232,23 @@ func TestImportManifestList(t *testing.T) {
 			},
 		},
 		{
-			name:           "ImportByDigest",
-			importMode:     imageapi.ImportModePreserveOriginal,
-			importFromName: "test@sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
-			manifestList:   manifestList,
+			name: "ImportByDigest",
+			isImport: imageapi.ImageStreamImport{
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							ImportPolicy: imageapi.TagImportPolicy{
+								ImportMode: imageapi.ImportModePreserveOriginal,
+							},
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "test@sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
+							},
+						},
+					},
+				},
+			},
+			manifestList: manifestList,
 			manifests: []struct {
 				raw              []byte
 				digest           godigest.Digest
@@ -241,6 +277,65 @@ func TestImportManifestList(t *testing.T) {
 				"sha256:1a06d68cb9117b52965035a5b0fa4c1470ef892e6062ffedb1af1922952e0950",
 			},
 		},
+		{
+			name: "ImportTwoImagesBySameDigest",
+			isImport: imageapi.ImageStreamImport{
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							ImportPolicy: imageapi.TagImportPolicy{
+								ImportMode: imageapi.ImportModePreserveOriginal,
+							},
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "test@sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
+							},
+						},
+						{
+							ImportPolicy: imageapi.TagImportPolicy{
+								ImportMode: imageapi.ImportModeLegacy,
+							},
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "test@sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
+							},
+						},
+					},
+				},
+			},
+			manifestList: manifestList,
+			manifests: []struct {
+				raw              []byte
+				digest           godigest.Digest
+				configBlobDigest godigest.Digest
+				rawConfigBlob    []byte
+			}{
+				{
+					raw:              amd64ManifestJSON,
+					digest:           "sha256:ca013ac5c09f9a9f6db8370c1b759a29fe997d64d6591e9a75b71748858f7da0",
+					configBlobDigest: "sha256:a2a15febcdf362f6115e801d37b5e60d6faaeedcb9896155e5fe9d754025be12",
+					rawConfigBlob:    amd64ConfigJSON,
+				},
+				{
+					raw:              arm64ManifestJSON,
+					digest:           "sha256:1a06d68cb9117b52965035a5b0fa4c1470ef892e6062ffedb1af1922952e0950",
+					configBlobDigest: "sha256:eb8f2c2207058e4d8bb3afb85e959ff3f12d3481f3e38611de549a39935b28c4",
+					rawConfigBlob:    arm64ConfigJSON,
+				},
+			},
+			expectedRequests: []godigest.Digest{
+				// manifest list digest
+				"sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
+				// amd64 manifest digest
+				"sha256:ca013ac5c09f9a9f6db8370c1b759a29fe997d64d6591e9a75b71748858f7da0",
+				// arm64 manifest digest
+				"sha256:1a06d68cb9117b52965035a5b0fa4c1470ef892e6062ffedb1af1922952e0950",
+				// manifest list digest
+				"sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
+				// amd64 manifest digest
+				"sha256:ca013ac5c09f9a9f6db8370c1b759a29fe997d64d6591e9a75b71748858f7da0",
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -263,30 +358,9 @@ func TestImportManifestList(t *testing.T) {
 			}
 			retriever := &mockRetriever{repo: mockRepo}
 
-			imageStreamImport := imageapi.ImageStreamImport{Spec: imageapi.ImageStreamImportSpec{}}
+			imageStreamImport := testCase.isImport
 			if testCase.importEntireRepo {
 				mockRepo.tags = map[string]string{"latest": "foo-digest"}
-				imageStreamImport.Spec.Repository = &imageapi.RepositoryImportSpec{
-					ImportPolicy: imageapi.TagImportPolicy{
-						ImportMode: testCase.importMode,
-					},
-					From: kapi.ObjectReference{
-						Kind: "DockerImage",
-						Name: testCase.importFromName,
-					},
-				}
-			} else {
-				imageStreamImport.Spec.Images = []imageapi.ImageImportSpec{
-					{
-						ImportPolicy: imageapi.TagImportPolicy{
-							ImportMode: testCase.importMode,
-						},
-						From: kapi.ObjectReference{
-							Kind: "DockerImage",
-							Name: testCase.importFromName,
-						},
-					},
-				}
 			}
 
 			im := NewImageStreamImporter(retriever, nil, 5, nil, nil)
@@ -316,6 +390,7 @@ func TestImportManifestList(t *testing.T) {
 				if len(manifests) != len(testCase.manifests) {
 					t.Logf("want: %d", len(testCase.manifests))
 					t.Logf("got:  %d", len(manifests))
+					t.Logf("isi.Status.Images: %+v", imageStreamImport.Status.Images)
 					t.Fatal("failed to create image objects for sub manifests")
 				}
 			}
@@ -422,7 +497,6 @@ func TestImportManifestListSingleManifest(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 // TestMain starting point for all tests.
