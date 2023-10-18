@@ -29,7 +29,8 @@ import (
 // is intentionally private.  We don't want to leak it out further than this package.
 // Everything else should say what it wants.
 type InformerHolder struct {
-	kubernetesInformers kexternalinformers.SharedInformerFactory
+	kubernetesInformers   kexternalinformers.SharedInformerFactory
+	internalOAuthDisabled bool
 
 	// Internal OpenShift informers
 	authorizationInformers authorizationv1informer.SharedInformerFactory
@@ -44,7 +45,7 @@ type InformerHolder struct {
 }
 
 // NewInformers is only exposed for the build's integration testing until it can be fixed more appropriately.
-func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeClientConfig *rest.Config, loopbackClientConfig *rest.Config) (*InformerHolder, error) {
+func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeClientConfig *rest.Config, loopbackClientConfig *rest.Config, internalOAuthDisabled bool) (*InformerHolder, error) {
 	authorizationClient, err := authorizationv1client.NewForConfig(nonProtobufConfig(kubeClientConfig))
 	if err != nil {
 		return nil, err
@@ -87,6 +88,7 @@ func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeCl
 	const defaultInformerResyncPeriod = 10 * time.Minute
 
 	return &InformerHolder{
+		internalOAuthDisabled:  internalOAuthDisabled,
 		kubernetesInformers:    kubeInformers,
 		authorizationInformers: authorizationv1informer.NewSharedInformerFactory(authorizationClient, defaultInformerResyncPeriod),
 		configInformers:        configv1informer.NewSharedInformerFactory(configClient, defaultInformerResyncPeriod),
@@ -140,13 +142,16 @@ func (i *InformerHolder) GetOpenshiftUserInformers() userv1informer.SharedInform
 // Start initializes all requested informers.
 func (i *InformerHolder) Start(stopCh <-chan struct{}) {
 	i.kubernetesInformers.Start(stopCh)
-	i.authorizationInformers.Start(stopCh)
 	i.configInformers.Start(stopCh)
 	i.imageInformers.Start(stopCh)
 	i.oauthInformers.Start(stopCh)
 	i.quotaInformers.Start(stopCh)
 	i.routeInformers.Start(stopCh)
 	i.securityInformers.Start(stopCh)
-	i.userInformers.Start(stopCh)
+	// Only start oauth and user informers if oauth-apiserver is enabled
+	if i.internalOAuthDisabled == false {
+		i.authorizationInformers.Start(stopCh)
+		i.userInformers.Start(stopCh)
+	}
 	i.operatorInformers.Start(stopCh)
 }

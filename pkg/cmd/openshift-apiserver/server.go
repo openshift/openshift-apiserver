@@ -15,7 +15,7 @@ import (
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 )
 
-func RunOpenShiftAPIServer(serverConfig *openshiftcontrolplanev1.OpenShiftAPIServerConfig, authenticationOptions *genericapiserveroptions.DelegatingAuthenticationOptions, authorizationOptions *genericapiserveroptions.DelegatingAuthorizationOptions, stopCh <-chan struct{}) error {
+func RunOpenShiftAPIServer(serverConfig *openshiftcontrolplanev1.OpenShiftAPIServerConfig, authenticationOptions *genericapiserveroptions.DelegatingAuthenticationOptions, authorizationOptions *genericapiserveroptions.DelegatingAuthorizationOptions, internalOAuthDisabled bool, stopCh <-chan struct{}) error {
 	serviceability.InitLogrusFromKlog()
 	// Allow privileged containers
 	capabilities.Initialize(capabilities.Capabilities{
@@ -27,7 +27,7 @@ func RunOpenShiftAPIServer(serverConfig *openshiftcontrolplanev1.OpenShiftAPISer
 		},
 	})
 
-	openshiftAPIServerRuntimeConfig, err := openshiftapiserver.NewOpenshiftAPIConfig(serverConfig, authenticationOptions, authorizationOptions)
+	openshiftAPIServerRuntimeConfig, err := openshiftapiserver.NewOpenshiftAPIConfig(serverConfig, authenticationOptions, authorizationOptions, internalOAuthDisabled)
 	if err != nil {
 		return err
 	}
