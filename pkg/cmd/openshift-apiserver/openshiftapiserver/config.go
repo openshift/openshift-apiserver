@@ -125,9 +125,6 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	if err != nil {
 		return nil, err
 	}
-	if err := etcdOptions.Complete(genericConfig.Config.StorageObjectCountTracker, genericConfig.Config.DrainedNotify(), genericConfig.Config.AddPostStartHook); err != nil {
-		return nil, err
-	}
 	storageFactory := NewStorageFactory(etcdOptions)
 	if err := etcdOptions.ApplyWithStorageFactoryTo(storageFactory, &genericConfig.Config); err != nil {
 		return nil, err
@@ -212,7 +209,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	admissionOptions.DisablePlugins = config.AdmissionConfig.DisabledAdmissionPlugins
 	admissionOptions.ConfigFile = admissionConfigFile
 	// TODO:
-	if err := admissionOptions.ApplyTo(&genericConfig.Config, kubeInformers, kubeClientConfig, nil, admissionInitializer); err != nil {
+	if err := admissionOptions.ApplyTo(&genericConfig.Config, kubeInformers, kubeClient, dynamicClient, nil, admissionInitializer); err != nil {
 		return nil, err
 	}
 

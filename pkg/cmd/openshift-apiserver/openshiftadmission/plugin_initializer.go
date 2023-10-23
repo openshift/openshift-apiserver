@@ -104,7 +104,7 @@ func NewPluginInitializer(
 	kubePluginInitializer := kubeapiserveradmission.NewPluginInitializer(
 		cloudConfig,
 		restMapper,
-		generic.NewConfiguration(quotaRegistry.List(), map[schema.GroupResource]struct{}{}), nil)
+		generic.NewConfiguration(quotaRegistry.List(), map[schema.GroupResource]struct{}{}))
 
 	openshiftPluginInitializer := openshiftapiserveradmission.NewOpenShiftInformersInitializer(informers.GetOpenshiftConfigInformers(), informers.GetOpenshiftRouteInformers())
 
