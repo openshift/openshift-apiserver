@@ -207,7 +207,8 @@ func (s *SecureServingInfo) Serve(handler http.Handler, shutdownTimeout time.Dur
 // It returns a stoppedCh that is closed when all non-hijacked active requests have been processed.
 // It returns a listenerStoppedCh that is closed when the underlying http Server has stopped listening.
 // TODO: do a follow up PR to remove this function, change 'Serve' to return listenerStoppedCh
-//  and update all components that call 'Serve'
+//
+//	and update all components that call 'Serve'
 func (s *SecureServingInfo) ServeWithListenerStopped(handler http.Handler, shutdownTimeout time.Duration, stopCh <-chan struct{}) (<-chan struct{}, <-chan struct{}, error) {
 	if s.Listener == nil {
 		return nil, nil, fmt.Errorf("listener must not be nil")
@@ -245,7 +246,10 @@ func (s *SecureServingInfo) ServeWithListenerStopped(handler http.Handler, shutd
 	if s.HTTP2MaxStreamsPerConnection > 0 {
 		http2Options.MaxConcurrentStreams = uint32(s.HTTP2MaxStreamsPerConnection)
 	} else {
-		http2Options.MaxConcurrentStreams = 250
+		// match http2.initialMaxConcurrentStreams used by clients
+		// this makes it so that a malicious client can only open 400 streams before we forcibly close the connection
+		// https://github.com/golang/net/commit/b225e7ca6dde1ef5a5ae5ce922861bda011cfabd
+		http2Options.MaxConcurrentStreams = 100
 	}
 
 	// increase the connection buffer size from the 1MB default to handle the specified number of concurrent streams
