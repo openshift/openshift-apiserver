@@ -162,7 +162,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 		return nil, err
 	}
 
-	informers, err := NewInformers(kubeInformers, kubeClientConfig, genericConfig.LoopbackClientConfig, internalOAuthDisabled)
+	informers, err := NewInformers(kubeInformers, kubeClientConfig, genericConfig.LoopbackClientConfig)
 	if err != nil {
 		return nil, err
 	}

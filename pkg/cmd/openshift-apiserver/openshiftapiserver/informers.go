@@ -9,8 +9,6 @@ import (
 	configv1informer "github.com/openshift/client-go/config/informers/externalversions"
 	imagev1client "github.com/openshift/client-go/image/clientset/versioned"
 	imagev1informer "github.com/openshift/client-go/image/informers/externalversions"
-	oauthv1client "github.com/openshift/client-go/oauth/clientset/versioned"
-	oauthv1informer "github.com/openshift/client-go/oauth/informers/externalversions"
 	operatorclient "github.com/openshift/client-go/operator/clientset/versioned"
 	operatorinformers "github.com/openshift/client-go/operator/informers/externalversions"
 	quotaclient "github.com/openshift/client-go/quota/clientset/versioned"
@@ -19,8 +17,6 @@ import (
 	routev1informer "github.com/openshift/client-go/route/informers/externalversions"
 	securityv1client "github.com/openshift/client-go/security/clientset/versioned"
 	securityv1informer "github.com/openshift/client-go/security/informers/externalversions"
-	userv1client "github.com/openshift/client-go/user/clientset/versioned"
-	userv1informer "github.com/openshift/client-go/user/informers/externalversions"
 	kexternalinformers "k8s.io/client-go/informers"
 	"k8s.io/client-go/rest"
 )
@@ -29,23 +25,20 @@ import (
 // is intentionally private.  We don't want to leak it out further than this package.
 // Everything else should say what it wants.
 type InformerHolder struct {
-	kubernetesInformers   kexternalinformers.SharedInformerFactory
-	internalOAuthDisabled bool
+	kubernetesInformers kexternalinformers.SharedInformerFactory
 
 	// Internal OpenShift informers
 	authorizationInformers authorizationv1informer.SharedInformerFactory
 	configInformers        configv1informer.SharedInformerFactory
 	imageInformers         imagev1informer.SharedInformerFactory
-	oauthInformers         oauthv1informer.SharedInformerFactory
 	quotaInformers         quotainformer.SharedInformerFactory
 	routeInformers         routev1informer.SharedInformerFactory
 	securityInformers      securityv1informer.SharedInformerFactory
-	userInformers          userv1informer.SharedInformerFactory
 	operatorInformers      operatorinformers.SharedInformerFactory
 }
 
 // NewInformers is only exposed for the build's integration testing until it can be fixed more appropriately.
-func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeClientConfig *rest.Config, loopbackClientConfig *rest.Config, internalOAuthDisabled bool) (*InformerHolder, error) {
+func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeClientConfig *rest.Config, loopbackClientConfig *rest.Config) (*InformerHolder, error) {
 	authorizationClient, err := authorizationv1client.NewForConfig(nonProtobufConfig(kubeClientConfig))
 	if err != nil {
 		return nil, err
@@ -55,10 +48,6 @@ func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeCl
 		return nil, err
 	}
 	imageClient, err := imagev1client.NewForConfig(loopbackClientConfig)
-	if err != nil {
-		return nil, err
-	}
-	oauthClient, err := oauthv1client.NewForConfig(loopbackClientConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -74,10 +63,6 @@ func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeCl
 	if err != nil {
 		return nil, err
 	}
-	userClient, err := userv1client.NewForConfig(loopbackClientConfig)
-	if err != nil {
-		return nil, err
-	}
 	operatorClient, err := operatorclient.NewForConfig(nonProtobufConfig(kubeClientConfig))
 	if err != nil {
 		return nil, err
@@ -88,16 +73,13 @@ func NewInformers(kubeInformers kexternalinformers.SharedInformerFactory, kubeCl
 	const defaultInformerResyncPeriod = 10 * time.Minute
 
 	return &InformerHolder{
-		internalOAuthDisabled:  internalOAuthDisabled,
 		kubernetesInformers:    kubeInformers,
 		authorizationInformers: authorizationv1informer.NewSharedInformerFactory(authorizationClient, defaultInformerResyncPeriod),
 		configInformers:        configv1informer.NewSharedInformerFactory(configClient, defaultInformerResyncPeriod),
 		imageInformers:         imagev1informer.NewSharedInformerFactory(imageClient, defaultInformerResyncPeriod),
-		oauthInformers:         oauthv1informer.NewSharedInformerFactory(oauthClient, defaultInformerResyncPeriod),
 		quotaInformers:         quotainformer.NewSharedInformerFactory(quotaClient, defaultInformerResyncPeriod),
 		routeInformers:         routev1informer.NewSharedInformerFactory(routerClient, defaultInformerResyncPeriod),
 		securityInformers:      securityv1informer.NewSharedInformerFactory(securityClient, defaultInformerResyncPeriod),
-		userInformers:          userv1informer.NewSharedInformerFactory(userClient, defaultInformerResyncPeriod),
 		operatorInformers:      operatorinformers.NewSharedInformerFactory(operatorClient, defaultInformerResyncPeriod),
 	}, nil
 }
@@ -123,9 +105,6 @@ func (i *InformerHolder) GetOpenshiftConfigInformers() configv1informer.SharedIn
 func (i *InformerHolder) GetOpenshiftImageInformers() imagev1informer.SharedInformerFactory {
 	return i.imageInformers
 }
-func (i *InformerHolder) GetOpenshiftOauthInformers() oauthv1informer.SharedInformerFactory {
-	return i.oauthInformers
-}
 func (i *InformerHolder) GetOpenshiftQuotaInformers() quotainformer.SharedInformerFactory {
 	return i.quotaInformers
 }
@@ -135,23 +114,15 @@ func (i *InformerHolder) GetOpenshiftRouteInformers() routev1informer.SharedInfo
 func (i *InformerHolder) GetOpenshiftSecurityInformers() securityv1informer.SharedInformerFactory {
 	return i.securityInformers
 }
-func (i *InformerHolder) GetOpenshiftUserInformers() userv1informer.SharedInformerFactory {
-	return i.userInformers
-}
 
 // Start initializes all requested informers.
 func (i *InformerHolder) Start(stopCh <-chan struct{}) {
 	i.kubernetesInformers.Start(stopCh)
+	i.authorizationInformers.Start(stopCh)
 	i.configInformers.Start(stopCh)
 	i.imageInformers.Start(stopCh)
-	i.oauthInformers.Start(stopCh)
 	i.quotaInformers.Start(stopCh)
 	i.routeInformers.Start(stopCh)
 	i.securityInformers.Start(stopCh)
-	// Only start oauth and user informers if oauth-apiserver is enabled
-	if i.internalOAuthDisabled == false {
-		i.authorizationInformers.Start(stopCh)
-		i.userInformers.Start(stopCh)
-	}
 	i.operatorInformers.Start(stopCh)
 }
