@@ -192,6 +192,7 @@ func TestNewMetadataFields(t *testing.T) {
 		objMeta.Finalizers = nil
 		objMeta.ClusterName = ""
 		objMeta.ManagedFields = nil
+		objMeta.ZZZ_DeprecatedClusterName = ""
 
 		if !reflect.DeepEqual(metav1.ObjectMeta{}, objMeta) {
 			t.Fatalf(`A new field was introduced in ObjectMeta, add the field to
