@@ -31,8 +31,9 @@ import (
 )
 
 type OpenShiftAPIServer struct {
-	ConfigFile string
-	Output     io.Writer
+	ConfigFile            string
+	Output                io.Writer
+	InternalOAuthDisabled bool
 
 	Authentication *genericapiserveroptions.DelegatingAuthenticationOptions
 	Authorization  *genericapiserveroptions.DelegatingAuthorizationOptions
@@ -74,6 +75,7 @@ func NewOpenShiftAPIServerCommand(name string, out, errout io.Writer, stopCh <-c
 		},
 	}
 
+	cmd.Flags().BoolVar(&options.InternalOAuthDisabled, "internal-oauth-disabled", false, "disable internal oauth")
 	options.AddFlags(cmd.Flags())
 
 	return cmd
@@ -132,5 +134,5 @@ func (o *OpenShiftAPIServer) RunAPIServer(stopCh <-chan struct{}) error {
 	}
 	setRecommendedOpenShiftAPIServerConfigDefaults(config)
 
-	return RunOpenShiftAPIServer(config, o.Authentication, o.Authorization, stopCh)
+	return RunOpenShiftAPIServer(config, o.Authentication, o.Authorization, o.InternalOAuthDisabled, stopCh)
 }

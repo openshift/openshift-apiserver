@@ -38,7 +38,7 @@ import (
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 )
 
-func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerConfig, authenticationOptions *genericapiserveroptions.DelegatingAuthenticationOptions, authorizationOptions *genericapiserveroptions.DelegatingAuthorizationOptions) (*OpenshiftAPIConfig, error) {
+func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerConfig, authenticationOptions *genericapiserveroptions.DelegatingAuthenticationOptions, authorizationOptions *genericapiserveroptions.DelegatingAuthorizationOptions, internalOAuthDisabled bool) (*OpenshiftAPIConfig, error) {
 	kubeClientConfig, err := helpers.GetKubeClientConfig(config.KubeClientConfig)
 	if err != nil {
 		return nil, err
@@ -209,6 +209,9 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	admissionOptions.RecommendedPluginOrder = openshiftadmission.OpenShiftAdmissionPlugins
 	admissionOptions.Plugins = openshiftadmission.OriginAdmissionPlugins
 	admissionOptions.EnablePlugins = config.AdmissionConfig.EnabledAdmissionPlugins
+	if internalOAuthDisabled == true {
+		config.AdmissionConfig.DisabledAdmissionPlugins = append(config.AdmissionConfig.DisabledAdmissionPlugins, "project.openshift.io/ProjectRequestLimit")
+	}
 	admissionOptions.DisablePlugins = config.AdmissionConfig.DisabledAdmissionPlugins
 	admissionOptions.ConfigFile = admissionConfigFile
 	// TODO:

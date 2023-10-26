@@ -30,7 +30,6 @@ import (
 	quotainformer "github.com/openshift/client-go/quota/informers/externalversions"
 	routeinformers "github.com/openshift/client-go/route/informers/externalversions"
 	securityv1informer "github.com/openshift/client-go/security/informers/externalversions"
-	userv1informer "github.com/openshift/client-go/user/informers/externalversions"
 	"github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig"
 	"github.com/openshift/library-go/pkg/quota/clusterquotamapping"
 	openshiftapiserveradmission "github.com/openshift/openshift-apiserver/pkg/admission"
@@ -45,7 +44,6 @@ type InformerAccess interface {
 	GetOpenshiftQuotaInformers() quotainformer.SharedInformerFactory
 	GetOpenshiftRouteInformers() routeinformers.SharedInformerFactory
 	GetOpenshiftSecurityInformers() securityv1informer.SharedInformerFactory
-	GetOpenshiftUserInformers() userv1informer.SharedInformerFactory
 }
 
 func NewPluginInitializer(
