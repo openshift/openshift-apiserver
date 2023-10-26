@@ -69,7 +69,6 @@ API rule violation: list_type_missing,github.com/openshift/api/config/v1,AWSPlat
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AWSPlatformStatus,ServiceEndpoints
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AdmissionConfig,DisabledAdmissionPlugins
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AdmissionConfig,EnabledAdmissionPlugins
-API rule violation: list_type_missing,github.com/openshift/api/config/v1,AuthenticationSpec,WebhookTokenAuthenticators
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,AzurePlatformStatus,ResourceTags
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,BareMetalPlatformStatus,APIServerInternalIPs
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,BareMetalPlatformStatus,IngressIPs
@@ -244,6 +243,7 @@ API rule violation: list_type_missing,github.com/openshift/api/machine/v1,Alibab
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1,AlibabaCloudMachineProviderConfig,Tags
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1,AlibabaCloudMachineProviderStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1,FailureDomains,OpenStack
+API rule violation: list_type_missing,github.com/openshift/api/machine/v1,FailureDomains,VSphere
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1,NutanixMachineProviderConfig,Subnets
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1,NutanixMachineProviderStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1,PowerVSMachineProviderConfig,LoadBalancers
@@ -809,6 +809,8 @@ API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatu
 API rule violation: names_match,github.com/openshift/api/config/v1,PlatformStatus,VSphere
 API rule violation: names_match,github.com/openshift/api/config/v1,PromQLClusterCondition,PromQL
 API rule violation: names_match,github.com/openshift/api/config/v1,RequestHeaderIdentityProvider,ClientCA
+API rule violation: names_match,github.com/openshift/api/config/v1,TokenIssuer,CertificateAuthority
+API rule violation: names_match,github.com/openshift/api/config/v1,TokenIssuer,URL
 API rule violation: names_match,github.com/openshift/api/config/v1,VSpherePlatformNodeNetworkingSpec,ExcludeNetworkSubnetCIDR
 API rule violation: names_match,github.com/openshift/api/config/v1,VSpherePlatformNodeNetworkingSpec,NetworkSubnetCIDR
 API rule violation: names_match,github.com/openshift/api/config/v1,VSpherePlatformSpec,VCenters
@@ -868,6 +870,7 @@ API rule violation: names_match,github.com/openshift/api/machine/v1,DataDiskProp
 API rule violation: names_match,github.com/openshift/api/machine/v1,DataDiskProperties,Size
 API rule violation: names_match,github.com/openshift/api/machine/v1,DataDiskProperties,SnapshotID
 API rule violation: names_match,github.com/openshift/api/machine/v1,FailureDomains,OpenStack
+API rule violation: names_match,github.com/openshift/api/machine/v1,FailureDomains,VSphere
 API rule violation: names_match,github.com/openshift/api/machine/v1,NutanixMachineProviderConfig,VCPUsPerSocket
 API rule violation: names_match,github.com/openshift/api/machine/v1,PowerVSMachineProviderStatus,InstanceID
 API rule violation: names_match,github.com/openshift/api/machine/v1,PowerVSResource,RegEx
@@ -922,6 +925,10 @@ API rule violation: names_match,github.com/openshift/api/operator/v1,AWSLoadBala
 API rule violation: names_match,github.com/openshift/api/operator/v1,AWSLoadBalancerParameters,NetworkLoadBalancerParameters
 API rule violation: names_match,github.com/openshift/api/operator/v1,AuthenticationStatus,OAuthAPIServer
 API rule violation: names_match,github.com/openshift/api/operator/v1,DefaultNetworkDefinition,OpenShiftSDNConfig
+API rule violation: names_match,github.com/openshift/api/operator/v1,EtcdSpec,HardwareSpeed
+API rule violation: names_match,github.com/openshift/api/operator/v1,EtcdStatus,HardwareSpeed
+API rule violation: names_match,github.com/openshift/api/operator/v1,GatewayConfig,IPv4
+API rule violation: names_match,github.com/openshift/api/operator/v1,GatewayConfig,IPv6
 API rule violation: names_match,github.com/openshift/api/operator/v1,OVNKubernetesConfig,IPsecConfig
 API rule violation: names_match,github.com/openshift/api/operator/v1,StorageSpec,VSphereStorageDriver
 API rule violation: names_match,github.com/openshift/api/operator/v1alpha1,OperatorStatus,CurrentAvailability
@@ -1053,5 +1060,3 @@ API rule violation: names_match,k8s.io/controller-manager/config/v1alpha1,Generi
 API rule violation: names_match,k8s.io/controller-manager/config/v1alpha1,GenericControllerManagerConfiguration,LeaderMigrationEnabled
 API rule violation: names_match,k8s.io/controller-manager/config/v1alpha1,GenericControllerManagerConfiguration,MinResyncPeriod
 API rule violation: names_match,k8s.io/controller-manager/config/v1alpha1,GenericControllerManagerConfiguration,Port
-API rule violation: omitempty_match_case,github.com/openshift/api/operator/v1,StaticPodOperatorStatus,LatestAvailableRevision
-API rule violation: omitempty_match_case,github.com/openshift/api/operator/v1,StaticPodOperatorStatus,LatestAvailableRevisionReason
