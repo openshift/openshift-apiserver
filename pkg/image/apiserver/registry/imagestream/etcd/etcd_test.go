@@ -34,11 +34,6 @@ const (
 	name = "foo"
 )
 
-var (
-	testDefaultRegistry = func(_ context.Context) (string, bool) { return "test", true }
-	noDefaultRegistry   = func(_ context.Context) (string, bool) { return "", false }
-)
-
 type fakeSubjectAccessReviewRegistry struct {
 	err              error
 	allow            bool
@@ -82,7 +77,7 @@ func newStorage(t *testing.T) (*REST, *LayersREST, *InternalREST, *MockImageLaye
 		DeleteCollectionWorkers: 1,
 		ResourcePrefix:          "imagestreams",
 	}
-	registry := registryhostname.TestingRegistryHostnameRetriever(noDefaultRegistry, "", "")
+	registry := registryhostname.DefaultRegistryHostnameRetriever("", "")
 	imageIndex := NewMockImageLayerIndex()
 	imageStorage, layersStorage, _, internalStorage, err := NewRESTWithLimitVerifier(
 		imagestreamRESTOptions,

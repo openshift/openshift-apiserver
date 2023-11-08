@@ -42,8 +42,6 @@ import (
 
 const testDefaultRegistryURL = "defaultregistry:5000"
 
-var testDefaultRegistry = func(_ context.Context) (string, bool) { return testDefaultRegistryURL, true }
-
 type fakeSubjectAccessReviewRegistry struct{}
 
 func (f *fakeSubjectAccessReviewRegistry) Create(_ context.Context, subjectAccessReview *authorizationapi.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationapi.SubjectAccessReview, error) {
@@ -65,7 +63,7 @@ func setup(t *testing.T) (etcd.KV, *etcdtesting.EtcdTestServer, *REST) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	registry := registryhostname.TestingRegistryHostnameRetriever(testDefaultRegistry, "", "")
+	registry := registryhostname.DefaultRegistryHostnameRetriever("", testDefaultRegistryURL)
 	etcdStorageConfigForImageStreams := &storagebackend.ConfigForResource{Config: *etcdStorage, GroupResource: schema.GroupResource{Group: "image.openshift.io", Resource: "imagestreams"}}
 	imagestreamRESTOptions := generic.RESTOptions{StorageConfig: etcdStorageConfigForImageStreams, Decorator: generic.UndecoratedStorage, DeleteCollectionWorkers: 1, ResourcePrefix: "imagestreams"}
 	imageStreamStorage, imageStreamLayersStorage, imageStreamStatus, internalStorage, err := imagestreametcd.NewRESTWithLimitVerifier(imagestreamRESTOptions, registry, &fakeSubjectAccessReviewRegistry{}, &admfake.ImageStreamLimitVerifier{}, &fake.RegistryWhitelister{}, imagestreametcd.NewMockImageLayerIndex())
@@ -604,7 +602,7 @@ func TestTrackingTags(t *testing.T) {
 // TestCreateRetryUnrecoverable ensures that an attempt to create a mapping
 // using failing registry update calls will return an error.
 func TestCreateRetryUnrecoverable(t *testing.T) {
-	registry := registryhostname.TestingRegistryHostnameRetriever(nil, "", testDefaultRegistryURL)
+	registry := registryhostname.DefaultRegistryHostnameRetriever("", testDefaultRegistryURL)
 	restInstance := &REST{
 		strategy: NewStrategy(registry),
 		imageRegistry: &fakeImageRegistry{
@@ -638,7 +636,7 @@ func TestCreateRetryUnrecoverable(t *testing.T) {
 // that result in resource conflicts that do NOT include tag diffs causes the
 // create to be retried successfully.
 func TestCreateRetryConflictNoTagDiff(t *testing.T) {
-	registry := registryhostname.TestingRegistryHostnameRetriever(nil, "", testDefaultRegistryURL)
+	registry := registryhostname.DefaultRegistryHostnameRetriever("", testDefaultRegistryURL)
 	firstUpdate := true
 	restInstance := &REST{
 		strategy: NewStrategy(registry),
@@ -684,7 +682,7 @@ func TestCreateRetryConflictTagDiff(t *testing.T) {
 	firstGet := true
 	firstUpdate := true
 	restInstance := &REST{
-		strategy: NewStrategy(registryhostname.TestingRegistryHostnameRetriever(nil, "", testDefaultRegistryURL)),
+		strategy: NewStrategy(registryhostname.DefaultRegistryHostnameRetriever("", testDefaultRegistryURL)),
 		imageRegistry: &fakeImageRegistry{
 			createImage: func(ctx context.Context, image *imageapi.Image) error {
 				return nil
