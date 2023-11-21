@@ -3,6 +3,7 @@ package delegated
 import (
 	"github.com/openshift/api/annotations"
 	rbacv1 "k8s.io/api/rbac/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -53,7 +54,7 @@ func DefaultTemplate() *templatev1.Template {
 	}
 	ret.Objects = append(ret.Objects, runtime.RawExtension{Raw: objBytes})
 
-	binding := rbacv1helpers.NewRoleBindingForClusterRole(bootstrappolicy.AdminRoleName, ns).Users("${" + ProjectAdminUserParam + "}").BindingOrDie()
+	binding := NewRoleBindingForClusterRole(bootstrappolicy.AdminRoleName, ns).Users("${" + ProjectAdminUserParam + "}").BindingOrDie()
 	objBytes, err = runtime.Encode(codec, &binding)
 	if err != nil {
 		panic(err)
@@ -67,4 +68,21 @@ func DefaultTemplate() *templatev1.Template {
 	}
 
 	return ret
+}
+
+func NewRoleBindingForClusterRole(roleName, namespace string) *rbacv1helpers.RoleBindingBuilder {
+	const GroupName = "rbac.authorization.k8s.io"
+	return &rbacv1helpers.RoleBindingBuilder{
+		RoleBinding: rbacv1.RoleBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      roleName,
+				Namespace: namespace,
+			},
+			RoleRef: rbacv1.RoleRef{
+				APIGroup: GroupName,
+				Kind:     "ClusterRole",
+				Name:     roleName,
+			},
+		},
+	}
 }
