@@ -937,6 +937,8 @@ github.com/denis-tingajkin/go-header v0.4.2/go.mod h1:eLRHAVXzE5atsKAnNRDB90WHCF
 github.com/denverdino/aliyungo v0.0.0-20190125010748-a747050bb1ba/go.mod h1:dV8lFg6daOBZbT6/BDGIz6Y3WFGn8juu6G+CQ6LHtl0=
 github.com/dgrijalva/jwt-go v0.0.0-20170104182250-a601269ab70c/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
+github.com/dgrisonnet/library-go v0.0.0-20231123101319-7034387e2ab3 h1:ZfDzC3qflEQokrfyWkrfK6p1ilD918heB1socCXIpP0=
+github.com/dgrisonnet/library-go v0.0.0-20231123101319-7034387e2ab3/go.mod h1:ZFwNwC3opc/7aOvzUbU95zp33Lbxet48h80ryH3p6DY=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
 github.com/dnaeon/go-vcr v1.0.1/go.mod h1:aBB1+wY4s93YsC3HHjMBMrwTj2R9FHDzUr9KyGc8n1E=
 github.com/dnaeon/go-vcr v1.2.0/go.mod h1:R4UdLID7HZT3taECzJs4YgbbH6PIGXB6W/sc5OLb6RQ=
@@ -1649,8 +1651,6 @@ github.com/openshift/kubernetes v0.0.0-20231102175044-c01bd450743e h1:VQAVi9Vw2O
 github.com/openshift/kubernetes v0.0.0-20231102175044-c01bd450743e/go.mod h1:NhAysZWvHtNcJFFHic87ofxQN7loylCQwg3ZvXVDbag=
 github.com/openshift/kubernetes-apiserver v0.0.0-20231102175202-a8306eaa8d0e h1:eyg8YW4APL1fjedOpafDDMiG3FtxA2Kl8IYNqtV/I6Y=
 github.com/openshift/kubernetes-apiserver v0.0.0-20231102175202-a8306eaa8d0e/go.mod h1:YIpM+9wngNAv8Ctt0rHG4vQuX/I5rvkEMtZtsxW2rNM=
-github.com/openshift/library-go v0.0.0-20230808150704-ce4395c85e8c h1:UJjxHFSTcasHxRXtDc3od9p7UJUBJxUKjhZHFyp2uUQ=
-github.com/openshift/library-go v0.0.0-20230808150704-ce4395c85e8c/go.mod h1:ZFwNwC3opc/7aOvzUbU95zp33Lbxet48h80ryH3p6DY=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d h1:fLITXDjxMSvUDjnXs/zljIWktbST9+Om8XbrmmM7T4I=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d/go.mod h1:LJM49W8fBVSj+rvcopJZu9mgH5Tx6HwLHySIYeGeu4k=
 github.com/openshift/runtime-utils v0.0.0-20220926190846-5c488b20a19f h1:ubRzazPtplWWNWWX07v4ww74S9QL+B2RAxHJ8O00m7o=

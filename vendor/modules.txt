@@ -588,7 +588,7 @@ github.com/openshift/client-go/user/clientset/versioned/fake
 github.com/openshift/client-go/user/clientset/versioned/scheme
 github.com/openshift/client-go/user/clientset/versioned/typed/user/v1
 github.com/openshift/client-go/user/clientset/versioned/typed/user/v1/fake
-# github.com/openshift/library-go v0.0.0-20230808150704-ce4395c85e8c
+# github.com/openshift/library-go v0.0.0-20230808150704-ce4395c85e8c => github.com/dgrisonnet/library-go v0.0.0-20231123101319-7034387e2ab3
 ## explicit; go 1.20
 github.com/openshift/library-go/pkg/apiserver/admission/admissionregistrationtesting
 github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig
@@ -2266,6 +2266,7 @@ sigs.k8s.io/structured-merge-diff/v4/value
 sigs.k8s.io/yaml
 # github.com/distribution/distribution/v3 => github.com/openshift/docker-distribution/v3 v3.0.0-20230613095533-f65dc997445a
 # github.com/docker/docker => github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d
+# github.com/openshift/library-go => github.com/dgrisonnet/library-go v0.0.0-20231123101319-7034387e2ab3
 # k8s.io/api => k8s.io/api v0.28.3
 # k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.28.3
 # k8s.io/apimachinery => k8s.io/apimachinery v0.28.3
