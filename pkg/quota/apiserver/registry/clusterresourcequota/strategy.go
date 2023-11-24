@@ -5,7 +5,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	quotaapi "github.com/openshift/openshift-apiserver/pkg/quota/apis/quota"
@@ -17,12 +16,6 @@ type strategy struct {
 }
 
 var Strategy = strategy{legacyscheme.Scheme}
-
-var _ rest.GarbageCollectionDeleteStrategy = strategy{}
-
-func (strategy) DefaultGarbageCollectionPolicy(ctx context.Context) rest.GarbageCollectionPolicy {
-	return rest.Unsupported
-}
 
 func (strategy) NamespaceScoped() bool {
 	return false
