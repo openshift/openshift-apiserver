@@ -21,6 +21,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	_ "k8s.io/apiserver/pkg/features"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
 	"k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/tools/clientcmd/api"

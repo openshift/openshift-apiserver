@@ -406,6 +406,8 @@ func (c *completedConfig) WithOpenAPIV3AggregationController(delegatedAPIServer 
 	openAPIV3Aggregator, err := openapiv3aggregator.BuildAndRegisterAggregator(
 		specDownloaderV3,
 		delegatedAPIServer.NextDelegate(),
+		delegatedAPIServer.Handler.GoRestfulContainer,
+		c.GenericConfig.OpenAPIV3Config,
 		delegatedAPIServer.Handler.NonGoRestfulMux)
 	if err != nil {
 		return err
