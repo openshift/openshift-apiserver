@@ -61,14 +61,10 @@ type DiscoveryAggregationController interface {
 	// Spwans a worker which waits for added/updated apiservices and updates
 	// the unified discovery document by contacting the aggregated api services
 	Run(stopCh <-chan struct{})
-
-	// Returns true if all non-local APIServices that have been added
-	// are synced at least once to the discovery document
-	ExternalServicesSynced() bool
 }
 
 type discoveryManager struct {
-	// Locks `services`
+	// Locks `apiServices`
 	servicesLock sync.RWMutex
 
 	// Map from APIService's name (or a unique string for local servers)
@@ -146,9 +142,6 @@ type groupVersionInfo struct {
 	// This ensures that if the apiservice was changed after the last cached entry
 	// was stored, the discovery document will always be re-fetched.
 	lastMarkedDirty time.Time
-
-	// Last time sync function was run for this GV.
-	lastReconciled time.Time
 
 	// ServiceReference of this GroupVersion. This identifies the Service which
 	// describes how to contact the server responsible for this GroupVersion.
@@ -299,9 +292,9 @@ func (dm *discoveryManager) fetchFreshDiscoveryForService(gv metav1.GroupVersion
 			lastUpdated: now,
 		}
 
-		// Save the resolve, because it is still useful in case other services
-		// are already marked dirty. THey can use it without making http request
-		dm.setCacheEntryForService(info.service, cached)
+		// Do not save the resolve as the legacy fallback only fetches
+		// one group version and an API Service may serve multiple
+		// group versions.
 		return &cached, nil
 
 	case http.StatusOK:
@@ -316,6 +309,18 @@ func (dm *discoveryManager) fetchFreshDiscoveryForService(gv metav1.GroupVersion
 		for _, g := range parsed.Items {
 			for _, v := range g.Versions {
 				discoMap[metav1.GroupVersion{Group: g.Name, Version: v.Version}] = v
+				for i := range v.Resources {
+					// avoid nil panics in v0.26.0-v0.26.3 client-go clients
+					// see https://github.com/kubernetes/kubernetes/issues/118361
+					if v.Resources[i].ResponseKind == nil {
+						v.Resources[i].ResponseKind = &metav1.GroupVersionKind{}
+					}
+					for j := range v.Resources[i].Subresources {
+						if v.Resources[i].Subresources[j].ResponseKind == nil {
+							v.Resources[i].Subresources[j].ResponseKind = &metav1.GroupVersionKind{}
+						}
+					}
+				}
 			}
 		}
 
@@ -350,11 +355,7 @@ func (dm *discoveryManager) syncAPIService(apiServiceName string) error {
 	}
 
 	// Lookup last cached result for this apiservice's service.
-	now := time.Now()
 	cached, err := dm.fetchFreshDiscoveryForService(mgv, info)
-
-	info.lastReconciled = now
-	dm.setInfoForAPIService(apiServiceName, &info)
 
 	var entry apidiscoveryv2beta1.APIVersionDiscovery
 
@@ -475,18 +476,6 @@ func (dm *discoveryManager) RemoveAPIService(apiServiceName string) {
 		// mark dirty if there was actually something deleted
 		dm.dirtyAPIServiceQueue.Add(apiServiceName)
 	}
-}
-
-func (dm *discoveryManager) ExternalServicesSynced() bool {
-	dm.servicesLock.RLock()
-	defer dm.servicesLock.RUnlock()
-	for _, info := range dm.apiServices {
-		if info.lastReconciled.IsZero() {
-			return false
-		}
-	}
-
-	return true
 }
 
 //
