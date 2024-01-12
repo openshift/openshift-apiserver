@@ -48,6 +48,7 @@ import (
 	"k8s.io/apiserver/pkg/server/egressselector"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/etcd3"
+	"k8s.io/apiserver/pkg/storage/etcd3/etcd3retry"
 	"k8s.io/apiserver/pkg/storage/etcd3/metrics"
 	"k8s.io/apiserver/pkg/storage/storagebackend"
 	"k8s.io/apiserver/pkg/storage/value/encrypt/identity"
@@ -454,7 +455,7 @@ func newETCD3Storage(c storagebackend.ConfigForResource, newFunc func() runtime.
 	if transformer == nil {
 		transformer = identity.NewEncryptCheckTransformer()
 	}
-	return etcd3.New(client, c.Codec, newFunc, c.Prefix, c.GroupResource, transformer, c.Paging, c.LeaseManagerConfig), destroyFunc, nil
+	return etcd3retry.NewRetryingEtcdStorage(etcd3.New(client, c.Codec, newFunc, c.Prefix, c.GroupResource, transformer, c.Paging, c.LeaseManagerConfig)), destroyFunc, nil
 }
 
 // startDBSizeMonitorPerEndpoint starts a loop to monitor etcd database size and update the
