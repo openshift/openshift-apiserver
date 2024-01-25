@@ -99,9 +99,9 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	}
 
 	v1Storage := map[string]rest.Storage{}
-	v1Storage["clusterResourceQuotas"] = clusterResourceQuotaStorage
-	v1Storage["clusterResourceQuotas/status"] = clusterResourceQuotaStatusStorage
-	v1Storage["appliedClusterResourceQuotas"] = appliedclusterresourcequotaregistry.NewREST(
+	v1Storage["clusterresourcequotas"] = clusterResourceQuotaStorage
+	v1Storage["clusterresourcequotas/status"] = clusterResourceQuotaStatusStorage
+	v1Storage["appliedclusterresourcequotas"] = appliedclusterresourcequotaregistry.NewREST(
 		c.ExtraConfig.ClusterQuotaMappingController.GetClusterQuotaMapper(),
 		c.ExtraConfig.QuotaInformers.Quota().V1().ClusterResourceQuotas().Lister(),
 	)

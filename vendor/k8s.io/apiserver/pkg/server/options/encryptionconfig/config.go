@@ -17,6 +17,7 @@ limitations under the License.
 package encryptionconfig
 
 import (
+	"context"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
@@ -365,7 +366,12 @@ func secretboxPrefixTransformer(config *apiserverconfig.SecretboxConfiguration) 
 }
 
 func envelopePrefixTransformer(config *apiserverconfig.KMSConfiguration, envelopeService envelope.Service, prefix string) (value.PrefixTransformer, error) {
-	envelopeTransformer, err := envelope.NewEnvelopeTransformer(envelopeService, int(*config.CacheSize), aestransformer.NewCBCTransformer)
+	baseTransformerFunc := func(block cipher.Block) value.Transformer {
+		// v1.24: write using AES-CBC only but support reads via AES-CBC and AES-GCM (so we can move to AES-GCM)
+		return &cbcToGCMTransformer{cbc: aestransformer.NewCBCTransformer(block), gcm: aestransformer.NewGCMTransformer(block)}
+	}
+
+	envelopeTransformer, err := envelope.NewEnvelopeTransformer(envelopeService, int(*config.CacheSize), baseTransformerFunc)
 	if err != nil {
 		return value.PrefixTransformer{}, err
 	}
@@ -373,4 +379,24 @@ func envelopePrefixTransformer(config *apiserverconfig.KMSConfiguration, envelop
 		Transformer: envelopeTransformer,
 		Prefix:      []byte(prefix + config.Name + ":"),
 	}, nil
+}
+
+var _ value.Transformer = &cbcToGCMTransformer{}
+
+type cbcToGCMTransformer struct {
+	cbc, gcm value.Transformer
+}
+
+func (c *cbcToGCMTransformer) TransformFromStorage(ctx context.Context, data []byte, dataCtx value.Context) ([]byte, bool, error) {
+	// support reads via AES-CBC and AES-GCM
+	// check AES-GCM first because an AEAD can detect when data is meant for it
+	if out, _, err := c.gcm.TransformFromStorage(ctx, data, dataCtx); err == nil {
+		return out, true, nil // data encrypted via AES-GCM is considered stale because writes are supposed to use AES-CBC in v1.24
+	}
+
+	return c.cbc.TransformFromStorage(ctx, data, dataCtx)
+}
+
+func (c *cbcToGCMTransformer) TransformToStorage(ctx context.Context, data []byte, dataCtx value.Context) ([]byte, error) {
+	return c.cbc.TransformToStorage(ctx, data, dataCtx) // write using AES-CBC only
 }

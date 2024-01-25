@@ -127,16 +127,16 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	}
 
 	v1Storage := map[string]rest.Storage{}
-	v1Storage["resourceAccessReviews"] = resourceAccessReviewStorage
-	v1Storage["subjectAccessReviews"] = subjectAccessReviewStorage
-	v1Storage["localSubjectAccessReviews"] = localSubjectAccessReviewStorage
-	v1Storage["localResourceAccessReviews"] = localResourceAccessReviewStorage
-	v1Storage["selfSubjectRulesReviews"] = selfSubjectRulesReviewStorage
-	v1Storage["subjectRulesReviews"] = subjectRulesReviewStorage
+	v1Storage["resourceaccessreviews"] = resourceAccessReviewStorage
+	v1Storage["subjectaccessreviews"] = subjectAccessReviewStorage
+	v1Storage["localsubjectaccessreviews"] = localSubjectAccessReviewStorage
+	v1Storage["localresourceaccessreviews"] = localResourceAccessReviewStorage
+	v1Storage["selfsubjectrulesreviews"] = selfSubjectRulesReviewStorage
+	v1Storage["subjectrulesreviews"] = subjectRulesReviewStorage
 	v1Storage["roles"] = role.NewREST(rbacClient.RESTClient())
-	v1Storage["roleBindings"] = rolebinding.NewREST(rbacClient.RESTClient())
-	v1Storage["clusterRoles"] = clusterrole.NewREST(rbacClient.RESTClient())
-	v1Storage["clusterRoleBindings"] = clusterrolebinding.NewREST(rbacClient.RESTClient())
-	v1Storage["roleBindingRestrictions"] = roleBindingRestrictionStorage
+	v1Storage["rolebindings"] = rolebinding.NewREST(rbacClient.RESTClient())
+	v1Storage["clusterroles"] = clusterrole.NewREST(rbacClient.RESTClient())
+	v1Storage["clusterrolebindings"] = clusterrolebinding.NewREST(rbacClient.RESTClient())
+	v1Storage["rolebindingrestrictions"] = roleBindingRestrictionStorage
 	return v1Storage, nil
 }

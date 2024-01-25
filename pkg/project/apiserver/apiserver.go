@@ -150,7 +150,7 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 
 	v1Storage := map[string]rest.Storage{}
 	v1Storage["projects"] = projectStorage
-	v1Storage["projectRequests"] = projectRequestStorage
+	v1Storage["projectrequests"] = projectRequestStorage
 	return v1Storage, nil
 }
 

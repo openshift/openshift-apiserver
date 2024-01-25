@@ -279,14 +279,14 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	v1Storage := map[string]rest.Storage{}
 	v1Storage["images"] = imageStorage
 	v1Storage["imagesignatures"] = imageSignatureStorage
-	v1Storage["imageStreams/secrets"] = imageStreamSecretsStorage
-	v1Storage["imageStreams"] = imageStreamStorage
-	v1Storage["imageStreams/layers"] = imageStreamLayersStorage
-	v1Storage["imageStreams/status"] = imageStreamStatusStorage
-	v1Storage["imageStreamImports"] = imageStreamImportStorage
-	v1Storage["imageStreamImages"] = imageStreamImageStorage
-	v1Storage["imageStreamMappings"] = imageStreamMappingStorage
-	v1Storage["imageStreamTags"] = imageStreamTagStorage
-	v1Storage["imageTags"] = imageTagStorage
+	v1Storage["imagestreams/secrets"] = imageStreamSecretsStorage
+	v1Storage["imagestreams"] = imageStreamStorage
+	v1Storage["imagestreams/layers"] = imageStreamLayersStorage
+	v1Storage["imagestreams/status"] = imageStreamStatusStorage
+	v1Storage["imagestreamimports"] = imageStreamImportStorage
+	v1Storage["imagestreamimages"] = imageStreamImageStorage
+	v1Storage["imagestreammappings"] = imageStreamMappingStorage
+	v1Storage["imagestreamtags"] = imageStreamTagStorage
+	v1Storage["imagetags"] = imageTagStorage
 	return v1Storage, nil
 }

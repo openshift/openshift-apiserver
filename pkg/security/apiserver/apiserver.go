@@ -124,10 +124,10 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	uidRangeStorage := rangeallocations.NewREST(c.GenericConfig.RESTOptionsGetter)
 
 	v1Storage := map[string]rest.Storage{}
-	v1Storage["securityContextConstraints"] = sccStorage
-	v1Storage["podSecurityPolicyReviews"] = podSecurityPolicyReviewStorage
-	v1Storage["podSecurityPolicySubjectReviews"] = podSecurityPolicySubjectStorage
-	v1Storage["podSecurityPolicySelfSubjectReviews"] = podSecurityPolicySelfSubjectReviewStorage
+	v1Storage["securitycontextconstraints"] = sccStorage
+	v1Storage["podsecuritypolicyreviews"] = podSecurityPolicyReviewStorage
+	v1Storage["podsecuritypolicysubjectreviews"] = podSecurityPolicySubjectStorage
+	v1Storage["podsecuritypolicyselfsubjectreviews"] = podSecurityPolicySelfSubjectReviewStorage
 	v1Storage["rangeallocations"] = uidRangeStorage
 	return v1Storage, nil
 }

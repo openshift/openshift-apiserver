@@ -85,7 +85,7 @@ func TestPodSecurityPolicySelfSubjectReview(t *testing.T) {
 		ctx := apirequest.WithUser(apirequest.WithNamespace(apirequest.NewContext(), metav1.NamespaceDefault), &user.DefaultInfo{Name: "foo", Groups: []string{"bar", "baz"}})
 		obj, err := storage.Create(ctx, reviewRequest, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
 		if err != nil {
-			t.Errorf("%s - Unexpected error: %w", testName, err)
+			t.Errorf("%s - Unexpected error: %v", testName, err)
 			continue
 		}
 		pspssr, ok := obj.(*securityapi.PodSecurityPolicySelfSubjectReview)
