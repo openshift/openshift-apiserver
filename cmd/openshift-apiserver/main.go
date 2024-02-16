@@ -14,6 +14,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/version"
 )
 
+// main runs
 func main() {
 	stopCh := genericapiserver.SetupSignalHandler()
 	defer serviceability.BehaviorOnPanic(os.Getenv("OPENSHIFT_ON_PANIC"), version.Get())()
