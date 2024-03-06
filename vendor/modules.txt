@@ -2,7 +2,7 @@
 ## explicit; go 1.16
 github.com/Azure/go-ansiterm
 github.com/Azure/go-ansiterm/winterm
-# github.com/BurntSushi/toml v1.2.0
+# github.com/BurntSushi/toml v1.2.1
 ## explicit; go 1.16
 github.com/BurntSushi/toml
 github.com/BurntSushi/toml/internal
@@ -23,8 +23,8 @@ github.com/Nvveen/Gotty
 # github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230305170008-8188dc5388df
 ## explicit; go 1.18
 github.com/antlr/antlr4/runtime/Go/antlr/v4
-# github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
-## explicit
+# github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
+## explicit; go 1.13
 github.com/asaskevich/govalidator
 # github.com/beorn7/perks v1.0.1
 ## explicit; go 1.11
@@ -47,7 +47,7 @@ github.com/chai2010/gettext-go
 github.com/chai2010/gettext-go/mo
 github.com/chai2010/gettext-go/plural
 github.com/chai2010/gettext-go/po
-# github.com/containers/image/v5 v5.22.0
+# github.com/containers/image/v5 v5.24.0
 ## explicit; go 1.17
 github.com/containers/image/v5/docker/reference
 github.com/containers/image/v5/internal/rootless
@@ -55,13 +55,14 @@ github.com/containers/image/v5/pkg/compression/internal
 github.com/containers/image/v5/pkg/compression/types
 github.com/containers/image/v5/pkg/sysregistriesv2
 github.com/containers/image/v5/types
-# github.com/containers/storage v1.42.0
-## explicit; go 1.16
+# github.com/containers/storage v1.45.3
+## explicit; go 1.17
 github.com/containers/storage/pkg/homedir
 github.com/containers/storage/pkg/idtools
 github.com/containers/storage/pkg/lockfile
 github.com/containers/storage/pkg/mount
 github.com/containers/storage/pkg/reexec
+github.com/containers/storage/pkg/regexp
 github.com/containers/storage/pkg/system
 github.com/containers/storage/pkg/unshare
 # github.com/coreos/go-semver v0.3.1
@@ -74,7 +75,7 @@ github.com/coreos/go-systemd/v22/journal
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
 github.com/davecgh/go-spew/spew
-# github.com/distribution/distribution/v3 v3.0.0 => github.com/openshift/docker-distribution/v3 v3.0.0-20230613095533-f65dc997445a
+# github.com/distribution/distribution/v3 v3.0.0 => github.com/openshift/docker-distribution/v3 v3.0.0-20240215131201-6b2f5d2f1f43
 ## explicit; go 1.18
 github.com/distribution/distribution/v3
 github.com/distribution/distribution/v3/context
@@ -108,7 +109,7 @@ github.com/docker/distribution/registry/client/auth/challenge
 github.com/docker/distribution/registry/client/transport
 github.com/docker/distribution/registry/storage/cache
 github.com/docker/distribution/registry/storage/cache/memory
-# github.com/docker/docker v20.10.21+incompatible => github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d
+# github.com/docker/docker v20.10.23+incompatible => github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d
 ## explicit
 github.com/docker/docker/api/types
 github.com/docker/docker/api/types/blkiodev
@@ -178,8 +179,8 @@ github.com/go-logr/logr/funcr
 # github.com/go-logr/stdr v1.2.2
 ## explicit; go 1.16
 github.com/go-logr/stdr
-# github.com/go-openapi/errors v0.19.2
-## explicit
+# github.com/go-openapi/errors v0.20.3
+## explicit; go 1.14
 github.com/go-openapi/errors
 # github.com/go-openapi/jsonpointer v0.19.6
 ## explicit; go 1.13
@@ -361,8 +362,8 @@ github.com/mxk/go-flowrate/flowrate
 # github.com/opencontainers/go-digest v1.0.0
 ## explicit; go 1.13
 github.com/opencontainers/go-digest
-# github.com/opencontainers/image-spec v1.0.3-0.20220114050600-8b9d41f48198
-## explicit; go 1.11
+# github.com/opencontainers/image-spec v1.1.0-rc2
+## explicit; go 1.17
 github.com/opencontainers/image-spec/specs-go
 github.com/opencontainers/image-spec/specs-go/v1
 # github.com/opencontainers/runc v1.1.7
@@ -623,7 +624,7 @@ github.com/openshift/library-go/pkg/serviceability
 github.com/openshift/library-go/pkg/template/generator
 github.com/openshift/library-go/pkg/template/templateprocessing
 github.com/openshift/library-go/pkg/template/templateprocessingclient
-# github.com/openshift/runtime-utils v0.0.0-20220926190846-5c488b20a19f
+# github.com/openshift/runtime-utils v0.0.0-20230921210328-7bdb5b9c177b
 ## explicit; go 1.18
 github.com/openshift/runtime-utils/pkg/registries
 # github.com/peterbourgon/diskv v2.0.1+incompatible
@@ -2265,7 +2266,7 @@ sigs.k8s.io/structured-merge-diff/v4/value
 # sigs.k8s.io/yaml v1.3.0
 ## explicit; go 1.12
 sigs.k8s.io/yaml
-# github.com/distribution/distribution/v3 => github.com/openshift/docker-distribution/v3 v3.0.0-20230613095533-f65dc997445a
+# github.com/distribution/distribution/v3 => github.com/openshift/docker-distribution/v3 v3.0.0-20240215131201-6b2f5d2f1f43
 # github.com/docker/docker => github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d
 # k8s.io/api => k8s.io/api v0.28.3
 # k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.28.3
