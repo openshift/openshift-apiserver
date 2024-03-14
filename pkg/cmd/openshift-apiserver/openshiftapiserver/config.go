@@ -99,7 +99,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	genericConfig.BuildHandlerChainFunc = OpenshiftHandlerChain
 	genericConfig.RequestInfoResolver = apiserverconfig.OpenshiftRequestInfoResolver()
 	genericConfig.OpenAPIConfig = configprocessing.DefaultOpenAPIConfig()
-	genericConfig.OpenAPIV3Config = configprocessing.DefaultOpenAPIConfig()
+	genericConfig.OpenAPIV3Config = configprocessing.DefaultOpenAPIV3Config()
 	// previously overwritten.  I don't know why
 	genericConfig.RequestTimeout = time.Duration(60) * time.Second
 	genericConfig.MinRequestTimeout = int(config.ServingInfo.RequestTimeoutSeconds)

@@ -37,8 +37,8 @@ func ValidateClusterResourceQuota(clusterquota *quotaapi.ClusterResourceQuota) f
 		fldPath := field.NewPath("status", "namespaces").Key(namespace)
 		for k, v := range used.Used {
 			resPath := fldPath.Key(string(k))
-			allErrs = append(allErrs, validation.ValidateResourceQuotaResourceName(string(k), resPath)...)
-			allErrs = append(allErrs, validation.ValidateResourceQuantityValue(string(k), v, resPath)...)
+			allErrs = append(allErrs, validation.ValidateResourceQuotaResourceName(k, resPath)...)
+			allErrs = append(allErrs, validation.ValidateResourceQuantityValue(k, v, resPath)...)
 		}
 	}
 
