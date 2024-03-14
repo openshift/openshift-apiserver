@@ -140,7 +140,7 @@ func buildControllerRoles() ([]rbacv1.ClusterRole, []rbacv1.ClusterRoleBinding) 
 			},
 		}
 		if utilfeature.DefaultFeatureGate.Enabled(features.PodDisruptionConditions) {
-			role.Rules = append(role.Rules, rbacv1helpers.NewRule("patch").Groups(legacyGroup).Resources("pods/status").RuleOrDie())
+			role.Rules = append(role.Rules, rbacv1helpers.NewRule("patch", "update").Groups(legacyGroup).Resources("pods/status").RuleOrDie())
 		}
 		return role
 	}())
@@ -162,6 +162,7 @@ func buildControllerRoles() ([]rbacv1.ClusterRole, []rbacv1.ClusterRoleBinding) 
 			// resource that is owned by the service and sets blockOwnerDeletion=true in its ownerRef.
 			rbacv1helpers.NewRule("update").Groups(legacyGroup).Resources("services/finalizers").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "list", "create", "update", "delete").Groups(discoveryGroup).Resources("endpointslices").RuleOrDie(),
+			rbacv1helpers.NewRule("create").Groups(discoveryGroup).Resources("endpointslices/restricted").RuleOrDie(),
 			eventsRule(),
 		},
 	})
@@ -178,6 +179,7 @@ func buildControllerRoles() ([]rbacv1.ClusterRole, []rbacv1.ClusterRoleBinding) 
 			// see https://github.com/openshift/kubernetes/blob/8691466059314c3f7d6dcffcbb76d14596ca716c/pkg/controller/endpointslicemirroring/utils.go#L87-L88
 			rbacv1helpers.NewRule("update").Groups(legacyGroup).Resources("endpoints/finalizers").RuleOrDie(),
 			rbacv1helpers.NewRule("get", "list", "create", "update", "delete").Groups(discoveryGroup).Resources("endpointslices").RuleOrDie(),
+			rbacv1helpers.NewRule("create").Groups(discoveryGroup).Resources("endpointslices/restricted").RuleOrDie(),
 			eventsRule(),
 		},
 	})
@@ -369,6 +371,18 @@ func buildControllerRoles() ([]rbacv1.ClusterRole, []rbacv1.ClusterRoleBinding) 
 			eventsRule(),
 		},
 	})
+	if utilfeature.DefaultFeatureGate.Enabled(features.MultiCIDRServiceAllocator) {
+		addControllerRole(&controllerRoles, &controllerRoleBindings, rbacv1.ClusterRole{
+			ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + "service-cidrs-controller"},
+			Rules: []rbacv1.PolicyRule{
+				rbacv1helpers.NewRule("get", "list", "watch", "patch", "update").Groups(networkingGroup).Resources("servicecidrs").RuleOrDie(),
+				rbacv1helpers.NewRule("patch", "update").Groups(networkingGroup).Resources("servicecidrs/finalizers").RuleOrDie(),
+				rbacv1helpers.NewRule("patch", "update").Groups(networkingGroup).Resources("servicecidrs/status").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list", "watch").Groups(networkingGroup).Resources("ipaddresses").RuleOrDie(),
+				eventsRule(),
+			},
+		})
+	}
 	addControllerRole(&controllerRoles, &controllerRoleBindings, func() rbacv1.ClusterRole {
 		role := rbacv1.ClusterRole{
 			ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + "statefulset-controller"},
@@ -442,6 +456,13 @@ func buildControllerRoles() ([]rbacv1.ClusterRole, []rbacv1.ClusterRoleBinding) 
 			eventsRule(),
 		},
 	})
+	addControllerRole(&controllerRoles, &controllerRoleBindings, rbacv1.ClusterRole{
+		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + "service-ca-cert-publisher"},
+		Rules: []rbacv1.PolicyRule{
+			rbacv1helpers.NewRule("create", "update").Groups(legacyGroup).Resources("configmaps").RuleOrDie(),
+			eventsRule(),
+		},
+	})
 	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.ValidatingAdmissionPolicy) {
 		addControllerRole(&controllerRoles, &controllerRoleBindings, rbacv1.ClusterRole{
 			ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + "validatingadmissionpolicy-status-controller"},
@@ -472,7 +493,7 @@ func buildControllerRoles() ([]rbacv1.ClusterRole, []rbacv1.ClusterRoleBinding) 
 			ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + "legacy-service-account-token-cleaner"},
 			Rules: []rbacv1.PolicyRule{
 				rbacv1helpers.NewRule("get").Groups(legacyGroup).Resources("configmaps").Names(legacytokentracking.ConfigMapName).RuleOrDie(),
-				rbacv1helpers.NewRule("delete").Groups(legacyGroup).Resources("secrets").RuleOrDie(),
+				rbacv1helpers.NewRule("patch", "delete").Groups(legacyGroup).Resources("secrets").RuleOrDie(),
 			},
 		})
 	}
