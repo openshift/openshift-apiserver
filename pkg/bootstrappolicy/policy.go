@@ -767,13 +767,13 @@ func GetOpenshiftBootstrapClusterRoleBindings() []rbacv1.ClusterRoleBinding {
 			Groups(AuthenticatedGroup).
 			BindingOrDie(),
 		newOriginClusterBinding(SelfAccessReviewerRoleBindingName, SelfAccessReviewerRoleName).
-			Groups(AuthenticatedGroup, UnauthenticatedGroup).
+			Groups(AuthenticatedGroup).
 			BindingOrDie(),
 		newOriginClusterBinding(SelfProvisionerRoleBindingName, SelfProvisionerRoleName).
 			Groups(AuthenticatedOAuthGroup).
 			BindingOrDie(),
 		newOriginClusterBinding(OAuthTokenDeleterRoleBindingName, OAuthTokenDeleterRoleName).
-			Groups(AuthenticatedGroup, UnauthenticatedGroup).
+			Groups(AuthenticatedGroup).
 			BindingOrDie(),
 		newOriginClusterBinding(StatusCheckerRoleBindingName, StatusCheckerRoleName).
 			Groups(AuthenticatedGroup).
@@ -787,7 +787,7 @@ func GetOpenshiftBootstrapClusterRoleBindings() []rbacv1.ClusterRoleBinding {
 			Groups(NodesGroup).
 			BindingOrDie(),
 		newOriginClusterBinding(WebHooksRoleBindingName, WebHooksRoleName).
-			Groups(AuthenticatedGroup, UnauthenticatedGroup).
+			Groups(AuthenticatedGroup).
 			BindingOrDie(),
 		rbacv1helpers.NewClusterBinding(DiscoveryRoleName).
 			Groups(AuthenticatedGroup).
@@ -811,7 +811,7 @@ func GetOpenshiftBootstrapClusterRoleBindings() []rbacv1.ClusterRoleBinding {
 		// Everyone should be able to add a scope to their impersonation request.  It is purely tightening.
 		// This does not grant access to impersonate in general, only tighten if you already have permission.
 		rbacv1helpers.NewClusterBinding(ScopeImpersonationRoleName).
-			Groups(AuthenticatedGroup, UnauthenticatedGroup).
+			Groups(AuthenticatedGroup).
 			BindingOrDie(),
 	}
 	for i := range clusterRoleBindings {
