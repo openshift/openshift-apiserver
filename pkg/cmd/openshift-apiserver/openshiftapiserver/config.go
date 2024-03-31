@@ -19,6 +19,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver/configprocessing"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
 	"github.com/openshift/openshift-apiserver/pkg/version"
+	apisimage "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -262,6 +263,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 			AllowedRegistriesForImport:         config.ImagePolicyConfig.AllowedRegistriesForImport,
 			MaxImagesBulkImportedPerRepository: config.ImagePolicyConfig.MaxImagesBulkImportedPerRepository,
 			AdditionalTrustedCA:                caData,
+			ImagestreamImportMode:              apisimage.ImportModeType(config.ImagePolicyConfig.ImagestreamImportMode),
 			RouteAllocator:                     routeAllocator,
 			AllowRouteExternalCertificates:     feature.DefaultFeatureGate.Enabled(featuregate.Feature(configv1.FeatureGateRouteExternalCertificate)),
 			ProjectAuthorizationCache:          projectAuthorizationCache,

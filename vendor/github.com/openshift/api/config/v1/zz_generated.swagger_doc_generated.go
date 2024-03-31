@@ -969,6 +969,7 @@ var map_ImageSpec = map[string]string{
 	"externalRegistryHostnames":  "externalRegistryHostnames provides the hostnames for the default external image registry. The external hostname should be set only when the image registry is exposed externally. The first value is used in 'publicDockerImageRepository' field in ImageStreams. The value must be in \"hostname[:port]\" format.",
 	"additionalTrustedCA":        "additionalTrustedCA is a reference to a ConfigMap containing additional CAs that should be trusted during imagestream import, pod image pull, build image pull, and imageregistry pullthrough. The namespace for this config map is openshift-config.",
 	"registrySources":            "registrySources contains configuration that determines how the container runtime should treat individual registries when accessing images for builds+pods. (e.g. whether or not to allow insecure access).  It does not contain configuration for the internal cluster registry.",
+	"imagestreamImportMode":      "imagestreamImportMode controls the import mode beahviour of imagestreams. It can be set to `Legacy` or `PreserveOriginal`. The default behaviour is to default to Legacy. If this value is specified, this setting is applied to all imagestreams which do not have the value set.",
 }
 
 func (ImageSpec) SwaggerDoc() map[string]string {

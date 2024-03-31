@@ -114,6 +114,7 @@ var map_ImagePolicyConfig = map[string]string{
 	"internalRegistryHostname":           "internalRegistryHostname sets the hostname for the default internal image registry. The value must be in \"hostname[:port]\" format.",
 	"externalRegistryHostnames":          "externalRegistryHostnames provides the hostnames for the default external image registry. The external hostname should be set only when the image registry is exposed externally. The first value is used in 'publicDockerImageRepository' field in ImageStreams. The value must be in \"hostname[:port]\" format.",
 	"additionalTrustedCA":                "additionalTrustedCA is a path to a pem bundle file containing additional CAs that should be trusted during imagestream import.",
+	"imagestreamImportMode":              "imagestreamImportMode controls the import mode beahviour of imagestreams. It can be set to `Legacy` or `PreserveOriginal`. The default behaviour is to default to Legacy. If this value is specified, this setting is applied to all imagestreams which do not have the value set.",
 }
 
 func (ImagePolicyConfig) SwaggerDoc() map[string]string {

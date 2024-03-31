@@ -1,6 +1,7 @@
 package v1
 
 import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+import imagev1 "github.com/openshift/api/image/v1"
 
 // +genclient
 // +genclient:nonNamespaced
@@ -61,6 +62,13 @@ type ImageSpec struct {
 	// internal cluster registry.
 	// +optional
 	RegistrySources RegistrySources `json:"registrySources"`
+
+	// imagestreamImportMode controls the import mode beahviour of imagestreams.
+	// It can be set to `Legacy` or `PreserveOriginal`. The default behaviour is
+	// to default to Legacy. If this value is specified, this setting is applied to all
+	// imagestreams which do not have the value set.
+	// +optional
+	ImagestreamImportMode imagev1.ImportModeType `json:"imagestreamImportMode,omitempty"`
 }
 
 type ImageStatus struct {
