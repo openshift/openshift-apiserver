@@ -17,6 +17,7 @@ import (
 	routehostassignment "github.com/openshift/library-go/pkg/route/hostassignment"
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftadmission"
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver/configprocessing"
+	apisimage "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
 	"github.com/openshift/openshift-apiserver/pkg/version"
 	"github.com/spf13/pflag"
@@ -264,6 +265,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 			AllowedRegistriesForImport:         config.ImagePolicyConfig.AllowedRegistriesForImport,
 			MaxImagesBulkImportedPerRepository: config.ImagePolicyConfig.MaxImagesBulkImportedPerRepository,
 			AdditionalTrustedCA:                caData,
+			ImageStreamImportMode:              apisimage.ImportModeType(config.ImagePolicyConfig.ImageStreamImportMode),
 			RouteAllocator:                     routeAllocator,
 			AllowRouteExternalCertificates:     feature.DefaultFeatureGate.Enabled(featuregate.Feature(openshiftfeatures.FeatureGateRouteExternalCertificate)),
 			ProjectAuthorizationCache:          projectAuthorizationCache,
