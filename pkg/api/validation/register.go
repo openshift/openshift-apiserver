@@ -1,6 +1,9 @@
 package validation
 
 import (
+	"context"
+
+	routecommon "github.com/openshift/library-go/pkg/route"
 	appsvalidation "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps/validation"
 	authorizationvalidation "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization/validation"
 	buildvalidation "github.com/openshift/openshift-apiserver/pkg/build/apis/build/validation"
@@ -11,6 +14,8 @@ import (
 	securityvalidation "github.com/openshift/openshift-apiserver/pkg/security/apis/security/validation"
 	templatevalidation "github.com/openshift/openshift-apiserver/pkg/template/apis/template/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	authorizationclient "k8s.io/client-go/kubernetes/typed/authorization/v1"
+	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 
 	appsapi "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
@@ -76,9 +81,11 @@ func registerAll() {
 }
 
 func routeOptionsAdapter(route *routeapi.Route) field.ErrorList {
-	return routevalidation.ValidateRoute(route, routevalidation.RouteValidationOptions{})
+	a := &authorizationclient.AuthorizationV1Client{}
+	return routevalidation.ValidateRoute(context.Background(), route, a.SubjectAccessReviews(), &v1.CoreV1Client{}, routecommon.RouteValidationOptions{})
 }
 
 func routeUpdateOptionsAdapter(route *routeapi.Route, oldRoute *routeapi.Route) field.ErrorList {
-	return routevalidation.ValidateRouteUpdate(route, oldRoute, routevalidation.RouteValidationOptions{})
+	a := &authorizationclient.AuthorizationV1Client{}
+	return routevalidation.ValidateRouteUpdate(context.Background(), route, oldRoute, a.SubjectAccessReviews(), &v1.CoreV1Client{}, routecommon.RouteValidationOptions{})
 }

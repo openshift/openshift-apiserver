@@ -6,14 +6,18 @@ import (
 	"testing"
 
 	authorizationapi "k8s.io/api/authorization/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/authentication/user"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
+	testclient "k8s.io/client-go/kubernetes/fake"
 
 	routev1 "github.com/openshift/api/route/v1"
+	"github.com/openshift/library-go/pkg/route"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type testAllocator struct {
@@ -38,9 +42,18 @@ func (t *testSAR) Create(_ context.Context, subjectAccessReview *authorizationap
 	}, t.err
 }
 
+type testSecretGetter struct {
+	namespace string
+	secret    *corev1.Secret
+}
+
+func (t *testSecretGetter) Secrets(_ string) corev1client.SecretInterface {
+	return testclient.NewSimpleClientset(t.secret).CoreV1().Secrets(t.namespace)
+}
+
 func TestEmptyHostDefaulting(t *testing.T) {
 	ctx := apirequest.NewContext()
-	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, true)
+	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, &testSecretGetter{}, true)
 
 	hostlessCreatedRoute := &routeapi.Route{}
 	strategy.Validate(ctx, hostlessCreatedRoute)
@@ -69,7 +82,7 @@ func TestEmptyHostDefaulting(t *testing.T) {
 
 func TestEmptyHostDefaultingWhenSubdomainSet(t *testing.T) {
 	ctx := apirequest.NewContext()
-	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, true)
+	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, &testSecretGetter{}, true)
 
 	hostlessCreatedRoute := &routeapi.Route{}
 	strategy.Validate(ctx, hostlessCreatedRoute)
@@ -140,6 +153,7 @@ func TestEmptyDefaultCACertificate(t *testing.T) {
 func TestHostWithWildcardPolicies(t *testing.T) {
 	ctx := apirequest.NewContext()
 	ctx = apirequest.WithUser(ctx, &user.DefaultInfo{Name: "bob"})
+	testNamespace := "wildcard"
 
 	tests := []struct {
 		name          string
@@ -152,6 +166,10 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 
 		expected          string
 		expectedSubdomain string
+
+		// field for externalCertificate
+		opts   route.RouteValidationOptions
+		secret *corev1.Secret
 
 		errs  int
 		allow bool
@@ -426,16 +444,558 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 			allow:          false,
 			errs:           1,
 		},
+		{
+			name:     "create-with-external-certificate-denied",
+			host:     "host",
+			expected: "host",
+			tls:      &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeTLS,
+			},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          false,
+			errs:           6,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:     "create-with-external-certificate-allowed",
+			host:     "host",
+			expected: "host",
+			tls:      &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeTLS,
+			},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           0,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "create-with-external-certificate-allowed-but-missing-secret",
+			host:           "host",
+			expected:       "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			secret:         &corev1.Secret{},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           1,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:     "create-with-external-certificate-allowed-but-incorrect-secret-type",
+			host:     "host",
+			expected: "host",
+			tls:      &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeBasicAuth,
+			},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           1,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-changed-to-certificate-denied",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, Certificate: "a"},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          false,
+			errs:           4,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-changed-to-certificate-allowed",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, Certificate: "a"},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           0,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:     "certificate-changed-to-external-certificate-denied",
+			host:     "host",
+			expected: "host",
+			oldHost:  "host",
+			tls:      &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
+			oldTLS:   &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, Certificate: "a"},
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "b",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeTLS,
+			},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          false,
+			errs:           9,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:     "certificate-changed-to-external-certificate-allowed",
+			host:     "host",
+			expected: "host",
+			oldHost:  "host",
+			tls:      &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
+			oldTLS:   &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, Certificate: "a"},
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "b",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeTLS,
+			},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           0,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "certificate-changed-to-external-certificate-allowed-but-missing-secret",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, Certificate: "a"},
+			secret:         &corev1.Secret{},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           1,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:     "certificate-changed-to-external-certificate-allowed-but-incorrect-secret-type",
+			host:     "host",
+			expected: "host",
+			oldHost:  "host",
+			tls:      &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
+			oldTLS:   &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, Certificate: "a"},
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "b",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeBasicAuth,
+			},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           1,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:     "external-certificate-unchanged-denied",
+			host:     "host",
+			expected: "host",
+			oldHost:  "host",
+			tls:      &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:   &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeTLS,
+			},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          false,
+			errs:           7,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:     "external-certificate-unchanged-allowed",
+			host:     "host",
+			expected: "host",
+			oldHost:  "host",
+			tls:      &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:   &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeTLS,
+			},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           0,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-unchanged-allowed-but-missing-secret",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			secret:         &corev1.Secret{},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           1,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:     "external-certificate-unchanged-allowed-but-incorrect-secret-type",
+			host:     "host",
+			expected: "host",
+			oldHost:  "host",
+			tls:      &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:   &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeBasicAuth,
+			},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           1,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-changed-denied",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeTLS,
+			},
+			allow: false,
+			errs:  8,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-changed-allowed",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeTLS,
+			},
+			allow: true,
+			errs:  0,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-changed-allowed-but-missing-secret",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			secret:         &corev1.Secret{},
+			allow:          true,
+			errs:           1,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-changed-allowed-but-incorrect-secret-type",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeBasicAuth,
+			},
+			allow: true,
+			errs:  1,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-removed-denied",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          false,
+			errs:           2,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-removed-allowed",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           0,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-removed-and-set-nil-tls-denied",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            nil,
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          false,
+			errs:           2,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-removed-and-set-nil-tls-allowed",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            nil,
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           0,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-added-denied",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeTLS,
+			},
+			allow: false,
+			errs:  8,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-added-allowed",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeTLS,
+			},
+			allow: true,
+			errs:  0,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-added-allowed-but-missing-secret",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			secret:         &corev1.Secret{},
+			allow:          true,
+			errs:           1,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-added-allowed-but-incorrect-secret-type",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeBasicAuth,
+			},
+			allow: true,
+			errs:  1,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-added-from-nil-tls-denied",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         nil,
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeTLS,
+			},
+			allow: false,
+			errs:  8,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-added-from-nil-tls-allowed",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         nil,
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeTLS,
+			},
+			allow: true,
+			errs:  0,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-added-from-nil-tls-allowed-but-missing-secret",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         nil,
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			secret:         &corev1.Secret{},
+			allow:          true,
+			errs:           1,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:           "external-certificate-added-from-nil-tls-allowed-but-incorrect-secret-type",
+			host:           "host",
+			expected:       "host",
+			oldHost:        "host",
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
+			oldTLS:         nil,
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			secret: &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: testNamespace,
+				},
+				Type: corev1.SecretTypeBasicAuth,
+			},
+			allow: true,
+			errs:  1,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
+		},
+		{
+			name:     "certificate-changed-to-external-certificate-denied-and-featuregate-is-not-set",
+			host:     "host",
+			expected: "host",
+			oldHost:  "host",
+			// if the featuregate was disabled, and ExternalCertificate wasn't previously set, apiserver will strip ExternalCertificate field.
+			// https://github.com/openshift/openshift-apiserver/blob/1fac5e7e3a6153efae875185af2dba48fbad41ab/pkg/route/apiserver/registry/route/strategy.go#L73-L93
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: nil},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, Certificate: "a"},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          false,
+			errs:           0,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: false},
+		},
+		{
+			name:     "certificate-changed-to-external-certificate-allowed-but-featuregate-is-not-set",
+			host:     "host",
+			expected: "host",
+			oldHost:  "host",
+			// if the featuregate was disabled, and ExternalCertificate wasn't previously set, apiserver will strip ExternalCertificate field.
+			// https://github.com/openshift/openshift-apiserver/blob/1fac5e7e3a6153efae875185af2dba48fbad41ab/pkg/route/apiserver/registry/route/strategy.go#L73-L93
+			tls:            &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: nil},
+			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, Certificate: "a"},
+			wildcardPolicy: routeapi.WildcardPolicyNone,
+			allow:          true,
+			errs:           0,
+
+			opts: route.RouteValidationOptions{AllowExternalCertificates: false},
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			sar := &testSAR{allow: tc.allow}
-			strategy := NewStrategy(testAllocator{}, sar, true)
 
 			route := &routeapi.Route{
 				ObjectMeta: metav1.ObjectMeta{
-					Namespace:       "wildcard",
+					Namespace:       testNamespace,
 					Name:            tc.name,
 					UID:             types.UID("wild"),
 					ResourceVersion: "1",
@@ -452,11 +1012,15 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 				},
 			}
 
+			sar := &testSAR{allow: tc.allow}
+			secretGetter := &testSecretGetter{namespace: testNamespace, secret: tc.secret}
+			strategy := NewStrategy(testAllocator{}, sar, secretGetter, tc.opts.AllowExternalCertificates)
+
 			var errs field.ErrorList
 			if len(tc.oldHost) > 0 || len(tc.oldSubdomain) > 0 || tc.oldTLS != nil {
 				oldRoute := &routeapi.Route{
 					ObjectMeta: metav1.ObjectMeta{
-						Namespace:       "wildcard",
+						Namespace:       testNamespace,
 						Name:            tc.name,
 						UID:             types.UID("wild"),
 						ResourceVersion: "1",
@@ -484,6 +1048,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 				t.Fatalf("expected subdomain %s, got %s", tc.expectedSubdomain, route.Spec.Subdomain)
 			}
 			if len(errs) != tc.errs {
+				t.Logf("wanted %d errors but got %d", tc.errs, len(errs))
 				t.Fatalf("unexpected errors: %v %#v", errs, sar)
 			}
 		})
@@ -505,7 +1070,7 @@ func TestExternalCertRemoval(t *testing.T) {
 	}
 
 	{
-		noExternalCertificates := NewStrategy(nil, nil, false)
+		noExternalCertificates := NewStrategy(nil, nil, nil, false)
 
 		freshRoute := withExternalCert.DeepCopy()
 		noExternalCertificates.PrepareForCreate(ctx, freshRoute)
@@ -530,7 +1095,7 @@ func TestExternalCertRemoval(t *testing.T) {
 	}
 
 	{
-		allowExternalCertificates := NewStrategy(nil, nil, true)
+		allowExternalCertificates := NewStrategy(nil, nil, nil, true)
 
 		freshRoute := withExternalCert.DeepCopy()
 		allowExternalCertificates.PrepareForCreate(ctx, freshRoute)
