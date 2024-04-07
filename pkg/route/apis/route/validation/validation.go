@@ -1,9 +1,13 @@
 package validation
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 
 	routev1 "github.com/openshift/api/route/v1"
+	routecommon "github.com/openshift/library-go/pkg/route"
 	routevalidation "github.com/openshift/library-go/pkg/route/validation"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	routev1conversion "github.com/openshift/openshift-apiserver/pkg/route/apis/route/v1"
@@ -17,23 +21,17 @@ func toRouteV1(internal *routeapi.Route) (*routev1.Route, field.ErrorList) {
 	return &external, nil
 }
 
-// TODO this needs to move to library-go.  The network-edge team owns moving this as part of these PRs https://issues.redhat.com//browse/CFE-815 and https://github.com/openshift/enhancements/pull/1307
-// TODO @thejas in particular comes to mind since I coded this as an example at his request.
-type RouteValidationOptions struct {
-	AllowExternalCertificates bool
-}
-
 // ValidateRoute tests if required fields in the route are set.
-func ValidateRoute(route *routeapi.Route, opts RouteValidationOptions) field.ErrorList {
+func ValidateRoute(ctx context.Context, route *routeapi.Route, sarc routecommon.SubjectAccessReviewCreator, secretsGetter corev1client.SecretsGetter, opts routecommon.RouteValidationOptions) field.ErrorList {
 	external, errs := toRouteV1(route)
 	if len(errs) > 0 {
 		return errs
 	}
 
-	return routevalidation.ValidateRoute(external /*, opts*/)
+	return routevalidation.ValidateRoute(ctx, external, sarc, secretsGetter, opts)
 }
 
-func ValidateRouteUpdate(route *routeapi.Route, oldRoute *routeapi.Route, opts RouteValidationOptions) field.ErrorList {
+func ValidateRouteUpdate(ctx context.Context, route *routeapi.Route, oldRoute *routeapi.Route, sarc routecommon.SubjectAccessReviewCreator, secretsGetter corev1client.SecretsGetter, opts routecommon.RouteValidationOptions) field.ErrorList {
 	external, errs := toRouteV1(route)
 	if len(errs) > 0 {
 		return errs
@@ -44,7 +42,7 @@ func ValidateRouteUpdate(route *routeapi.Route, oldRoute *routeapi.Route, opts R
 		return errs
 	}
 
-	return routevalidation.ValidateRouteUpdate(external, oldExternal /*, opts*/)
+	return routevalidation.ValidateRouteUpdate(ctx, external, oldExternal, sarc, secretsGetter, opts)
 }
 
 // ValidateRouteStatusUpdate validates status updates for routes.

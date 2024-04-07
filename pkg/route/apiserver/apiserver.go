@@ -9,6 +9,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
+	"k8s.io/client-go/kubernetes"
 	authorizationclient "k8s.io/client-go/kubernetes/typed/authorization/v1"
 	restclient "k8s.io/client-go/rest"
 
@@ -99,10 +100,17 @@ func (c *completedConfig) newV1RESTStorage() (map[string]rest.Storage, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	kubeClient, err := kubernetes.NewForConfig(c.ExtraConfig.KubeAPIServerClientConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	routeStorage, routeStatusStorage, err := routeetcd.NewREST(
 		c.GenericConfig.RESTOptionsGetter,
 		c.ExtraConfig.RouteAllocator,
 		authorizationClient.SubjectAccessReviews(),
+		kubeClient.CoreV1(),
 		c.ExtraConfig.AllowExternalCertificates,
 	)
 	if err != nil {
