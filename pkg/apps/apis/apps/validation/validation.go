@@ -251,7 +251,7 @@ func validateDeploymentStrategy(strategy *appsapi.DeploymentStrategy, pod *kapi.
 		errs = append(errs, validation.ValidateAnnotations(strategy.Annotations, fldPath.Child("annotations"))...)
 	}
 
-	podClaimNames := sets.NewString()
+	podClaimNames := sets.New[string]()
 	for _, claim := range pod.ResourceClaims {
 		if claim.Name != "" {
 			podClaimNames.Insert(claim.Name)
