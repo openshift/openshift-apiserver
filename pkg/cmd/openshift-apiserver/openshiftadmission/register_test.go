@@ -9,7 +9,7 @@ import (
 )
 
 func TestAdmissionRegistration(t *testing.T) {
-	err := admissionregistrationtesting.AdmissionRegistrationTest(OriginAdmissionPlugins, OpenShiftAdmissionPlugins, sets.String{})
+	err := admissionregistrationtesting.AdmissionRegistrationTest(OriginAdmissionPlugins, OpenShiftAdmissionPlugins, sets.Set[string]{})
 	if err != nil {
 		t.Fatal(err)
 	}
