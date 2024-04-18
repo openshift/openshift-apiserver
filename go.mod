@@ -18,11 +18,11 @@ require (
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc2
-	github.com/openshift/api v0.0.0-20231218131639-7a5aa77cc72d
+	github.com/openshift/api v0.0.0-20240417231225-21822c8bdd5c
 	github.com/openshift/apiserver-library-go v0.0.0-20240313131158-facc40cc7688
-	github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d
-	github.com/openshift/client-go v0.0.0-20231218155125-ff7d9f9bf415
-	github.com/openshift/library-go v0.0.0-20231218143352-99cedb2a141c
+	github.com/openshift/build-machinery-go v0.0.0-20231128094528-1e9b1b0595c8
+	github.com/openshift/client-go v0.0.0-20240415214935-be70f772f157
+	github.com/openshift/library-go v0.0.0-20240412173449-eb2f24c36528
 	github.com/openshift/runtime-utils v0.0.0-20230921210328-7bdb5b9c177b
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
@@ -53,7 +53,6 @@ require (
 	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230305170008-8188dc5388df // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
