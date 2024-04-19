@@ -37,5 +37,6 @@ verify:
 	hack/verify-generated-conversions.sh
 	hack/verify-generated-deep-copies.sh
 	hack/verify-generated-defaulters.sh
+	sleep 1800
 	hack/verify-generated-openapi.sh
 .PHONY: verify
