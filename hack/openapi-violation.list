@@ -217,7 +217,6 @@ API rule violation: list_type_missing,github.com/openshift/api/machine/v1,Alibab
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1,AlibabaCloudMachineProviderConfig,Tags
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1,AlibabaCloudMachineProviderStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1,FailureDomains,OpenStack
-API rule violation: list_type_missing,github.com/openshift/api/machine/v1,FailureDomains,VSphere
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1,NutanixMachineProviderConfig,Subnets
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1,NutanixMachineProviderStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1,PowerVSMachineProviderConfig,LoadBalancers
@@ -258,6 +257,7 @@ API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,N
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,NetworkDeviceSpec,Nameservers
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,NetworkSpec,Devices
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,ObjectMeta,OwnerReferences
+API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,VSphereMachineProviderSpec,TagIDs
 API rule violation: list_type_missing,github.com/openshift/api/machine/v1beta1,VSphereMachineProviderStatus,Conditions
 API rule violation: list_type_missing,github.com/openshift/api/monitoring/v1alpha1,AlertRelabelConfigSpec,Configs
 API rule violation: list_type_missing,github.com/openshift/api/monitoring/v1alpha1,AlertRelabelConfigStatus,Conditions
