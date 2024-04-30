@@ -10,6 +10,7 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	kapirest "k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/kubernetes/pkg/printers"
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 
@@ -37,8 +38,8 @@ type HostnameGenerator interface {
 }
 
 // NewREST returns a RESTStorage object that will work against routes.
-func NewREST(optsGetter generic.RESTOptionsGetter, allocator HostnameGenerator, sarClient routeregistry.SubjectAccessReviewInterface, allowExternalCertificates bool) (*REST, *StatusREST, error) {
-	strategy := routeregistry.NewStrategy(allocator, sarClient, allowExternalCertificates)
+func NewREST(optsGetter generic.RESTOptionsGetter, allocator HostnameGenerator, sarClient routeregistry.SubjectAccessReviewInterface, secretsGetter corev1client.SecretsGetter, allowExternalCertificates bool) (*REST, *StatusREST, error) {
+	strategy := routeregistry.NewStrategy(allocator, sarClient, secretsGetter, allowExternalCertificates)
 
 	store := &registry.Store{
 		NewFunc:                   func() runtime.Object { return &routeapi.Route{} },
