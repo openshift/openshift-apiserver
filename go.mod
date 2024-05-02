@@ -4,26 +4,26 @@ go 1.20
 
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
-	github.com/containers/image/v5 v5.22.0
+	github.com/containers/image/v5 v5.24.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/distribution/distribution/v3 v3.0.0
-	github.com/docker/docker v20.10.21+incompatible
+	github.com/docker/docker v20.10.23+incompatible
 	github.com/docker/go-units v0.5.0
 	github.com/emicklei/go-restful/v3 v3.9.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/go-openapi/errors v0.19.2
+	github.com/go-openapi/errors v0.20.3
 	github.com/google/go-cmp v0.5.9
 	github.com/google/gofuzz v1.2.0
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/jteeuwen/go-bindata v3.0.8-0.20151023091102-a0ff2567cfb7+incompatible
 	github.com/opencontainers/go-digest v1.0.0
-	github.com/opencontainers/image-spec v1.0.3-0.20220114050600-8b9d41f48198
+	github.com/opencontainers/image-spec v1.1.0-rc2
 	github.com/openshift/api v0.0.0-20230807132801-600991d550ac
 	github.com/openshift/apiserver-library-go v0.0.0-20230503174907-d9b2bf6185e9
 	github.com/openshift/build-machinery-go v0.0.0-20220913142420-e25cf57ea46d
 	github.com/openshift/client-go v0.0.0-20230503144108-75015d2347cb
 	github.com/openshift/library-go v0.0.0-20230808150704-ce4395c85e8c
-	github.com/openshift/runtime-utils v0.0.0-20220926190846-5c488b20a19f
+	github.com/openshift/runtime-utils v0.0.0-20240416132540-f53b5c56c13f
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd/client/v3 v3.5.7
@@ -46,19 +46,19 @@ require (
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
-	github.com/BurntSushi/toml v1.2.0 // indirect
-	github.com/Microsoft/go-winio v0.5.2 // indirect
+	github.com/BurntSushi/toml v1.2.1 // indirect
+	github.com/Microsoft/go-winio v0.6.0 // indirect
 	github.com/NYTimes/gziphandler v1.1.1 // indirect
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
-	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
+	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chai2010/gettext-go v1.0.2 // indirect
-	github.com/containers/storage v1.42.0 // indirect
+	github.com/containers/storage v1.45.3 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.4.0 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
@@ -102,7 +102,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
-	github.com/mitchellh/mapstructure v1.4.2 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/moby/spdystream v0.2.0 // indirect
 	github.com/moby/sys/mountinfo v0.6.2 // indirect
 	github.com/moby/term v0.0.0-20221205130635-1aeaba878587 // indirect
@@ -181,7 +181,7 @@ require (
 )
 
 replace (
-	github.com/distribution/distribution/v3 => github.com/openshift/docker-distribution/v3 v3.0.0-20230613095533-f65dc997445a
+	github.com/distribution/distribution/v3 => github.com/openshift/docker-distribution/v3 v3.0.0-20240216102618-dbaf4de30867
 	github.com/docker/docker => github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d
 	k8s.io/api => k8s.io/api v0.27.7
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.27.7
