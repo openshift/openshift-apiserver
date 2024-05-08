@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	configv1 "github.com/openshift/api/config/v1"
+	openshiftfeatures "github.com/openshift/api/features"
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	"github.com/openshift/apiserver-library-go/pkg/configflags"
 	"github.com/openshift/library-go/pkg/apiserver/admission/admissiontimeout"
@@ -263,7 +263,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 			MaxImagesBulkImportedPerRepository: config.ImagePolicyConfig.MaxImagesBulkImportedPerRepository,
 			AdditionalTrustedCA:                caData,
 			RouteAllocator:                     routeAllocator,
-			AllowRouteExternalCertificates:     feature.DefaultFeatureGate.Enabled(featuregate.Feature(configv1.FeatureGateRouteExternalCertificate)),
+			AllowRouteExternalCertificates:     feature.DefaultFeatureGate.Enabled(featuregate.Feature(openshiftfeatures.FeatureGateRouteExternalCertificate)),
 			ProjectAuthorizationCache:          projectAuthorizationCache,
 			ProjectCache:                       projectCache,
 			ProjectRequestTemplate:             config.ProjectConfig.ProjectRequestTemplate,

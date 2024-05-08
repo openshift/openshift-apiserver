@@ -9,6 +9,7 @@ import (
 	"path"
 
 	configv1 "github.com/openshift/api/config/v1"
+	openshiftfeatures "github.com/openshift/api/features"
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	"github.com/openshift/library-go/pkg/config/helpers"
 	"github.com/openshift/library-go/pkg/features"
@@ -103,7 +104,7 @@ func (o *OpenShiftAPIServer) Validate() error {
 
 // RunAPIServer takes the options, starts the API server and waits until stopCh is closed or initial listening fails.
 func (o *OpenShiftAPIServer) RunAPIServer(stopCh <-chan struct{}) error {
-	if err := features.InitializeFeatureGates(feature.DefaultMutableFeatureGate, configv1.SelfManaged, configv1.FeatureGateRouteExternalCertificate); err != nil {
+	if err := features.InitializeFeatureGates(feature.DefaultMutableFeatureGate, openshiftfeatures.SelfManaged, openshiftfeatures.FeatureGateRouteExternalCertificate); err != nil {
 		return err
 	}
 

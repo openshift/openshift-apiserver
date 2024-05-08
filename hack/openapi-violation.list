@@ -84,8 +84,6 @@ API rule violation: list_type_missing,github.com/openshift/api/config/v1,Externa
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ExternalIPPolicy,RejectedCIDRs
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,FeatureGateDetails,Disabled
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,FeatureGateDetails,Enabled
-API rule violation: list_type_missing,github.com/openshift/api/config/v1,FeatureGateEnabledDisabled,Disabled
-API rule violation: list_type_missing,github.com/openshift/api/config/v1,FeatureGateEnabledDisabled,Enabled
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,FeatureGateTests,Tests
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,GenericAPIServerConfig,CORSAllowedOrigins
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,GitHubIdentityProvider,Organizations
@@ -745,12 +743,6 @@ API rule violation: names_match,github.com/openshift/api/config/v1,AdmissionConf
 API rule violation: names_match,github.com/openshift/api/config/v1,AuthenticationSpec,OAuthMetadata
 API rule violation: names_match,github.com/openshift/api/config/v1,ClusterCondition,PromQL
 API rule violation: names_match,github.com/openshift/api/config/v1,EtcdConnectionInfo,URLs
-API rule violation: names_match,github.com/openshift/api/config/v1,FeatureGateDescription,FeatureGateAttributes
-API rule violation: names_match,github.com/openshift/api/config/v1,FeatureGateDescription,OwningJiraComponent
-API rule violation: names_match,github.com/openshift/api/config/v1,FeatureGateDescription,OwningProduct
-API rule violation: names_match,github.com/openshift/api/config/v1,FeatureGateDescription,ResponsiblePerson
-API rule violation: names_match,github.com/openshift/api/config/v1,FeatureGateEnabledDisabled,Disabled
-API rule violation: names_match,github.com/openshift/api/config/v1,FeatureGateEnabledDisabled,Enabled
 API rule violation: names_match,github.com/openshift/api/config/v1,GenericAPIServerConfig,AdmissionConfig
 API rule violation: names_match,github.com/openshift/api/config/v1,IdentityProviderConfig,GitHub
 API rule violation: names_match,github.com/openshift/api/config/v1,IdentityProviderConfig,GitLab
@@ -773,11 +765,6 @@ API rule violation: names_match,github.com/openshift/api/config/v1,TokenIssuer,U
 API rule violation: names_match,github.com/openshift/api/config/v1,VSpherePlatformNodeNetworkingSpec,ExcludeNetworkSubnetCIDR
 API rule violation: names_match,github.com/openshift/api/config/v1,VSpherePlatformNodeNetworkingSpec,NetworkSubnetCIDR
 API rule violation: names_match,github.com/openshift/api/config/v1,VSpherePlatformSpec,VCenters
-API rule violation: names_match,github.com/openshift/api/config/v1,featureGateBuilder,name
-API rule violation: names_match,github.com/openshift/api/config/v1,featureGateBuilder,owningJiraComponent
-API rule violation: names_match,github.com/openshift/api/config/v1,featureGateBuilder,owningProduct
-API rule violation: names_match,github.com/openshift/api/config/v1,featureGateBuilder,responsiblePerson
-API rule violation: names_match,github.com/openshift/api/config/v1,featureGateBuilder,statusByClusterProfileByFeatureSet
 API rule violation: names_match,github.com/openshift/api/config/v1alpha1,BackupSpec,EtcdBackupSpec
 API rule violation: names_match,github.com/openshift/api/config/v1alpha1,PolicyIdentity,PolicyMatchExactRepository
 API rule violation: names_match,github.com/openshift/api/config/v1alpha1,PolicyIdentity,PolicyMatchRemapIdentity
