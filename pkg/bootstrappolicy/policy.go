@@ -767,7 +767,7 @@ func GetOpenshiftBootstrapClusterRoleBindings() []rbacv1.ClusterRoleBinding {
 			Groups(AuthenticatedGroup).
 			BindingOrDie(),
 		newOriginClusterBinding(SelfAccessReviewerRoleBindingName, SelfAccessReviewerRoleName).
-			Groups(AuthenticatedGroup).
+			Groups(AuthenticatedGroup, UnauthenticatedGroup).
 			BindingOrDie(),
 		newOriginClusterBinding(SelfProvisionerRoleBindingName, SelfProvisionerRoleName).
 			Groups(AuthenticatedOAuthGroup).
