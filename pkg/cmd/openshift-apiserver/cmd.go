@@ -108,6 +108,8 @@ func (o *OpenShiftAPIServer) RunAPIServer(stopCh <-chan struct{}) error {
 		return err
 	}
 
+	feature.DefaultMutableFeatureGate.AddMetrics()
+
 	// try to decode into our new types first.  right now there is no validation, no file path resolution.  this unsticks the operator to start.
 	// TODO add those things
 	configContent, err := ioutil.ReadFile(o.ConfigFile)
