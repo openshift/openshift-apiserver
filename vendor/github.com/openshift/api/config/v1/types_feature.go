@@ -159,8 +159,10 @@ type FeatureGateEnabledDisabled struct {
 var FeatureSets = map[FeatureSet]*FeatureGateEnabledDisabled{
 	Default: defaultFeatures,
 	CustomNoUpgrade: {
-		Enabled:  []FeatureGateDescription{},
-		Disabled: []FeatureGateDescription{},
+		Enabled: []FeatureGateDescription{},
+		Disabled: []FeatureGateDescription{
+			disableKubeletCloudCredentialProviders, // We do not currently ship the correct config to use the external credentials provider.
+		},
 	},
 	TechPreviewNoUpgrade: newDefaultFeatures().
 		with(validatingAdmissionPolicy).
@@ -174,6 +176,7 @@ var FeatureSets = map[FeatureSet]*FeatureGateEnabledDisabled{
 		without(eventedPleg).
 		with(sigstoreImageVerification).
 		with(gcpLabelsTags).
+		with(gcpClusterHostedDNS).
 		with(vSphereStaticIPs).
 		with(routeExternalCertificate).
 		with(automatedEtcdBackup).
@@ -182,7 +185,15 @@ var FeatureSets = map[FeatureSet]*FeatureGateEnabledDisabled{
 		with(adminNetworkPolicy).
 		with(dnsNameResolver).
 		with(machineConfigNodes).
-		with(clusterAPIInstall).
+		with(metricsServer).
+		with(installAlternateInfrastructureAWS).
+		without(clusterAPIInstall).
+		with(mixedCPUsAllocation).
+		with(managedBootImages).
+		without(disableKubeletCloudCredentialProviders).
+		with(onClusterBuild).
+		with(signatureStores).
+		with(openShiftPodSecurityAdmission).
 		toFeatures(defaultFeatures),
 	LatencySensitive: newDefaultFeatures().
 		toFeatures(defaultFeatures),
@@ -190,7 +201,6 @@ var FeatureSets = map[FeatureSet]*FeatureGateEnabledDisabled{
 
 var defaultFeatures = &FeatureGateEnabledDisabled{
 	Enabled: []FeatureGateDescription{
-		openShiftPodSecurityAdmission,
 		alibabaPlatform, // This is a bug, it should be TechPreviewNoUpgrade. This must be downgraded before 4.14 is shipped.
 		azureWorkloadIdentity,
 		cloudDualStackNodeIPs,
@@ -200,8 +210,11 @@ var defaultFeatures = &FeatureGateEnabledDisabled{
 		externalCloudProviderExternal,
 		privateHostedZoneAWS,
 		buildCSIVolumes,
+		sdnLiveMigration,
 	},
-	Disabled: []FeatureGateDescription{},
+	Disabled: []FeatureGateDescription{
+		disableKubeletCloudCredentialProviders, // We do not currently ship the correct config to use the external credentials provider.
+	},
 }
 
 type featureSetBuilder struct {
