@@ -2,6 +2,7 @@ package importer
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"runtime"
@@ -230,13 +231,15 @@ func (imp *ImageStreamImporter) importImages(ctx context.Context, isi *imageapi.
 			tag.value = defaultRef.Tag
 			tags[tag] = append(tags[tag], i)
 			if len(tags[tag]) == 1 {
-				repo.Tags = append(repo.Tags, importTag{
-					Name:       defaultRef.Tag,
-					PreferArch: preferArch,
-					PreferOS:   preferOS,
-					ImportMode: spec.ImportPolicy.ImportMode,
-					Image:      cache[tag],
-				})
+				if image, ok := cache[tag]; ok {
+					repo.Tags = append(repo.Tags, importTag{
+						Name:       defaultRef.Tag,
+						PreferArch: preferArch,
+						PreferOS:   preferOS,
+						ImportMode: spec.ImportPolicy.ImportMode,
+						Image:      image,
+					})
+				}
 			}
 		}
 	}
@@ -258,6 +261,10 @@ func (imp *ImageStreamImporter) importImages(ctx context.Context, isi *imageapi.
 			for _, index := range tags[j] {
 				if tag.Err != nil {
 					setImageImportStatus(isi, index, tag.Name, tag.Err)
+					continue
+				}
+				if tag.Image == nil {
+					setImageImportStatus(isi, index, tag.Name, errors.New("the referenced image in the import tag nil"))
 					continue
 				}
 				copied := *tag.Image
