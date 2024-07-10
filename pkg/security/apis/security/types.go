@@ -59,6 +59,17 @@ type SecurityContextConstraints struct {
 	AllowHostPID bool
 	// AllowHostIPC determines if the policy allows host ipc in the containers.
 	AllowHostIPC bool
+	// userNamespaceLevel determines if the policy allows host users in containers.
+	// Valid values are "AllowHostLevel", "RequirePodLevel", and omitted.
+	// When "AllowHostLevel" is set, a pod author may set `hostUsers` to either `true` or `false`.
+	// When "RequirePodLevel" is set, a pod author must set `hostUsers` to `false`.
+	// When omitted, this means no opinion and the platform is left to choose a reasonable default,
+	// which is subject to change over time.
+	// The current default is "AllowHostLevel".
+	// +openshift:enable:FeatureGate=UserNamespacesPodSecurityStandards
+	// +kubebuilder:validation:Enum="AllowHostLevel";"RequirePodLevel";""
+	// +optional
+	UserNamespaceLevel NamespaceLevelType `json:"userNamespaceLevel" protobuf:"bytes,26,opt,name=userNamespaceLevel"`
 	// DefaultAllowPrivilegeEscalation controls the default setting for whether a
 	// process can gain more privileges than its parent process.
 	// +optional
@@ -204,6 +215,9 @@ type IDRange struct {
 	Max int64
 }
 
+// NamespaceLevelType shows the allowable values for the UserNamespaceLevel field.
+type NamespaceLevelType string
+
 // SELinuxContextStrategyType denotes strategy types for generating SELinux options for a
 // SecurityContext
 type SELinuxContextStrategyType string
@@ -221,6 +235,13 @@ type SupplementalGroupsStrategyType string
 type FSGroupStrategyType string
 
 const (
+	// NamespaceLevelAllowHost allows a pod to set `hostUsers` field to either `true` or `false`
+	NamespaceLevelAllowHost NamespaceLevelType = "AllowHostLevel"
+	// NamespaceLevelRequirePod requires the `hostUsers` field be `false` in a pod.
+	NamespaceLevelRequirePod NamespaceLevelType = "RequirePodLevel"
+	// NamespaceLevelEmpty will set to the default, which is currently "AllowHostLevel".
+	NamespaceLevelEmpty NamespaceLevelType = ""
+
 	// container must have SELinux labels of X applied.
 	SELinuxStrategyMustRunAs SELinuxContextStrategyType = "MustRunAs"
 	// container may make requests for any SELinux context labels.
