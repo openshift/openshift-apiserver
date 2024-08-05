@@ -3,4 +3,14 @@
 source "$(dirname "${BASH_SOURCE}")/lib/init.sh"
 
 SCRIPT_ROOT=$(dirname ${BASH_SOURCE})/..
-VERIFY=--verify-only ${SCRIPT_ROOT}/hack/update-generated-defaulters.sh
+${SCRIPT_ROOT}/hack/update-generated-defaulters.sh
+
+PKG_DIR=${SCRIPT_ROOT}/pkg
+
+ret=0
+git diff --exit-code --quiet ${PKG_DIR} || ret=$?
+if [[ $ret -ne 0 ]]; then
+  echo "defaulters-gen is out of date. Please run hack/update-generated-defaulters.sh"
+  exit 1
+fi
+echo "defaulters-gen up to date."
