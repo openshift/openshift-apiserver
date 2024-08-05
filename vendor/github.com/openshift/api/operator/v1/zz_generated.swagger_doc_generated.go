@@ -205,6 +205,25 @@ func (AddPage) SwaggerDoc() map[string]string {
 	return map_AddPage
 }
 
+var map_Capability = map[string]string{
+	"":           "Capabilities contains set of UI capabilities and their state in the console UI.",
+	"name":       "name is the unique name of a capability. Available capabilities are LightspeedButton.",
+	"visibility": "visibility defines the visibility state of the capability.",
+}
+
+func (Capability) SwaggerDoc() map[string]string {
+	return map_Capability
+}
+
+var map_CapabilityVisibility = map[string]string{
+	"":      "CapabilityVisibility defines the criteria to enable/disable a capability.",
+	"state": "state defines if the capability is enabled or disabled in the console UI. Enabling the capability in the console UI is represented by the \"Enabled\" value. Disabling the capability in the console UI is represented by the \"Disabled\" value.",
+}
+
+func (CapabilityVisibility) SwaggerDoc() map[string]string {
+	return map_CapabilityVisibility
+}
+
 var map_Console = map[string]string{
 	"":         "Console provides a means to configure an operator to manage the console.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 	"metadata": "metadata is the standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
@@ -226,6 +245,7 @@ func (ConsoleConfigRoute) SwaggerDoc() map[string]string {
 
 var map_ConsoleCustomization = map[string]string{
 	"":                     "ConsoleCustomization defines a list of optional configuration for the console UI.",
+	"capabilities":         "capabilities defines an array of capabilities that can be interacted with in the console UI. Each capability defines a visual state that can be interacted with the console to render in the UI. Available capabilities are LightspeedButton. Each of the available capabilities may appear only once in the list.",
 	"brand":                "brand is the default branding of the web console which can be overridden by providing the brand field.  There is a limited set of specific brand options. This field controls elements of the console such as the logo. Invalid value will prevent a console rollout.",
 	"documentationBaseURL": "documentationBaseURL links to external documentation are shown in various sections of the web console.  Providing documentationBaseURL will override the default documentation URL. Invalid value will prevent a console rollout.",
 	"customProductName":    "customProductName is the name that will be displayed in page titles, logo alt text, and the about dialog instead of the normal OpenShift product name.",
@@ -265,6 +285,7 @@ var map_ConsoleSpec = map[string]string{
 	"providers":     "providers contains configuration for using specific service providers.",
 	"route":         "route contains hostname and secret reference that contains the serving certificate. If a custom route is specified, a new route will be created with the provided hostname, under which console will be available. In case of custom hostname uses the default routing suffix of the cluster, the Secret specification for a serving certificate will not be needed. In case of custom hostname points to an arbitrary domain, manual DNS configurations steps are necessary. The default console route will be maintained to reserve the default hostname for console if the custom route is removed. If not specified, default route will be used. DEPRECATED",
 	"plugins":       "plugins defines a list of enabled console plugin names.",
+	"ingress":       "ingress allows to configure the alternative ingress for the console. This field is intended for clusters without ingress capability, where access to routes is not possible.",
 }
 
 func (ConsoleSpec) SwaggerDoc() map[string]string {
@@ -318,6 +339,16 @@ var map_DeveloperConsoleCatalogTypes = map[string]string{
 
 func (DeveloperConsoleCatalogTypes) SwaggerDoc() map[string]string {
 	return map_DeveloperConsoleCatalogTypes
+}
+
+var map_Ingress = map[string]string{
+	"":                   "Ingress allows cluster admin to configure alternative ingress for the console.",
+	"consoleURL":         "consoleURL is a URL to be used as the base console address. If not specified, the console route hostname will be used. This field is required for clusters without ingress capability, where access to routes is not possible. Make sure that appropriate ingress is set up at this URL. The console operator will monitor the URL and may go degraded if it's unreachable for an extended period. Must use the HTTPS scheme.",
+	"clientDownloadsURL": "clientDownloadsURL is a URL to be used as the address to download client binaries. If not specified, the downloads route hostname will be used. This field is required for clusters without ingress capability, where access to routes is not possible. The console operator will monitor the URL and may go degraded if it's unreachable for an extended period. Must use the HTTPS scheme.",
+}
+
+func (Ingress) SwaggerDoc() map[string]string {
+	return map_Ingress
 }
 
 var map_Perspective = map[string]string{
@@ -390,12 +421,33 @@ func (StatuspageProvider) SwaggerDoc() map[string]string {
 }
 
 var map_AWSCSIDriverConfigSpec = map[string]string{
-	"":          "AWSCSIDriverConfigSpec defines properties that can be configured for the AWS CSI driver.",
-	"kmsKeyARN": "kmsKeyARN sets the cluster default storage class to encrypt volumes with a user-defined KMS key, rather than the default KMS key used by AWS. The value may be either the ARN or Alias ARN of a KMS key.",
+	"":                 "AWSCSIDriverConfigSpec defines properties that can be configured for the AWS CSI driver.",
+	"kmsKeyARN":        "kmsKeyARN sets the cluster default storage class to encrypt volumes with a user-defined KMS key, rather than the default KMS key used by AWS. The value may be either the ARN or Alias ARN of a KMS key.",
+	"efsVolumeMetrics": "efsVolumeMetrics sets the configuration for collecting metrics from EFS volumes used by the EFS CSI Driver.",
 }
 
 func (AWSCSIDriverConfigSpec) SwaggerDoc() map[string]string {
 	return map_AWSCSIDriverConfigSpec
+}
+
+var map_AWSEFSVolumeMetrics = map[string]string{
+	"":              "AWSEFSVolumeMetrics defines the configuration for volume metrics in the EFS CSI Driver.",
+	"state":         "state defines the state of metric collection in the AWS EFS CSI Driver. This field is required and must be set to one of the following values: Disabled or RecursiveWalk. Disabled means no metrics collection will be performed. This is the default value. RecursiveWalk means the AWS EFS CSI Driver will recursively scan volumes to collect metrics. This process may result in high CPU and memory usage, depending on the volume size.",
+	"recursiveWalk": "recursiveWalk provides additional configuration for collecting volume metrics in the AWS EFS CSI Driver when the state is set to RecursiveWalk.",
+}
+
+func (AWSEFSVolumeMetrics) SwaggerDoc() map[string]string {
+	return map_AWSEFSVolumeMetrics
+}
+
+var map_AWSEFSVolumeMetricsRecursiveWalkConfig = map[string]string{
+	"":                     "AWSEFSVolumeMetricsRecursiveWalkConfig defines options for volume metrics in the EFS CSI Driver.",
+	"refreshPeriodMinutes": "refreshPeriodMinutes specifies the frequency, in minutes, at which volume metrics are refreshed. When omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time. The current default is 240. The valid range is from 1 to 43200 minutes (30 days).",
+	"fsRateLimit":          "fsRateLimit defines the rate limit, in goroutines per file system, for processing volume metrics. When omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time. The current default is 5. The valid range is from 1 to 100 goroutines.",
+}
+
+func (AWSEFSVolumeMetricsRecursiveWalkConfig) SwaggerDoc() map[string]string {
+	return map_AWSEFSVolumeMetricsRecursiveWalkConfig
 }
 
 var map_AzureCSIDriverConfigSpec = map[string]string{
@@ -701,6 +753,7 @@ func (EtcdList) SwaggerDoc() map[string]string {
 
 var map_EtcdSpec = map[string]string{
 	"controlPlaneHardwareSpeed": "HardwareSpeed allows user to change the etcd tuning profile which configures the latency parameters for heartbeat interval and leader election timeouts allowing the cluster to tolerate longer round-trip-times between etcd members. Valid values are \"\", \"Standard\" and \"Slower\".\n\t\"\" means no opinion and the platform is left to choose a reasonable default\n\twhich is subject to change without notice.",
+	"backendQuotaGiB":           "backendQuotaGiB sets the etcd backend storage size limit in gibibytes. The value should be an integer not less than 8 and not more than 32. When not specified, the default value is 8.",
 }
 
 func (EtcdSpec) SwaggerDoc() map[string]string {
@@ -710,6 +763,7 @@ func (EtcdSpec) SwaggerDoc() map[string]string {
 var map_AWSClassicLoadBalancerParameters = map[string]string{
 	"":                      "AWSClassicLoadBalancerParameters holds configuration parameters for an AWS Classic load balancer.",
 	"connectionIdleTimeout": "connectionIdleTimeout specifies the maximum time period that a connection may be idle before the load balancer closes the connection.  The value must be parseable as a time duration value; see <https://pkg.go.dev/time#ParseDuration>.  A nil or zero value means no opinion, in which case a default value is used.  The default value for this field is 60s.  This default is subject to change.",
+	"subnets":               "subnets specifies the subnets to which the load balancer will attach. The subnets may be specified by either their ID or name. The total number of subnets is limited to 10.\n\nIn order for the load balancer to be provisioned with subnets, each subnet must exist, each subnet must be from a different availability zone, and the load balancer service must be recreated to pick up new values.\n\nWhen omitted from the spec, the subnets will be auto-discovered for each availability zone. Auto-discovered subnets are not reported in the status of the IngressController object.",
 }
 
 func (AWSClassicLoadBalancerParameters) SwaggerDoc() map[string]string {
@@ -728,11 +782,23 @@ func (AWSLoadBalancerParameters) SwaggerDoc() map[string]string {
 }
 
 var map_AWSNetworkLoadBalancerParameters = map[string]string{
-	"": "AWSNetworkLoadBalancerParameters holds configuration parameters for an AWS Network load balancer.",
+	"":               "AWSNetworkLoadBalancerParameters holds configuration parameters for an AWS Network load balancer. For Example: Setting AWS EIPs https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html",
+	"subnets":        "subnets specifies the subnets to which the load balancer will attach. The subnets may be specified by either their ID or name. The total number of subnets is limited to 10.\n\nIn order for the load balancer to be provisioned with subnets, each subnet must exist, each subnet must be from a different availability zone, and the load balancer service must be recreated to pick up new values.\n\nWhen omitted from the spec, the subnets will be auto-discovered for each availability zone. Auto-discovered subnets are not reported in the status of the IngressController object.",
+	"eipAllocations": "eipAllocations is a list of IDs for Elastic IP (EIP) addresses that are assigned to the Network Load Balancer. The following restrictions apply:\n\neipAllocations can only be used with external scope, not internal. An EIP can be allocated to only a single IngressController. The number of EIP allocations must match the number of subnets that are used for the load balancer. Each EIP allocation must be unique. A maximum of 10 EIP allocations are permitted.\n\nSee https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html for general information about configuration, characteristics, and limitations of Elastic IP addresses.",
 }
 
 func (AWSNetworkLoadBalancerParameters) SwaggerDoc() map[string]string {
 	return map_AWSNetworkLoadBalancerParameters
+}
+
+var map_AWSSubnets = map[string]string{
+	"":      "AWSSubnets contains a list of references to AWS subnets by ID or name.",
+	"ids":   "ids specifies a list of AWS subnets by subnet ID. Subnet IDs must start with \"subnet-\", consist only of alphanumeric characters, must be exactly 24 characters long, must be unique, and the total number of subnets specified by ids and names must not exceed 10.",
+	"names": "names specifies a list of AWS subnets by subnet name. Subnet names must not start with \"subnet-\", must not include commas, must be under 256 characters in length, must be unique, and the total number of subnets specified by ids and names must not exceed 10.",
+}
+
+func (AWSSubnets) SwaggerDoc() map[string]string {
+	return map_AWSSubnets
 }
 
 var map_AccessLogging = map[string]string{
@@ -1288,6 +1354,8 @@ func (MachineConfigurationSpec) SwaggerDoc() map[string]string {
 }
 
 var map_MachineConfigurationStatus = map[string]string{
+	"observedGeneration":         "observedGeneration is the last generation change you've dealt with",
+	"conditions":                 "conditions is a list of conditions and their status",
 	"nodeDisruptionPolicyStatus": "nodeDisruptionPolicyStatus status reflects what the latest cluster-validated policies are, and will be used by the Machine Config Daemon during future node updates.",
 }
 
@@ -1469,6 +1537,15 @@ var map_AdditionalNetworkDefinition = map[string]string{
 
 func (AdditionalNetworkDefinition) SwaggerDoc() map[string]string {
 	return map_AdditionalNetworkDefinition
+}
+
+var map_AdditionalRoutingCapabilities = map[string]string{
+	"":          "AdditionalRoutingCapabilities describes components and relevant configuration providing advanced routing capabilities.",
+	"providers": "providers is a set of enabled components that provide additional routing capabilities. Entries on this list must be unique. The  only valid value is currrently \"FRR\" which provides FRR routing capabilities through the deployment of FRR.",
+}
+
+func (AdditionalRoutingCapabilities) SwaggerDoc() map[string]string {
+	return map_AdditionalRoutingCapabilities
 }
 
 var map_ClusterNetworkEntry = map[string]string{
@@ -1661,18 +1738,19 @@ func (NetworkMigration) SwaggerDoc() map[string]string {
 }
 
 var map_NetworkSpec = map[string]string{
-	"":                          "NetworkSpec is the top-level network configuration object.",
-	"clusterNetwork":            "clusterNetwork is the IP address pool to use for pod IPs. Some network providers, e.g. OpenShift SDN, support multiple ClusterNetworks. Others only support one. This is equivalent to the cluster-cidr.",
-	"serviceNetwork":            "serviceNetwork is the ip address pool to use for Service IPs Currently, all existing network providers only support a single value here, but this is an array to allow for growth.",
-	"defaultNetwork":            "defaultNetwork is the \"default\" network that all pods will receive",
-	"additionalNetworks":        "additionalNetworks is a list of extra networks to make available to pods when multiple networks are enabled.",
-	"disableMultiNetwork":       "disableMultiNetwork specifies whether or not multiple pod network support should be disabled. If unset, this property defaults to 'false' and multiple network support is enabled.",
-	"useMultiNetworkPolicy":     "useMultiNetworkPolicy enables a controller which allows for MultiNetworkPolicy objects to be used on additional networks as created by Multus CNI. MultiNetworkPolicy are similar to NetworkPolicy objects, but NetworkPolicy objects only apply to the primary interface. With MultiNetworkPolicy, you can control the traffic that a pod can receive over the secondary interfaces. If unset, this property defaults to 'false' and MultiNetworkPolicy objects are ignored. If 'disableMultiNetwork' is 'true' then the value of this field is ignored.",
-	"deployKubeProxy":           "deployKubeProxy specifies whether or not a standalone kube-proxy should be deployed by the operator. Some network providers include kube-proxy or similar functionality. If unset, the plugin will attempt to select the correct value, which is false when OpenShift SDN and ovn-kubernetes are used and true otherwise.",
-	"disableNetworkDiagnostics": "disableNetworkDiagnostics specifies whether or not PodNetworkConnectivityCheck CRs from a test pod to every node, apiserver and LB should be disabled or not. If unset, this property defaults to 'false' and network diagnostics is enabled. Setting this to 'true' would reduce the additional load of the pods performing the checks.",
-	"kubeProxyConfig":           "kubeProxyConfig lets us configure desired proxy configuration. If not specified, sensible defaults will be chosen by OpenShift directly. Not consumed by all network providers - currently only openshift-sdn.",
-	"exportNetworkFlows":        "exportNetworkFlows enables and configures the export of network flow metadata from the pod network by using protocols NetFlow, SFlow or IPFIX. Currently only supported on OVN-Kubernetes plugin. If unset, flows will not be exported to any collector.",
-	"migration":                 "migration enables and configures the cluster network migration. The migration procedure allows to change the network type and the MTU.",
+	"":                              "NetworkSpec is the top-level network configuration object.",
+	"clusterNetwork":                "clusterNetwork is the IP address pool to use for pod IPs. Some network providers, e.g. OpenShift SDN, support multiple ClusterNetworks. Others only support one. This is equivalent to the cluster-cidr.",
+	"serviceNetwork":                "serviceNetwork is the ip address pool to use for Service IPs Currently, all existing network providers only support a single value here, but this is an array to allow for growth.",
+	"defaultNetwork":                "defaultNetwork is the \"default\" network that all pods will receive",
+	"additionalNetworks":            "additionalNetworks is a list of extra networks to make available to pods when multiple networks are enabled.",
+	"disableMultiNetwork":           "disableMultiNetwork specifies whether or not multiple pod network support should be disabled. If unset, this property defaults to 'false' and multiple network support is enabled.",
+	"useMultiNetworkPolicy":         "useMultiNetworkPolicy enables a controller which allows for MultiNetworkPolicy objects to be used on additional networks as created by Multus CNI. MultiNetworkPolicy are similar to NetworkPolicy objects, but NetworkPolicy objects only apply to the primary interface. With MultiNetworkPolicy, you can control the traffic that a pod can receive over the secondary interfaces. If unset, this property defaults to 'false' and MultiNetworkPolicy objects are ignored. If 'disableMultiNetwork' is 'true' then the value of this field is ignored.",
+	"deployKubeProxy":               "deployKubeProxy specifies whether or not a standalone kube-proxy should be deployed by the operator. Some network providers include kube-proxy or similar functionality. If unset, the plugin will attempt to select the correct value, which is false when OpenShift SDN and ovn-kubernetes are used and true otherwise.",
+	"disableNetworkDiagnostics":     "disableNetworkDiagnostics specifies whether or not PodNetworkConnectivityCheck CRs from a test pod to every node, apiserver and LB should be disabled or not. If unset, this property defaults to 'false' and network diagnostics is enabled. Setting this to 'true' would reduce the additional load of the pods performing the checks.",
+	"kubeProxyConfig":               "kubeProxyConfig lets us configure desired proxy configuration. If not specified, sensible defaults will be chosen by OpenShift directly. Not consumed by all network providers - currently only openshift-sdn.",
+	"exportNetworkFlows":            "exportNetworkFlows enables and configures the export of network flow metadata from the pod network by using protocols NetFlow, SFlow or IPFIX. Currently only supported on OVN-Kubernetes plugin. If unset, flows will not be exported to any collector.",
+	"migration":                     "migration enables and configures the cluster network migration. The migration procedure allows to change the network type and the MTU.",
+	"additionalRoutingCapabilities": "additionalRoutingCapabilities describes components and relevant configuration providing additional routing capabilities. When set, it enables such components and the usage of the routing capabilities they provide for the machine network. Upstream operators, like MetalLB operator, requiring these capabilities may rely on, or automatically set this attribute. Network plugins may leverage advanced routing capabilities acquired through the enablement of these components but may require specific configuration on their side to do so; refer to their respective documentation and configuration options.",
 }
 
 func (NetworkSpec) SwaggerDoc() map[string]string {
@@ -1700,6 +1778,7 @@ var map_OVNKubernetesConfig = map[string]string{
 	"egressIPConfig":      "egressIPConfig holds the configuration for EgressIP options.",
 	"ipv4":                "ipv4 allows users to configure IP settings for IPv4 connections. When ommitted, this means no opinions and the default configuration is used. Check individual fields within ipv4 for details of default values.",
 	"ipv6":                "ipv6 allows users to configure IP settings for IPv6 connections. When ommitted, this means no opinions and the default configuration is used. Check individual fields within ipv4 for details of default values.",
+	"routeAdvertisements": "routeAdvertisements determines if the functionality to advertise cluster network routes through a dynamic routing protocol, such as BGP, is enabled or not. This functionality is configured through the ovn-kubernetes RouteAdvertisements CRD. Requires the 'FRR' routing capability provider to be enabled as an additional routing capability. Allowed values are \"Enabled\", \"Disabled\" and ommited. When omitted, this means the user has no opinion and the platform is left to choose reasonable defaults. These defaults are subject to change over time. The current default is \"Disabled\".",
 }
 
 func (OVNKubernetesConfig) SwaggerDoc() map[string]string {
