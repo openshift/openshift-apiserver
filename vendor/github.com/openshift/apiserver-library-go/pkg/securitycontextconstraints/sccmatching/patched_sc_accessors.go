@@ -98,6 +98,19 @@ func (w *podSecurityContextWrapper) SetHostIPC(v bool) {
 	w.ensurePodSC()
 	w.podSC.HostIPC = v
 }
+func (w *podSecurityContextWrapper) HostUsers() *bool {
+	if w.podSC == nil {
+		return nil
+	}
+	return w.podSC.HostUsers
+}
+func (w *podSecurityContextWrapper) SetHostUsers(v *bool) {
+	if w.podSC == nil && v == nil {
+		return
+	}
+	w.ensurePodSC()
+	w.podSC.HostUsers = v
+}
 func (w *podSecurityContextWrapper) SELinuxOptions() *api.SELinuxOptions {
 	if w.podSC == nil {
 		return nil
