@@ -69,6 +69,7 @@ clustercsidrivers.operator.openshift.io:
   Capability: ""
   Category: ""
   FeatureGates:
+  - AWSEFSDriverVolumeMetrics
   - VSphereDriverConfiguration
   FilenameOperatorName: csi-driver
   FilenameOperatorOrdering: "01"
@@ -154,6 +155,7 @@ etcds.operator.openshift.io:
   Capability: ""
   Category: coreoperators
   FeatureGates:
+  - EtcdBackendQuota
   - HardwareSpeed
   FilenameOperatorName: etcd
   FilenameOperatorOrdering: "01"
@@ -175,7 +177,9 @@ ingresscontrollers.operator.openshift.io:
   CRDName: ingresscontrollers.operator.openshift.io
   Capability: Ingress
   Category: ""
-  FeatureGates: []
+  FeatureGates:
+  - IngressControllerLBSubnetsAWS
+  - SetEIPForNLBIngressController
   FilenameOperatorName: ingress
   FilenameOperatorOrdering: "00"
   FilenameRunLevel: "0000_50"
@@ -319,14 +323,15 @@ machineconfigurations.operator.openshift.io:
   Version: v1
 
 networks.operator.openshift.io:
-  Annotations:
-    include.release.openshift.io/self-managed-high-availability: "true"
+  Annotations: {}
   ApprovedPRNumber: https://github.com/openshift/api/pull/475
   CRDName: networks.operator.openshift.io
   Capability: ""
   Category: ""
   FeatureGates:
+  - AdditionalRoutingCapabilities
   - NetworkLiveMigration
+  - RouteAdvertisements
   FilenameOperatorName: network
   FilenameOperatorOrdering: "01"
   FilenameRunLevel: "0000_70"

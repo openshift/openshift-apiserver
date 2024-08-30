@@ -18,6 +18,7 @@ import (
 // +openshift:file-pattern=cvoRunLevel=0000_10,operatorName=config-operator,operatorOrdering=01
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:path=networks,scope=Cluster
+// +kubebuilder:metadata:annotations=release.openshift.io/bootstrap-required=true
 type Network struct {
 	metav1.TypeMeta `json:",inline"`
 
@@ -45,18 +46,20 @@ type Network struct {
 type NetworkSpec struct {
 	// IP address pool to use for pod IPs.
 	// This field is immutable after installation.
+	// +listType=atomic
 	ClusterNetwork []ClusterNetworkEntry `json:"clusterNetwork"`
 
 	// IP address pool for services.
 	// Currently, we only support a single entry here.
 	// This field is immutable after installation.
+	// +listType=atomic
 	ServiceNetwork []string `json:"serviceNetwork"`
 
-	// NetworkType is the plugin that is to be deployed (e.g. OpenShiftSDN).
+	// NetworkType is the plugin that is to be deployed (e.g. OVNKubernetes).
 	// This should match a value that the cluster-network-operator understands,
 	// or else no networking will be installed.
 	// Currently supported values are:
-	// - OpenShiftSDN
+	// - OVNKubernetes
 	// This field is immutable after installation.
 	NetworkType string `json:"networkType"`
 
@@ -90,13 +93,15 @@ type NetworkSpec struct {
 // NetworkStatus is the current network configuration.
 type NetworkStatus struct {
 	// IP address pool to use for pod IPs.
+	// +listType=atomic
 	ClusterNetwork []ClusterNetworkEntry `json:"clusterNetwork,omitempty"`
 
 	// IP address pool for services.
 	// Currently, we only support a single entry here.
+	// +listType=atomic
 	ServiceNetwork []string `json:"serviceNetwork,omitempty"`
 
-	// NetworkType is the plugin that is deployed (e.g. OpenShiftSDN).
+	// NetworkType is the plugin that is deployed (e.g. OVNKubernetes).
 	NetworkType string `json:"networkType,omitempty"`
 
 	// ClusterNetworkMTU is the MTU for inter-pod networking.
@@ -106,15 +111,12 @@ type NetworkStatus struct {
 	Migration *NetworkMigration `json:"migration,omitempty"`
 
 	// conditions represents the observations of a network.config current state.
-	// Known .status.conditions.type are: "NetworkTypeMigrationInProgress", "NetworkTypeMigrationMTUReady",
-	// "NetworkTypeMigrationTargetCNIAvailable", "NetworkTypeMigrationTargetCNIInUse",
-	// "NetworkTypeMigrationOriginalCNIPurged" and "NetworkDiagnosticsAvailable"
+	// Known .status.conditions.type are: "NetworkDiagnosticsAvailable"
 	// +optional
 	// +patchMergeKey=type
 	// +patchStrategy=merge
 	// +listType=map
 	// +listMapKey=type
-	// +openshift:enable:FeatureGate=NetworkLiveMigration
 	// +openshift:enable:FeatureGate=NetworkDiagnosticsConfig
 	Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type"`
 }
@@ -148,6 +150,7 @@ type ExternalIPConfig struct {
 	// ExternalIPPolicy rules.
 	// Currently, only one entry may be provided.
 	// +optional
+	// +listType=atomic
 	AutoAssignCIDRs []string `json:"autoAssignCIDRs,omitempty"`
 }
 
@@ -156,11 +159,13 @@ type ExternalIPConfig struct {
 // The policy controller always allows automatically assigned external IPs.
 type ExternalIPPolicy struct {
 	// allowedCIDRs is the list of allowed CIDRs.
+	// +listType=atomic
 	AllowedCIDRs []string `json:"allowedCIDRs,omitempty"`
 
 	// rejectedCIDRs is the list of disallowed CIDRs. These take precedence
 	// over allowedCIDRs.
 	// +optional
+	// +listType=atomic
 	RejectedCIDRs []string `json:"rejectedCIDRs,omitempty"`
 }
 
@@ -178,15 +183,15 @@ type NetworkList struct {
 	Items []Network `json:"items"`
 }
 
-// NetworkMigration represents the cluster network configuration.
+// NetworkMigration represents the network migration status.
 type NetworkMigration struct {
-	// NetworkType is the target plugin that is to be deployed.
-	// Currently supported values are: OpenShiftSDN, OVNKubernetes
-	// +kubebuilder:validation:Enum={"OpenShiftSDN","OVNKubernetes"}
+	// NetworkType is the target plugin that is being deployed.
+	// DEPRECATED: network type migration is no longer supported,
+	// so this should always be unset.
 	// +optional
 	NetworkType string `json:"networkType,omitempty"`
 
-	// MTU contains the MTU migration configuration.
+	// MTU is the MTU configuration that is being deployed.
 	// +optional
 	MTU *MTUMigration `json:"mtu,omitempty"`
 }
