@@ -22,6 +22,12 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 	scheme.AddTypeDefaultingFunc(&v1.PodSecurityPolicySubjectReview{}, func(obj interface{}) {
 		SetObjectDefaults_PodSecurityPolicySubjectReview(obj.(*v1.PodSecurityPolicySubjectReview))
 	})
+	scheme.AddTypeDefaultingFunc(&v1.SecurityContextConstraints{}, func(obj interface{}) {
+		SetObjectDefaults_SecurityContextConstraints(obj.(*v1.SecurityContextConstraints))
+	})
+	scheme.AddTypeDefaultingFunc(&v1.SecurityContextConstraintsList{}, func(obj interface{}) {
+		SetObjectDefaults_SecurityContextConstraintsList(obj.(*v1.SecurityContextConstraintsList))
+	})
 	return nil
 }
 
@@ -1619,4 +1625,17 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 		}
 	}
 	corev1.SetDefaults_ResourceList(&in.Status.Template.Spec.Overhead)
+}
+
+func SetObjectDefaults_SecurityContextConstraints(in *v1.SecurityContextConstraints) {
+	if in.UserNamespaceLevel == "" {
+		in.UserNamespaceLevel = "AllowHostLevel"
+	}
+}
+
+func SetObjectDefaults_SecurityContextConstraintsList(in *v1.SecurityContextConstraintsList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_SecurityContextConstraints(a)
+	}
 }

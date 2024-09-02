@@ -569,6 +569,7 @@ func Convert_authorization_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubject
 }
 
 func autoConvert_v1_LocalResourceAccessReview_To_authorization_LocalResourceAccessReview(in *v1.LocalResourceAccessReview, out *authorization.LocalResourceAccessReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_Action_To_authorization_Action(&in.Action, &out.Action, s); err != nil {
 		return err
 	}
@@ -581,6 +582,7 @@ func Convert_v1_LocalResourceAccessReview_To_authorization_LocalResourceAccessRe
 }
 
 func autoConvert_authorization_LocalResourceAccessReview_To_v1_LocalResourceAccessReview(in *authorization.LocalResourceAccessReview, out *v1.LocalResourceAccessReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_Action_To_v1_Action(&in.Action, &out.Action, s); err != nil {
 		return err
 	}
@@ -593,6 +595,7 @@ func Convert_authorization_LocalResourceAccessReview_To_v1_LocalResourceAccessRe
 }
 
 func autoConvert_v1_LocalSubjectAccessReview_To_authorization_LocalSubjectAccessReview(in *v1.LocalSubjectAccessReview, out *authorization.LocalSubjectAccessReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_Action_To_authorization_Action(&in.Action, &out.Action, s); err != nil {
 		return err
 	}
@@ -603,6 +606,7 @@ func autoConvert_v1_LocalSubjectAccessReview_To_authorization_LocalSubjectAccess
 }
 
 func autoConvert_authorization_LocalSubjectAccessReview_To_v1_LocalSubjectAccessReview(in *authorization.LocalSubjectAccessReview, out *v1.LocalSubjectAccessReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_Action_To_v1_Action(&in.Action, &out.Action, s); err != nil {
 		return err
 	}
@@ -637,6 +641,7 @@ func autoConvert_authorization_PolicyRule_To_v1_PolicyRule(in *authorization.Pol
 }
 
 func autoConvert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview(in *v1.ResourceAccessReview, out *authorization.ResourceAccessReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_Action_To_authorization_Action(&in.Action, &out.Action, s); err != nil {
 		return err
 	}
@@ -649,6 +654,7 @@ func Convert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview(in *v
 }
 
 func autoConvert_authorization_ResourceAccessReview_To_v1_ResourceAccessReview(in *authorization.ResourceAccessReview, out *v1.ResourceAccessReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_Action_To_v1_Action(&in.Action, &out.Action, s); err != nil {
 		return err
 	}
@@ -915,6 +921,7 @@ func Convert_authorization_RoleList_To_v1_RoleList(in *authorization.RoleList, o
 }
 
 func autoConvert_v1_SelfSubjectRulesReview_To_authorization_SelfSubjectRulesReview(in *v1.SelfSubjectRulesReview, out *authorization.SelfSubjectRulesReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_SelfSubjectRulesReviewSpec_To_authorization_SelfSubjectRulesReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
@@ -930,6 +937,7 @@ func Convert_v1_SelfSubjectRulesReview_To_authorization_SelfSubjectRulesReview(i
 }
 
 func autoConvert_authorization_SelfSubjectRulesReview_To_v1_SelfSubjectRulesReview(in *authorization.SelfSubjectRulesReview, out *v1.SelfSubjectRulesReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_SelfSubjectRulesReviewSpec_To_v1_SelfSubjectRulesReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
@@ -999,6 +1007,7 @@ func Convert_authorization_ServiceAccountRestriction_To_v1_ServiceAccountRestric
 }
 
 func autoConvert_v1_SubjectAccessReview_To_authorization_SubjectAccessReview(in *v1.SubjectAccessReview, out *authorization.SubjectAccessReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_Action_To_authorization_Action(&in.Action, &out.Action, s); err != nil {
 		return err
 	}
@@ -1009,6 +1018,7 @@ func autoConvert_v1_SubjectAccessReview_To_authorization_SubjectAccessReview(in 
 }
 
 func autoConvert_authorization_SubjectAccessReview_To_v1_SubjectAccessReview(in *authorization.SubjectAccessReview, out *v1.SubjectAccessReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_Action_To_v1_Action(&in.Action, &out.Action, s); err != nil {
 		return err
 	}
@@ -1045,6 +1055,7 @@ func Convert_authorization_SubjectAccessReviewResponse_To_v1_SubjectAccessReview
 }
 
 func autoConvert_v1_SubjectRulesReview_To_authorization_SubjectRulesReview(in *v1.SubjectRulesReview, out *authorization.SubjectRulesReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
@@ -1060,6 +1071,7 @@ func Convert_v1_SubjectRulesReview_To_authorization_SubjectRulesReview(in *v1.Su
 }
 
 func autoConvert_authorization_SubjectRulesReview_To_v1_SubjectRulesReview(in *authorization.SubjectRulesReview, out *v1.SubjectRulesReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_SubjectRulesReviewSpec_To_v1_SubjectRulesReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
