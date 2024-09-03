@@ -10,6 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ktypes "k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
@@ -39,10 +40,15 @@ func TestNilPath(t *testing.T) {
 }
 
 func TestNameFunc(t *testing.T) {
+	emptyObjectMetaRequired := EmptyObjectMetaRequired()
 	const nameRulesMessage = `a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')`
 
 	for apiType, validationInfo := range Validator.typeToValidator {
 		if !validationInfo.HasObjectMeta {
+			continue
+		}
+		if emptyObjectMetaRequired.Has(apiType.Elem().String()) {
+			// tested in TestObjectMeta
 			continue
 		}
 
@@ -125,6 +131,8 @@ func TestNameFunc(t *testing.T) {
 }
 
 func TestObjectMeta(t *testing.T) {
+	emptyObjectMetaRequired := EmptyObjectMetaRequired()
+
 	for apiType, validationInfo := range Validator.typeToValidator {
 		if !validationInfo.HasObjectMeta {
 			continue
@@ -140,7 +148,12 @@ func TestObjectMeta(t *testing.T) {
 		}
 
 		errList := validationInfo.Validator.Validate(apiValue.Interface().(runtime.Object))
-		requiredErrors := validation.ValidateObjectMeta(apiObjectMeta.Addr().Interface().(*metav1.ObjectMeta), validationInfo.IsNamespaced, path.ValidatePathSegmentName, field.NewPath("metadata"))
+		var requiredErrors field.ErrorList
+		if emptyObjectMetaRequired.Has(apiType.Elem().String()) {
+			requiredErrors = append(requiredErrors, field.Invalid(field.NewPath("metadata"), apiObjectMeta.Addr().Interface(), `must be empty`))
+		} else {
+			requiredErrors = validation.ValidateObjectMeta(apiObjectMeta.Addr().Interface().(*metav1.ObjectMeta), validationInfo.IsNamespaced, path.ValidatePathSegmentName, field.NewPath("metadata"))
+		}
 
 		if len(errList) == 0 {
 			t.Errorf("expected errors %v in %v not found amongst %v.  You probably need to call kube/validation.ValidateObjectMeta in your validator.", requiredErrors, apiType.Elem(), errList)
@@ -160,6 +173,36 @@ func TestObjectMeta(t *testing.T) {
 
 			if !foundExpectedError {
 				t.Errorf("expected error %v in %v not found amongst %v.  You probably need to call kube/validation.ValidateObjectMeta in your validator.", requiredError, apiType.Elem(), errList)
+			}
+		}
+	}
+}
+
+func TestEmptyObjectMetaNamespace(t *testing.T) {
+	emptyObjectMetaRequired := EmptyObjectMetaRequired()
+
+	for apiType, validationInfo := range Validator.typeToValidator {
+		if !validationInfo.HasObjectMeta || !emptyObjectMetaRequired.Has(apiType.Elem().String()) {
+			continue
+		}
+
+		apiValue := reflect.New(apiType.Elem())
+		apiObjectMeta := apiValue.Elem().FieldByName("ObjectMeta")
+
+		if validationInfo.IsNamespaced {
+			apiObjectMeta.Set(reflect.ValueOf(metav1.ObjectMeta{Namespace: metav1.NamespaceDefault}))
+		} else {
+			apiObjectMeta.Set(reflect.ValueOf(metav1.ObjectMeta{}))
+		}
+
+		errList := validationInfo.Validator.Validate(apiValue.Interface().(runtime.Object))
+		invalidError := field.Invalid(field.NewPath("metadata"), apiObjectMeta.Addr().Interface(), `must be empty`)
+
+		for _, err := range errList {
+			validationError := err
+			if fmt.Sprintf("%v", validationError) == fmt.Sprintf("%v", invalidError) {
+				t.Errorf("expected 0 metadata must be empty errors in %v, found %v. Objects with required empty meta should accept a namespace.", apiType.Elem(), errList)
+				break
 			}
 		}
 	}
@@ -264,4 +307,18 @@ func TestPodSpecNodeSelectorUpdateDisallowed(t *testing.T) {
 	if len(errs) == 0 {
 		t.Fatal("expected at least 1 error")
 	}
+}
+
+func EmptyObjectMetaRequired() sets.Set[string] {
+	return sets.New(
+		"authorization.SelfSubjectRulesReview",
+		"authorization.SubjectRulesReview",
+		"authorization.ResourceAccessReview",
+		"authorization.SubjectAccessReview",
+		"authorization.LocalResourceAccessReview",
+		"authorization.LocalSubjectAccessReview",
+		"security.PodSecurityPolicySubjectReview",
+		"security.PodSecurityPolicySelfSubjectReview",
+		"security.PodSecurityPolicyReview",
+	)
 }
