@@ -5,8 +5,10 @@ import (
 	"regexp"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/validation"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 	kapivalidation "k8s.io/kubernetes/pkg/apis/core/validation"
@@ -278,6 +280,13 @@ func ValidateSecurityContextConstraintsUpdate(newScc, oldScc *securityapi.Securi
 func ValidatePodSecurityPolicySubjectReview(podSecurityPolicySubjectReview *securityapi.PodSecurityPolicySubjectReview) field.ErrorList {
 	allErrs := field.ErrorList{}
 	allErrs = append(allErrs, validatePodSecurityPolicySubjectReviewSpec(&podSecurityPolicySubjectReview.Spec, field.NewPath("spec"))...)
+
+	objectMetaShallowCopy := podSecurityPolicySubjectReview.ObjectMeta
+	objectMetaShallowCopy.Namespace = ""
+	objectMetaShallowCopy.ManagedFields = nil
+	if !equality.Semantic.DeepEqual(metav1.ObjectMeta{}, objectMetaShallowCopy) {
+		allErrs = append(allErrs, field.Invalid(field.NewPath("metadata"), podSecurityPolicySubjectReview.ObjectMeta, `must be empty`))
+	}
 	return allErrs
 }
 
@@ -295,6 +304,13 @@ func validatePodSecurityPolicySubjectReviewSpec(spec *securityapi.PodSecurityPol
 func ValidatePodSecurityPolicySelfSubjectReview(podSecurityPolicySelfSubjectReview *securityapi.PodSecurityPolicySelfSubjectReview) field.ErrorList {
 	allErrs := field.ErrorList{}
 	allErrs = append(allErrs, validatePodSecurityPolicySelfSubjectReviewSpec(&podSecurityPolicySelfSubjectReview.Spec, field.NewPath("spec"))...)
+
+	objectMetaShallowCopy := podSecurityPolicySelfSubjectReview.ObjectMeta
+	objectMetaShallowCopy.Namespace = ""
+	objectMetaShallowCopy.ManagedFields = nil
+	if !equality.Semantic.DeepEqual(metav1.ObjectMeta{}, objectMetaShallowCopy) {
+		allErrs = append(allErrs, field.Invalid(field.NewPath("metadata"), podSecurityPolicySelfSubjectReview.ObjectMeta, `must be empty`))
+	}
 	return allErrs
 }
 
@@ -308,6 +324,13 @@ func validatePodSecurityPolicySelfSubjectReviewSpec(podSecurityPolicySelfSubject
 func ValidatePodSecurityPolicyReview(podSecurityPolicyReview *securityapi.PodSecurityPolicyReview) field.ErrorList {
 	allErrs := field.ErrorList{}
 	allErrs = append(allErrs, validatePodSecurityPolicyReviewSpec(&podSecurityPolicyReview.Spec, field.NewPath("spec"))...)
+
+	objectMetaShallowCopy := podSecurityPolicyReview.ObjectMeta
+	objectMetaShallowCopy.Namespace = ""
+	objectMetaShallowCopy.ManagedFields = nil
+	if !equality.Semantic.DeepEqual(metav1.ObjectMeta{}, objectMetaShallowCopy) {
+		allErrs = append(allErrs, field.Invalid(field.NewPath("metadata"), podSecurityPolicyReview.ObjectMeta, `must be empty`))
+	}
 	return allErrs
 }
 

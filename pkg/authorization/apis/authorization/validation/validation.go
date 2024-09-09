@@ -7,6 +7,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/equality"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/api/validation/path"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	unversionedvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	kvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -18,7 +19,15 @@ import (
 )
 
 func ValidateSelfSubjectRulesReview(review *authorizationapi.SelfSubjectRulesReview) field.ErrorList {
-	return field.ErrorList{}
+	allErrs := field.ErrorList{}
+
+	objectMetaShallowCopy := review.ObjectMeta
+	objectMetaShallowCopy.Namespace = ""
+	objectMetaShallowCopy.ManagedFields = nil
+	if !equality.Semantic.DeepEqual(metav1.ObjectMeta{}, objectMetaShallowCopy) {
+		allErrs = append(allErrs, field.Invalid(field.NewPath("metadata"), review.ObjectMeta, `must be empty`))
+	}
+	return allErrs
 }
 
 func ValidateSubjectRulesReview(rules *authorizationapi.SubjectRulesReview) field.ErrorList {
@@ -28,6 +37,12 @@ func ValidateSubjectRulesReview(rules *authorizationapi.SubjectRulesReview) fiel
 		allErrs = append(allErrs, field.Required(field.NewPath("user"), "at least one of user and groups must be specified"))
 	}
 
+	objectMetaShallowCopy := rules.ObjectMeta
+	objectMetaShallowCopy.Namespace = ""
+	objectMetaShallowCopy.ManagedFields = nil
+	if !equality.Semantic.DeepEqual(metav1.ObjectMeta{}, objectMetaShallowCopy) {
+		allErrs = append(allErrs, field.Invalid(field.NewPath("metadata"), rules.ObjectMeta, `must be empty`))
+	}
 	return allErrs
 }
 
@@ -71,6 +86,11 @@ func ValidateSubjectAccessReview(review *authorizationapi.SubjectAccessReview) f
 	}
 	allErrs = append(allErrs, validateCommonAccessReviewAction(nil, &review.Action)...)
 
+	objectMetaShallowCopy := review.ObjectMeta
+	objectMetaShallowCopy.ManagedFields = nil
+	if !equality.Semantic.DeepEqual(metav1.ObjectMeta{}, objectMetaShallowCopy) {
+		allErrs = append(allErrs, field.Invalid(field.NewPath("metadata"), review.ObjectMeta, `must be empty`))
+	}
 	return allErrs
 }
 
@@ -82,6 +102,11 @@ func ValidateResourceAccessReview(review *authorizationapi.ResourceAccessReview)
 	}
 	allErrs = append(allErrs, validateCommonAccessReviewAction(nil, &review.Action)...)
 
+	objectMetaShallowCopy := review.ObjectMeta
+	objectMetaShallowCopy.ManagedFields = nil
+	if !equality.Semantic.DeepEqual(metav1.ObjectMeta{}, objectMetaShallowCopy) {
+		allErrs = append(allErrs, field.Invalid(field.NewPath("metadata"), review.ObjectMeta, `must be empty`))
+	}
 	return allErrs
 }
 
@@ -93,6 +118,12 @@ func ValidateLocalSubjectAccessReview(review *authorizationapi.LocalSubjectAcces
 	}
 	allErrs = append(allErrs, validateCommonAccessReviewAction(nil, &review.Action)...)
 
+	objectMetaShallowCopy := review.ObjectMeta
+	objectMetaShallowCopy.Namespace = ""
+	objectMetaShallowCopy.ManagedFields = nil
+	if !equality.Semantic.DeepEqual(metav1.ObjectMeta{}, objectMetaShallowCopy) {
+		allErrs = append(allErrs, field.Invalid(field.NewPath("metadata"), review.ObjectMeta, `must be empty`))
+	}
 	return allErrs
 }
 
@@ -104,6 +135,12 @@ func ValidateLocalResourceAccessReview(review *authorizationapi.LocalResourceAcc
 	}
 	allErrs = append(allErrs, validateCommonAccessReviewAction(nil, &review.Action)...)
 
+	objectMetaShallowCopy := review.ObjectMeta
+	objectMetaShallowCopy.Namespace = ""
+	objectMetaShallowCopy.ManagedFields = nil
+	if !equality.Semantic.DeepEqual(metav1.ObjectMeta{}, objectMetaShallowCopy) {
+		allErrs = append(allErrs, field.Invalid(field.NewPath("metadata"), review.ObjectMeta, `must be empty`))
+	}
 	return allErrs
 }
 

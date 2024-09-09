@@ -99,6 +99,7 @@ type RoleBinding struct {
 // SelfSubjectRulesReview is a resource you can create to determine which actions you can perform in a namespace
 type SelfSubjectRulesReview struct {
 	metav1.TypeMeta
+	metav1.ObjectMeta
 
 	// Spec adds information about how to conduct the check
 	Spec SelfSubjectRulesReviewSpec
@@ -123,6 +124,7 @@ type SelfSubjectRulesReviewSpec struct {
 // SubjectRulesReview is a resource you can create to determine which actions another user can perform in a namespace
 type SubjectRulesReview struct {
 	metav1.TypeMeta
+	metav1.ObjectMeta
 
 	// Spec adds information about how to conduct the check
 	Spec SubjectRulesReviewSpec
@@ -173,7 +175,7 @@ type ResourceAccessReviewResponse struct {
 
 // +genclient
 // +genclient:nonNamespaced
-// +genclient:skipVerbs=get,list,create,update,patch,delete,deleteCollection,watch
+// +genclient:skipVerbs=apply,applyStatus,get,list,create,update,updateStatus,patch,delete,deleteCollection,watch
 // +genclient:method=Create,verb=create,result=ResourceAccessReviewResponse
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -181,6 +183,7 @@ type ResourceAccessReviewResponse struct {
 // action specified by spec
 type ResourceAccessReview struct {
 	metav1.TypeMeta
+	metav1.ObjectMeta
 
 	// Action describes the action being tested
 	Action
@@ -206,13 +209,14 @@ type SubjectAccessReviewResponse struct {
 
 // +genclient
 // +genclient:nonNamespaced
-// +genclient:skipVerbs=get,list,create,update,patch,delete,deleteCollection,watch
+// +genclient:skipVerbs=apply,applyStatus,get,list,create,update,updateStatus,patch,delete,deleteCollection,watch
 // +genclient:method=Create,verb=create,result=SubjectAccessReviewResponse
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // SubjectAccessReview is an object for requesting information about whether a user or group can perform an action
 type SubjectAccessReview struct {
 	metav1.TypeMeta
+	metav1.ObjectMeta
 
 	// Action describes the action being tested
 	Action
@@ -229,26 +233,28 @@ type SubjectAccessReview struct {
 }
 
 // +genclient
-// +genclient:skipVerbs=get,list,create,update,patch,delete,deleteCollection,watch
+// +genclient:skipVerbs=apply,applyStatus,get,list,create,update,updateStatus,patch,delete,deleteCollection,watch
 // +genclient:method=Create,verb=create,result=ResourceAccessReviewResponse
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // LocalResourceAccessReview is a means to request a list of which users and groups are authorized to perform the action specified by spec in a particular namespace
 type LocalResourceAccessReview struct {
 	metav1.TypeMeta
+	metav1.ObjectMeta
 
 	// Action describes the action being tested
 	Action
 }
 
 // +genclient
-// +genclient:skipVerbs=get,list,create,update,patch,delete,deleteCollection,watch
+// +genclient:skipVerbs=apply,applyStatus,get,list,create,update,updateStatus,patch,delete,deleteCollection,watch
 // +genclient:method=Create,verb=create,result=SubjectAccessReviewResponse
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // LocalSubjectAccessReview is an object for requesting information about whether a user or group can perform an action in a particular namespace
 type LocalSubjectAccessReview struct {
 	metav1.TypeMeta
+	metav1.ObjectMeta
 
 	// Action describes the action being tested.  The Namespace element is FORCED to the current namespace.
 	Action

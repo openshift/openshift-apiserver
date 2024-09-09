@@ -282,6 +282,7 @@ func Convert_security_IDRange_To_v1_IDRange(in *security.IDRange, out *v1.IDRang
 }
 
 func autoConvert_v1_PodSecurityPolicyReview_To_security_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview, out *security.PodSecurityPolicyReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_PodSecurityPolicyReviewSpec_To_security_PodSecurityPolicyReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
@@ -297,6 +298,7 @@ func Convert_v1_PodSecurityPolicyReview_To_security_PodSecurityPolicyReview(in *
 }
 
 func autoConvert_security_PodSecurityPolicyReview_To_v1_PodSecurityPolicyReview(in *security.PodSecurityPolicyReview, out *v1.PodSecurityPolicyReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_security_PodSecurityPolicyReviewSpec_To_v1_PodSecurityPolicyReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
@@ -378,6 +380,7 @@ func Convert_security_PodSecurityPolicyReviewStatus_To_v1_PodSecurityPolicyRevie
 }
 
 func autoConvert_v1_PodSecurityPolicySelfSubjectReview_To_security_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPolicySelfSubjectReview, out *security.PodSecurityPolicySelfSubjectReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_PodSecurityPolicySelfSubjectReviewSpec_To_security_PodSecurityPolicySelfSubjectReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
@@ -393,6 +396,7 @@ func Convert_v1_PodSecurityPolicySelfSubjectReview_To_security_PodSecurityPolicy
 }
 
 func autoConvert_security_PodSecurityPolicySelfSubjectReview_To_v1_PodSecurityPolicySelfSubjectReview(in *security.PodSecurityPolicySelfSubjectReview, out *v1.PodSecurityPolicySelfSubjectReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_security_PodSecurityPolicySelfSubjectReviewSpec_To_v1_PodSecurityPolicySelfSubjectReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
@@ -432,6 +436,7 @@ func Convert_security_PodSecurityPolicySelfSubjectReviewSpec_To_v1_PodSecurityPo
 }
 
 func autoConvert_v1_PodSecurityPolicySubjectReview_To_security_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySubjectReview, out *security.PodSecurityPolicySubjectReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_PodSecurityPolicySubjectReviewSpec_To_security_PodSecurityPolicySubjectReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
@@ -447,6 +452,7 @@ func Convert_v1_PodSecurityPolicySubjectReview_To_security_PodSecurityPolicySubj
 }
 
 func autoConvert_security_PodSecurityPolicySubjectReview_To_v1_PodSecurityPolicySubjectReview(in *security.PodSecurityPolicySubjectReview, out *v1.PodSecurityPolicySubjectReview, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_security_PodSecurityPolicySubjectReviewSpec_To_v1_PodSecurityPolicySubjectReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
@@ -657,6 +663,7 @@ func autoConvert_v1_SecurityContextConstraints_To_security_SecurityContextConstr
 	out.AllowHostPorts = in.AllowHostPorts
 	out.AllowHostPID = in.AllowHostPID
 	out.AllowHostIPC = in.AllowHostIPC
+	// WARNING: in.UserNamespaceLevel requires manual conversion: does not exist in peer-type
 	out.DefaultAllowPrivilegeEscalation = (*bool)(unsafe.Pointer(in.DefaultAllowPrivilegeEscalation))
 	out.AllowPrivilegeEscalation = (*bool)(unsafe.Pointer(in.AllowPrivilegeEscalation))
 	if err := Convert_v1_SELinuxContextStrategyOptions_To_security_SELinuxContextStrategyOptions(&in.SELinuxContext, &out.SELinuxContext, s); err != nil {
