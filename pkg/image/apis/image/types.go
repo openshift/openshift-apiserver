@@ -298,6 +298,8 @@ const (
 	ImportModePreserveOriginal ImportModeType = "PreserveOriginal"
 )
 
+var DefaultImportMode ImportModeType = ImportModeLegacy
+
 // TagReferencePolicyType describes how pull-specs for images in an image stream tag are generated when
 // image change triggers are fired.
 type TagReferencePolicyType string
