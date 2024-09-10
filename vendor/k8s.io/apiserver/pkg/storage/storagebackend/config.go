@@ -36,7 +36,7 @@ const (
 
 	DefaultCompactInterval      = 5 * time.Minute
 	DefaultDBMetricPollInterval = 30 * time.Second
-	DefaultHealthcheckTimeout   = 10 * time.Second
+	DefaultHealthcheckTimeout   = 2 * time.Second
 	DefaultReadinessTimeout     = 2 * time.Second
 )
 

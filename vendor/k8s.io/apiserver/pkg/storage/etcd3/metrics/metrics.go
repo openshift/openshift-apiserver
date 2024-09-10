@@ -84,7 +84,7 @@ var (
 		},
 		[]string{"endpoint"},
 	)
-	storageSizeDescription   = compbasemetrics.NewDesc("apiserver_storage_size_bytes", "Size of the storage database file physically allocated in bytes.", []string{"cluster"}, nil, compbasemetrics.ALPHA, "")
+	storageSizeDescription   = compbasemetrics.NewDesc("apiserver_storage_size_bytes", "Size of the storage database file physically allocated in bytes.", []string{"storage_cluster_id"}, nil, compbasemetrics.STABLE, "")
 	storageMonitor           = &monitorCollector{monitorGetter: func() ([]Monitor, error) { return nil, nil }}
 	etcdEventsReceivedCounts = compbasemetrics.NewCounterVec(
 		&compbasemetrics.CounterOpts{
@@ -153,14 +153,6 @@ var (
 		},
 		[]string{"resource"},
 	)
-	etcdRequestRetry = compbasemetrics.NewCounterVec(
-		&compbasemetrics.CounterOpts{
-			Name:           "etcd_request_retry_total",
-			Help:           "Etcd request retry total",
-			StabilityLevel: compbasemetrics.ALPHA,
-		},
-		[]string{"error"},
-	)
 )
 
 var registerMetrics sync.Once
@@ -175,6 +167,7 @@ func Register() {
 		legacyregistry.MustRegister(objectCounts)
 		legacyregistry.MustRegister(dbTotalSize)
 		legacyregistry.CustomMustRegister(storageMonitor)
+		legacyregistry.MustRegister(etcdEventsReceivedCounts)
 		legacyregistry.MustRegister(etcdBookmarkCounts)
 		legacyregistry.MustRegister(etcdLeaseObjectCounts)
 		legacyregistry.MustRegister(listStorageCount)
@@ -182,7 +175,6 @@ func Register() {
 		legacyregistry.MustRegister(listStorageNumSelectorEvals)
 		legacyregistry.MustRegister(listStorageNumReturned)
 		legacyregistry.MustRegister(decodeErrorCounts)
-		legacyregistry.MustRegister(etcdRequestRetry)
 	})
 }
 
@@ -247,11 +239,6 @@ func UpdateLeaseObjectCount(count int64) {
 	etcdLeaseObjectCounts.WithLabelValues().Observe(float64(count))
 }
 
-// UpdateEtcdRequestRetry sets the etcd_request_retry_total metric.
-func UpdateEtcdRequestRetry(errorCode string) {
-	etcdRequestRetry.WithLabelValues(errorCode).Inc()
-}
-
 // RecordListEtcd3Metrics notes various metrics of the cost to serve a LIST request
 func RecordStorageListMetrics(resource string, numFetched, numEvald, numReturned int) {
 	listStorageCount.WithLabelValues(resource).Inc()
@@ -301,21 +288,21 @@ func (c *monitorCollector) CollectWithStability(ch chan<- compbasemetrics.Metric
 	}
 
 	for i, m := range monitors {
-		cluster := fmt.Sprintf("etcd-%d", i)
+		storageClusterID := fmt.Sprintf("etcd-%d", i)
 
-		klog.V(4).InfoS("Start collecting storage metrics", "cluster", cluster)
+		klog.V(4).InfoS("Start collecting storage metrics", "storage_cluster_id", storageClusterID)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		metrics, err := m.Monitor(ctx)
 		cancel()
 		m.Close()
 		if err != nil {
-			klog.InfoS("Failed to get storage metrics", "cluster", cluster, "err", err)
+			klog.InfoS("Failed to get storage metrics", "storage_cluster_id", storageClusterID, "err", err)
 			continue
 		}
 
-		metric, err := compbasemetrics.NewConstMetric(storageSizeDescription, compbasemetrics.GaugeValue, float64(metrics.Size), cluster)
+		metric, err := compbasemetrics.NewConstMetric(storageSizeDescription, compbasemetrics.GaugeValue, float64(metrics.Size), storageClusterID)
 		if err != nil {
-			klog.ErrorS(err, "Failed to create metric", "cluster", cluster)
+			klog.ErrorS(err, "Failed to create metric", "storage_cluster_id", storageClusterID)
 		}
 		ch <- metric
 	}
