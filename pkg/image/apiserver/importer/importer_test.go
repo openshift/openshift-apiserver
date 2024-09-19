@@ -71,6 +71,7 @@ func (r *mockRepository) Blobs(ctx context.Context) distribution.BlobStore { ret
 func (r *mockRepository) Exists(ctx context.Context, dgst godigest.Digest) (bool, error) {
 	return false, r.getErr
 }
+
 func (r *mockRepository) Get(ctx context.Context, dgst godigest.Digest, options ...distribution.ManifestServiceOption) (distribution.Manifest, error) {
 	r.manifestReqs = append(r.manifestReqs, dgst)
 	for d, manifest := range r.extraManifests {
@@ -85,12 +86,15 @@ func (r *mockRepository) Get(ctx context.Context, dgst godigest.Digest, options 
 	}
 	return r.manifest, r.getErr
 }
+
 func (r *mockRepository) Delete(ctx context.Context, dgst godigest.Digest) error {
 	return fmt.Errorf("not implemented")
 }
+
 func (r *mockRepository) Put(ctx context.Context, manifest distribution.Manifest, options ...distribution.ManifestServiceOption) (godigest.Digest, error) {
 	return "", fmt.Errorf("not implemented")
 }
+
 func (r *mockRepository) Tags(ctx context.Context) distribution.TagService {
 	return &mockTagService{repo: r}
 }
@@ -223,11 +227,13 @@ func TestImport(t *testing.T) {
 		},
 	}
 	testCases := []struct {
+		name      string
 		retriever RepositoryRetriever
 		isi       imageapi.ImageStreamImport
 		expect    func(*imageapi.ImageStreamImport, *testing.T)
 	}{
 		{
+			name:      "insecure import policy",
 			retriever: insecureRetriever,
 			isi: imageapi.ImageStreamImport{
 				Spec: imageapi.ImageStreamImportSpec{
@@ -243,6 +249,7 @@ func TestImport(t *testing.T) {
 			},
 		},
 		{
+			name: "missing tag, digest, and invalid image reference",
 			retriever: &mockRetriever{
 				repo: &mockRepository{
 					getTagErr:   fmt.Errorf("no such tag"),
@@ -283,6 +290,7 @@ func TestImport(t *testing.T) {
 			},
 		},
 		{
+			name:      "failed repository import",
 			retriever: &mockRetriever{err: fmt.Errorf("error")},
 			isi: imageapi.ImageStreamImport{
 				Spec: imageapi.ImageStreamImportSpec{
@@ -304,6 +312,7 @@ func TestImport(t *testing.T) {
 			},
 		},
 		{
+			name:      "successfull import by tag and digest",
 			retriever: &mockRetriever{repo: &mockRepository{manifest: etcdManifestSchema1}},
 			isi: imageapi.ImageStreamImport{
 				Spec: imageapi.ImageStreamImportSpec{
@@ -337,6 +346,7 @@ func TestImport(t *testing.T) {
 			},
 		},
 		{
+			name: "successful import by tag",
 			retriever: &mockRetriever{
 				repo: &mockRepository{
 					blobs: &mockBlobStore{
@@ -379,6 +389,7 @@ func TestImport(t *testing.T) {
 			},
 		},
 		{
+			name: "import repository with additional tags",
 			retriever: &mockRetriever{
 				repo: &mockRepository{
 					manifest: etcdManifestSchema1,
@@ -421,13 +432,15 @@ func TestImport(t *testing.T) {
 		},
 	}
 	for i, test := range testCases {
-		im := NewImageStreamImporter(test.retriever, nil, 5, nil, nil)
-		if err := im.Import(nil, &test.isi, &imageapi.ImageStream{}); err != nil {
-			t.Errorf("%d: %v", i, err)
-		}
-		if test.expect != nil {
-			test.expect(&test.isi, t)
-		}
+		t.Run(test.name, func(t *testing.T) {
+			im := NewImageStreamImporter(test.retriever, nil, 5, nil, nil)
+			if err := im.Import(nil, &test.isi, &imageapi.ImageStream{}); err != nil {
+				t.Errorf("%d: %v", i, err)
+			}
+			if test.expect != nil {
+				test.expect(&test.isi, t)
+			}
+		})
 	}
 }
 
