@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
-	github.com/containers/image/v5 v5.24.0
+	github.com/containers/image/v5 v5.24.3
 	github.com/davecgh/go-spew v1.1.1
 	github.com/distribution/distribution/v3 v3.0.0
 	github.com/docker/docker v20.10.23+incompatible

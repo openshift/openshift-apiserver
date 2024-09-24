@@ -51,8 +51,8 @@ github.com/cncf/xds/go v0.0.0-20230607035331-e9ce68804cb4 h1:/inchEIKaYC1Akx+H+g
 github.com/cncf/xds/go v0.0.0-20230607035331-e9ce68804cb4/go.mod h1:eXthEFrGJvWHgFFCl3hGmgk+/aYT6PnTQLykKQRLhEs=
 github.com/cockroachdb/datadriven v1.0.2 h1:H9MtNqVoVhvd9nCBwOyDjUEdZCREqbIdCJD93PBm/jA=
 github.com/cockroachdb/datadriven v1.0.2/go.mod h1:a9RdTaap04u637JoCzcUoIcDmvwSUtcUFtT/C3kJlTU=
-github.com/containers/image/v5 v5.24.0 h1:2Pu8ztTntqNxteVN15bORCQnM8rfnbYuyKwUiiKUBuc=
-github.com/containers/image/v5 v5.24.0/go.mod h1:oss5F6ssGQz8ZtC79oY+fuzYA3m3zBek9tq9gmhuvHc=
+github.com/containers/image/v5 v5.24.3 h1:IKrt9qWFqLkvu7trjH5XOKjkCdJ3y5vdcriOcm7j3GM=
+github.com/containers/image/v5 v5.24.3/go.mod h1:oss5F6ssGQz8ZtC79oY+fuzYA3m3zBek9tq9gmhuvHc=
 github.com/containers/storage v1.45.3 h1:GbtTvTtp3GW2/tcFg5VhgHXcYMwVn2KfZKiHjf9FAOM=
 github.com/containers/storage v1.45.3/go.mod h1:OdRUYHrq1HP6iAo79VxqtYuJzC5j4eA2I60jKOoCT7g=
 github.com/coreos/go-semver v0.3.1 h1:yi21YpKnrx1gt5R+la8n5WgS0kCrsPp33dmEyHReZr4=
