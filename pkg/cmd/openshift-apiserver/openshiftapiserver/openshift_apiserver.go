@@ -183,7 +183,7 @@ func (c *OpenshiftAPIConfig) Complete() completedConfig {
 
 func (c *completedConfig) withAppsAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
 	cfg := &oappsapiserver.AppsServerConfig{
-		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
+		GenericConfig: &genericapiserver.RecommendedConfig{Config: shallowCopyAndSanitizeGenericConfig(c.GenericConfig.Config), SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
 		ExtraConfig: oappsapiserver.ExtraConfig{
 			KubeAPIServerClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
 			Codecs:                    legacyscheme.Codecs,
@@ -203,7 +203,7 @@ func (c *completedConfig) withAppsAPIServer(delegateAPIServer genericapiserver.D
 
 func (c *completedConfig) withAuthorizationAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
 	cfg := &authorizationapiserver.AuthorizationAPIServerConfig{
-		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
+		GenericConfig: &genericapiserver.RecommendedConfig{Config: shallowCopyAndSanitizeGenericConfig(c.GenericConfig.Config), SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
 		ExtraConfig: authorizationapiserver.ExtraConfig{
 			KubeAPIServerClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
 			KubeInformers:             c.ExtraConfig.KubeInformers,
@@ -226,7 +226,7 @@ func (c *completedConfig) withAuthorizationAPIServer(delegateAPIServer genericap
 
 func (c *completedConfig) withBuildAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
 	cfg := &buildapiserver.BuildServerConfig{
-		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
+		GenericConfig: &genericapiserver.RecommendedConfig{Config: shallowCopyAndSanitizeGenericConfig(c.GenericConfig.Config), SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
 		ExtraConfig: buildapiserver.ExtraConfig{
 			KubeAPIServerClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
 			Codecs:                    legacyscheme.Codecs,
@@ -246,7 +246,7 @@ func (c *completedConfig) withBuildAPIServer(delegateAPIServer genericapiserver.
 
 func (c *completedConfig) withImageAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
 	cfg := &imageapiserver.ImageAPIServerConfig{
-		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
+		GenericConfig: &genericapiserver.RecommendedConfig{Config: shallowCopyAndSanitizeGenericConfig(c.GenericConfig.Config), SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
 		ExtraConfig: imageapiserver.ExtraConfig{
 			KubeAPIServerClientConfig:          c.ExtraConfig.KubeAPIServerClientConfig,
 			RegistryHostnameRetriever:          c.ExtraConfig.RegistryHostnameRetriever,
@@ -272,7 +272,7 @@ func (c *completedConfig) withImageAPIServer(delegateAPIServer genericapiserver.
 
 func (c *completedConfig) withProjectAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
 	cfg := &projectapiserver.ProjectAPIServerConfig{
-		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
+		GenericConfig: &genericapiserver.RecommendedConfig{Config: shallowCopyAndSanitizeGenericConfig(c.GenericConfig.Config), SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
 		ExtraConfig: projectapiserver.ExtraConfig{
 			KubeAPIServerClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
 			ProjectAuthorizationCache: c.ExtraConfig.ProjectAuthorizationCache,
@@ -297,7 +297,7 @@ func (c *completedConfig) withProjectAPIServer(delegateAPIServer genericapiserve
 
 func (c *completedConfig) withQuotaAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
 	cfg := &quotaapiserver.QuotaAPIServerConfig{
-		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
+		GenericConfig: &genericapiserver.RecommendedConfig{Config: shallowCopyAndSanitizeGenericConfig(c.GenericConfig.Config), SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
 		ExtraConfig: quotaapiserver.ExtraConfig{
 			ClusterQuotaMappingController: c.ExtraConfig.ClusterQuotaMappingController,
 			QuotaInformers:                c.ExtraConfig.QuotaInformers,
@@ -318,7 +318,7 @@ func (c *completedConfig) withQuotaAPIServer(delegateAPIServer genericapiserver.
 
 func (c *completedConfig) withRouteAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
 	cfg := &routeapiserver.RouteAPIServerConfig{
-		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
+		GenericConfig: &genericapiserver.RecommendedConfig{Config: shallowCopyAndSanitizeGenericConfig(c.GenericConfig.Config), SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
 		ExtraConfig: routeapiserver.ExtraConfig{
 			KubeAPIServerClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
 			RouteAllocator:            c.ExtraConfig.RouteAllocator,
@@ -340,7 +340,7 @@ func (c *completedConfig) withRouteAPIServer(delegateAPIServer genericapiserver.
 
 func (c *completedConfig) withSecurityAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
 	cfg := &securityapiserver.SecurityAPIServerConfig{
-		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
+		GenericConfig: &genericapiserver.RecommendedConfig{Config: shallowCopyAndSanitizeGenericConfig(c.GenericConfig.Config), SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
 		ExtraConfig: securityapiserver.ExtraConfig{
 			KubeAPIServerClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
 			SecurityInformers:         c.ExtraConfig.SecurityInformers,
@@ -363,7 +363,7 @@ func (c *completedConfig) withSecurityAPIServer(delegateAPIServer genericapiserv
 
 func (c *completedConfig) withTemplateAPIServer(delegateAPIServer genericapiserver.DelegationTarget) (genericapiserver.DelegationTarget, error) {
 	cfg := &templateapiserver.TemplateConfig{
-		GenericConfig: &genericapiserver.RecommendedConfig{Config: *c.GenericConfig.Config, SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
+		GenericConfig: &genericapiserver.RecommendedConfig{Config: shallowCopyAndSanitizeGenericConfig(c.GenericConfig.Config), SharedInformerFactory: c.GenericConfig.SharedInformerFactory},
 		ExtraConfig: templateapiserver.ExtraConfig{
 			KubeAPIServerClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
 			Codecs:                    legacyscheme.Codecs,
@@ -639,4 +639,16 @@ func bootstrapData(data *bootstrappolicy.PolicyData) *rbacrest.PolicyData {
 		RoleBindings:            data.RoleBindings,
 		ClusterRolesToAggregate: data.ClusterRolesToAggregate,
 	}
+}
+
+// shallowCopyAndSanitizeGenericConfig makes a shallow copy of the passed config
+// and clears the reference field that should not be shared
+// between multiple apiservers
+func shallowCopyAndSanitizeGenericConfig(config *genericapiserver.Config) genericapiserver.Config {
+	configCopy := *config
+	// post-start-hooks should not be shared
+	// because the server breaks when repeated
+	// hooks are registered
+	configCopy.PostStartHooks = map[string]genericapiserver.PostStartHookConfigEntry{}
+	return configCopy
 }
