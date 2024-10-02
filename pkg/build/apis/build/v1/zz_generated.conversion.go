@@ -25,7 +25,7 @@ func init() {
 }
 
 // RegisterConversions adds conversion functions to the given scheme.
-// Public to allow building arbitrary schemes.
+// Public to allow building arbitrary schemes. Test
 func RegisterConversions(s *runtime.Scheme) error {
 	if err := s.AddGeneratedConversionFunc((*v1.BinaryBuildRequestOptions)(nil), (*build.BinaryBuildRequestOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1_BinaryBuildRequestOptions_To_build_BinaryBuildRequestOptions(a.(*v1.BinaryBuildRequestOptions), b.(*build.BinaryBuildRequestOptions), scope)
