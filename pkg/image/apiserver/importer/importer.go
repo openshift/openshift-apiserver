@@ -2,6 +2,7 @@ package importer
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"runtime"
@@ -256,6 +257,22 @@ func (imp *ImageStreamImporter) importImages(ctx context.Context, isi *imageapi.
 				cache[j] = tag.Image
 			}
 			for _, index := range tags[j] {
+				// we have seen the below state in our internal CI clusters. we think
+				// it's caused by outages in the upstream registry, but we're not sure
+				// exactly how we end up in this situation where neither error or image
+				// are set. to protect against that we throw a generic error when it
+				// happens.
+				// See https://issues.redhat.com/browse/OCPBUGS-35036 for details.
+				if tag.Image == nil && tag.Err == nil {
+					errMsg := fmt.Sprintf(
+						"unknown error while importing tag %q from repository %q with import mode %q, please try again.",
+						tag.Name,
+						repo.Name,
+						tag.ImportMode,
+					)
+					tag.Err = errors.New(errMsg)
+					klog.Infof("importImages: both tag image and error are nil! repo=%+v tag=%+v", repo, tag)
+				}
 				if tag.Err != nil {
 					setImageImportStatus(isi, index, tag.Name, tag.Err)
 					continue
