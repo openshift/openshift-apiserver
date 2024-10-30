@@ -23,8 +23,8 @@ import (
 	"strings"
 	"time"
 
-	jsonpatch "github.com/evanphx/json-patch"
 	"go.opentelemetry.io/otel/attribute"
+	jsonpatch "gopkg.in/evanphx/json-patch.v4"
 	kjson "sigs.k8s.io/json"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -45,7 +45,6 @@ import (
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/audit"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
-	"k8s.io/apiserver/pkg/endpoints/filters"
 	"k8s.io/apiserver/pkg/endpoints/handlers/fieldmanager"
 	"k8s.io/apiserver/pkg/endpoints/handlers/finisher"
 	requestmetrics "k8s.io/apiserver/pkg/endpoints/handlers/metrics"
@@ -92,7 +91,7 @@ func PatchResource(r rest.Patcher, scope *RequestScope, admit admission.Interfac
 
 		// enforce a timeout of at most requestTimeoutUpperBound (34s) or less if the user-provided
 		// timeout inside the parent context is lower than requestTimeoutUpperBound.
-		ctx, cancel := filters.RequestContextWithUpperBoundOrWorkAroundOurBrokenCaseWhereTimeoutWasNotAppliedYet(req, requestTimeoutUpperBound)
+		ctx, cancel := context.WithTimeout(ctx, requestTimeoutUpperBound)
 		defer cancel()
 
 		ctx = request.WithNamespace(ctx, namespace)

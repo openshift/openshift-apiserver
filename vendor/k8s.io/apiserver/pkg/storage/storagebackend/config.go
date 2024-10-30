@@ -20,6 +20,7 @@ import (
 	"time"
 
 	oteltrace "go.opentelemetry.io/otel/trace"
+	noopoteltrace "go.opentelemetry.io/otel/trace/noop"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -36,7 +37,7 @@ const (
 
 	DefaultCompactInterval      = 5 * time.Minute
 	DefaultDBMetricPollInterval = 30 * time.Second
-	DefaultHealthcheckTimeout   = 10 * time.Second
+	DefaultHealthcheckTimeout   = 2 * time.Second
 	DefaultReadinessTimeout     = 2 * time.Second
 )
 
@@ -117,6 +118,6 @@ func NewDefaultConfig(prefix string, codec runtime.Codec) *Config {
 		HealthcheckTimeout:   DefaultHealthcheckTimeout,
 		ReadycheckTimeout:    DefaultReadinessTimeout,
 		LeaseManagerConfig:   etcd3.NewDefaultLeaseManagerConfig(),
-		Transport:            TransportConfig{TracerProvider: oteltrace.NewNoopTracerProvider()},
+		Transport:            TransportConfig{TracerProvider: noopoteltrace.NewTracerProvider()},
 	}
 }
