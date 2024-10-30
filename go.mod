@@ -21,7 +21,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc2
 	github.com/openshift/api v0.0.0-20241001152557-e415140e5d5f
-	github.com/openshift/apiserver-library-go v0.0.0-20240716092710-e88385a79b17
+	github.com/openshift/apiserver-library-go v0.0.0-20241021160823-f6d544efa1ab
 	github.com/openshift/build-machinery-go v0.0.0-20240613134303-8359781da660
 	github.com/openshift/client-go v0.0.0-20241001162912-da6d55e4611f
 	github.com/openshift/library-go v0.0.0-20241001171606-756adf2188fc
