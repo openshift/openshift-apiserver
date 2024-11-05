@@ -23,6 +23,7 @@ import (
 )
 
 func TestPodSecurityPolicySelfSubjectReview(t *testing.T) {
+	defaultGracePeriod := int64(30)
 	testcases := map[string]struct {
 		sccs  []*securityv1.SecurityContextConstraints
 		check func(p *securityapi.PodSecurityPolicySelfSubjectReview) (bool, string)
@@ -61,11 +62,12 @@ func TestPodSecurityPolicySelfSubjectReview(t *testing.T) {
 								TerminationMessagePolicy: coreapi.TerminationMessageReadFile,
 							},
 						},
-						RestartPolicy:      coreapi.RestartPolicyAlways,
-						SecurityContext:    &coreapi.PodSecurityContext{},
-						DNSPolicy:          coreapi.DNSClusterFirst,
-						ServiceAccountName: "default",
-						SchedulerName:      corev1.DefaultSchedulerName,
+						RestartPolicy:                 coreapi.RestartPolicyAlways,
+						SecurityContext:               &coreapi.PodSecurityContext{},
+						DNSPolicy:                     coreapi.DNSClusterFirst,
+						ServiceAccountName:            "default",
+						SchedulerName:                 corev1.DefaultSchedulerName,
+						TerminationGracePeriodSeconds: &defaultGracePeriod,
 					},
 				},
 			},

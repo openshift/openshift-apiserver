@@ -6,7 +6,6 @@ import (
 
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/admission/initializer"
 	webhookinitializer "k8s.io/apiserver/pkg/admission/plugin/webhook/initializer"
@@ -100,10 +99,7 @@ func NewPluginInitializer(
 	// It's used for informational type checking of Validating Admission Policy
 	// expressions which are disabled by default.
 	// Injecting a nil SchemaResolver only disables the type checker status warnings.
-	kubePluginInitializer := kubeapiserveradmission.NewPluginInitializer(
-		cloudConfig,
-		generic.NewConfiguration(quotaRegistry.List(), map[schema.GroupResource]struct{}{}),
-		nil)
+	kubePluginInitializer := kubeapiserveradmission.NewPluginInitializer(cloudConfig)
 
 	openshiftPluginInitializer := openshiftapiserveradmission.NewOpenShiftInformersInitializer(informers.GetOpenshiftConfigInformers(), informers.GetOpenshiftRouteInformers())
 

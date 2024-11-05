@@ -272,6 +272,7 @@ func TestObjectMetaUpdate(t *testing.T) {
 }
 
 func TestPodSpecNodeSelectorUpdateDisallowed(t *testing.T) {
+	defaultGracePeriod := int64(30)
 	oldPod := &kapi.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			ResourceVersion: "1",
@@ -292,6 +293,7 @@ func TestPodSpecNodeSelectorUpdateDisallowed(t *testing.T) {
 			NodeSelector: map[string]string{
 				"foo": "bar",
 			},
+			TerminationGracePeriodSeconds: &defaultGracePeriod,
 		},
 	}
 
