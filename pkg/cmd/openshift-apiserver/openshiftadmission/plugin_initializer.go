@@ -6,6 +6,7 @@ import (
 
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/admission/initializer"
 	webhookinitializer "k8s.io/apiserver/pkg/admission/plugin/webhook/initializer"
@@ -18,6 +19,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/component-base/featuregate"
 	aggregatorapiserver "k8s.io/kube-aggregator/pkg/apiserver"
+	controlplaneadmission "k8s.io/kubernetes/pkg/controlplane/apiserver/admission"
 	kubeapiserveradmission "k8s.io/kubernetes/pkg/kubeapiserver/admission"
 	"k8s.io/kubernetes/pkg/quota/v1/install"
 
@@ -101,6 +103,11 @@ func NewPluginInitializer(
 	// Injecting a nil SchemaResolver only disables the type checker status warnings.
 	kubePluginInitializer := kubeapiserveradmission.NewPluginInitializer(cloudConfig)
 
+	quotaConfigurationInitializer := controlplaneadmission.NewPluginInitializer(
+		generic.NewConfiguration(quotaRegistry.List(), map[schema.GroupResource]struct{}{}),
+		nil,
+	)
+
 	openshiftPluginInitializer := openshiftapiserveradmission.NewOpenShiftInformersInitializer(informers.GetOpenshiftConfigInformers(), informers.GetOpenshiftRouteInformers())
 
 	webhookAuthResolverWrapper := func(delegate webhook.AuthenticationInfoResolver) webhook.AuthenticationInfoResolver {
@@ -129,6 +136,7 @@ func NewPluginInitializer(
 		genericInitializer,
 		webhookInitializer,
 		kubePluginInitializer,
+		quotaConfigurationInitializer,
 		openshiftPluginInitializer,
 		imagepolicy.NewInitializer(
 			originimagereferencemutators.OriginImageMutators{},
