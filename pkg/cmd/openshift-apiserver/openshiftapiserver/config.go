@@ -28,6 +28,7 @@ import (
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
 	"k8s.io/apiserver/pkg/util/feature"
+	utilversion "k8s.io/apiserver/pkg/util/version"
 	cacheddiscovery "k8s.io/client-go/discovery/cached"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/informers"
@@ -54,6 +55,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	kubeInformers := informers.NewSharedInformerFactory(kubeClient, 10*time.Minute)
 
 	openshiftVersion := version.Get()
+	effectiveVersion := utilversion.NewEffectiveVersion(openshiftVersion.String())
 
 	genericConfig := genericapiserver.NewRecommendedConfig(legacyscheme.Codecs)
 	// Current default values
@@ -94,7 +96,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	// DiscoveryAddresses discovery.Addresses
 
 	genericConfig.CorsAllowedOriginList = config.CORSAllowedOrigins
-	genericConfig.Version = &openshiftVersion
+	genericConfig.EffectiveVersion = effectiveVersion
 	genericConfig.ExternalAddress = "apiserver.openshift-apiserver.svc"
 	genericConfig.BuildHandlerChainFunc = OpenshiftHandlerChain
 	genericConfig.RequestInfoResolver = apiserverconfig.OpenshiftRequestInfoResolver()
@@ -202,7 +204,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 		admission.DecoratorFunc(admissionmetrics.WithControllerMetrics),
 		admission.DecoratorFunc(admissiontimeout.AdmissionTimeout{Timeout: 13 * time.Second}.WithTimeout),
 	}
-	admissionOptions.DefaultOffPlugins = sets.String{}
+	admissionOptions.DefaultOffPlugins = sets.Set[string]{}
 	admissionOptions.RecommendedPluginOrder = openshiftadmission.OpenShiftAdmissionPlugins
 	admissionOptions.Plugins = openshiftadmission.OriginAdmissionPlugins
 	admissionOptions.EnablePlugins = config.AdmissionConfig.EnabledAdmissionPlugins

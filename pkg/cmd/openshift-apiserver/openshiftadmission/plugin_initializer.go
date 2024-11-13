@@ -19,6 +19,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/component-base/featuregate"
 	aggregatorapiserver "k8s.io/kube-aggregator/pkg/apiserver"
+	controlplaneadmission "k8s.io/kubernetes/pkg/controlplane/apiserver/admission"
 	kubeapiserveradmission "k8s.io/kubernetes/pkg/kubeapiserver/admission"
 	"k8s.io/kubernetes/pkg/quota/v1/install"
 
@@ -100,10 +101,12 @@ func NewPluginInitializer(
 	// It's used for informational type checking of Validating Admission Policy
 	// expressions which are disabled by default.
 	// Injecting a nil SchemaResolver only disables the type checker status warnings.
-	kubePluginInitializer := kubeapiserveradmission.NewPluginInitializer(
-		cloudConfig,
+	kubePluginInitializer := kubeapiserveradmission.NewPluginInitializer(cloudConfig)
+
+	quotaConfigurationInitializer := controlplaneadmission.NewPluginInitializer(
 		generic.NewConfiguration(quotaRegistry.List(), map[schema.GroupResource]struct{}{}),
-		nil)
+		nil,
+	)
 
 	openshiftPluginInitializer := openshiftapiserveradmission.NewOpenShiftInformersInitializer(informers.GetOpenshiftConfigInformers(), informers.GetOpenshiftRouteInformers())
 
@@ -133,6 +136,7 @@ func NewPluginInitializer(
 		genericInitializer,
 		webhookInitializer,
 		kubePluginInitializer,
+		quotaConfigurationInitializer,
 		openshiftPluginInitializer,
 		imagepolicy.NewInitializer(
 			originimagereferencemutators.OriginImageMutators{},

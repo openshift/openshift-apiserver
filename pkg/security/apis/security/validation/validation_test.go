@@ -345,6 +345,7 @@ func TestValidateSecurityContextConstraints(t *testing.T) {
 
 func validPodSpec() kapi.PodSpec {
 	activeDeadlineSeconds := int64(1)
+	defaultGracePeriod := int64(30)
 	return kapi.PodSpec{
 		Volumes: []kapi.Volume{
 			{Name: "vol", VolumeSource: kapi.VolumeSource{EmptyDir: &kapi.EmptyDirVolumeSource{}}},
@@ -361,19 +362,22 @@ func validPodSpec() kapi.PodSpec {
 		NodeSelector: map[string]string{
 			"key": "value",
 		},
-		NodeName:              "foobar",
-		DNSPolicy:             kapi.DNSClusterFirst,
-		ActiveDeadlineSeconds: &activeDeadlineSeconds,
-		ServiceAccountName:    "acct",
-		SchedulerName:         corev1.DefaultSchedulerName,
+		NodeName:                      "foobar",
+		DNSPolicy:                     kapi.DNSClusterFirst,
+		ActiveDeadlineSeconds:         &activeDeadlineSeconds,
+		ServiceAccountName:            "acct",
+		SchedulerName:                 corev1.DefaultSchedulerName,
+		TerminationGracePeriodSeconds: &defaultGracePeriod,
 	}
 }
 
 func invalidPodSpec() kapi.PodSpec {
+	defaultGracePeriod := int64(30)
 	return kapi.PodSpec{
-		Containers:    []kapi.Container{{TerminationMessagePolicy: kapi.TerminationMessageReadFile}},
-		RestartPolicy: kapi.RestartPolicyAlways,
-		DNSPolicy:     kapi.DNSClusterFirst,
+		Containers:                    []kapi.Container{{TerminationMessagePolicy: kapi.TerminationMessageReadFile}},
+		RestartPolicy:                 kapi.RestartPolicyAlways,
+		DNSPolicy:                     kapi.DNSClusterFirst,
+		TerminationGracePeriodSeconds: &defaultGracePeriod,
 	}
 }
 

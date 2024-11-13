@@ -43,6 +43,7 @@ func saSCC() *securityv1.SecurityContextConstraints {
 }
 
 func TestAllowed(t *testing.T) {
+	defaultGracePeriod := int64(30)
 	testcases := map[string]struct {
 		sccs []*securityv1.SecurityContextConstraints
 		// patch function modify nominal PodSecurityPolicySubjectReview request
@@ -112,11 +113,12 @@ func TestAllowed(t *testing.T) {
 								TerminationMessagePolicy: coreapi.TerminationMessageReadFile,
 							},
 						},
-						RestartPolicy:      coreapi.RestartPolicyAlways,
-						SecurityContext:    &coreapi.PodSecurityContext{},
-						DNSPolicy:          coreapi.DNSClusterFirst,
-						ServiceAccountName: "default",
-						SchedulerName:      corev1.DefaultSchedulerName,
+						RestartPolicy:                 coreapi.RestartPolicyAlways,
+						SecurityContext:               &coreapi.PodSecurityContext{},
+						DNSPolicy:                     coreapi.DNSClusterFirst,
+						ServiceAccountName:            "default",
+						SchedulerName:                 corev1.DefaultSchedulerName,
+						TerminationGracePeriodSeconds: &defaultGracePeriod,
 					},
 				},
 				User:   "foo",
@@ -164,6 +166,7 @@ func TestAllowed(t *testing.T) {
 }
 
 func TestRequests(t *testing.T) {
+	defaultGracePeriod := int64(30)
 	testcases := map[string]struct {
 		request        *securityapi.PodSecurityPolicySubjectReview
 		sccs           []*securityv1.SecurityContextConstraints
@@ -183,11 +186,12 @@ func TestRequests(t *testing.T) {
 									TerminationMessagePolicy: coreapi.TerminationMessageReadFile,
 								},
 							},
-							RestartPolicy:      coreapi.RestartPolicyAlways,
-							SecurityContext:    &coreapi.PodSecurityContext{},
-							DNSPolicy:          coreapi.DNSClusterFirst,
-							ServiceAccountName: "A.B.C.D",
-							SchedulerName:      corev1.DefaultSchedulerName,
+							RestartPolicy:                 coreapi.RestartPolicyAlways,
+							SecurityContext:               &coreapi.PodSecurityContext{},
+							DNSPolicy:                     coreapi.DNSClusterFirst,
+							ServiceAccountName:            "A.B.C.D",
+							SchedulerName:                 corev1.DefaultSchedulerName,
+							TerminationGracePeriodSeconds: &defaultGracePeriod,
 						},
 					},
 					User:   "foo",
@@ -209,11 +213,12 @@ func TestRequests(t *testing.T) {
 									TerminationMessagePolicy: coreapi.TerminationMessageReadFile,
 								},
 							},
-							RestartPolicy:      coreapi.RestartPolicyAlways,
-							SecurityContext:    &coreapi.PodSecurityContext{},
-							DNSPolicy:          coreapi.DNSClusterFirst,
-							ServiceAccountName: "default",
-							SchedulerName:      corev1.DefaultSchedulerName,
+							RestartPolicy:                 coreapi.RestartPolicyAlways,
+							SecurityContext:               &coreapi.PodSecurityContext{},
+							DNSPolicy:                     coreapi.DNSClusterFirst,
+							ServiceAccountName:            "default",
+							SchedulerName:                 corev1.DefaultSchedulerName,
+							TerminationGracePeriodSeconds: &defaultGracePeriod,
 						},
 					},
 				},
@@ -238,11 +243,12 @@ func TestRequests(t *testing.T) {
 									TerminationMessagePolicy: coreapi.TerminationMessageReadFile,
 								},
 							},
-							RestartPolicy:      coreapi.RestartPolicyAlways,
-							SecurityContext:    &coreapi.PodSecurityContext{},
-							DNSPolicy:          coreapi.DNSClusterFirst,
-							ServiceAccountName: "default",
-							SchedulerName:      corev1.DefaultSchedulerName,
+							RestartPolicy:                 coreapi.RestartPolicyAlways,
+							SecurityContext:               &coreapi.PodSecurityContext{},
+							DNSPolicy:                     coreapi.DNSClusterFirst,
+							ServiceAccountName:            "default",
+							SchedulerName:                 corev1.DefaultSchedulerName,
+							TerminationGracePeriodSeconds: &defaultGracePeriod,
 						},
 					},
 					User: "foo",

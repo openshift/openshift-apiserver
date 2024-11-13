@@ -263,6 +263,7 @@ type SecurityContextConstraintsList struct {
 // PodSecurityPolicySubjectReview checks whether a particular user/SA tuple can create the PodTemplateSpec.
 type PodSecurityPolicySubjectReview struct {
 	metav1.TypeMeta
+	metav1.ObjectMeta
 
 	// Spec defines specification for the PodSecurityPolicySubjectReview.
 	Spec PodSecurityPolicySubjectReviewSpec
@@ -309,6 +310,7 @@ type PodSecurityPolicySubjectReviewStatus struct {
 // PodSecurityPolicySelfSubjectReview checks whether this user/SA tuple can create the PodTemplateSpec.
 type PodSecurityPolicySelfSubjectReview struct {
 	metav1.TypeMeta
+	metav1.ObjectMeta
 
 	// Spec defines specification the PodSecurityPolicySelfSubjectReview.
 	Spec PodSecurityPolicySelfSubjectReviewSpec
@@ -330,6 +332,7 @@ type PodSecurityPolicySelfSubjectReviewSpec struct {
 // PodSecurityPolicyReview checks which service accounts (not users, since that would be cluster-wide) can create the `PodTemplateSpec` in question.
 type PodSecurityPolicyReview struct {
 	metav1.TypeMeta
+	metav1.ObjectMeta
 
 	// Spec is the PodSecurityPolicy to check.
 	Spec PodSecurityPolicyReviewSpec
