@@ -458,7 +458,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 			},
 			wildcardPolicy: routeapi.WildcardPolicyNone,
 			allow:          false,
-			errs:           6,
+			errs:           4,
 
 			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
 		},
@@ -519,7 +519,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "b"}},
 			wildcardPolicy: routeapi.WildcardPolicyNone,
 			allow:          false,
-			errs:           4,
+			errs:           2,
 
 			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
 		},
@@ -552,7 +552,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 			},
 			wildcardPolicy: routeapi.WildcardPolicyNone,
 			allow:          false,
-			errs:           9,
+			errs:           5,
 
 			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
 		},
@@ -626,7 +626,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 			},
 			wildcardPolicy: routeapi.WildcardPolicyNone,
 			allow:          false,
-			errs:           7,
+			errs:           4,
 
 			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
 		},
@@ -700,7 +700,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 				Type: corev1.SecretTypeTLS,
 			},
 			allow: false,
-			errs:  8,
+			errs:  4,
 
 			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
 		},
@@ -767,7 +767,8 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
 			wildcardPolicy: routeapi.WildcardPolicyNone,
 			allow:          false,
-			errs:           2,
+			// removing certificate info is allowed
+			errs: 0,
 
 			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
 		},
@@ -793,7 +794,8 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 			oldTLS:         &routeapi.TLSConfig{Termination: routeapi.TLSTerminationEdge, ExternalCertificate: &routeapi.LocalObjectReference{Name: "a"}},
 			wildcardPolicy: routeapi.WildcardPolicyNone,
 			allow:          false,
-			errs:           2,
+			// removing certificate info is allowed
+			errs: 0,
 
 			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
 		},
@@ -826,7 +828,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 				Type: corev1.SecretTypeTLS,
 			},
 			allow: false,
-			errs:  8,
+			errs:  4,
 
 			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
 		},
@@ -900,7 +902,7 @@ func TestHostWithWildcardPolicies(t *testing.T) {
 				Type: corev1.SecretTypeTLS,
 			},
 			allow: false,
-			errs:  8,
+			errs:  4,
 
 			opts: route.RouteValidationOptions{AllowExternalCertificates: true},
 		},

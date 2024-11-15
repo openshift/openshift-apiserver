@@ -47,21 +47,3 @@ func ValidateHostUpdate(ctx context.Context, route, oldRoute *routeinternal.Rout
 
 	return hostassignment.ValidateHostUpdate(ctx, &external, &oldExternal, sarClient, opts)
 }
-
-func ValidateHostExternalCertificate(ctx context.Context, route, oldRoute *routeinternal.Route, sarClient routecommon.SubjectAccessReviewCreator, opts routecommon.RouteValidationOptions) field.ErrorList {
-	var external, oldExternal routev1.Route
-	var errs field.ErrorList
-	err := routev1conversion.Convert_route_Route_To_v1_Route(route, &external, nil)
-	if err != nil {
-		errs = append(errs, field.InternalError(field.NewPath(""), err))
-	}
-	err = routev1conversion.Convert_route_Route_To_v1_Route(oldRoute, &oldExternal, nil)
-	if err != nil {
-		errs = append(errs, field.InternalError(field.NewPath(""), err))
-	}
-	if len(errs) > 0 {
-		return errs
-	}
-
-	return hostassignment.ValidateHostExternalCertificate(ctx, &external, &oldExternal, sarClient, opts)
-}
