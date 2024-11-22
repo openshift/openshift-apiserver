@@ -44,6 +44,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/bootstrappolicy"
 	buildapiserver "github.com/openshift/openshift-apiserver/pkg/build/apiserver"
 	"github.com/openshift/openshift-apiserver/pkg/cmd/openshift-apiserver/openshiftapiserver/configprocessing"
+	apisimage "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	imageapiserver "github.com/openshift/openshift-apiserver/pkg/image/apiserver"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
 	projectapiserver "github.com/openshift/openshift-apiserver/pkg/project/apiserver"
@@ -87,6 +88,7 @@ type OpenshiftAPIExtraConfig struct {
 	AllowedRegistriesForImport         openshiftcontrolplanev1.AllowedRegistries
 	MaxImagesBulkImportedPerRepository int
 	AdditionalTrustedCA                []byte
+	ImageStreamImportMode              apisimage.ImportModeType
 
 	RouteAllocator                 *routehostassignment.SimpleAllocationPlugin
 	AllowRouteExternalCertificates bool
@@ -146,7 +148,11 @@ func (c *OpenshiftAPIExtraConfig) Validate() error {
 	if c.RESTMapper == nil {
 		ret = append(ret, fmt.Errorf("RESTMapper is required"))
 	}
-
+	if len(c.ImageStreamImportMode) > 0 {
+		if (c.ImageStreamImportMode != apisimage.ImportModeLegacy) && (c.ImageStreamImportMode != apisimage.ImportModePreserveOriginal) {
+			ret = append(ret, fmt.Errorf("Invalid value for import mode"))
+		}
+	}
 	return utilerrors.NewAggregate(ret)
 }
 
@@ -503,6 +509,10 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 
 	s := &OpenshiftAPIServer{
 		GenericAPIServer: genericServer,
+	}
+
+	if len(c.ExtraConfig.ImageStreamImportMode) > 0 {
+		apisimage.DefaultImportMode = c.ExtraConfig.ImageStreamImportMode
 	}
 
 	// this remains a non-healthz endpoint so that you can be healthy without being ready.
