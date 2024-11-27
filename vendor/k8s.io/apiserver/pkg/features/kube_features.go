@@ -388,7 +388,8 @@ var defaultKubernetesFeatureGates = map[featuregate.Feature]featuregate.FeatureS
 
 	RemainingItemCount: {Default: true, PreRelease: featuregate.GA, LockToDefault: true}, // remove in 1.32
 
-	ResilientWatchCacheInitialization: {Default: true, PreRelease: featuregate.Beta},
+	// Disabled temporarily until cause of storage error triggering cache reinitialization during bootstrap is fixed: https://issues.redhat.com/browse/OCPBUGS-45126.
+	ResilientWatchCacheInitialization: {Default: false, PreRelease: featuregate.Beta},
 
 	RetryGenerateName: {Default: true, PreRelease: featuregate.Beta},
 
