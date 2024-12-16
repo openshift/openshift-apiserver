@@ -8,6 +8,7 @@ import (
 
 	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy"
 	quotaclusterresourcequota "github.com/openshift/apiserver-library-go/pkg/admission/quota/clusterresourcequota"
+	"github.com/openshift/openshift-apiserver/pkg/authorization/apiserver/admission/rolebindingrestriction"
 	buildsecretinjector "github.com/openshift/openshift-apiserver/pkg/build/apiserver/admission/secretinjector"
 	buildstrategyrestrictions "github.com/openshift/openshift-apiserver/pkg/build/apiserver/admission/strategyrestrictions"
 	imageadmission "github.com/openshift/openshift-apiserver/pkg/image/apiserver/admission/limitrange"
@@ -40,6 +41,7 @@ func RegisterOpenshiftAdmissionPlugins(plugins *admission.Plugins) {
 	imagepolicy.Register(plugins)
 	quotaclusterresourcequota.Register(plugins)
 	requiredrouteannotations.Register(plugins)
+    rolebindingrestriction.Register(plugins)
 }
 
 var (
@@ -57,6 +59,7 @@ var (
 		"image.openshift.io/ImagePolicy",
 		"quota.openshift.io/ClusterResourceQuota",
 		"route.openshift.io/RequiredRouteAnnotations",
+        "authorization.openshift.io/RoleBindingRestrictionOIDC",
 
 		// the rest of the kube chain goes here
 		"MutatingAdmissionWebhook",
