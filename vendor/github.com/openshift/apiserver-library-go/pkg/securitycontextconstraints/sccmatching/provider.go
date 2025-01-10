@@ -269,9 +269,9 @@ func (s *simpleProvider) ValidatePodSecurityContext(pod *api.Pod, fldPath *field
 
 	allErrs = append(allErrs, s.seLinuxStrategy.Validate(fldPath.Child("seLinuxOptions"), pod, nil, sc.SELinuxOptions())...)
 
-	if !s.scc.AllowHostNetwork && sc.HostNetwork() {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("hostNetwork"), sc.HostNetwork(), "Host network is not allowed to be used"))
-	}
+	//if !s.scc.AllowHostNetwork && sc.HostNetwork() {
+	//	allErrs = append(allErrs, field.Invalid(fldPath.Child("hostNetwork"), sc.HostNetwork(), "Host network is not allowed to be used"))
+	//}
 
 	if !s.scc.AllowHostPID && sc.HostPID() {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("hostPID"), sc.HostPID(), "Host PID is not allowed to be used"))
@@ -351,9 +351,9 @@ func (s *simpleProvider) ValidateContainerSecurityContext(pod *api.Pod, containe
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("hostUsers"), podSC.HostUsers(), "Host Users must be set to false"))
 	}
 
-	if !s.scc.AllowHostNetwork && podSC.HostNetwork() {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("hostNetwork"), podSC.HostNetwork(), "Host network is not allowed to be used"))
-	}
+	//if !s.scc.AllowHostNetwork && podSC.HostNetwork() {
+	//	allErrs = append(allErrs, field.Invalid(fldPath.Child("hostNetwork"), podSC.HostNetwork(), "Host network is not allowed to be used"))
+	//}
 
 	if !s.scc.AllowHostPorts {
 		podhelpers.VisitContainersWithPath(&pod.Spec, fldPath, func(container *api.Container, path *field.Path) bool {
