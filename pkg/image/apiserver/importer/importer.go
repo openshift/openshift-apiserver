@@ -397,6 +397,11 @@ func (imp *ImageStreamImporter) importFromRepository(ctx context.Context, isi *i
 		}
 		status.Images[i].Status.Status = metav1.StatusSuccess
 
+		if tag.Image == nil {
+			status.Images[i].Status = invalidStatus("", field.Invalid(field.NewPath("tags").Key(tag.Name), nil, fmt.Sprintf("nil image for tag index=%d, tag name=%v", i, tag.Name)))
+			continue
+		}
+
 		copied := *tag.Image
 		ref.Tag, ref.ID = tag.Name, copied.Name
 		copied.DockerImageReference = ref.MostSpecific().Exact()
