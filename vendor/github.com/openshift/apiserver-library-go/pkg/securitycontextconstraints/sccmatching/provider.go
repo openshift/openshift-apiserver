@@ -347,6 +347,10 @@ func (s *simpleProvider) ValidateContainerSecurityContext(pod *api.Pod, containe
 
 	allErrs = append(allErrs, s.capabilitiesStrategy.Validate(fldPath, pod, container, sc.Capabilities())...)
 
+	if s.scc.UserNamespaceLevel == securityv1.NamespaceLevelRequirePod && (podSC.HostUsers() == nil || *podSC.HostUsers()) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("hostUsers"), podSC.HostUsers(), "Host Users must be set to false"))
+	}
+
 	if !s.scc.AllowHostNetwork && podSC.HostNetwork() {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("hostNetwork"), podSC.HostNetwork(), "Host network is not allowed to be used"))
 	}
