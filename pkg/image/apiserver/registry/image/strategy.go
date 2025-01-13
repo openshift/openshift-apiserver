@@ -9,6 +9,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/apiserver/pkg/audit"
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
@@ -19,8 +20,14 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
 )
 
-// managedSignatureAnnotation used to be set by image signature import controller as a signature annotation.
-const managedSignatureAnnotation = "image.openshift.io/managed-signature"
+const (
+	// managedSignatureAnnotation used to be set by image signature import
+	// controller as a signature annotation.
+	managedSignatureAnnotation = "image.openshift.io/managed-signature"
+	// reasonAnnotation is a audit annotation we add to the context
+	// when we see a failure during an image processing.
+	reasonAnnotation = "image.internal.openshift.io/reason"
+)
 
 // imageStrategy implements behavior for Images.
 type imageStrategy struct {
@@ -57,6 +64,7 @@ func (s imageStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object)
 		[]byte(newImage.DockerImageManifest),
 	)
 	if err != nil {
+		audit.AddAuditAnnotation(ctx, reasonAnnotation, fmt.Sprintf("unable to parse manifest: %v", err))
 		utilruntime.HandleError(fmt.Errorf("unable to parse manifest for %q: %v", newImage.Name, err))
 	}
 
