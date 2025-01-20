@@ -811,7 +811,7 @@ func (imp *ImageStreamImporter) importRepositoryFromDocker(ctx context.Context, 
 					"unable to import manifest list %q: %v",
 					ref.Exact(), err)
 				importDigest.Err = err
-				return
+				continue
 			}
 			importDigest.Manifests = images
 		}
@@ -906,7 +906,7 @@ func (imp *ImageStreamImporter) importRepositoryFromDocker(ctx context.Context, 
 					"unable to import manifest list %q: %v",
 					ref.Exact(), err)
 				importTag.Err = err
-				return
+				continue
 			}
 			importTag.Manifests = images
 		}
