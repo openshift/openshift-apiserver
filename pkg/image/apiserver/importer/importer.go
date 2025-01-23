@@ -295,6 +295,22 @@ func (imp *ImageStreamImporter) importImages(ctx context.Context, isi *imageapi.
 				cache[j] = digest.Image
 			}
 			for _, index := range ids[j] {
+				// we have seen the below state in our internal CI clusters. we think
+				// it's caused by outages in the upstream registry, but we're not sure
+				// exactly how we end up in this situation where neither error or image
+				// are set. to protect against that we throw a generic error when it
+				// happens.
+				// See https://issues.redhat.com/browse/OCPBUGS-35036 for details.
+				if digest.Image == nil && digest.Err == nil {
+					errMsg := fmt.Sprintf(
+						"unknown error while importing digest %q from repository %q with import mode %q, please try again.",
+						digest.Name,
+						repo.Name,
+						digest.ImportMode,
+					)
+					digest.Err = errors.New(errMsg)
+					klog.Infof("importImages: both digest image and error are nil! repo=%+v digest=%+v", repo, digest)
+				}
 				if digest.Err != nil {
 					setImageImportStatus(isi, index, "", digest.Err)
 					continue
