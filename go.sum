@@ -349,8 +349,8 @@ github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsT
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635 h1:kdXcSzyDtseVEc4yCz2qF8ZrQvIDBJLl4S1c3GCXmoI=
 github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
-github.com/thealisyed/library-go v0.0.0-20250128134320-276e90950e1e h1:KfjkavBI7B1YxWjQW1MI3eBz0azzZtIte+Ne+nKz3a4=
-github.com/thealisyed/library-go v0.0.0-20250128134320-276e90950e1e/go.mod h1:sWLccvvouYXzmFUBb03FXP5qZJl2yqqftvIfaCxMrFE=
+github.com/thealisyed/library-go v0.0.0-20250129120441-5c24ab1cfe65 h1:htk6uNuohWQOFSdDckDUI5jab9C+9Uoanaw8TyQFA0A=
+github.com/thealisyed/library-go v0.0.0-20250129120441-5c24ab1cfe65/go.mod h1:/wmao3qtqOQ484HDka9cWP7SIvOQOdzpmhyXkF2YdzE=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20220101234140-673ab2c3ae75 h1:6fotK7otjonDflCTK0BCfls4SPy3NcCVb5dqqmbRknE=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20220101234140-673ab2c3ae75/go.mod h1:KO6IkyS8Y3j8OdNO85qEYBsRPuteD+YciPomcXdrMnk=
 github.com/x448/float16 v0.8.4 h1:qLwI1I70+NjRFUR3zs1JPUCgaCXSh3SW62uAKT1mSBM=
