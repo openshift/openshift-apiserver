@@ -274,6 +274,8 @@ github.com/openshift/docker-distribution/v3 v3.0.0-20240215131201-6b2f5d2f1f43 h
 github.com/openshift/docker-distribution/v3 v3.0.0-20240215131201-6b2f5d2f1f43/go.mod h1:+fqBJ4vPYo4Uu1ZE4d+bUtTLRXfdSL3NvCZIZ9GHv58=
 github.com/openshift/kubernetes-apiserver v0.0.0-20241112103933-0f10e4260855 h1:sxkHh3Bhcqg/tkoPN3s9bdCHri4V+nR4hVwXoRTK34I=
 github.com/openshift/kubernetes-apiserver v0.0.0-20241112103933-0f10e4260855/go.mod h1:lzDhpeToamVZJmmFlaLwdYZwd7zB+WYRYIboqA1kGxM=
+github.com/openshift/library-go v0.0.0-20241107160307-0064ad7bd060 h1:jiDC7d8d+jmjv2WfiMY0+Uf55q11MGyYkGGqXnfqWTU=
+github.com/openshift/library-go v0.0.0-20241107160307-0064ad7bd060/go.mod h1:9B1MYPoLtP9tqjWxcbUNVpwxy68zOH/3EIP6c31dAM0=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d h1:fLITXDjxMSvUDjnXs/zljIWktbST9+Om8XbrmmM7T4I=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d/go.mod h1:LJM49W8fBVSj+rvcopJZu9mgH5Tx6HwLHySIYeGeu4k=
 github.com/openshift/runtime-utils v0.0.0-20230921210328-7bdb5b9c177b h1:oXzC1N6E9gw76/WH2gEA8GEHvuq09wuVQ9GoCuR8GF4=
@@ -349,8 +351,6 @@ github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsT
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635 h1:kdXcSzyDtseVEc4yCz2qF8ZrQvIDBJLl4S1c3GCXmoI=
 github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
-github.com/thealisyed/library-go v0.0.0-20250129120441-5c24ab1cfe65 h1:htk6uNuohWQOFSdDckDUI5jab9C+9Uoanaw8TyQFA0A=
-github.com/thealisyed/library-go v0.0.0-20250129120441-5c24ab1cfe65/go.mod h1:/wmao3qtqOQ484HDka9cWP7SIvOQOdzpmhyXkF2YdzE=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20220101234140-673ab2c3ae75 h1:6fotK7otjonDflCTK0BCfls4SPy3NcCVb5dqqmbRknE=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20220101234140-673ab2c3ae75/go.mod h1:KO6IkyS8Y3j8OdNO85qEYBsRPuteD+YciPomcXdrMnk=
 github.com/x448/float16 v0.8.4 h1:qLwI1I70+NjRFUR3zs1JPUCgaCXSh3SW62uAKT1mSBM=
