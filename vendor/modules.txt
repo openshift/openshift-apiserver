@@ -1309,7 +1309,7 @@ k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v0.31.1 => github.com/openshift/kubernetes-apiserver v0.0.0-20241112103933-0f10e4260855
+# k8s.io/apiserver v0.31.1 => github.com/openshift/kubernetes-apiserver v0.0.0-20250205074533-d8ec43992017
 ## explicit; go 1.22.0
 k8s.io/apiserver/pkg/admission
 k8s.io/apiserver/pkg/admission/configuration
@@ -2343,7 +2343,7 @@ sigs.k8s.io/yaml/goyaml.v3
 # k8s.io/api => k8s.io/api v0.31.1
 # k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.31.1
 # k8s.io/apimachinery => k8s.io/apimachinery v0.31.1
-# k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20241112103933-0f10e4260855
+# k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20250205074533-d8ec43992017
 # k8s.io/cli-runtime => k8s.io/cli-runtime v0.31.1
 # k8s.io/client-go => k8s.io/client-go v0.31.1
 # k8s.io/cloud-provider => k8s.io/cloud-provider v0.31.1
