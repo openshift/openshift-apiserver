@@ -139,7 +139,19 @@ func (r *ScaleREST) Update(ctx context.Context, name string, objInfo rest.Update
 	}
 
 	deploymentConfig.Spec.Replicas = scale.Spec.Replicas
-	if _, _, err := r.store.Update(ctx, deploymentConfig.Name, rest.DefaultUpdatedObjectInfo(deploymentConfig), createValidation, updateValidation, forceAllowCreate, options); err != nil {
+	if _, _, err := r.store.Update(
+		ctx,
+		deploymentConfig.Name,
+		rest.DefaultUpdatedObjectInfo(deploymentConfig),
+		func(ctx context.Context, obj runtime.Object) error {
+			return createValidation(ctx, scaleFromConfig(obj.(*appsapi.DeploymentConfig)))
+		},
+		func(ctx context.Context, obj, old runtime.Object) error {
+			return updateValidation(ctx, scaleFromConfig(obj.(*appsapi.DeploymentConfig)), scaleFromConfig(old.(*appsapi.DeploymentConfig)))
+		},
+		forceAllowCreate,
+		options,
+	); err != nil {
 		return nil, false, err
 	}
 
