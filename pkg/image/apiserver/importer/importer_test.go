@@ -571,6 +571,73 @@ func TestImportFromMirror(t *testing.T) {
 			t.Errorf("unexpected ref: %#v", image.Image.DockerImageReference)
 		}
 	})
+
+	regBlockedSourceConf := &sysregistriesv2.V2RegistriesConf{
+		Registries: []sysregistriesv2.Registry{
+			{
+				Prefix: "quay.io",
+				Endpoint: sysregistriesv2.Endpoint{
+					Location: "quay.io",
+				},
+				Blocked: true,
+				Mirrors: []sysregistriesv2.Endpoint{
+					{
+						Location:       "mirror.example.com",
+						PullFromMirror: sysregistriesv2.MirrorByDigestOnly,
+					},
+				},
+			},
+		},
+	}
+
+	t.Run("source blocked pull by digest only from mirrored repo", func(t *testing.T) {
+		testRetriever := mockRetrieverFunc(func(registry *url.URL, repoName string, insecure bool) (distribution.Repository, error) {
+			if registry.String() == "https://mirror.example.com" && repoName == "openshift/test" && !insecure {
+				return &mockRepository{
+					blobs: &mockBlobStore{
+						blobs: map[godigest.Digest][]byte{
+							busyboxConfigDigest: []byte(busyboxManifestConfig),
+						},
+					},
+					manifest: busyboxManifestSchema2,
+				}, nil
+			}
+			err := fmt.Errorf("unexpected call to the repository retriever: %v %v %v", registry, repoName, insecure)
+			t.Error(err)
+			return nil, err
+		})
+
+		isi := imageapi.ImageStreamImport{
+			Spec: imageapi.ImageStreamImportSpec{
+				Images: []imageapi.ImageImportSpec{
+					{
+						From: kapi.ObjectReference{Kind: "DockerImage", Name: "quay.io/openshift/test@" + busyboxDigest},
+					},
+				},
+			},
+		}
+
+		im := NewImageStreamImporter(testRetriever, regBlockedSourceConf, 5, nil, nil)
+		if err := im.Import(nil, &isi, &imageapi.ImageStream{}); err != nil {
+			t.Fatalf("%v", err)
+		}
+		if len(isi.Status.Images) != 1 {
+			t.Fatalf("unexpected number of images: %#v", isi.Status.Repository.Images)
+		}
+		image := isi.Status.Images[0]
+		if image.Status.Status != metav1.StatusSuccess {
+			t.Fatalf("unexpected status: %#v", image.Status)
+		}
+		if image.Image.Name != busyboxDigest {
+			t.Errorf("unexpected image: %q != %q", image.Image.Name, busyboxDigest)
+		}
+		if image.Image.DockerImageMetadata.Size != busyboxImageSize {
+			t.Errorf("unexpected image size: %d != %d", image.Image.DockerImageMetadata.Size, busyboxImageSize)
+		}
+		if image.Image.DockerImageReference != "quay.io/openshift/test@"+busyboxDigest {
+			t.Errorf("unexpected ref: %#v", image.Image.DockerImageReference)
+		}
+	})
 }
 
 const etcdManifest = `
