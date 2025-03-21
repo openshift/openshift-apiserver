@@ -138,9 +138,9 @@ func (imp *ImageStreamImporter) blockedRegistry(ref imageapi.DockerImageReferenc
 	}
 	regURL := ref.DockerClientDefaults().Registry
 	for _, reg := range imp.regConf.Registries {
-		if len(reg.Mirrors) > 0 {
-			continue
-		}
+		// if len(reg.Mirrors) > 0 {
+		// 	continue
+		// }
 		if reg.Location == regURL {
 			return reg.Blocked
 		}
