@@ -93,7 +93,7 @@ func TestImageStreamImportQuayIO(t *testing.T) {
 	rt, _ := restclient.TransportFor(&restclient.Config{})
 	importCtx := importer.NewStaticCredentialsContext(rt, nil, nil)
 
-	repositoryName := quayRegistryName + "/coreos/etcd"
+	repositoryName := quayRegistryName + "/coreos/etcd-operator"
 	imports := &imageapi.ImageStreamImport{
 		Spec: imageapi.ImageStreamImportSpec{
 			Images: []imageapi.ImageImportSpec{
