@@ -62,7 +62,7 @@ func (p *WebHookPlugin) Extract(buildCfg *buildv1.BuildConfig, trigger *buildv1.
 		return revision, envvars, dockerStrategyOptions, proceed, err
 	}
 
-	lastCommit := event.Commits[len(event.Commits)-1]
+	lastCommit := event.Commits[0]
 
 	revision = &buildv1.SourceRevision{
 		Git: &buildv1.GitSourceRevision{
