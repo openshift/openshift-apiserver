@@ -171,6 +171,8 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 			template.Parameters[i].Value = projectName
 		case ProjectRequesterParam:
 			template.Parameters[i].Value = projectRequester
+		case ProjectUDNName:
+			template.Parameters[i].Value = projectRequest.UDNName
 		}
 	}
 
