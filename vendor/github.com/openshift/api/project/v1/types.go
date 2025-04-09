@@ -18,7 +18,7 @@ type ProjectList struct {
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Items is the list of projects
+	// items is the list of projects
 	Items []Project `json:"items" protobuf:"bytes,2,rep,name=items"`
 }
 
@@ -32,17 +32,20 @@ const (
 	// ProjectRequesterAnnotation is the username that requested a given project.  Its not guaranteed to be present,
 	// but it is set by the default project template.
 	ProjectRequesterAnnotation = "openshift.io/requester"
+
+	// ProjectUDNName is a label which refers to a UDN Name for a project
+	ProjectUDNName = "k8s.ovn.org/primary-user-defined-network"
 )
 
 // ProjectSpec describes the attributes on a Project
 type ProjectSpec struct {
-	// Finalizers is an opaque list of values that must be empty to permanently remove object from storage
+	// finalizers is an opaque list of values that must be empty to permanently remove object from storage
 	Finalizers []corev1.FinalizerName `json:"finalizers,omitempty" protobuf:"bytes,1,rep,name=finalizers,casttype=k8s.io/api/core/v1.FinalizerName"`
 }
 
 // ProjectStatus is information about the current status of a Project
 type ProjectStatus struct {
-	// Phase is the current lifecycle phase of the project
+	// phase is the current lifecycle phase of the project
 	// +optional
 	Phase corev1.NamespacePhase `json:"phase,omitempty" protobuf:"bytes,1,opt,name=phase,casttype=k8s.io/api/core/v1.NamespacePhase"`
 
@@ -79,10 +82,10 @@ type Project struct {
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Spec defines the behavior of the Namespace.
+	// spec defines the behavior of the Namespace.
 	Spec ProjectSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 
-	// Status describes the current status of a Namespace
+	// status describes the current status of a Namespace
 	// +optional
 	Status ProjectStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
@@ -104,8 +107,13 @@ type ProjectRequest struct {
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// DisplayName is the display name to apply to a project
+	// displayName is the display name to apply to a project
 	DisplayName string `json:"displayName,omitempty" protobuf:"bytes,2,opt,name=displayName"`
-	// Description is the description to apply to a project
+	// description is the description to apply to a project
 	Description string `json:"description,omitempty" protobuf:"bytes,3,opt,name=description"`
+	// udnName is the User Defined Networks Name to apply to a project
+	// Reference of regex and max length: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
+	// +kubebuilder:validation:MaxLength=63
+	// +kubebuilder:validation:Pattern=`^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$`
+	UDNName string `json:"udnName,omitempty" protobuf:"bytes,4,opt,name=udnName"`
 }
