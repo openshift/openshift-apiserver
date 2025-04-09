@@ -55,6 +55,7 @@ type ProjectRequest struct {
 	metav1.ObjectMeta
 	DisplayName string
 	Description string
+	UDNName     string
 }
 
 // These constants represent annotations keys affixed to projects
@@ -65,4 +66,6 @@ const (
 	// ProjectRequester is the username that requested a given project.  Its not guaranteed to be present,
 	// but it is set by the default project template.
 	ProjectRequester = "openshift.io/requester"
+	// ProjectUDNName is a label which refers to a UDN Name for a project
+	ProjectUDNName = "k8s.ovn.org/primary-user-defined-network"
 )
