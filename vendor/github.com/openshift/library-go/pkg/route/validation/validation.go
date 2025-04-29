@@ -212,6 +212,27 @@ func validateRoute(ctx context.Context, route *routev1.Route, checkHostname bool
 		result = append(result, errs...)
 	}
 
+	if errs := ValidatePathWithSpecRoute(route, specPath.Child("path")); len(errs) != 0 {
+		result = append(result, errs...)
+	}
+
+	return result
+}
+
+// ValidatePathWithSpecRoute tests the spec.path field for invalid syntax when the
+// rewrite-target annotation is set. This addresses OCPBUGS-47773 by rejecting invalid spec.path
+// values, while preserving compatibility for users who may have depended on the unintended
+// behavior caused by the bug.
+func ValidatePathWithSpecRoute(route *routev1.Route, fldPath *field.Path) field.ErrorList {
+	result := field.ErrorList{}
+	// These validations are to protect against HAProxy config file level errors.
+
+	if strings.Contains(route.Spec.Path, "#") {
+		result = append(result, field.Invalid(fldPath, route.Spec.Path, "cannot contain # in the spec.path"))
+	}
+	if strings.Contains(route.Spec.Path, " ") {
+		result = append(result, field.Invalid(fldPath, route.Spec.Path, "cannot contain whitespace in the spec.path"))
+	}
 	return result
 }
 
