@@ -401,7 +401,7 @@ func (c *completedConfig) WithOpenAPIAggregationController(delegatedAPIServer *g
 	openAPIAggregationController := openapicontroller.NewAggregationController(&specDownloader, openAPIAggregator)
 
 	delegatedAPIServer.AddPostStartHook("apiservice-openapi-controller", func(context genericapiserver.PostStartHookContext) error {
-		go openAPIAggregationController.Run(context.StopCh)
+		go openAPIAggregationController.Run(context.Done())
 		return nil
 	})
 	return nil
@@ -421,7 +421,7 @@ func (c *completedConfig) WithOpenAPIV3AggregationController(delegatedAPIServer 
 	openAPIV3AggregationController := openapiv3controller.NewAggregationController(openAPIV3Aggregator)
 
 	delegatedAPIServer.AddPostStartHook("apiservice-openapiv3-controller", func(context genericapiserver.PostStartHookContext) error {
-		go openAPIV3AggregationController.Run(context.StopCh)
+		go openAPIV3AggregationController.Run(context.Done())
 		return nil
 	})
 	return nil
@@ -526,7 +526,7 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 		func(context genericapiserver.PostStartHookContext) error {
 			newContext := genericapiserver.PostStartHookContext{
 				LoopbackClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
-				StopCh:               context.StopCh,
+				Context:              context.Context,
 			}
 			return bootstrapData(bootstrappolicy.Policy()).EnsureRBACPolicy()(newContext)
 
@@ -535,20 +535,20 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 	s.GenericAPIServer.AddPostStartHookOrDie("project.openshift.io-projectcache", c.startProjectCache)
 	s.GenericAPIServer.AddPostStartHookOrDie("project.openshift.io-projectauthorizationcache", c.startProjectAuthorizationCache)
 	s.GenericAPIServer.AddPostStartHookOrDie("openshift.io-startinformers", func(context genericapiserver.PostStartHookContext) error {
-		c.ExtraConfig.InformerStart(context.StopCh)
+		c.ExtraConfig.InformerStart(context.Done())
 		return nil
 	})
 	s.GenericAPIServer.AddPostStartHookOrDie("openshift.io-restmapperupdater", func(context genericapiserver.PostStartHookContext) error {
 		go func() {
 			wait.Until(func() {
 				c.ExtraConfig.RESTMapper.Reset()
-			}, 10*time.Second, context.StopCh)
+			}, 10*time.Second, context.Done())
 		}()
 		return nil
 
 	})
 	s.GenericAPIServer.AddPostStartHookOrDie("quota.openshift.io-clusterquotamapping", func(context genericapiserver.PostStartHookContext) error {
-		go c.ExtraConfig.ClusterQuotaMappingController.Run(5, context.StopCh)
+		go c.ExtraConfig.ClusterQuotaMappingController.Run(5, context.Done())
 		return nil
 	})
 
@@ -601,7 +601,7 @@ func writeJSON(resp *restful.Response, json []byte) {
 func (c *completedConfig) startProjectCache(context genericapiserver.PostStartHookContext) error {
 	// RunProjectCache populates project cache, used by scheduler and project admission controller.
 	klog.Infof("Using default project node label selector: %s", c.ExtraConfig.ProjectCache.DefaultNodeSelector)
-	go c.ExtraConfig.ProjectCache.Run(context.StopCh)
+	go c.ExtraConfig.ProjectCache.Run(context.Done())
 	return nil
 }
 
