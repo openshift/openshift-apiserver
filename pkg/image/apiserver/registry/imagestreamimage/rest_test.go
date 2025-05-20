@@ -247,7 +247,7 @@ func TestGet(t *testing.T) {
 			defer server.Terminate(t)
 			etcdStorage.Codec = legacyscheme.Codecs.LegacyCodec(
 				schema.GroupVersion{Group: "image.openshift.io", Version: "v1"})
-			client := etcd.NewKV(server.V3Client)
+			client := etcd.NewKV(server.V3Client.Client)
 			etcdStorageConfigForImages := &storagebackend.ConfigForResource{
 				Config:        *etcdStorage,
 				GroupResource: schema.GroupResource{Group: "image.openshift.io", Resource: "images"},

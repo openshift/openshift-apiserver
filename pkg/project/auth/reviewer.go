@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"context"
+
 	kauthorizer "k8s.io/apiserver/pkg/authorization/authorizer"
 	"k8s.io/kubernetes/plugin/pkg/auth/authorizer/rbac"
 
@@ -55,7 +57,9 @@ func (r *authorizerReviewer) Review(namespaceName string) (Review, error) {
 		ResourceRequest: true,
 	}
 
-	subjects, err := r.policyChecker.AllowedSubjects(attributes)
+	ctx := context.TODO()
+
+	subjects, err := r.policyChecker.AllowedSubjects(ctx, attributes)
 	review := &defaultReview{}
 	review.users, review.groups = authorizationutil.RBACSubjectsToUsersAndGroups(subjects, attributes.GetNamespace())
 	if err != nil {
