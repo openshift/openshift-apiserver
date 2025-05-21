@@ -202,9 +202,9 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		// Check the stream creation timestamp and make sure we will not
 		// create a new image stream while deleting.
 		if target.CreationTimestamp.IsZero() {
-			target, err = r.imageStreamRegistry.CreateImageStream(ctx, target, &metav1.CreateOptions{})
+			target, err = r.imageStreamRegistry.CreateImageStream(ctx, target, internalimageutil.CreateOptionsToSupportedCreateOptions(options))
 		} else {
-			target, err = r.imageStreamRegistry.UpdateImageStream(ctx, target, false, &metav1.UpdateOptions{})
+			target, err = r.imageStreamRegistry.UpdateImageStream(ctx, target, false, internalimageutil.CreateOptionsToSupportedUpdateOptions(options))
 		}
 		if kapierrors.IsAlreadyExists(err) || kapierrors.IsConflict(err) {
 			continue
@@ -360,9 +360,9 @@ func (r *REST) update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 	// mutate the image stream
 	var newImageStream *imageapi.ImageStream
 	if create {
-		newImageStream, err = r.imageStreamRegistry.CreateImageStream(ctx, originalImageStream, &metav1.CreateOptions{})
+		newImageStream, err = r.imageStreamRegistry.CreateImageStream(ctx, originalImageStream, internalimageutil.UpdateOptionsToSupportedCreateOptions(options))
 	} else {
-		newImageStream, err = r.imageStreamRegistry.UpdateImageStream(ctx, originalImageStream, false, &metav1.UpdateOptions{})
+		newImageStream, err = r.imageStreamRegistry.UpdateImageStream(ctx, originalImageStream, false, internalimageutil.UpdateOptionsToSupportedUpdateOptions(options))
 	}
 	if err != nil {
 		// return true for canRetry if we had a failure for resource versions
@@ -422,7 +422,7 @@ func (r *REST) Delete(ctx context.Context, id string, objectFunc rest.ValidateOb
 			return nil, false, kapierrors.NewNotFound(imagegroup.Resource("imagestreamtags"), id)
 		}
 
-		_, err = r.imageStreamRegistry.UpdateImageStream(ctx, stream, false, &metav1.UpdateOptions{})
+		_, err = r.imageStreamRegistry.UpdateImageStream(ctx, stream, false, internalimageutil.DeleteOptionsToSupportedUpdateOptions(options))
 		if kapierrors.IsConflict(err) {
 			continue
 		}
