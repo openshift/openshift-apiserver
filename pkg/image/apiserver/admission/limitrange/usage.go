@@ -40,23 +40,31 @@ type InternalImageReferenceHandler func(imageReference string, inSpec, inStatus 
 // returns a number of unique image references found in the image stream spec not contained in
 // processedSpecRefs and a number of unique image hashes contained in iS status not contained in
 // processedStatusRefs. Given sets will be updated with new references found.
-func GetImageStreamUsage(is *imageapi.ImageStream) corev1.ResourceList {
-	specRefs := resource.NewQuantity(0, resource.DecimalSI)
-	statusRefs := resource.NewQuantity(0, resource.DecimalSI)
+// It also returns 2 sets of spec and status references.
+func GetImageStreamUsage(is *imageapi.ImageStream) (corev1.ResourceList, sets.Set[string], sets.Set[string]) {
+	specRefsQuantity := resource.NewQuantity(0, resource.DecimalSI)
+	statusRefsQuantity := resource.NewQuantity(0, resource.DecimalSI)
 
-	processImageStreamImages(is, false, func(ref string, inSpec, inStatus bool) {
-		if inSpec {
-			specRefs.Set(specRefs.Value() + 1)
-		}
-		if inStatus {
-			statusRefs.Set(statusRefs.Value() + 1)
-		}
-	})
+	specRefs := sets.New[string]()
+	statusRefs := sets.New[string]()
+
+	if is != nil {
+		processImageStreamImages(is, false, func(ref string, inSpec, inStatus bool) {
+			if inSpec {
+				specRefs.Insert(ref)
+				specRefsQuantity.Set(specRefsQuantity.Value() + 1)
+			}
+			if inStatus {
+				statusRefs.Insert(ref)
+				statusRefsQuantity.Set(statusRefsQuantity.Value() + 1)
+			}
+		})
+	}
 
 	return corev1.ResourceList{
-		imagev1.ResourceImageStreamTags:   *specRefs,
-		imagev1.ResourceImageStreamImages: *statusRefs,
-	}
+		imagev1.ResourceImageStreamTags:   *specRefsQuantity,
+		imagev1.ResourceImageStreamImages: *statusRefsQuantity,
+	}, specRefs, statusRefs
 }
 
 // processImageStreamImages is a utility method that calls a given handler on every image reference found in

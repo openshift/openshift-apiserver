@@ -11,7 +11,7 @@ import (
 )
 
 type LimitVerifier interface {
-	VerifyLimits(namespace string, is *imageapi.ImageStream) error
+	VerifyLimits(namespace string, oldStream, newStream *imageapi.ImageStream) error
 }
 
 type NamespaceLimiter interface {
@@ -29,15 +29,26 @@ type limitVerifier struct {
 	limiter NamespaceLimiter
 }
 
-func (v *limitVerifier) VerifyLimits(namespace string, is *imageapi.ImageStream) error {
+func (v *limitVerifier) VerifyLimits(namespace string, oldStream, newStream *imageapi.ImageStream) error {
 	limits, err := v.limiter.LimitsForNamespace(namespace)
 	if err != nil || len(limits) == 0 {
 		return err
 	}
 
-	usage := GetImageStreamUsage(is)
-	if err := verifyImageStreamUsage(usage, limits); err != nil {
-		return kapierrors.NewForbidden(image.Resource("ImageStream"), is.Name, err)
+	_, oldSpecRefs, oldStatusRefs := GetImageStreamUsage(oldStream)
+	newUsage, newSpecRefs, newStatusRefs := GetImageStreamUsage(newStream)
+
+	// count has not increased in any of the sets
+	if newSpecRefs.Len() <= oldSpecRefs.Len() && newStatusRefs.Len() <= oldStatusRefs.Len() {
+		// We do not have to check for limitRange violations if we do not increase the number of references.
+		// That is we should allow updates to the ImageStream resource if there are pre-existing violations in the cluster.
+		if newSpecRefs.Difference(oldSpecRefs).Len() == 0 && newStatusRefs.Difference(oldStatusRefs).Len() == 0 {
+			return nil
+		}
+	}
+
+	if err := verifyImageStreamUsage(newUsage, limits); err != nil {
+		return kapierrors.NewForbidden(image.Resource("ImageStream"), newStream.Name, err)
 	}
 	return nil
 }
