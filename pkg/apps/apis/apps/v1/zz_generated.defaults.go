@@ -6,7 +6,7 @@
 package v1
 
 import (
-	v1 "github.com/openshift/api/apps/v1"
+	appsv1 "github.com/openshift/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	apiscorev1 "k8s.io/kubernetes/pkg/apis/core/v1"
@@ -16,12 +16,12 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
-	scheme.AddTypeDefaultingFunc(&v1.DeploymentConfig{}, func(obj interface{}) { SetObjectDefaults_DeploymentConfig(obj.(*v1.DeploymentConfig)) })
-	scheme.AddTypeDefaultingFunc(&v1.DeploymentConfigList{}, func(obj interface{}) { SetObjectDefaults_DeploymentConfigList(obj.(*v1.DeploymentConfigList)) })
+	scheme.AddTypeDefaultingFunc(&appsv1.DeploymentConfig{}, func(obj interface{}) { SetObjectDefaults_DeploymentConfig(obj.(*appsv1.DeploymentConfig)) })
+	scheme.AddTypeDefaultingFunc(&appsv1.DeploymentConfigList{}, func(obj interface{}) { SetObjectDefaults_DeploymentConfigList(obj.(*appsv1.DeploymentConfigList)) })
 	return nil
 }
 
-func SetObjectDefaults_DeploymentConfig(in *v1.DeploymentConfig) {
+func SetObjectDefaults_DeploymentConfig(in *appsv1.DeploymentConfig) {
 	SetDefaults_DeploymentConfig(in)
 	SetDefaults_DeploymentConfigSpec(&in.Spec)
 	SetDefaults_DeploymentStrategy(&in.Spec.Strategy)
@@ -398,10 +398,14 @@ func SetObjectDefaults_DeploymentConfig(in *v1.DeploymentConfig) {
 			}
 		}
 		apiscorev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Overhead)
+		if in.Spec.Template.Spec.Resources != nil {
+			apiscorev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Resources.Limits)
+			apiscorev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Resources.Requests)
+		}
 	}
 }
 
-func SetObjectDefaults_DeploymentConfigList(in *v1.DeploymentConfigList) {
+func SetObjectDefaults_DeploymentConfigList(in *appsv1.DeploymentConfigList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_DeploymentConfig(a)
