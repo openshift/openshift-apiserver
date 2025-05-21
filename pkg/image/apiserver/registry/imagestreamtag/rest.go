@@ -199,12 +199,20 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 			target.Spec.Tags[imageTag] = *istag.Tag
 		}
 
+		var dryRun []string
+		if options != nil {
+			dryRun = options.DryRun
+		}
 		// Check the stream creation timestamp and make sure we will not
 		// create a new image stream while deleting.
 		if target.CreationTimestamp.IsZero() {
-			target, err = r.imageStreamRegistry.CreateImageStream(ctx, target, &metav1.CreateOptions{})
+			target, err = r.imageStreamRegistry.CreateImageStream(ctx, target, &metav1.CreateOptions{
+				DryRun: dryRun,
+			})
 		} else {
-			target, err = r.imageStreamRegistry.UpdateImageStream(ctx, target, false, &metav1.UpdateOptions{})
+			target, err = r.imageStreamRegistry.UpdateImageStream(ctx, target, false, &metav1.UpdateOptions{
+				DryRun: dryRun,
+			})
 		}
 		if kapierrors.IsAlreadyExists(err) || kapierrors.IsConflict(err) {
 			continue
@@ -357,12 +365,21 @@ func (r *REST) update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 	tagRef.Annotations = imageStreamTag.Annotations
 	originalImageStream.Spec.Tags[tag] = tagRef
 
+	var dryRun []string
+	if options != nil {
+		dryRun = options.DryRun
+	}
+
 	// mutate the image stream
 	var newImageStream *imageapi.ImageStream
 	if create {
-		newImageStream, err = r.imageStreamRegistry.CreateImageStream(ctx, originalImageStream, &metav1.CreateOptions{})
+		newImageStream, err = r.imageStreamRegistry.CreateImageStream(ctx, originalImageStream, &metav1.CreateOptions{
+			DryRun: dryRun,
+		})
 	} else {
-		newImageStream, err = r.imageStreamRegistry.UpdateImageStream(ctx, originalImageStream, false, &metav1.UpdateOptions{})
+		newImageStream, err = r.imageStreamRegistry.UpdateImageStream(ctx, originalImageStream, false, &metav1.UpdateOptions{
+			DryRun: dryRun,
+		})
 	}
 	if err != nil {
 		// return true for canRetry if we had a failure for resource versions
@@ -422,7 +439,14 @@ func (r *REST) Delete(ctx context.Context, id string, objectFunc rest.ValidateOb
 			return nil, false, kapierrors.NewNotFound(imagegroup.Resource("imagestreamtags"), id)
 		}
 
-		_, err = r.imageStreamRegistry.UpdateImageStream(ctx, stream, false, &metav1.UpdateOptions{})
+		var dryRun []string
+		if options != nil {
+			dryRun = options.DryRun
+		}
+
+		_, err = r.imageStreamRegistry.UpdateImageStream(ctx, stream, false, &metav1.UpdateOptions{
+			DryRun: dryRun,
+		})
 		if kapierrors.IsConflict(err) {
 			continue
 		}

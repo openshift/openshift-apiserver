@@ -76,7 +76,7 @@ func (s *storage) GetImageStream(ctx context.Context, imageStreamID string, opti
 }
 
 func (s *storage) CreateImageStream(ctx context.Context, imageStream *imageapi.ImageStream, options *metav1.CreateOptions) (*imageapi.ImageStream, error) {
-	obj, err := s.Create(ctx, imageStream, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
+	obj, err := s.Create(ctx, imageStream, rest.ValidateAllObjectFunc, options)
 	if err != nil {
 		return nil, err
 	}
