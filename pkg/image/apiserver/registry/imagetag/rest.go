@@ -3,7 +3,6 @@ package imagetag
 import (
 	"context"
 	"fmt"
-
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metainternal "k8s.io/apimachinery/pkg/apis/meta/internalversion"
@@ -211,9 +210,9 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		// Check the stream creation timestamp and make sure we will not
 		// create a new image stream while deleting.
 		if target.CreationTimestamp.IsZero() {
-			target, err = r.imageStreamRegistry.CreateImageStream(ctx, target, &metav1.CreateOptions{})
+			target, err = r.imageStreamRegistry.CreateImageStream(ctx, target, internalimageutil.CreateOptionsToSupportedCreateOptions(options))
 		} else {
-			target, err = r.imageStreamRegistry.UpdateImageStream(ctx, target, false, &metav1.UpdateOptions{})
+			target, err = r.imageStreamRegistry.UpdateImageStream(ctx, target, false, internalimageutil.CreateOptionsToSupportedUpdateOptions(options))
 		}
 		if kapierrors.IsAlreadyExists(err) || kapierrors.IsConflict(err) {
 			continue
@@ -323,9 +322,9 @@ func (r *REST) Update(ctx context.Context, tagName string, objInfo rest.UpdatedO
 	// mutate the image stream
 	var newImageStream *imageapi.ImageStream
 	if create {
-		newImageStream, err = r.imageStreamRegistry.CreateImageStream(ctx, imageStream, &metav1.CreateOptions{})
+		newImageStream, err = r.imageStreamRegistry.CreateImageStream(ctx, imageStream, internalimageutil.UpdateOptionsToSupportedCreateOptions(options))
 	} else {
-		newImageStream, err = r.imageStreamRegistry.UpdateImageStream(ctx, imageStream, false, &metav1.UpdateOptions{})
+		newImageStream, err = r.imageStreamRegistry.UpdateImageStream(ctx, imageStream, false, internalimageutil.UpdateOptionsToSupportedUpdateOptions(options))
 	}
 	if err != nil {
 		return nil, false, err
@@ -382,7 +381,7 @@ func (r *REST) Delete(ctx context.Context, id string, objectFunc rest.ValidateOb
 			return nil, false, kapierrors.NewNotFound(imagegroup.Resource("imagetags"), id)
 		}
 
-		_, err = r.imageStreamRegistry.UpdateImageStream(ctx, stream, false, &metav1.UpdateOptions{})
+		_, err = r.imageStreamRegistry.UpdateImageStream(ctx, stream, false, internalimageutil.DeleteOptionsToSupportedUpdateOptions(options))
 		if kapierrors.IsConflict(err) {
 			continue
 		}
