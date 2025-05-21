@@ -195,8 +195,7 @@ replace (
 	k8s.io/api => k8s.io/api v0.32.1
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.32.1
 	k8s.io/apimachinery => k8s.io/apimachinery v0.32.1
-	// FIXME: points to https://github.com/dinhxuanvu/kubernetes-apiserver/commits/rebase-1.32/
-	k8s.io/apiserver => github.com/dinhxuanvu/kubernetes-apiserver v0.0.0-20250326180244-86dfb68f9ee8
+	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20250526074939-69bc847b1ee3
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.32.1
 	k8s.io/client-go => k8s.io/client-go v0.32.1
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.32.1

@@ -6,7 +6,7 @@
 package v1
 
 import (
-	v1 "github.com/openshift/api/security/v1"
+	securityv1 "github.com/openshift/api/security/v1"
 	corev1 "k8s.io/api/core/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	apiscorev1 "k8s.io/kubernetes/pkg/apis/core/v1"
@@ -16,23 +16,25 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
-	scheme.AddTypeDefaultingFunc(&v1.PodSecurityPolicyReview{}, func(obj interface{}) { SetObjectDefaults_PodSecurityPolicyReview(obj.(*v1.PodSecurityPolicyReview)) })
-	scheme.AddTypeDefaultingFunc(&v1.PodSecurityPolicySelfSubjectReview{}, func(obj interface{}) {
-		SetObjectDefaults_PodSecurityPolicySelfSubjectReview(obj.(*v1.PodSecurityPolicySelfSubjectReview))
+	scheme.AddTypeDefaultingFunc(&securityv1.PodSecurityPolicyReview{}, func(obj interface{}) {
+		SetObjectDefaults_PodSecurityPolicyReview(obj.(*securityv1.PodSecurityPolicyReview))
 	})
-	scheme.AddTypeDefaultingFunc(&v1.PodSecurityPolicySubjectReview{}, func(obj interface{}) {
-		SetObjectDefaults_PodSecurityPolicySubjectReview(obj.(*v1.PodSecurityPolicySubjectReview))
+	scheme.AddTypeDefaultingFunc(&securityv1.PodSecurityPolicySelfSubjectReview{}, func(obj interface{}) {
+		SetObjectDefaults_PodSecurityPolicySelfSubjectReview(obj.(*securityv1.PodSecurityPolicySelfSubjectReview))
 	})
-	scheme.AddTypeDefaultingFunc(&v1.SecurityContextConstraints{}, func(obj interface{}) {
-		SetObjectDefaults_SecurityContextConstraints(obj.(*v1.SecurityContextConstraints))
+	scheme.AddTypeDefaultingFunc(&securityv1.PodSecurityPolicySubjectReview{}, func(obj interface{}) {
+		SetObjectDefaults_PodSecurityPolicySubjectReview(obj.(*securityv1.PodSecurityPolicySubjectReview))
 	})
-	scheme.AddTypeDefaultingFunc(&v1.SecurityContextConstraintsList{}, func(obj interface{}) {
-		SetObjectDefaults_SecurityContextConstraintsList(obj.(*v1.SecurityContextConstraintsList))
+	scheme.AddTypeDefaultingFunc(&securityv1.SecurityContextConstraints{}, func(obj interface{}) {
+		SetObjectDefaults_SecurityContextConstraints(obj.(*securityv1.SecurityContextConstraints))
+	})
+	scheme.AddTypeDefaultingFunc(&securityv1.SecurityContextConstraintsList{}, func(obj interface{}) {
+		SetObjectDefaults_SecurityContextConstraintsList(obj.(*securityv1.SecurityContextConstraintsList))
 	})
 	return nil
 }
 
-func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
+func SetObjectDefaults_PodSecurityPolicyReview(in *securityv1.PodSecurityPolicyReview) {
 	apiscorev1.SetDefaults_PodSpec(&in.Spec.Template.Spec)
 	for i := range in.Spec.Template.Spec.Volumes {
 		a := &in.Spec.Template.Spec.Volumes[i]
@@ -327,6 +329,10 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 		}
 	}
 	apiscorev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Overhead)
+	if in.Spec.Template.Spec.Resources != nil {
+		apiscorev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Resources.Limits)
+		apiscorev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Resources.Requests)
+	}
 	for i := range in.Status.AllowedServiceAccounts {
 		a := &in.Status.AllowedServiceAccounts[i]
 		apiscorev1.SetDefaults_PodSpec(&a.PodSecurityPolicySubjectReviewStatus.Template.Spec)
@@ -623,10 +629,14 @@ func SetObjectDefaults_PodSecurityPolicyReview(in *v1.PodSecurityPolicyReview) {
 			}
 		}
 		apiscorev1.SetDefaults_ResourceList(&a.PodSecurityPolicySubjectReviewStatus.Template.Spec.Overhead)
+		if a.PodSecurityPolicySubjectReviewStatus.Template.Spec.Resources != nil {
+			apiscorev1.SetDefaults_ResourceList(&a.PodSecurityPolicySubjectReviewStatus.Template.Spec.Resources.Limits)
+			apiscorev1.SetDefaults_ResourceList(&a.PodSecurityPolicySubjectReviewStatus.Template.Spec.Resources.Requests)
+		}
 	}
 }
 
-func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPolicySelfSubjectReview) {
+func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *securityv1.PodSecurityPolicySelfSubjectReview) {
 	apiscorev1.SetDefaults_PodSpec(&in.Spec.Template.Spec)
 	for i := range in.Spec.Template.Spec.Volumes {
 		a := &in.Spec.Template.Spec.Volumes[i]
@@ -921,6 +931,10 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 		}
 	}
 	apiscorev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Overhead)
+	if in.Spec.Template.Spec.Resources != nil {
+		apiscorev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Resources.Limits)
+		apiscorev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Resources.Requests)
+	}
 	apiscorev1.SetDefaults_PodSpec(&in.Status.Template.Spec)
 	for i := range in.Status.Template.Spec.Volumes {
 		a := &in.Status.Template.Spec.Volumes[i]
@@ -1215,9 +1229,13 @@ func SetObjectDefaults_PodSecurityPolicySelfSubjectReview(in *v1.PodSecurityPoli
 		}
 	}
 	apiscorev1.SetDefaults_ResourceList(&in.Status.Template.Spec.Overhead)
+	if in.Status.Template.Spec.Resources != nil {
+		apiscorev1.SetDefaults_ResourceList(&in.Status.Template.Spec.Resources.Limits)
+		apiscorev1.SetDefaults_ResourceList(&in.Status.Template.Spec.Resources.Requests)
+	}
 }
 
-func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySubjectReview) {
+func SetObjectDefaults_PodSecurityPolicySubjectReview(in *securityv1.PodSecurityPolicySubjectReview) {
 	apiscorev1.SetDefaults_PodSpec(&in.Spec.Template.Spec)
 	for i := range in.Spec.Template.Spec.Volumes {
 		a := &in.Spec.Template.Spec.Volumes[i]
@@ -1512,6 +1530,10 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 		}
 	}
 	apiscorev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Overhead)
+	if in.Spec.Template.Spec.Resources != nil {
+		apiscorev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Resources.Limits)
+		apiscorev1.SetDefaults_ResourceList(&in.Spec.Template.Spec.Resources.Requests)
+	}
 	apiscorev1.SetDefaults_PodSpec(&in.Status.Template.Spec)
 	for i := range in.Status.Template.Spec.Volumes {
 		a := &in.Status.Template.Spec.Volumes[i]
@@ -1806,15 +1828,19 @@ func SetObjectDefaults_PodSecurityPolicySubjectReview(in *v1.PodSecurityPolicySu
 		}
 	}
 	apiscorev1.SetDefaults_ResourceList(&in.Status.Template.Spec.Overhead)
+	if in.Status.Template.Spec.Resources != nil {
+		apiscorev1.SetDefaults_ResourceList(&in.Status.Template.Spec.Resources.Limits)
+		apiscorev1.SetDefaults_ResourceList(&in.Status.Template.Spec.Resources.Requests)
+	}
 }
 
-func SetObjectDefaults_SecurityContextConstraints(in *v1.SecurityContextConstraints) {
+func SetObjectDefaults_SecurityContextConstraints(in *securityv1.SecurityContextConstraints) {
 	if in.UserNamespaceLevel == "" {
 		in.UserNamespaceLevel = "AllowHostLevel"
 	}
 }
 
-func SetObjectDefaults_SecurityContextConstraintsList(in *v1.SecurityContextConstraintsList) {
+func SetObjectDefaults_SecurityContextConstraintsList(in *securityv1.SecurityContextConstraintsList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_SecurityContextConstraints(a)

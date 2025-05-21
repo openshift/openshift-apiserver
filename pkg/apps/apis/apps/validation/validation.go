@@ -258,6 +258,8 @@ func validateDeploymentStrategy(strategy *appsapi.DeploymentStrategy, pod *kapi.
 		}
 	}
 
+	errs = append(errs, validation.ValidateContainerResourceRequirements(&strategy.Resources, podClaimNames, fldPath.Child("resources"), kapivalidation.PodValidationOptions{})...)
+
 	if strategy.ActiveDeadlineSeconds != nil {
 		errs = append(errs, kapivalidation.ValidateNonnegativeField(*strategy.ActiveDeadlineSeconds, fldPath.Child("activeDeadlineSeconds"))...)
 		var timeoutSeconds *int64
