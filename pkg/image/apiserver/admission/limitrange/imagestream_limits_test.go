@@ -247,12 +247,13 @@ func TestVerifyLimits(t *testing.T) {
 	for _, tc := range []struct {
 		name              string
 		maxUsage          corev1.ResourceList
-		is                imageapi.ImageStream
+		oldIs             *imageapi.ImageStream
+		newIs             imageapi.ImageStream
 		exceededResources []corev1.ResourceName
 	}{
 		{
 			name: "no limits",
-			is: imageapi.ImageStream{
+			newIs: imageapi.ImageStream{
 				Status: imageapi.ImageStreamStatus{
 					Tags: map[string]imageapi.TagEventList{
 						"latest": {
@@ -282,7 +283,7 @@ func TestVerifyLimits(t *testing.T) {
 				imagev1.ResourceImageStreamImages: resource.MustParse("0"),
 				imagev1.ResourceImageStreamTags:   resource.MustParse("0"),
 			},
-			is: imageapi.ImageStream{
+			newIs: imageapi.ImageStream{
 				Status: imageapi.ImageStreamStatus{
 					Tags: map[string]imageapi.TagEventList{
 						"latest": {
@@ -304,7 +305,7 @@ func TestVerifyLimits(t *testing.T) {
 			maxUsage: corev1.ResourceList{
 				imagev1.ResourceImageStreamTags: resource.MustParse("0"),
 			},
-			is: imageapi.ImageStream{
+			newIs: imageapi.ImageStream{
 				Spec: imageapi.ImageStreamSpec{
 					Tags: map[string]imageapi.TagReference{
 						"new": {
@@ -338,7 +339,7 @@ func TestVerifyLimits(t *testing.T) {
 				imagev1.ResourceImageStreamTags:   resource.MustParse("1"),
 				imagev1.ResourceImageStreamImages: resource.MustParse("0"),
 			},
-			is: imageapi.ImageStream{
+			newIs: imageapi.ImageStream{
 				Spec: imageapi.ImageStreamSpec{
 					Tags: map[string]imageapi.TagReference{
 						"new": {
@@ -375,6 +376,158 @@ func TestVerifyLimits(t *testing.T) {
 				imagev1.ResourceImageStreamImages,
 			},
 		},
+
+		{
+			name: "exceed images, with no update should not cause new violations",
+			maxUsage: corev1.ResourceList{
+				imagev1.ResourceImageStreamImages: resource.MustParse("0"),
+				imagev1.ResourceImageStreamTags:   resource.MustParse("0"),
+			},
+			oldIs: &imageapi.ImageStream{
+				Status: imageapi.ImageStreamStatus{
+					Tags: map[string]imageapi.TagEventList{
+						"latest": {
+							Items: []imageapi.TagEvent{
+								{
+									DockerImageReference: imagetest.MakeDockerImageReference("test", "is", imagetest.BaseImageWith1LayerDigest),
+									Image:                imagetest.BaseImageWith1LayerDigest,
+								},
+							},
+						},
+					},
+				},
+			},
+			newIs: imageapi.ImageStream{
+				Status: imageapi.ImageStreamStatus{
+					Tags: map[string]imageapi.TagEventList{
+						"latest": {
+							Items: []imageapi.TagEvent{
+								{
+									DockerImageReference: imagetest.MakeDockerImageReference("test", "is", imagetest.BaseImageWith1LayerDigest),
+									Image:                imagetest.BaseImageWith1LayerDigest,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			name: "exceed images, should allow removal of violating refs",
+			maxUsage: corev1.ResourceList{
+				imagev1.ResourceImageStreamImages: resource.MustParse("0"),
+				imagev1.ResourceImageStreamTags:   resource.MustParse("0"),
+			},
+			oldIs: &imageapi.ImageStream{
+				Status: imageapi.ImageStreamStatus{
+					Tags: map[string]imageapi.TagEventList{
+						"latest": {
+							Items: []imageapi.TagEvent{
+								{
+									DockerImageReference: imagetest.MakeDockerImageReference("test", "is", imagetest.BaseImageWith1LayerDigest),
+									Image:                imagetest.BaseImageWith1LayerDigest,
+								},
+							},
+						},
+					},
+				},
+			},
+			newIs: imageapi.ImageStream{
+				Status: imageapi.ImageStreamStatus{},
+			},
+		},
+
+		{
+			name: "exceed images, should not allow replacement of violating refs",
+			maxUsage: corev1.ResourceList{
+				imagev1.ResourceImageStreamImages: resource.MustParse("0"),
+				imagev1.ResourceImageStreamTags:   resource.MustParse("0"),
+			},
+			oldIs: &imageapi.ImageStream{
+				Status: imageapi.ImageStreamStatus{
+					Tags: map[string]imageapi.TagEventList{
+						"latest": {
+							Items: []imageapi.TagEvent{
+								{
+									DockerImageReference: imagetest.MakeDockerImageReference("test", "is", imagetest.BaseImageWith1LayerDigest),
+									Image:                imagetest.BaseImageWith1LayerDigest,
+								},
+							},
+						},
+					},
+				},
+			},
+			newIs: imageapi.ImageStream{
+				Status: imageapi.ImageStreamStatus{
+					Tags: map[string]imageapi.TagEventList{
+						"latest": {
+							Items: []imageapi.TagEvent{
+								{
+									DockerImageReference: imagetest.MakeDockerImageReference("test", "is", imagetest.BaseImageWith1LayerDigest),
+									Image:                imagetest.BaseImageWith2LayersDigest,
+								},
+							},
+						},
+					},
+				},
+			},
+			exceededResources: []corev1.ResourceName{imagev1.ResourceImageStreamImages},
+		},
+
+		{
+			name: "exceed tags and images, should allow removal of violating refs",
+			maxUsage: corev1.ResourceList{
+				imagev1.ResourceImageStreamTags:   resource.MustParse("1"),
+				imagev1.ResourceImageStreamImages: resource.MustParse("0"),
+			},
+			oldIs: &imageapi.ImageStream{
+				Spec: imageapi.ImageStreamSpec{
+					Tags: map[string]imageapi.TagReference{
+						"new": {
+							Name: "new",
+							From: &coreapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: imagetest.MakeDockerImageReference("test", "noshared", imagetest.ChildImageWith2LayersDigest),
+							},
+						},
+						"good": {
+							Name: "good",
+							From: &coreapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: imagetest.MakeDockerImageReference("test", "is", imagetest.BaseImageWith1LayerDigest),
+							},
+						},
+					},
+				},
+				Status: imageapi.ImageStreamStatus{
+					Tags: map[string]imageapi.TagEventList{
+						"latest": {
+							Items: []imageapi.TagEvent{
+								{
+									DockerImageReference: imagetest.MakeDockerImageReference("test", "is", imagetest.BaseImageWith1LayerDigest),
+									Image:                imagetest.BaseImageWith1LayerDigest,
+								},
+							},
+						},
+					},
+				},
+			},
+			newIs: imageapi.ImageStream{
+				Spec: imageapi.ImageStreamSpec{
+					Tags: map[string]imageapi.TagReference{
+						"good": {
+							Name: "good",
+							From: &coreapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: imagetest.MakeDockerImageReference("test", "is", imagetest.BaseImageWith1LayerDigest),
+							},
+						},
+					},
+				},
+				Status: imageapi.ImageStreamStatus{},
+			},
+		},
 	} {
 		limitRange := &corev1.LimitRange{
 			ObjectMeta: metav1.ObjectMeta{
@@ -397,7 +550,7 @@ func TestVerifyLimits(t *testing.T) {
 			}),
 		}
 
-		err := verifier.VerifyLimits("test", &tc.is)
+		err := verifier.VerifyLimits("test", tc.oldIs, &tc.newIs)
 		if len(tc.exceededResources) > 0 && err == nil {
 			t.Errorf("[%s] unexpected non-error while following resources should fail: %v", tc.name, tc.exceededResources)
 			continue

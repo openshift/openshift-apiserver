@@ -124,7 +124,7 @@ func (s Strategy) validateTagsAndLimits(ctx context.Context, oldStream, newStrea
 	if !ok {
 		ns = newStream.Namespace
 	}
-	return s.limitVerifier.VerifyLimits(ns, newStream)
+	return s.limitVerifier.VerifyLimits(ns, oldStream, newStream)
 }
 
 // WarningsOnCreate returns warnings for the creation of the given object.
@@ -673,20 +673,21 @@ func (StatusStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Obj
 }
 
 func (s StatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	newIS := obj.(*imageapi.ImageStream)
 	errs := field.ErrorList{}
+	oldStream := old.(*imageapi.ImageStream)
+	newStream := obj.(*imageapi.ImageStream)
 
 	ns, ok := apirequest.NamespaceFrom(ctx)
 	if !ok {
-		ns = newIS.Namespace
+		ns = newStream.Namespace
 	}
-	err := s.limitVerifier.VerifyLimits(ns, newIS)
+	err := s.limitVerifier.VerifyLimits(ns, oldStream, newStream)
 	if err != nil {
 		errs = append(errs, field.Forbidden(field.NewPath("imageStream"), err.Error()))
 	}
 
 	// TODO: merge valid fields after update
-	errs = append(errs, validation.ValidateImageStreamStatusUpdateWithWhitelister(ctx, s.registryWhitelister, newIS, old.(*imageapi.ImageStream))...)
+	errs = append(errs, validation.ValidateImageStreamStatusUpdateWithWhitelister(ctx, s.registryWhitelister, newStream, oldStream)...)
 	return errs
 }
 

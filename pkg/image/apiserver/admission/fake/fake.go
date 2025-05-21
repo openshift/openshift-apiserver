@@ -5,13 +5,13 @@ import (
 )
 
 type ImageStreamLimitVerifier struct {
-	ImageStreamEvaluator func(ns string, is *imageapi.ImageStream) error
+	ImageStreamEvaluator func(ns string, oldStream, newStream *imageapi.ImageStream) error
 	Err                  error
 }
 
-func (f *ImageStreamLimitVerifier) VerifyLimits(ns string, is *imageapi.ImageStream) error {
+func (f *ImageStreamLimitVerifier) VerifyLimits(ns string, oldStream, newStream *imageapi.ImageStream) error {
 	if f.ImageStreamEvaluator != nil {
-		return f.ImageStreamEvaluator(ns, is)
+		return f.ImageStreamEvaluator(ns, oldStream, newStream)
 	}
 	return f.Err
 }
