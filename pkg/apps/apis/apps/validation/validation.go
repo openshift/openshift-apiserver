@@ -258,8 +258,6 @@ func validateDeploymentStrategy(strategy *appsapi.DeploymentStrategy, pod *kapi.
 		}
 	}
 
-	errs = append(errs, validation.ValidateResourceRequirements(&strategy.Resources, podClaimNames, fldPath.Child("resources"), kapivalidation.PodValidationOptions{})...)
-
 	if strategy.ActiveDeadlineSeconds != nil {
 		errs = append(errs, kapivalidation.ValidateNonnegativeField(*strategy.ActiveDeadlineSeconds, fldPath.Child("activeDeadlineSeconds"))...)
 		var timeoutSeconds *int64
@@ -584,7 +582,7 @@ func ValidateDeploymentLogOptions(opts *appsapi.DeploymentLogOptions) field.Erro
 
 	// TODO: Replace by validating PodLogOptions via DeploymentLogOptions once it's bundled in
 	popts := appsapi.DeploymentToPodLogOptions(opts)
-	if errs := validation.ValidatePodLogOptions(popts); len(errs) > 0 {
+	if errs := validation.ValidatePodLogOptions(popts, false); len(errs) > 0 {
 		allErrs = append(allErrs, errs...)
 	}
 
