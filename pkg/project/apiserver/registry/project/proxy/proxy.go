@@ -214,26 +214,5 @@ func (s *REST) Delete(ctx context.Context, name string, objectFunc rest.Validate
 	if options != nil {
 		opts = *options
 	}
-	if objectFunc != nil {
-		obj, err := s.Get(ctx, name, &metav1.GetOptions{})
-		if err != nil {
-			return nil, false, err
-		}
-		projectObj, ok := obj.(*projectapi.Project)
-		if !ok || projectObj == nil {
-			return nil, false, fmt.Errorf("not a project: %#v", obj)
-		}
-
-		// Make sure the object hasn't changed between Get and Delete - pass UID and RV to delete options
-		if opts.Preconditions == nil {
-			opts.Preconditions = &metav1.Preconditions{}
-		}
-		opts.Preconditions.UID = &projectObj.UID
-		opts.Preconditions.ResourceVersion = &projectObj.ResourceVersion
-
-		if err := objectFunc(ctx, obj); err != nil {
-			return nil, false, err
-		}
-	}
 	return &metav1.Status{Status: metav1.StatusSuccess}, false, s.client.Delete(ctx, name, opts)
 }

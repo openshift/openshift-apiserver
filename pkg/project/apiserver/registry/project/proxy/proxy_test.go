@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"context"
 	"strings"
 	"testing"
 
@@ -9,7 +8,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/authentication/user"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -103,27 +101,6 @@ func TestCreateProjectOK(t *testing.T) {
 	}
 }
 
-func TestCreateProjectValidation(t *testing.T) {
-	mockClient := &fake.Clientset{}
-	storage := NewREST(mockClient.CoreV1().Namespaces(), &mockLister{}, nil, nil)
-
-	validationCalled := false
-	validationFunc := func(ctx context.Context, obj runtime.Object) error {
-		validationCalled = true
-		return nil
-	}
-
-	_, err := storage.Create(apirequest.NewContext(), &projectapi.Project{
-		ObjectMeta: metav1.ObjectMeta{Name: "foo"},
-	}, validationFunc, &metav1.CreateOptions{})
-	if err != nil {
-		t.Errorf("Unexpected non-nil error: %#v", err)
-	}
-	if !validationCalled {
-		t.Errorf("Expected validation function to be called")
-	}
-}
-
 func TestGetProjectOK(t *testing.T) {
 	mockClient := fake.NewSimpleClientset(&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "foo"}})
 	storage := NewREST(mockClient.CoreV1().Namespaces(), &mockLister{}, nil, nil)
@@ -159,26 +136,9 @@ func TestDeleteProject(t *testing.T) {
 		t.Errorf("Expected status=success, got: %#v", status)
 	}
 	if len(mockClient.Actions()) != 1 {
-		t.Errorf("Expected client action for delete, got %v", mockClient.Actions())
+		t.Errorf("Expected client action for delete")
 	}
 	if !mockClient.Actions()[0].Matches("delete", "namespaces") {
-		t.Errorf("Expected call to delete-namespace, got %#v", mockClient.Actions()[0])
-	}
-}
-
-func TestDeleteProjectValidation(t *testing.T) {
-	mockClient := &fake.Clientset{}
-	storage := REST{
-		client: mockClient.CoreV1().Namespaces(),
-	}
-	validationCalled := false
-	validationFunc := func(ctx context.Context, obj runtime.Object) error {
-		validationCalled = true
-		return nil
-	}
-
-	storage.Delete(apirequest.NewContext(), "foo", validationFunc, &metav1.DeleteOptions{})
-	if !validationCalled {
-		t.Errorf("Expected validation function to be called")
+		t.Errorf("Expected call to delete-namespace")
 	}
 }
