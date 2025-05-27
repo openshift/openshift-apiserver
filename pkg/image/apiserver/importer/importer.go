@@ -33,7 +33,7 @@ import (
 	"github.com/openshift/library-go/pkg/image/imageutil"
 	imageref "github.com/openshift/library-go/pkg/image/reference"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
+	internalimageutil "github.com/openshift/openshift-apiserver/pkg/image/apiserver/internal/imageutil"
 )
 
 // Interface loads images into an image stream import request.
