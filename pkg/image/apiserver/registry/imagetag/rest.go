@@ -20,7 +20,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/api/apihelpers"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
+	internalimageutil "github.com/openshift/openshift-apiserver/pkg/image/apiserver/internal/imageutil"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
 	imageprinters "github.com/openshift/openshift-apiserver/pkg/image/printers/internalversion"
