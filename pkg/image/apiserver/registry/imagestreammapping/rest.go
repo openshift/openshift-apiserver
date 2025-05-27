@@ -20,7 +20,7 @@ import (
 	imagev1 "github.com/openshift/api/image/v1"
 	imagereference "github.com/openshift/library-go/pkg/image/reference"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
+	internalimageutil "github.com/openshift/openshift-apiserver/pkg/image/apiserver/internal/imageutil"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registryhostname"
