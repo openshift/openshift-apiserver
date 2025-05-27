@@ -30,7 +30,7 @@ import (
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/fake"
 	admfake "github.com/openshift/openshift-apiserver/pkg/image/apiserver/admission/fake"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
+	internalimageutil "github.com/openshift/openshift-apiserver/pkg/image/apiserver/internal/imageutil"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/image"
 	imageetcd "github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/image/etcd"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
