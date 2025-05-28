@@ -7,6 +7,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
 
 	imagev1 "github.com/openshift/api/image/v1"
@@ -203,18 +204,26 @@ func TestGetImageReferenceForObjectReference(t *testing.T) {
 
 func TestGetImageStreamUsage(t *testing.T) {
 	for _, tc := range []struct {
-		name           string
-		is             imageapi.ImageStream
-		expectedTags   int64
-		expectedImages int64
+		name               string
+		is                 *imageapi.ImageStream
+		expectedTags       int64
+		expectedImages     int64
+		expectedSpecRefs   sets.Set[string]
+		expectedStatusRefs sets.Set[string]
 	}{
 		{
+			name: "nil",
+			is:   nil,
+		},
+
+		{
 			name: "empty",
+			is:   &imageapi.ImageStream{},
 		},
 
 		{
 			name: "single tag",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				Spec: imageapi.ImageStreamSpec{
 					Tags: map[string]imageapi.TagReference{
 						"latest": {
@@ -227,12 +236,13 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedTags: 1,
+			expectedTags:     1,
+			expectedSpecRefs: sets.New[string]("docker.io/openshift/base:v1"),
 		},
 
 		{
 			name: "single image",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				Status: imageapi.ImageStreamStatus{
 					Tags: map[string]imageapi.TagEventList{
 						"latest": {
@@ -246,12 +256,13 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedImages: 1,
+			expectedImages:     1,
+			expectedStatusRefs: sets.New[string](imagetest.BaseImageWith1LayerDigest),
 		},
 
 		{
 			name: "tag and image",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				Spec: imageapi.ImageStreamSpec{
 					Tags: map[string]imageapi.TagReference{
 						"new": {
@@ -277,13 +288,15 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedTags:   1,
-			expectedImages: 1,
+			expectedTags:       1,
+			expectedImages:     1,
+			expectedSpecRefs:   sets.New[string](fmt.Sprintf("shared/is@%s", imagetest.MiscImageDigest)),
+			expectedStatusRefs: sets.New[string](imagetest.BaseImageWith1LayerDigest),
 		},
 
 		{
 			name: "two images under one tag",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				Status: imageapi.ImageStreamStatus{
 					Tags: map[string]imageapi.TagEventList{
 						"latest": {
@@ -301,12 +314,13 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedImages: 2,
+			expectedImages:     2,
+			expectedStatusRefs: sets.New[string](imagetest.BaseImageWith1LayerDigest, imagetest.BaseImageWith2LayersDigest),
 		},
 
 		{
 			name: "two different tags",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				Status: imageapi.ImageStreamStatus{
 					Tags: map[string]imageapi.TagEventList{
 						"foo": {
@@ -328,12 +342,13 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedImages: 2,
+			expectedImages:     2,
+			expectedStatusRefs: sets.New[string](imagetest.BaseImageWith2LayersDigest, imagetest.ChildImageWith3LayersDigest),
 		},
 
 		{
 			name: "the same image under different tags",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				Status: imageapi.ImageStreamStatus{
 					Tags: map[string]imageapi.TagEventList{
 						"latest": {
@@ -355,12 +370,13 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedImages: 1,
+			expectedImages:     1,
+			expectedStatusRefs: sets.New[string](imagetest.ChildImageWith2LayersDigest),
 		},
 
 		{
 			name: "two non-canonical references",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				Spec: imageapi.ImageStreamSpec{
 					Tags: map[string]imageapi.TagReference{
 						"new": {
@@ -392,13 +408,15 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedTags:   1,
-			expectedImages: 1,
+			expectedTags:       1,
+			expectedImages:     1,
+			expectedSpecRefs:   sets.New[string]("docker.io/repo"),
+			expectedStatusRefs: sets.New[string](imagetest.ChildImageWith3LayersDigest),
 		},
 
 		{
 			name: "the same image in both spec and status",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "test",
 					Name:      "noshared",
@@ -427,13 +445,15 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedTags:   1,
-			expectedImages: 1,
+			expectedTags:       1,
+			expectedImages:     1,
+			expectedSpecRefs:   sets.New[string](imagetest.MakeDockerImageReference("test", "noshared", imagetest.ChildImageWith2LayersDigest)),
+			expectedStatusRefs: sets.New[string](imagetest.ChildImageWith2LayersDigest),
 		},
 
 		{
 			name: "imagestreamtag and dockerimage references",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				Spec: imageapi.ImageStreamSpec{
 					Tags: map[string]imageapi.TagReference{
 						"ist": {
@@ -455,12 +475,13 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedTags: 2,
+			expectedTags:     2,
+			expectedSpecRefs: sets.New[string]("docker.io/is", "shared/is:latest"),
 		},
 
 		{
 			name: "dockerimage reference tagged in status",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				Spec: imageapi.ImageStreamSpec{
 					Tags: map[string]imageapi.TagReference{
 						"dockerimage": {
@@ -485,13 +506,15 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedTags:   1,
-			expectedImages: 1,
+			expectedTags:       1,
+			expectedImages:     1,
+			expectedSpecRefs:   sets.New[string](imagetest.MakeDockerImageReference("test", "is", imagetest.BaseImageWith1LayerDigest)),
+			expectedStatusRefs: sets.New[string](imagetest.BaseImageWith1LayerDigest),
 		},
 
 		{
 			name: "wrong spec image references",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				Spec: imageapi.ImageStreamSpec{
 					Tags: map[string]imageapi.TagReference{
 						"badkind": {
@@ -527,12 +550,13 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedTags: 1,
+			expectedTags:     1,
+			expectedSpecRefs: sets.New[string](imagetest.MakeDockerImageReference("test", "is", imagetest.BaseImageWith1LayerDigest)),
 		},
 
 		{
 			name: "identical tags with fallback namespace",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "fallback",
 					Name:      "is",
@@ -557,12 +581,13 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedTags: 1,
+			expectedTags:     1,
+			expectedSpecRefs: sets.New[string]("fallback/other:tag"),
 		},
 
 		{
 			name: "identical tags without fallback namespace",
-			is: imageapi.ImageStream{
+			is: &imageapi.ImageStream{
 				Spec: imageapi.ImageStreamSpec{
 					Tags: map[string]imageapi.TagReference{
 						"havingnamespace": {
@@ -583,10 +608,11 @@ func TestGetImageStreamUsage(t *testing.T) {
 					},
 				},
 			},
-			expectedTags: 2,
+			expectedTags:     2,
+			expectedSpecRefs: sets.New[string]("ns/other:tag", "other:tag"),
 		},
 	} {
-		usage := GetImageStreamUsage(&tc.is)
+		usage, specRefs, statusRefs := GetImageStreamUsage(tc.is)
 		expectedUsage := corev1.ResourceList{
 			imagev1.ResourceImageStreamTags:   *resource.NewQuantity(tc.expectedTags, resource.DecimalSI),
 			imagev1.ResourceImageStreamImages: *resource.NewQuantity(tc.expectedImages, resource.DecimalSI),
@@ -611,6 +637,14 @@ func TestGetImageStreamUsage(t *testing.T) {
 			if _, exists := expectedUsage[r]; !exists {
 				t.Errorf("[%s] got unexpected resource %s", tc.name, r)
 			}
+		}
+
+		if !specRefs.Equal(tc.expectedSpecRefs) {
+			t.Errorf("[%s] expected spec references %v, got %v ", tc.name, tc.expectedSpecRefs.UnsortedList(), specRefs.UnsortedList())
+		}
+
+		if !statusRefs.Equal(tc.expectedStatusRefs) {
+			t.Errorf("[%s] expected status references %v, got %v ", tc.name, tc.expectedStatusRefs.UnsortedList(), statusRefs.UnsortedList())
 		}
 	}
 }

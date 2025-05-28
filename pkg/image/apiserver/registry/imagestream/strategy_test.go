@@ -518,15 +518,19 @@ func TestLimitVerifier(t *testing.T) {
 		return kapierrors.NewForbidden(image.Resource("ImageStream"), isName, err)
 	}
 
-	makeISEvaluator := func(maxImages, maxImageTags int64) func(string, *imageapi.ImageStream) error {
-		return func(ns string, is *imageapi.ImageStream) error {
+	makeISEvaluator := func(maxImages, maxImageTags int64) func(string, *imageapi.ImageStream, *imageapi.ImageStream) error {
+		return func(ns string, oldStream, newStream *imageapi.ImageStream) error {
+			if oldStream == newStream {
+				// simplified implementation of change detection of the real evaluator to test the strategy passthrough
+				return nil
+			}
 			limit := corev1.ResourceList{
 				imagev1.ResourceImageStreamImages: *resource.NewQuantity(maxImages, resource.DecimalSI),
 				imagev1.ResourceImageStreamTags:   *resource.NewQuantity(maxImageTags, resource.DecimalSI),
 			}
-			externalUsage := limitrange.GetImageStreamUsage(is)
+			externalUsage, _, _ := limitrange.GetImageStreamUsage(newStream)
 			if less, exceeded := kquota.LessThanOrEqual(externalUsage, limit); !less {
-				return makeISForbiddenError(is.Name, exceeded)
+				return makeISForbiddenError(newStream.Name, exceeded)
 			}
 			return nil
 		}
@@ -534,7 +538,7 @@ func TestLimitVerifier(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		isEvaluator func(string, *imageapi.ImageStream) error
+		isEvaluator func(string, *imageapi.ImageStream, *imageapi.ImageStream) error
 		is          imageapi.ImageStream
 		expected    field.ErrorList
 	}{
@@ -711,6 +715,13 @@ func TestLimitVerifier(t *testing.T) {
 		err = s.ValidateUpdate(ctx, &tc.is, old)
 		if e, a := tc.expected, err; !reflect.DeepEqual(e, a) {
 			t.Errorf("%s: unexpected validation errors: %s", tc.name, diff.ObjectReflectDiff(e, a))
+		}
+
+		// Update with no change should pass even for violating image streams
+		tcIs := &tc.is
+		err = s.ValidateUpdate(ctx, tcIs, tcIs)
+		if err != nil {
+			t.Errorf("%s: unexpected error: %v", tc.name, err)
 		}
 	}
 }
