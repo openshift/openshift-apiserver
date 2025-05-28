@@ -3,11 +3,13 @@ package proxy
 import (
 	"context"
 	"fmt"
+	"time"
 
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metainternal "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -43,13 +45,15 @@ type REST struct {
 	rest.TableConvertor
 }
 
-var _ rest.Lister = &REST{}
-var _ rest.CreaterUpdater = &REST{}
-var _ rest.GracefulDeleter = &REST{}
-var _ rest.Watcher = &REST{}
-var _ rest.Scoper = &REST{}
-var _ rest.Storage = &REST{}
-var _ rest.SingularNameProvider = &REST{}
+var (
+	_ rest.Lister               = &REST{}
+	_ rest.CreaterUpdater       = &REST{}
+	_ rest.GracefulDeleter      = &REST{}
+	_ rest.Watcher              = &REST{}
+	_ rest.Scoper               = &REST{}
+	_ rest.Storage              = &REST{}
+	_ rest.SingularNameProvider = &REST{}
+)
 
 // NewREST returns a RESTStorage object that will work against Project resources
 func NewREST(client corev1client.NamespaceInterface, lister projectauth.Lister, authCache *projectauth.AuthorizationCache, projectCache *projectcache.ProjectCache) *REST {
@@ -214,26 +218,123 @@ func (s *REST) Delete(ctx context.Context, name string, objectFunc rest.Validate
 	if options != nil {
 		opts = *options
 	}
-	if objectFunc != nil {
-		obj, err := s.Get(ctx, name, &metav1.GetOptions{})
+
+	// If there is no admission validation to run against this operation, we can safely
+	// run the delete call using the user provided information and delete options
+	// and return the result.
+	if objectFunc == nil {
+		err := s.client.Delete(ctx, name, opts)
 		if err != nil {
-			return nil, false, err
+			return &metav1.Status{Status: metav1.StatusFailure}, false, err
 		}
-		projectObj, ok := obj.(*projectapi.Project)
-		if !ok || projectObj == nil {
-			return nil, false, fmt.Errorf("not a project: %#v", obj)
-		}
-
-		// Make sure the object hasn't changed between Get and Delete - pass UID and RV to delete options
-		if opts.Preconditions == nil {
-			opts.Preconditions = &metav1.Preconditions{}
-		}
-		opts.Preconditions.UID = &projectObj.UID
-		opts.Preconditions.ResourceVersion = &projectObj.ResourceVersion
-
-		if err := objectFunc(ctx, obj); err != nil {
-			return nil, false, err
-		}
+		return &metav1.Status{Status: metav1.StatusSuccess}, false, nil
 	}
-	return &metav1.Status{Status: metav1.StatusSuccess}, false, s.client.Delete(ctx, name, opts)
+
+	// If there is admission validation to run against this operation,
+	// we need to first perform a GET for the Project being deleted.
+	// This allows us to have a concrete instance of the Project
+	// to validate.
+	//
+	// If the user has provided specific delete preconditions,
+	// we should validate that they are correct before performing validation
+	// and attempting the delete request. If the delete request fails
+	// with user provided delete preconditions, we should not retry.
+	//
+	// If the user has *not* provided delete preconditions,
+	// we build them based on the metadata of the fetched Project
+	// that has passed the validation check to ensure we only
+	// attempt to delete the resource that we ran validation on.
+	// If we encounter conflict errors during a delete attempt, we
+	// should retry with a fresh fetch of the Project.
+
+	var lastErr error
+	backoff := wait.Backoff{
+		Steps:    10,
+		Duration: time.Millisecond,
+		Cap:      time.Second,
+		Factor:   2,
+	}
+	err := wait.ExponentialBackoffWithContext(ctx, backoff, func(ctx context.Context) (bool, error) {
+		project, err := s.getProjectForDeletion(ctx, name, &opts)
+		if err != nil {
+			lastErr = fmt.Errorf("getting project for deletion: %w", err)
+			return false, nil
+		}
+
+		// Do not retry if the deletion preconditions are invalid because
+		// the request will always fail.
+		err = validateDeletePreconditionsForProject(project, &opts)
+		if err != nil {
+			return false, fmt.Errorf("validating preconditions: %w", err)
+		}
+
+		if err := objectFunc(ctx, project); err != nil {
+			lastErr = fmt.Errorf("validating project: %w", err)
+			return false, nil
+		}
+
+		// If the user did not supply any preconditions, set them to the Project
+		// we fetched for validation to ensure we are only deleting the Project
+		// that we validated.
+		// If the user *did* supply preconditions, we already inherited them and
+		// should continue using them.
+		deleteOpts := opts
+		userProvidedPreconditions := (options != nil && options.Preconditions != nil)
+		if !userProvidedPreconditions {
+			deleteOpts.Preconditions = &metav1.Preconditions{
+				UID:             &project.UID,
+				ResourceVersion: &project.ResourceVersion,
+			}
+		}
+
+		err = s.client.Delete(ctx, name, deleteOpts)
+		switch {
+		case err == nil:
+			return true, nil
+		case kerrors.IsConflict(err) && !userProvidedPreconditions:
+			lastErr = err
+			return false, nil
+		default:
+			return false, err
+		}
+	})
+	if err != nil {
+		if wait.Interrupted(err) && lastErr != nil {
+			err = lastErr
+		}
+		return &metav1.Status{Status: metav1.StatusFailure}, false, err
+	}
+	return &metav1.Status{Status: metav1.StatusSuccess}, false, nil
+}
+
+func (s *REST) getProjectForDeletion(ctx context.Context, name string, deleteOptions *metav1.DeleteOptions) (*projectapi.Project, error) {
+	getOpts := metav1.GetOptions{}
+
+	obj, err := s.Get(ctx, name, &getOpts)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get project: %w", err)
+	}
+
+	projectObj, ok := obj.(*projectapi.Project)
+	if !ok || projectObj == nil {
+		return nil, fmt.Errorf("not a project: %#v", obj)
+	}
+
+	return projectObj, nil
+}
+
+func validateDeletePreconditionsForProject(project *projectapi.Project, deleteOptions *metav1.DeleteOptions) error {
+	if deleteOptions == nil || deleteOptions.Preconditions == nil {
+		return nil
+	}
+
+	if deleteOptions.Preconditions.UID != nil && project.UID != *deleteOptions.Preconditions.UID {
+		return fmt.Errorf("uid precondition %q does not match project uid %q", *deleteOptions.Preconditions.UID, project.UID)
+	}
+
+	if deleteOptions.Preconditions.ResourceVersion != nil && project.ResourceVersion != *deleteOptions.Preconditions.ResourceVersion {
+		return fmt.Errorf("resourceVersion precondition %q does not match project resourceVersion %q", *deleteOptions.Preconditions.ResourceVersion, project.ResourceVersion)
+	}
+
+	return nil
 }
