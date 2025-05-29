@@ -23,10 +23,11 @@ const (
 	ProjectDescriptionParam = "PROJECT_DESCRIPTION"
 	ProjectAdminUserParam   = "PROJECT_ADMIN_USER"
 	ProjectRequesterParam   = "PROJECT_REQUESTING_USER"
+	ProjectUDNName          = "PROJECT_UDNNAME"
 )
 
 var (
-	parameters = []string{ProjectNameParam, ProjectDisplayNameParam, ProjectDescriptionParam, ProjectAdminUserParam, ProjectRequesterParam}
+	parameters = []string{ProjectNameParam, ProjectDisplayNameParam, ProjectDescriptionParam, ProjectAdminUserParam, ProjectRequesterParam, ProjectUDNName}
 )
 
 func DefaultTemplate() *templatev1.Template {
@@ -47,6 +48,7 @@ func DefaultTemplate() *templatev1.Template {
 		annotations.OpenShiftDescription: "${" + ProjectDescriptionParam + "}",
 		annotations.OpenShiftDisplayName: "${" + ProjectDisplayNameParam + "}",
 		projectapi.ProjectRequester:      "${" + ProjectRequesterParam + "}",
+		projectapi.ProjectUDNName:        "${" + ProjectUDNName + "}",
 	}
 	objBytes, err := runtime.Encode(codec, project)
 	if err != nil {
