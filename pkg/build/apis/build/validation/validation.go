@@ -692,7 +692,7 @@ func ValidateBuildLogOptions(opts *buildapi.BuildLogOptions) field.ErrorList {
 
 	// TODO: Replace by validating PodLogOptions via BuildLogOptions once it's bundled in
 	popts := buildinternalhelpers.BuildToPodLogOptions(opts)
-	if errs := validation.ValidatePodLogOptions(popts); len(errs) > 0 {
+	if errs := validation.ValidatePodLogOptions(popts, false); len(errs) > 0 {
 		allErrs = append(allErrs, errs...)
 	}
 
