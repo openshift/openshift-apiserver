@@ -8,7 +8,7 @@ package v1
 import (
 	unsafe "unsafe"
 
-	v1 "github.com/openshift/api/template/v1"
+	templatev1 "github.com/openshift/api/template/v1"
 	template "github.com/openshift/openshift-apiserver/pkg/template/apis/template"
 	apicorev1 "k8s.io/api/core/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
@@ -24,140 +24,140 @@ func init() {
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterConversions(s *runtime.Scheme) error {
-	if err := s.AddGeneratedConversionFunc((*v1.BrokerTemplateInstance)(nil), (*template.BrokerTemplateInstance)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_BrokerTemplateInstance_To_template_BrokerTemplateInstance(a.(*v1.BrokerTemplateInstance), b.(*template.BrokerTemplateInstance), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.BrokerTemplateInstance)(nil), (*template.BrokerTemplateInstance)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_BrokerTemplateInstance_To_template_BrokerTemplateInstance(a.(*templatev1.BrokerTemplateInstance), b.(*template.BrokerTemplateInstance), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.BrokerTemplateInstance)(nil), (*v1.BrokerTemplateInstance)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_BrokerTemplateInstance_To_v1_BrokerTemplateInstance(a.(*template.BrokerTemplateInstance), b.(*v1.BrokerTemplateInstance), scope)
+	if err := s.AddGeneratedConversionFunc((*template.BrokerTemplateInstance)(nil), (*templatev1.BrokerTemplateInstance)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_BrokerTemplateInstance_To_v1_BrokerTemplateInstance(a.(*template.BrokerTemplateInstance), b.(*templatev1.BrokerTemplateInstance), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.BrokerTemplateInstanceList)(nil), (*template.BrokerTemplateInstanceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_BrokerTemplateInstanceList_To_template_BrokerTemplateInstanceList(a.(*v1.BrokerTemplateInstanceList), b.(*template.BrokerTemplateInstanceList), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.BrokerTemplateInstanceList)(nil), (*template.BrokerTemplateInstanceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_BrokerTemplateInstanceList_To_template_BrokerTemplateInstanceList(a.(*templatev1.BrokerTemplateInstanceList), b.(*template.BrokerTemplateInstanceList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.BrokerTemplateInstanceList)(nil), (*v1.BrokerTemplateInstanceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_BrokerTemplateInstanceList_To_v1_BrokerTemplateInstanceList(a.(*template.BrokerTemplateInstanceList), b.(*v1.BrokerTemplateInstanceList), scope)
+	if err := s.AddGeneratedConversionFunc((*template.BrokerTemplateInstanceList)(nil), (*templatev1.BrokerTemplateInstanceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_BrokerTemplateInstanceList_To_v1_BrokerTemplateInstanceList(a.(*template.BrokerTemplateInstanceList), b.(*templatev1.BrokerTemplateInstanceList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.BrokerTemplateInstanceSpec)(nil), (*template.BrokerTemplateInstanceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_BrokerTemplateInstanceSpec_To_template_BrokerTemplateInstanceSpec(a.(*v1.BrokerTemplateInstanceSpec), b.(*template.BrokerTemplateInstanceSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.BrokerTemplateInstanceSpec)(nil), (*template.BrokerTemplateInstanceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_BrokerTemplateInstanceSpec_To_template_BrokerTemplateInstanceSpec(a.(*templatev1.BrokerTemplateInstanceSpec), b.(*template.BrokerTemplateInstanceSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.BrokerTemplateInstanceSpec)(nil), (*v1.BrokerTemplateInstanceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_BrokerTemplateInstanceSpec_To_v1_BrokerTemplateInstanceSpec(a.(*template.BrokerTemplateInstanceSpec), b.(*v1.BrokerTemplateInstanceSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*template.BrokerTemplateInstanceSpec)(nil), (*templatev1.BrokerTemplateInstanceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_BrokerTemplateInstanceSpec_To_v1_BrokerTemplateInstanceSpec(a.(*template.BrokerTemplateInstanceSpec), b.(*templatev1.BrokerTemplateInstanceSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Parameter)(nil), (*template.Parameter)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Parameter_To_template_Parameter(a.(*v1.Parameter), b.(*template.Parameter), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.Parameter)(nil), (*template.Parameter)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_Parameter_To_template_Parameter(a.(*templatev1.Parameter), b.(*template.Parameter), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.Parameter)(nil), (*v1.Parameter)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_Parameter_To_v1_Parameter(a.(*template.Parameter), b.(*v1.Parameter), scope)
+	if err := s.AddGeneratedConversionFunc((*template.Parameter)(nil), (*templatev1.Parameter)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_Parameter_To_v1_Parameter(a.(*template.Parameter), b.(*templatev1.Parameter), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Template)(nil), (*template.Template)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Template_To_template_Template(a.(*v1.Template), b.(*template.Template), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.Template)(nil), (*template.Template)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_Template_To_template_Template(a.(*templatev1.Template), b.(*template.Template), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.Template)(nil), (*v1.Template)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_Template_To_v1_Template(a.(*template.Template), b.(*v1.Template), scope)
+	if err := s.AddGeneratedConversionFunc((*template.Template)(nil), (*templatev1.Template)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_Template_To_v1_Template(a.(*template.Template), b.(*templatev1.Template), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TemplateInstance)(nil), (*template.TemplateInstance)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TemplateInstance_To_template_TemplateInstance(a.(*v1.TemplateInstance), b.(*template.TemplateInstance), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.TemplateInstance)(nil), (*template.TemplateInstance)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_TemplateInstance_To_template_TemplateInstance(a.(*templatev1.TemplateInstance), b.(*template.TemplateInstance), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.TemplateInstance)(nil), (*v1.TemplateInstance)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_TemplateInstance_To_v1_TemplateInstance(a.(*template.TemplateInstance), b.(*v1.TemplateInstance), scope)
+	if err := s.AddGeneratedConversionFunc((*template.TemplateInstance)(nil), (*templatev1.TemplateInstance)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_TemplateInstance_To_v1_TemplateInstance(a.(*template.TemplateInstance), b.(*templatev1.TemplateInstance), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TemplateInstanceCondition)(nil), (*template.TemplateInstanceCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TemplateInstanceCondition_To_template_TemplateInstanceCondition(a.(*v1.TemplateInstanceCondition), b.(*template.TemplateInstanceCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.TemplateInstanceCondition)(nil), (*template.TemplateInstanceCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_TemplateInstanceCondition_To_template_TemplateInstanceCondition(a.(*templatev1.TemplateInstanceCondition), b.(*template.TemplateInstanceCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.TemplateInstanceCondition)(nil), (*v1.TemplateInstanceCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_TemplateInstanceCondition_To_v1_TemplateInstanceCondition(a.(*template.TemplateInstanceCondition), b.(*v1.TemplateInstanceCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*template.TemplateInstanceCondition)(nil), (*templatev1.TemplateInstanceCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_TemplateInstanceCondition_To_v1_TemplateInstanceCondition(a.(*template.TemplateInstanceCondition), b.(*templatev1.TemplateInstanceCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TemplateInstanceList)(nil), (*template.TemplateInstanceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TemplateInstanceList_To_template_TemplateInstanceList(a.(*v1.TemplateInstanceList), b.(*template.TemplateInstanceList), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.TemplateInstanceList)(nil), (*template.TemplateInstanceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_TemplateInstanceList_To_template_TemplateInstanceList(a.(*templatev1.TemplateInstanceList), b.(*template.TemplateInstanceList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.TemplateInstanceList)(nil), (*v1.TemplateInstanceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_TemplateInstanceList_To_v1_TemplateInstanceList(a.(*template.TemplateInstanceList), b.(*v1.TemplateInstanceList), scope)
+	if err := s.AddGeneratedConversionFunc((*template.TemplateInstanceList)(nil), (*templatev1.TemplateInstanceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_TemplateInstanceList_To_v1_TemplateInstanceList(a.(*template.TemplateInstanceList), b.(*templatev1.TemplateInstanceList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TemplateInstanceObject)(nil), (*template.TemplateInstanceObject)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TemplateInstanceObject_To_template_TemplateInstanceObject(a.(*v1.TemplateInstanceObject), b.(*template.TemplateInstanceObject), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.TemplateInstanceObject)(nil), (*template.TemplateInstanceObject)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_TemplateInstanceObject_To_template_TemplateInstanceObject(a.(*templatev1.TemplateInstanceObject), b.(*template.TemplateInstanceObject), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.TemplateInstanceObject)(nil), (*v1.TemplateInstanceObject)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_TemplateInstanceObject_To_v1_TemplateInstanceObject(a.(*template.TemplateInstanceObject), b.(*v1.TemplateInstanceObject), scope)
+	if err := s.AddGeneratedConversionFunc((*template.TemplateInstanceObject)(nil), (*templatev1.TemplateInstanceObject)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_TemplateInstanceObject_To_v1_TemplateInstanceObject(a.(*template.TemplateInstanceObject), b.(*templatev1.TemplateInstanceObject), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TemplateInstanceRequester)(nil), (*template.TemplateInstanceRequester)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TemplateInstanceRequester_To_template_TemplateInstanceRequester(a.(*v1.TemplateInstanceRequester), b.(*template.TemplateInstanceRequester), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.TemplateInstanceRequester)(nil), (*template.TemplateInstanceRequester)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_TemplateInstanceRequester_To_template_TemplateInstanceRequester(a.(*templatev1.TemplateInstanceRequester), b.(*template.TemplateInstanceRequester), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.TemplateInstanceRequester)(nil), (*v1.TemplateInstanceRequester)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_TemplateInstanceRequester_To_v1_TemplateInstanceRequester(a.(*template.TemplateInstanceRequester), b.(*v1.TemplateInstanceRequester), scope)
+	if err := s.AddGeneratedConversionFunc((*template.TemplateInstanceRequester)(nil), (*templatev1.TemplateInstanceRequester)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_TemplateInstanceRequester_To_v1_TemplateInstanceRequester(a.(*template.TemplateInstanceRequester), b.(*templatev1.TemplateInstanceRequester), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TemplateInstanceSpec)(nil), (*template.TemplateInstanceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TemplateInstanceSpec_To_template_TemplateInstanceSpec(a.(*v1.TemplateInstanceSpec), b.(*template.TemplateInstanceSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.TemplateInstanceSpec)(nil), (*template.TemplateInstanceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_TemplateInstanceSpec_To_template_TemplateInstanceSpec(a.(*templatev1.TemplateInstanceSpec), b.(*template.TemplateInstanceSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.TemplateInstanceSpec)(nil), (*v1.TemplateInstanceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_TemplateInstanceSpec_To_v1_TemplateInstanceSpec(a.(*template.TemplateInstanceSpec), b.(*v1.TemplateInstanceSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*template.TemplateInstanceSpec)(nil), (*templatev1.TemplateInstanceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_TemplateInstanceSpec_To_v1_TemplateInstanceSpec(a.(*template.TemplateInstanceSpec), b.(*templatev1.TemplateInstanceSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TemplateInstanceStatus)(nil), (*template.TemplateInstanceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TemplateInstanceStatus_To_template_TemplateInstanceStatus(a.(*v1.TemplateInstanceStatus), b.(*template.TemplateInstanceStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.TemplateInstanceStatus)(nil), (*template.TemplateInstanceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_TemplateInstanceStatus_To_template_TemplateInstanceStatus(a.(*templatev1.TemplateInstanceStatus), b.(*template.TemplateInstanceStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.TemplateInstanceStatus)(nil), (*v1.TemplateInstanceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_TemplateInstanceStatus_To_v1_TemplateInstanceStatus(a.(*template.TemplateInstanceStatus), b.(*v1.TemplateInstanceStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*template.TemplateInstanceStatus)(nil), (*templatev1.TemplateInstanceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_TemplateInstanceStatus_To_v1_TemplateInstanceStatus(a.(*template.TemplateInstanceStatus), b.(*templatev1.TemplateInstanceStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TemplateList)(nil), (*template.TemplateList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TemplateList_To_template_TemplateList(a.(*v1.TemplateList), b.(*template.TemplateList), scope)
+	if err := s.AddGeneratedConversionFunc((*templatev1.TemplateList)(nil), (*template.TemplateList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_TemplateList_To_template_TemplateList(a.(*templatev1.TemplateList), b.(*template.TemplateList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*template.TemplateList)(nil), (*v1.TemplateList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_template_TemplateList_To_v1_TemplateList(a.(*template.TemplateList), b.(*v1.TemplateList), scope)
+	if err := s.AddGeneratedConversionFunc((*template.TemplateList)(nil), (*templatev1.TemplateList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_template_TemplateList_To_v1_TemplateList(a.(*template.TemplateList), b.(*templatev1.TemplateList), scope)
 	}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func autoConvert_v1_BrokerTemplateInstance_To_template_BrokerTemplateInstance(in *v1.BrokerTemplateInstance, out *template.BrokerTemplateInstance, s conversion.Scope) error {
+func autoConvert_v1_BrokerTemplateInstance_To_template_BrokerTemplateInstance(in *templatev1.BrokerTemplateInstance, out *template.BrokerTemplateInstance, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_BrokerTemplateInstanceSpec_To_template_BrokerTemplateInstanceSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -166,11 +166,11 @@ func autoConvert_v1_BrokerTemplateInstance_To_template_BrokerTemplateInstance(in
 }
 
 // Convert_v1_BrokerTemplateInstance_To_template_BrokerTemplateInstance is an autogenerated conversion function.
-func Convert_v1_BrokerTemplateInstance_To_template_BrokerTemplateInstance(in *v1.BrokerTemplateInstance, out *template.BrokerTemplateInstance, s conversion.Scope) error {
+func Convert_v1_BrokerTemplateInstance_To_template_BrokerTemplateInstance(in *templatev1.BrokerTemplateInstance, out *template.BrokerTemplateInstance, s conversion.Scope) error {
 	return autoConvert_v1_BrokerTemplateInstance_To_template_BrokerTemplateInstance(in, out, s)
 }
 
-func autoConvert_template_BrokerTemplateInstance_To_v1_BrokerTemplateInstance(in *template.BrokerTemplateInstance, out *v1.BrokerTemplateInstance, s conversion.Scope) error {
+func autoConvert_template_BrokerTemplateInstance_To_v1_BrokerTemplateInstance(in *template.BrokerTemplateInstance, out *templatev1.BrokerTemplateInstance, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_template_BrokerTemplateInstanceSpec_To_v1_BrokerTemplateInstanceSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -179,11 +179,11 @@ func autoConvert_template_BrokerTemplateInstance_To_v1_BrokerTemplateInstance(in
 }
 
 // Convert_template_BrokerTemplateInstance_To_v1_BrokerTemplateInstance is an autogenerated conversion function.
-func Convert_template_BrokerTemplateInstance_To_v1_BrokerTemplateInstance(in *template.BrokerTemplateInstance, out *v1.BrokerTemplateInstance, s conversion.Scope) error {
+func Convert_template_BrokerTemplateInstance_To_v1_BrokerTemplateInstance(in *template.BrokerTemplateInstance, out *templatev1.BrokerTemplateInstance, s conversion.Scope) error {
 	return autoConvert_template_BrokerTemplateInstance_To_v1_BrokerTemplateInstance(in, out, s)
 }
 
-func autoConvert_v1_BrokerTemplateInstanceList_To_template_BrokerTemplateInstanceList(in *v1.BrokerTemplateInstanceList, out *template.BrokerTemplateInstanceList, s conversion.Scope) error {
+func autoConvert_v1_BrokerTemplateInstanceList_To_template_BrokerTemplateInstanceList(in *templatev1.BrokerTemplateInstanceList, out *template.BrokerTemplateInstanceList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
@@ -200,15 +200,15 @@ func autoConvert_v1_BrokerTemplateInstanceList_To_template_BrokerTemplateInstanc
 }
 
 // Convert_v1_BrokerTemplateInstanceList_To_template_BrokerTemplateInstanceList is an autogenerated conversion function.
-func Convert_v1_BrokerTemplateInstanceList_To_template_BrokerTemplateInstanceList(in *v1.BrokerTemplateInstanceList, out *template.BrokerTemplateInstanceList, s conversion.Scope) error {
+func Convert_v1_BrokerTemplateInstanceList_To_template_BrokerTemplateInstanceList(in *templatev1.BrokerTemplateInstanceList, out *template.BrokerTemplateInstanceList, s conversion.Scope) error {
 	return autoConvert_v1_BrokerTemplateInstanceList_To_template_BrokerTemplateInstanceList(in, out, s)
 }
 
-func autoConvert_template_BrokerTemplateInstanceList_To_v1_BrokerTemplateInstanceList(in *template.BrokerTemplateInstanceList, out *v1.BrokerTemplateInstanceList, s conversion.Scope) error {
+func autoConvert_template_BrokerTemplateInstanceList_To_v1_BrokerTemplateInstanceList(in *template.BrokerTemplateInstanceList, out *templatev1.BrokerTemplateInstanceList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.BrokerTemplateInstance, len(*in))
+		*out = make([]templatev1.BrokerTemplateInstance, len(*in))
 		for i := range *in {
 			if err := Convert_template_BrokerTemplateInstance_To_v1_BrokerTemplateInstance(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -221,11 +221,11 @@ func autoConvert_template_BrokerTemplateInstanceList_To_v1_BrokerTemplateInstanc
 }
 
 // Convert_template_BrokerTemplateInstanceList_To_v1_BrokerTemplateInstanceList is an autogenerated conversion function.
-func Convert_template_BrokerTemplateInstanceList_To_v1_BrokerTemplateInstanceList(in *template.BrokerTemplateInstanceList, out *v1.BrokerTemplateInstanceList, s conversion.Scope) error {
+func Convert_template_BrokerTemplateInstanceList_To_v1_BrokerTemplateInstanceList(in *template.BrokerTemplateInstanceList, out *templatev1.BrokerTemplateInstanceList, s conversion.Scope) error {
 	return autoConvert_template_BrokerTemplateInstanceList_To_v1_BrokerTemplateInstanceList(in, out, s)
 }
 
-func autoConvert_v1_BrokerTemplateInstanceSpec_To_template_BrokerTemplateInstanceSpec(in *v1.BrokerTemplateInstanceSpec, out *template.BrokerTemplateInstanceSpec, s conversion.Scope) error {
+func autoConvert_v1_BrokerTemplateInstanceSpec_To_template_BrokerTemplateInstanceSpec(in *templatev1.BrokerTemplateInstanceSpec, out *template.BrokerTemplateInstanceSpec, s conversion.Scope) error {
 	if err := corev1.Convert_v1_ObjectReference_To_core_ObjectReference(&in.TemplateInstance, &out.TemplateInstance, s); err != nil {
 		return err
 	}
@@ -237,11 +237,11 @@ func autoConvert_v1_BrokerTemplateInstanceSpec_To_template_BrokerTemplateInstanc
 }
 
 // Convert_v1_BrokerTemplateInstanceSpec_To_template_BrokerTemplateInstanceSpec is an autogenerated conversion function.
-func Convert_v1_BrokerTemplateInstanceSpec_To_template_BrokerTemplateInstanceSpec(in *v1.BrokerTemplateInstanceSpec, out *template.BrokerTemplateInstanceSpec, s conversion.Scope) error {
+func Convert_v1_BrokerTemplateInstanceSpec_To_template_BrokerTemplateInstanceSpec(in *templatev1.BrokerTemplateInstanceSpec, out *template.BrokerTemplateInstanceSpec, s conversion.Scope) error {
 	return autoConvert_v1_BrokerTemplateInstanceSpec_To_template_BrokerTemplateInstanceSpec(in, out, s)
 }
 
-func autoConvert_template_BrokerTemplateInstanceSpec_To_v1_BrokerTemplateInstanceSpec(in *template.BrokerTemplateInstanceSpec, out *v1.BrokerTemplateInstanceSpec, s conversion.Scope) error {
+func autoConvert_template_BrokerTemplateInstanceSpec_To_v1_BrokerTemplateInstanceSpec(in *template.BrokerTemplateInstanceSpec, out *templatev1.BrokerTemplateInstanceSpec, s conversion.Scope) error {
 	if err := corev1.Convert_core_ObjectReference_To_v1_ObjectReference(&in.TemplateInstance, &out.TemplateInstance, s); err != nil {
 		return err
 	}
@@ -253,11 +253,11 @@ func autoConvert_template_BrokerTemplateInstanceSpec_To_v1_BrokerTemplateInstanc
 }
 
 // Convert_template_BrokerTemplateInstanceSpec_To_v1_BrokerTemplateInstanceSpec is an autogenerated conversion function.
-func Convert_template_BrokerTemplateInstanceSpec_To_v1_BrokerTemplateInstanceSpec(in *template.BrokerTemplateInstanceSpec, out *v1.BrokerTemplateInstanceSpec, s conversion.Scope) error {
+func Convert_template_BrokerTemplateInstanceSpec_To_v1_BrokerTemplateInstanceSpec(in *template.BrokerTemplateInstanceSpec, out *templatev1.BrokerTemplateInstanceSpec, s conversion.Scope) error {
 	return autoConvert_template_BrokerTemplateInstanceSpec_To_v1_BrokerTemplateInstanceSpec(in, out, s)
 }
 
-func autoConvert_v1_Parameter_To_template_Parameter(in *v1.Parameter, out *template.Parameter, s conversion.Scope) error {
+func autoConvert_v1_Parameter_To_template_Parameter(in *templatev1.Parameter, out *template.Parameter, s conversion.Scope) error {
 	out.Name = in.Name
 	out.DisplayName = in.DisplayName
 	out.Description = in.Description
@@ -269,11 +269,11 @@ func autoConvert_v1_Parameter_To_template_Parameter(in *v1.Parameter, out *templ
 }
 
 // Convert_v1_Parameter_To_template_Parameter is an autogenerated conversion function.
-func Convert_v1_Parameter_To_template_Parameter(in *v1.Parameter, out *template.Parameter, s conversion.Scope) error {
+func Convert_v1_Parameter_To_template_Parameter(in *templatev1.Parameter, out *template.Parameter, s conversion.Scope) error {
 	return autoConvert_v1_Parameter_To_template_Parameter(in, out, s)
 }
 
-func autoConvert_template_Parameter_To_v1_Parameter(in *template.Parameter, out *v1.Parameter, s conversion.Scope) error {
+func autoConvert_template_Parameter_To_v1_Parameter(in *template.Parameter, out *templatev1.Parameter, s conversion.Scope) error {
 	out.Name = in.Name
 	out.DisplayName = in.DisplayName
 	out.Description = in.Description
@@ -285,11 +285,11 @@ func autoConvert_template_Parameter_To_v1_Parameter(in *template.Parameter, out 
 }
 
 // Convert_template_Parameter_To_v1_Parameter is an autogenerated conversion function.
-func Convert_template_Parameter_To_v1_Parameter(in *template.Parameter, out *v1.Parameter, s conversion.Scope) error {
+func Convert_template_Parameter_To_v1_Parameter(in *template.Parameter, out *templatev1.Parameter, s conversion.Scope) error {
 	return autoConvert_template_Parameter_To_v1_Parameter(in, out, s)
 }
 
-func autoConvert_v1_Template_To_template_Template(in *v1.Template, out *template.Template, s conversion.Scope) error {
+func autoConvert_v1_Template_To_template_Template(in *templatev1.Template, out *template.Template, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Message = in.Message
 	if in.Objects != nil {
@@ -309,14 +309,14 @@ func autoConvert_v1_Template_To_template_Template(in *v1.Template, out *template
 }
 
 // Convert_v1_Template_To_template_Template is an autogenerated conversion function.
-func Convert_v1_Template_To_template_Template(in *v1.Template, out *template.Template, s conversion.Scope) error {
+func Convert_v1_Template_To_template_Template(in *templatev1.Template, out *template.Template, s conversion.Scope) error {
 	return autoConvert_v1_Template_To_template_Template(in, out, s)
 }
 
-func autoConvert_template_Template_To_v1_Template(in *template.Template, out *v1.Template, s conversion.Scope) error {
+func autoConvert_template_Template_To_v1_Template(in *template.Template, out *templatev1.Template, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Message = in.Message
-	out.Parameters = *(*[]v1.Parameter)(unsafe.Pointer(&in.Parameters))
+	out.Parameters = *(*[]templatev1.Parameter)(unsafe.Pointer(&in.Parameters))
 	if in.Objects != nil {
 		in, out := &in.Objects, &out.Objects
 		*out = make([]runtime.RawExtension, len(*in))
@@ -333,11 +333,11 @@ func autoConvert_template_Template_To_v1_Template(in *template.Template, out *v1
 }
 
 // Convert_template_Template_To_v1_Template is an autogenerated conversion function.
-func Convert_template_Template_To_v1_Template(in *template.Template, out *v1.Template, s conversion.Scope) error {
+func Convert_template_Template_To_v1_Template(in *template.Template, out *templatev1.Template, s conversion.Scope) error {
 	return autoConvert_template_Template_To_v1_Template(in, out, s)
 }
 
-func autoConvert_v1_TemplateInstance_To_template_TemplateInstance(in *v1.TemplateInstance, out *template.TemplateInstance, s conversion.Scope) error {
+func autoConvert_v1_TemplateInstance_To_template_TemplateInstance(in *templatev1.TemplateInstance, out *template.TemplateInstance, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_TemplateInstanceSpec_To_template_TemplateInstanceSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -349,11 +349,11 @@ func autoConvert_v1_TemplateInstance_To_template_TemplateInstance(in *v1.Templat
 }
 
 // Convert_v1_TemplateInstance_To_template_TemplateInstance is an autogenerated conversion function.
-func Convert_v1_TemplateInstance_To_template_TemplateInstance(in *v1.TemplateInstance, out *template.TemplateInstance, s conversion.Scope) error {
+func Convert_v1_TemplateInstance_To_template_TemplateInstance(in *templatev1.TemplateInstance, out *template.TemplateInstance, s conversion.Scope) error {
 	return autoConvert_v1_TemplateInstance_To_template_TemplateInstance(in, out, s)
 }
 
-func autoConvert_template_TemplateInstance_To_v1_TemplateInstance(in *template.TemplateInstance, out *v1.TemplateInstance, s conversion.Scope) error {
+func autoConvert_template_TemplateInstance_To_v1_TemplateInstance(in *template.TemplateInstance, out *templatev1.TemplateInstance, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_template_TemplateInstanceSpec_To_v1_TemplateInstanceSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -365,11 +365,11 @@ func autoConvert_template_TemplateInstance_To_v1_TemplateInstance(in *template.T
 }
 
 // Convert_template_TemplateInstance_To_v1_TemplateInstance is an autogenerated conversion function.
-func Convert_template_TemplateInstance_To_v1_TemplateInstance(in *template.TemplateInstance, out *v1.TemplateInstance, s conversion.Scope) error {
+func Convert_template_TemplateInstance_To_v1_TemplateInstance(in *template.TemplateInstance, out *templatev1.TemplateInstance, s conversion.Scope) error {
 	return autoConvert_template_TemplateInstance_To_v1_TemplateInstance(in, out, s)
 }
 
-func autoConvert_v1_TemplateInstanceCondition_To_template_TemplateInstanceCondition(in *v1.TemplateInstanceCondition, out *template.TemplateInstanceCondition, s conversion.Scope) error {
+func autoConvert_v1_TemplateInstanceCondition_To_template_TemplateInstanceCondition(in *templatev1.TemplateInstanceCondition, out *template.TemplateInstanceCondition, s conversion.Scope) error {
 	out.Type = template.TemplateInstanceConditionType(in.Type)
 	out.Status = core.ConditionStatus(in.Status)
 	out.LastTransitionTime = in.LastTransitionTime
@@ -379,12 +379,12 @@ func autoConvert_v1_TemplateInstanceCondition_To_template_TemplateInstanceCondit
 }
 
 // Convert_v1_TemplateInstanceCondition_To_template_TemplateInstanceCondition is an autogenerated conversion function.
-func Convert_v1_TemplateInstanceCondition_To_template_TemplateInstanceCondition(in *v1.TemplateInstanceCondition, out *template.TemplateInstanceCondition, s conversion.Scope) error {
+func Convert_v1_TemplateInstanceCondition_To_template_TemplateInstanceCondition(in *templatev1.TemplateInstanceCondition, out *template.TemplateInstanceCondition, s conversion.Scope) error {
 	return autoConvert_v1_TemplateInstanceCondition_To_template_TemplateInstanceCondition(in, out, s)
 }
 
-func autoConvert_template_TemplateInstanceCondition_To_v1_TemplateInstanceCondition(in *template.TemplateInstanceCondition, out *v1.TemplateInstanceCondition, s conversion.Scope) error {
-	out.Type = v1.TemplateInstanceConditionType(in.Type)
+func autoConvert_template_TemplateInstanceCondition_To_v1_TemplateInstanceCondition(in *template.TemplateInstanceCondition, out *templatev1.TemplateInstanceCondition, s conversion.Scope) error {
+	out.Type = templatev1.TemplateInstanceConditionType(in.Type)
 	out.Status = apicorev1.ConditionStatus(in.Status)
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
@@ -393,11 +393,11 @@ func autoConvert_template_TemplateInstanceCondition_To_v1_TemplateInstanceCondit
 }
 
 // Convert_template_TemplateInstanceCondition_To_v1_TemplateInstanceCondition is an autogenerated conversion function.
-func Convert_template_TemplateInstanceCondition_To_v1_TemplateInstanceCondition(in *template.TemplateInstanceCondition, out *v1.TemplateInstanceCondition, s conversion.Scope) error {
+func Convert_template_TemplateInstanceCondition_To_v1_TemplateInstanceCondition(in *template.TemplateInstanceCondition, out *templatev1.TemplateInstanceCondition, s conversion.Scope) error {
 	return autoConvert_template_TemplateInstanceCondition_To_v1_TemplateInstanceCondition(in, out, s)
 }
 
-func autoConvert_v1_TemplateInstanceList_To_template_TemplateInstanceList(in *v1.TemplateInstanceList, out *template.TemplateInstanceList, s conversion.Scope) error {
+func autoConvert_v1_TemplateInstanceList_To_template_TemplateInstanceList(in *templatev1.TemplateInstanceList, out *template.TemplateInstanceList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
@@ -414,15 +414,15 @@ func autoConvert_v1_TemplateInstanceList_To_template_TemplateInstanceList(in *v1
 }
 
 // Convert_v1_TemplateInstanceList_To_template_TemplateInstanceList is an autogenerated conversion function.
-func Convert_v1_TemplateInstanceList_To_template_TemplateInstanceList(in *v1.TemplateInstanceList, out *template.TemplateInstanceList, s conversion.Scope) error {
+func Convert_v1_TemplateInstanceList_To_template_TemplateInstanceList(in *templatev1.TemplateInstanceList, out *template.TemplateInstanceList, s conversion.Scope) error {
 	return autoConvert_v1_TemplateInstanceList_To_template_TemplateInstanceList(in, out, s)
 }
 
-func autoConvert_template_TemplateInstanceList_To_v1_TemplateInstanceList(in *template.TemplateInstanceList, out *v1.TemplateInstanceList, s conversion.Scope) error {
+func autoConvert_template_TemplateInstanceList_To_v1_TemplateInstanceList(in *template.TemplateInstanceList, out *templatev1.TemplateInstanceList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.TemplateInstance, len(*in))
+		*out = make([]templatev1.TemplateInstance, len(*in))
 		for i := range *in {
 			if err := Convert_template_TemplateInstance_To_v1_TemplateInstance(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -435,11 +435,11 @@ func autoConvert_template_TemplateInstanceList_To_v1_TemplateInstanceList(in *te
 }
 
 // Convert_template_TemplateInstanceList_To_v1_TemplateInstanceList is an autogenerated conversion function.
-func Convert_template_TemplateInstanceList_To_v1_TemplateInstanceList(in *template.TemplateInstanceList, out *v1.TemplateInstanceList, s conversion.Scope) error {
+func Convert_template_TemplateInstanceList_To_v1_TemplateInstanceList(in *template.TemplateInstanceList, out *templatev1.TemplateInstanceList, s conversion.Scope) error {
 	return autoConvert_template_TemplateInstanceList_To_v1_TemplateInstanceList(in, out, s)
 }
 
-func autoConvert_v1_TemplateInstanceObject_To_template_TemplateInstanceObject(in *v1.TemplateInstanceObject, out *template.TemplateInstanceObject, s conversion.Scope) error {
+func autoConvert_v1_TemplateInstanceObject_To_template_TemplateInstanceObject(in *templatev1.TemplateInstanceObject, out *template.TemplateInstanceObject, s conversion.Scope) error {
 	if err := corev1.Convert_v1_ObjectReference_To_core_ObjectReference(&in.Ref, &out.Ref, s); err != nil {
 		return err
 	}
@@ -447,11 +447,11 @@ func autoConvert_v1_TemplateInstanceObject_To_template_TemplateInstanceObject(in
 }
 
 // Convert_v1_TemplateInstanceObject_To_template_TemplateInstanceObject is an autogenerated conversion function.
-func Convert_v1_TemplateInstanceObject_To_template_TemplateInstanceObject(in *v1.TemplateInstanceObject, out *template.TemplateInstanceObject, s conversion.Scope) error {
+func Convert_v1_TemplateInstanceObject_To_template_TemplateInstanceObject(in *templatev1.TemplateInstanceObject, out *template.TemplateInstanceObject, s conversion.Scope) error {
 	return autoConvert_v1_TemplateInstanceObject_To_template_TemplateInstanceObject(in, out, s)
 }
 
-func autoConvert_template_TemplateInstanceObject_To_v1_TemplateInstanceObject(in *template.TemplateInstanceObject, out *v1.TemplateInstanceObject, s conversion.Scope) error {
+func autoConvert_template_TemplateInstanceObject_To_v1_TemplateInstanceObject(in *template.TemplateInstanceObject, out *templatev1.TemplateInstanceObject, s conversion.Scope) error {
 	if err := corev1.Convert_core_ObjectReference_To_v1_ObjectReference(&in.Ref, &out.Ref, s); err != nil {
 		return err
 	}
@@ -459,11 +459,11 @@ func autoConvert_template_TemplateInstanceObject_To_v1_TemplateInstanceObject(in
 }
 
 // Convert_template_TemplateInstanceObject_To_v1_TemplateInstanceObject is an autogenerated conversion function.
-func Convert_template_TemplateInstanceObject_To_v1_TemplateInstanceObject(in *template.TemplateInstanceObject, out *v1.TemplateInstanceObject, s conversion.Scope) error {
+func Convert_template_TemplateInstanceObject_To_v1_TemplateInstanceObject(in *template.TemplateInstanceObject, out *templatev1.TemplateInstanceObject, s conversion.Scope) error {
 	return autoConvert_template_TemplateInstanceObject_To_v1_TemplateInstanceObject(in, out, s)
 }
 
-func autoConvert_v1_TemplateInstanceRequester_To_template_TemplateInstanceRequester(in *v1.TemplateInstanceRequester, out *template.TemplateInstanceRequester, s conversion.Scope) error {
+func autoConvert_v1_TemplateInstanceRequester_To_template_TemplateInstanceRequester(in *templatev1.TemplateInstanceRequester, out *template.TemplateInstanceRequester, s conversion.Scope) error {
 	out.Username = in.Username
 	out.UID = in.UID
 	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
@@ -472,24 +472,24 @@ func autoConvert_v1_TemplateInstanceRequester_To_template_TemplateInstanceReques
 }
 
 // Convert_v1_TemplateInstanceRequester_To_template_TemplateInstanceRequester is an autogenerated conversion function.
-func Convert_v1_TemplateInstanceRequester_To_template_TemplateInstanceRequester(in *v1.TemplateInstanceRequester, out *template.TemplateInstanceRequester, s conversion.Scope) error {
+func Convert_v1_TemplateInstanceRequester_To_template_TemplateInstanceRequester(in *templatev1.TemplateInstanceRequester, out *template.TemplateInstanceRequester, s conversion.Scope) error {
 	return autoConvert_v1_TemplateInstanceRequester_To_template_TemplateInstanceRequester(in, out, s)
 }
 
-func autoConvert_template_TemplateInstanceRequester_To_v1_TemplateInstanceRequester(in *template.TemplateInstanceRequester, out *v1.TemplateInstanceRequester, s conversion.Scope) error {
+func autoConvert_template_TemplateInstanceRequester_To_v1_TemplateInstanceRequester(in *template.TemplateInstanceRequester, out *templatev1.TemplateInstanceRequester, s conversion.Scope) error {
 	out.Username = in.Username
 	out.UID = in.UID
 	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
-	out.Extra = *(*map[string]v1.ExtraValue)(unsafe.Pointer(&in.Extra))
+	out.Extra = *(*map[string]templatev1.ExtraValue)(unsafe.Pointer(&in.Extra))
 	return nil
 }
 
 // Convert_template_TemplateInstanceRequester_To_v1_TemplateInstanceRequester is an autogenerated conversion function.
-func Convert_template_TemplateInstanceRequester_To_v1_TemplateInstanceRequester(in *template.TemplateInstanceRequester, out *v1.TemplateInstanceRequester, s conversion.Scope) error {
+func Convert_template_TemplateInstanceRequester_To_v1_TemplateInstanceRequester(in *template.TemplateInstanceRequester, out *templatev1.TemplateInstanceRequester, s conversion.Scope) error {
 	return autoConvert_template_TemplateInstanceRequester_To_v1_TemplateInstanceRequester(in, out, s)
 }
 
-func autoConvert_v1_TemplateInstanceSpec_To_template_TemplateInstanceSpec(in *v1.TemplateInstanceSpec, out *template.TemplateInstanceSpec, s conversion.Scope) error {
+func autoConvert_v1_TemplateInstanceSpec_To_template_TemplateInstanceSpec(in *templatev1.TemplateInstanceSpec, out *template.TemplateInstanceSpec, s conversion.Scope) error {
 	if err := Convert_v1_Template_To_template_Template(&in.Template, &out.Template, s); err != nil {
 		return err
 	}
@@ -507,11 +507,11 @@ func autoConvert_v1_TemplateInstanceSpec_To_template_TemplateInstanceSpec(in *v1
 }
 
 // Convert_v1_TemplateInstanceSpec_To_template_TemplateInstanceSpec is an autogenerated conversion function.
-func Convert_v1_TemplateInstanceSpec_To_template_TemplateInstanceSpec(in *v1.TemplateInstanceSpec, out *template.TemplateInstanceSpec, s conversion.Scope) error {
+func Convert_v1_TemplateInstanceSpec_To_template_TemplateInstanceSpec(in *templatev1.TemplateInstanceSpec, out *template.TemplateInstanceSpec, s conversion.Scope) error {
 	return autoConvert_v1_TemplateInstanceSpec_To_template_TemplateInstanceSpec(in, out, s)
 }
 
-func autoConvert_template_TemplateInstanceSpec_To_v1_TemplateInstanceSpec(in *template.TemplateInstanceSpec, out *v1.TemplateInstanceSpec, s conversion.Scope) error {
+func autoConvert_template_TemplateInstanceSpec_To_v1_TemplateInstanceSpec(in *template.TemplateInstanceSpec, out *templatev1.TemplateInstanceSpec, s conversion.Scope) error {
 	if err := Convert_template_Template_To_v1_Template(&in.Template, &out.Template, s); err != nil {
 		return err
 	}
@@ -524,16 +524,16 @@ func autoConvert_template_TemplateInstanceSpec_To_v1_TemplateInstanceSpec(in *te
 	} else {
 		out.Secret = nil
 	}
-	out.Requester = (*v1.TemplateInstanceRequester)(unsafe.Pointer(in.Requester))
+	out.Requester = (*templatev1.TemplateInstanceRequester)(unsafe.Pointer(in.Requester))
 	return nil
 }
 
 // Convert_template_TemplateInstanceSpec_To_v1_TemplateInstanceSpec is an autogenerated conversion function.
-func Convert_template_TemplateInstanceSpec_To_v1_TemplateInstanceSpec(in *template.TemplateInstanceSpec, out *v1.TemplateInstanceSpec, s conversion.Scope) error {
+func Convert_template_TemplateInstanceSpec_To_v1_TemplateInstanceSpec(in *template.TemplateInstanceSpec, out *templatev1.TemplateInstanceSpec, s conversion.Scope) error {
 	return autoConvert_template_TemplateInstanceSpec_To_v1_TemplateInstanceSpec(in, out, s)
 }
 
-func autoConvert_v1_TemplateInstanceStatus_To_template_TemplateInstanceStatus(in *v1.TemplateInstanceStatus, out *template.TemplateInstanceStatus, s conversion.Scope) error {
+func autoConvert_v1_TemplateInstanceStatus_To_template_TemplateInstanceStatus(in *templatev1.TemplateInstanceStatus, out *template.TemplateInstanceStatus, s conversion.Scope) error {
 	out.Conditions = *(*[]template.TemplateInstanceCondition)(unsafe.Pointer(&in.Conditions))
 	if in.Objects != nil {
 		in, out := &in.Objects, &out.Objects
@@ -550,15 +550,15 @@ func autoConvert_v1_TemplateInstanceStatus_To_template_TemplateInstanceStatus(in
 }
 
 // Convert_v1_TemplateInstanceStatus_To_template_TemplateInstanceStatus is an autogenerated conversion function.
-func Convert_v1_TemplateInstanceStatus_To_template_TemplateInstanceStatus(in *v1.TemplateInstanceStatus, out *template.TemplateInstanceStatus, s conversion.Scope) error {
+func Convert_v1_TemplateInstanceStatus_To_template_TemplateInstanceStatus(in *templatev1.TemplateInstanceStatus, out *template.TemplateInstanceStatus, s conversion.Scope) error {
 	return autoConvert_v1_TemplateInstanceStatus_To_template_TemplateInstanceStatus(in, out, s)
 }
 
-func autoConvert_template_TemplateInstanceStatus_To_v1_TemplateInstanceStatus(in *template.TemplateInstanceStatus, out *v1.TemplateInstanceStatus, s conversion.Scope) error {
-	out.Conditions = *(*[]v1.TemplateInstanceCondition)(unsafe.Pointer(&in.Conditions))
+func autoConvert_template_TemplateInstanceStatus_To_v1_TemplateInstanceStatus(in *template.TemplateInstanceStatus, out *templatev1.TemplateInstanceStatus, s conversion.Scope) error {
+	out.Conditions = *(*[]templatev1.TemplateInstanceCondition)(unsafe.Pointer(&in.Conditions))
 	if in.Objects != nil {
 		in, out := &in.Objects, &out.Objects
-		*out = make([]v1.TemplateInstanceObject, len(*in))
+		*out = make([]templatev1.TemplateInstanceObject, len(*in))
 		for i := range *in {
 			if err := Convert_template_TemplateInstanceObject_To_v1_TemplateInstanceObject(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -571,11 +571,11 @@ func autoConvert_template_TemplateInstanceStatus_To_v1_TemplateInstanceStatus(in
 }
 
 // Convert_template_TemplateInstanceStatus_To_v1_TemplateInstanceStatus is an autogenerated conversion function.
-func Convert_template_TemplateInstanceStatus_To_v1_TemplateInstanceStatus(in *template.TemplateInstanceStatus, out *v1.TemplateInstanceStatus, s conversion.Scope) error {
+func Convert_template_TemplateInstanceStatus_To_v1_TemplateInstanceStatus(in *template.TemplateInstanceStatus, out *templatev1.TemplateInstanceStatus, s conversion.Scope) error {
 	return autoConvert_template_TemplateInstanceStatus_To_v1_TemplateInstanceStatus(in, out, s)
 }
 
-func autoConvert_v1_TemplateList_To_template_TemplateList(in *v1.TemplateList, out *template.TemplateList, s conversion.Scope) error {
+func autoConvert_v1_TemplateList_To_template_TemplateList(in *templatev1.TemplateList, out *template.TemplateList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
@@ -592,15 +592,15 @@ func autoConvert_v1_TemplateList_To_template_TemplateList(in *v1.TemplateList, o
 }
 
 // Convert_v1_TemplateList_To_template_TemplateList is an autogenerated conversion function.
-func Convert_v1_TemplateList_To_template_TemplateList(in *v1.TemplateList, out *template.TemplateList, s conversion.Scope) error {
+func Convert_v1_TemplateList_To_template_TemplateList(in *templatev1.TemplateList, out *template.TemplateList, s conversion.Scope) error {
 	return autoConvert_v1_TemplateList_To_template_TemplateList(in, out, s)
 }
 
-func autoConvert_template_TemplateList_To_v1_TemplateList(in *template.TemplateList, out *v1.TemplateList, s conversion.Scope) error {
+func autoConvert_template_TemplateList_To_v1_TemplateList(in *template.TemplateList, out *templatev1.TemplateList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.Template, len(*in))
+		*out = make([]templatev1.Template, len(*in))
 		for i := range *in {
 			if err := Convert_template_Template_To_v1_Template(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -613,6 +613,6 @@ func autoConvert_template_TemplateList_To_v1_TemplateList(in *template.TemplateL
 }
 
 // Convert_template_TemplateList_To_v1_TemplateList is an autogenerated conversion function.
-func Convert_template_TemplateList_To_v1_TemplateList(in *template.TemplateList, out *v1.TemplateList, s conversion.Scope) error {
+func Convert_template_TemplateList_To_v1_TemplateList(in *template.TemplateList, out *templatev1.TemplateList, s conversion.Scope) error {
 	return autoConvert_template_TemplateList_To_v1_TemplateList(in, out, s)
 }

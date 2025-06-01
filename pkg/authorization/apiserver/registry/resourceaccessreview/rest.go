@@ -81,7 +81,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 	}
 
 	attributes := util.ToDefaultAuthorizationAttributes(nil, resourceAccessReview.Action.Namespace, resourceAccessReview.Action)
-	subjects, err := r.subjectLocator.AllowedSubjects(attributes)
+	subjects, err := r.subjectLocator.AllowedSubjects(ctx, attributes)
 	users, groups := authorizationutil.RBACSubjectsToUsersAndGroups(subjects, attributes.GetNamespace())
 
 	response := &authorizationapi.ResourceAccessReviewResponse{

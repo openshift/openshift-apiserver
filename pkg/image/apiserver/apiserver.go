@@ -120,7 +120,7 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 
 	if err := s.GenericAPIServer.AddPostStartHook("image.openshift.io-apiserver-caches", func(context genericapiserver.PostStartHookContext) error {
 		for _, fn := range c.ExtraConfig.startFns {
-			go fn(context.StopCh)
+			go fn(context.Done())
 		}
 		return nil
 	}); err != nil {

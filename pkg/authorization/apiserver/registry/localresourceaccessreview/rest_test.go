@@ -41,7 +41,8 @@ func (a *testAuthorizer) Authorize(ctx context.Context, attributes kauthorizer.A
 
 	return kauthorizer.DecisionNoOpinion, "", errors.New("Unsupported")
 }
-func (a *testAuthorizer) AllowedSubjects(attributes kauthorizer.Attributes) ([]rbacv1.Subject, error) {
+
+func (a *testAuthorizer) AllowedSubjects(cxt context.Context, attributes kauthorizer.Attributes) ([]rbacv1.Subject, error) {
 	a.actualAttributes = attributes
 	if len(a.err) == 0 {
 		return a.subjects, nil
