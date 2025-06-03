@@ -98,7 +98,7 @@ func GetEffectivePolicyRules(ctx context.Context, ruleResolver rbacregistryvalid
 
 	var errors []error
 	var rules []rbacv1.PolicyRule
-	namespaceRules, err := ruleResolver.RulesFor(user, namespace)
+	namespaceRules, err := ruleResolver.RulesFor(ctx, user, namespace)
 	if err != nil {
 		errors = append(errors, err)
 	}

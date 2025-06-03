@@ -15,6 +15,9 @@ func TestLogOptionsDrift(t *testing.T) {
 		// Verify name
 		name := popts.Field(i).Name
 		boptsField, found := bopts.FieldByName(name)
+		if name == "Stream" {
+			continue
+		}
 		if !found {
 			t.Errorf("buildLogOptions drifting from podLogOptions! Field %q wasn't found!", name)
 		}

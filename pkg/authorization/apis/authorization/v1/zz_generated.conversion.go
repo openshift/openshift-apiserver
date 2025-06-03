@@ -8,7 +8,7 @@ package v1
 import (
 	unsafe "unsafe"
 
-	v1 "github.com/openshift/api/authorization/v1"
+	authorizationv1 "github.com/openshift/api/authorization/v1"
 	authorization "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 	apicorev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -27,300 +27,300 @@ func init() {
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterConversions(s *runtime.Scheme) error {
-	if err := s.AddGeneratedConversionFunc((*v1.Action)(nil), (*authorization.Action)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Action_To_authorization_Action(a.(*v1.Action), b.(*authorization.Action), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.Action)(nil), (*authorization.Action)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_Action_To_authorization_Action(a.(*authorizationv1.Action), b.(*authorization.Action), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.Action)(nil), (*v1.Action)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_Action_To_v1_Action(a.(*authorization.Action), b.(*v1.Action), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.Action)(nil), (*authorizationv1.Action)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_Action_To_v1_Action(a.(*authorization.Action), b.(*authorizationv1.Action), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ClusterRole)(nil), (*authorization.ClusterRole)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ClusterRole_To_authorization_ClusterRole(a.(*v1.ClusterRole), b.(*authorization.ClusterRole), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.ClusterRole)(nil), (*authorization.ClusterRole)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_ClusterRole_To_authorization_ClusterRole(a.(*authorizationv1.ClusterRole), b.(*authorization.ClusterRole), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.ClusterRole)(nil), (*v1.ClusterRole)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_ClusterRole_To_v1_ClusterRole(a.(*authorization.ClusterRole), b.(*v1.ClusterRole), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.ClusterRole)(nil), (*authorizationv1.ClusterRole)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_ClusterRole_To_v1_ClusterRole(a.(*authorization.ClusterRole), b.(*authorizationv1.ClusterRole), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ClusterRoleBindingList)(nil), (*authorization.ClusterRoleBindingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ClusterRoleBindingList_To_authorization_ClusterRoleBindingList(a.(*v1.ClusterRoleBindingList), b.(*authorization.ClusterRoleBindingList), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.ClusterRoleBindingList)(nil), (*authorization.ClusterRoleBindingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_ClusterRoleBindingList_To_authorization_ClusterRoleBindingList(a.(*authorizationv1.ClusterRoleBindingList), b.(*authorization.ClusterRoleBindingList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.ClusterRoleBindingList)(nil), (*v1.ClusterRoleBindingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(a.(*authorization.ClusterRoleBindingList), b.(*v1.ClusterRoleBindingList), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.ClusterRoleBindingList)(nil), (*authorizationv1.ClusterRoleBindingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(a.(*authorization.ClusterRoleBindingList), b.(*authorizationv1.ClusterRoleBindingList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ClusterRoleList)(nil), (*authorization.ClusterRoleList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ClusterRoleList_To_authorization_ClusterRoleList(a.(*v1.ClusterRoleList), b.(*authorization.ClusterRoleList), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.ClusterRoleList)(nil), (*authorization.ClusterRoleList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_ClusterRoleList_To_authorization_ClusterRoleList(a.(*authorizationv1.ClusterRoleList), b.(*authorization.ClusterRoleList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.ClusterRoleList)(nil), (*v1.ClusterRoleList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_ClusterRoleList_To_v1_ClusterRoleList(a.(*authorization.ClusterRoleList), b.(*v1.ClusterRoleList), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.ClusterRoleList)(nil), (*authorizationv1.ClusterRoleList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_ClusterRoleList_To_v1_ClusterRoleList(a.(*authorization.ClusterRoleList), b.(*authorizationv1.ClusterRoleList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.GroupRestriction)(nil), (*authorization.GroupRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_GroupRestriction_To_authorization_GroupRestriction(a.(*v1.GroupRestriction), b.(*authorization.GroupRestriction), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.GroupRestriction)(nil), (*authorization.GroupRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_GroupRestriction_To_authorization_GroupRestriction(a.(*authorizationv1.GroupRestriction), b.(*authorization.GroupRestriction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.GroupRestriction)(nil), (*v1.GroupRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_GroupRestriction_To_v1_GroupRestriction(a.(*authorization.GroupRestriction), b.(*v1.GroupRestriction), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.GroupRestriction)(nil), (*authorizationv1.GroupRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_GroupRestriction_To_v1_GroupRestriction(a.(*authorization.GroupRestriction), b.(*authorizationv1.GroupRestriction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.IsPersonalSubjectAccessReview)(nil), (*authorization.IsPersonalSubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_IsPersonalSubjectAccessReview_To_authorization_IsPersonalSubjectAccessReview(a.(*v1.IsPersonalSubjectAccessReview), b.(*authorization.IsPersonalSubjectAccessReview), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.IsPersonalSubjectAccessReview)(nil), (*authorization.IsPersonalSubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_IsPersonalSubjectAccessReview_To_authorization_IsPersonalSubjectAccessReview(a.(*authorizationv1.IsPersonalSubjectAccessReview), b.(*authorization.IsPersonalSubjectAccessReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.IsPersonalSubjectAccessReview)(nil), (*v1.IsPersonalSubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview(a.(*authorization.IsPersonalSubjectAccessReview), b.(*v1.IsPersonalSubjectAccessReview), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.IsPersonalSubjectAccessReview)(nil), (*authorizationv1.IsPersonalSubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview(a.(*authorization.IsPersonalSubjectAccessReview), b.(*authorizationv1.IsPersonalSubjectAccessReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.LocalResourceAccessReview)(nil), (*authorization.LocalResourceAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_LocalResourceAccessReview_To_authorization_LocalResourceAccessReview(a.(*v1.LocalResourceAccessReview), b.(*authorization.LocalResourceAccessReview), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.LocalResourceAccessReview)(nil), (*authorization.LocalResourceAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_LocalResourceAccessReview_To_authorization_LocalResourceAccessReview(a.(*authorizationv1.LocalResourceAccessReview), b.(*authorization.LocalResourceAccessReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.LocalResourceAccessReview)(nil), (*v1.LocalResourceAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_LocalResourceAccessReview_To_v1_LocalResourceAccessReview(a.(*authorization.LocalResourceAccessReview), b.(*v1.LocalResourceAccessReview), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.LocalResourceAccessReview)(nil), (*authorizationv1.LocalResourceAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_LocalResourceAccessReview_To_v1_LocalResourceAccessReview(a.(*authorization.LocalResourceAccessReview), b.(*authorizationv1.LocalResourceAccessReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ResourceAccessReview)(nil), (*authorization.ResourceAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview(a.(*v1.ResourceAccessReview), b.(*authorization.ResourceAccessReview), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.ResourceAccessReview)(nil), (*authorization.ResourceAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview(a.(*authorizationv1.ResourceAccessReview), b.(*authorization.ResourceAccessReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.ResourceAccessReview)(nil), (*v1.ResourceAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_ResourceAccessReview_To_v1_ResourceAccessReview(a.(*authorization.ResourceAccessReview), b.(*v1.ResourceAccessReview), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.ResourceAccessReview)(nil), (*authorizationv1.ResourceAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_ResourceAccessReview_To_v1_ResourceAccessReview(a.(*authorization.ResourceAccessReview), b.(*authorizationv1.ResourceAccessReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Role)(nil), (*authorization.Role)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Role_To_authorization_Role(a.(*v1.Role), b.(*authorization.Role), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.Role)(nil), (*authorization.Role)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_Role_To_authorization_Role(a.(*authorizationv1.Role), b.(*authorization.Role), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.Role)(nil), (*v1.Role)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_Role_To_v1_Role(a.(*authorization.Role), b.(*v1.Role), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.Role)(nil), (*authorizationv1.Role)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_Role_To_v1_Role(a.(*authorization.Role), b.(*authorizationv1.Role), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.RoleBindingList)(nil), (*authorization.RoleBindingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_RoleBindingList_To_authorization_RoleBindingList(a.(*v1.RoleBindingList), b.(*authorization.RoleBindingList), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.RoleBindingList)(nil), (*authorization.RoleBindingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_RoleBindingList_To_authorization_RoleBindingList(a.(*authorizationv1.RoleBindingList), b.(*authorization.RoleBindingList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.RoleBindingList)(nil), (*v1.RoleBindingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_RoleBindingList_To_v1_RoleBindingList(a.(*authorization.RoleBindingList), b.(*v1.RoleBindingList), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.RoleBindingList)(nil), (*authorizationv1.RoleBindingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_RoleBindingList_To_v1_RoleBindingList(a.(*authorization.RoleBindingList), b.(*authorizationv1.RoleBindingList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.RoleBindingRestriction)(nil), (*authorization.RoleBindingRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_RoleBindingRestriction_To_authorization_RoleBindingRestriction(a.(*v1.RoleBindingRestriction), b.(*authorization.RoleBindingRestriction), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.RoleBindingRestriction)(nil), (*authorization.RoleBindingRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_RoleBindingRestriction_To_authorization_RoleBindingRestriction(a.(*authorizationv1.RoleBindingRestriction), b.(*authorization.RoleBindingRestriction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.RoleBindingRestriction)(nil), (*v1.RoleBindingRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_RoleBindingRestriction_To_v1_RoleBindingRestriction(a.(*authorization.RoleBindingRestriction), b.(*v1.RoleBindingRestriction), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.RoleBindingRestriction)(nil), (*authorizationv1.RoleBindingRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_RoleBindingRestriction_To_v1_RoleBindingRestriction(a.(*authorization.RoleBindingRestriction), b.(*authorizationv1.RoleBindingRestriction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.RoleBindingRestrictionList)(nil), (*authorization.RoleBindingRestrictionList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_RoleBindingRestrictionList_To_authorization_RoleBindingRestrictionList(a.(*v1.RoleBindingRestrictionList), b.(*authorization.RoleBindingRestrictionList), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.RoleBindingRestrictionList)(nil), (*authorization.RoleBindingRestrictionList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_RoleBindingRestrictionList_To_authorization_RoleBindingRestrictionList(a.(*authorizationv1.RoleBindingRestrictionList), b.(*authorization.RoleBindingRestrictionList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.RoleBindingRestrictionList)(nil), (*v1.RoleBindingRestrictionList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_RoleBindingRestrictionList_To_v1_RoleBindingRestrictionList(a.(*authorization.RoleBindingRestrictionList), b.(*v1.RoleBindingRestrictionList), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.RoleBindingRestrictionList)(nil), (*authorizationv1.RoleBindingRestrictionList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_RoleBindingRestrictionList_To_v1_RoleBindingRestrictionList(a.(*authorization.RoleBindingRestrictionList), b.(*authorizationv1.RoleBindingRestrictionList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.RoleBindingRestrictionSpec)(nil), (*authorization.RoleBindingRestrictionSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_RoleBindingRestrictionSpec_To_authorization_RoleBindingRestrictionSpec(a.(*v1.RoleBindingRestrictionSpec), b.(*authorization.RoleBindingRestrictionSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.RoleBindingRestrictionSpec)(nil), (*authorization.RoleBindingRestrictionSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_RoleBindingRestrictionSpec_To_authorization_RoleBindingRestrictionSpec(a.(*authorizationv1.RoleBindingRestrictionSpec), b.(*authorization.RoleBindingRestrictionSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.RoleBindingRestrictionSpec)(nil), (*v1.RoleBindingRestrictionSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_RoleBindingRestrictionSpec_To_v1_RoleBindingRestrictionSpec(a.(*authorization.RoleBindingRestrictionSpec), b.(*v1.RoleBindingRestrictionSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.RoleBindingRestrictionSpec)(nil), (*authorizationv1.RoleBindingRestrictionSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_RoleBindingRestrictionSpec_To_v1_RoleBindingRestrictionSpec(a.(*authorization.RoleBindingRestrictionSpec), b.(*authorizationv1.RoleBindingRestrictionSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.RoleList)(nil), (*authorization.RoleList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_RoleList_To_authorization_RoleList(a.(*v1.RoleList), b.(*authorization.RoleList), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.RoleList)(nil), (*authorization.RoleList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_RoleList_To_authorization_RoleList(a.(*authorizationv1.RoleList), b.(*authorization.RoleList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.RoleList)(nil), (*v1.RoleList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_RoleList_To_v1_RoleList(a.(*authorization.RoleList), b.(*v1.RoleList), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.RoleList)(nil), (*authorizationv1.RoleList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_RoleList_To_v1_RoleList(a.(*authorization.RoleList), b.(*authorizationv1.RoleList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SelfSubjectRulesReview)(nil), (*authorization.SelfSubjectRulesReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SelfSubjectRulesReview_To_authorization_SelfSubjectRulesReview(a.(*v1.SelfSubjectRulesReview), b.(*authorization.SelfSubjectRulesReview), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.SelfSubjectRulesReview)(nil), (*authorization.SelfSubjectRulesReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_SelfSubjectRulesReview_To_authorization_SelfSubjectRulesReview(a.(*authorizationv1.SelfSubjectRulesReview), b.(*authorization.SelfSubjectRulesReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.SelfSubjectRulesReview)(nil), (*v1.SelfSubjectRulesReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_SelfSubjectRulesReview_To_v1_SelfSubjectRulesReview(a.(*authorization.SelfSubjectRulesReview), b.(*v1.SelfSubjectRulesReview), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.SelfSubjectRulesReview)(nil), (*authorizationv1.SelfSubjectRulesReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_SelfSubjectRulesReview_To_v1_SelfSubjectRulesReview(a.(*authorization.SelfSubjectRulesReview), b.(*authorizationv1.SelfSubjectRulesReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ServiceAccountReference)(nil), (*authorization.ServiceAccountReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ServiceAccountReference_To_authorization_ServiceAccountReference(a.(*v1.ServiceAccountReference), b.(*authorization.ServiceAccountReference), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.ServiceAccountReference)(nil), (*authorization.ServiceAccountReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_ServiceAccountReference_To_authorization_ServiceAccountReference(a.(*authorizationv1.ServiceAccountReference), b.(*authorization.ServiceAccountReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.ServiceAccountReference)(nil), (*v1.ServiceAccountReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_ServiceAccountReference_To_v1_ServiceAccountReference(a.(*authorization.ServiceAccountReference), b.(*v1.ServiceAccountReference), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.ServiceAccountReference)(nil), (*authorizationv1.ServiceAccountReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_ServiceAccountReference_To_v1_ServiceAccountReference(a.(*authorization.ServiceAccountReference), b.(*authorizationv1.ServiceAccountReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ServiceAccountRestriction)(nil), (*authorization.ServiceAccountRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ServiceAccountRestriction_To_authorization_ServiceAccountRestriction(a.(*v1.ServiceAccountRestriction), b.(*authorization.ServiceAccountRestriction), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.ServiceAccountRestriction)(nil), (*authorization.ServiceAccountRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_ServiceAccountRestriction_To_authorization_ServiceAccountRestriction(a.(*authorizationv1.ServiceAccountRestriction), b.(*authorization.ServiceAccountRestriction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.ServiceAccountRestriction)(nil), (*v1.ServiceAccountRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_ServiceAccountRestriction_To_v1_ServiceAccountRestriction(a.(*authorization.ServiceAccountRestriction), b.(*v1.ServiceAccountRestriction), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.ServiceAccountRestriction)(nil), (*authorizationv1.ServiceAccountRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_ServiceAccountRestriction_To_v1_ServiceAccountRestriction(a.(*authorization.ServiceAccountRestriction), b.(*authorizationv1.ServiceAccountRestriction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SubjectAccessReviewResponse)(nil), (*authorization.SubjectAccessReviewResponse)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SubjectAccessReviewResponse_To_authorization_SubjectAccessReviewResponse(a.(*v1.SubjectAccessReviewResponse), b.(*authorization.SubjectAccessReviewResponse), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.SubjectAccessReviewResponse)(nil), (*authorization.SubjectAccessReviewResponse)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_SubjectAccessReviewResponse_To_authorization_SubjectAccessReviewResponse(a.(*authorizationv1.SubjectAccessReviewResponse), b.(*authorization.SubjectAccessReviewResponse), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.SubjectAccessReviewResponse)(nil), (*v1.SubjectAccessReviewResponse)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse(a.(*authorization.SubjectAccessReviewResponse), b.(*v1.SubjectAccessReviewResponse), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.SubjectAccessReviewResponse)(nil), (*authorizationv1.SubjectAccessReviewResponse)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse(a.(*authorization.SubjectAccessReviewResponse), b.(*authorizationv1.SubjectAccessReviewResponse), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SubjectRulesReview)(nil), (*authorization.SubjectRulesReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SubjectRulesReview_To_authorization_SubjectRulesReview(a.(*v1.SubjectRulesReview), b.(*authorization.SubjectRulesReview), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.SubjectRulesReview)(nil), (*authorization.SubjectRulesReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_SubjectRulesReview_To_authorization_SubjectRulesReview(a.(*authorizationv1.SubjectRulesReview), b.(*authorization.SubjectRulesReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.SubjectRulesReview)(nil), (*v1.SubjectRulesReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_SubjectRulesReview_To_v1_SubjectRulesReview(a.(*authorization.SubjectRulesReview), b.(*v1.SubjectRulesReview), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.SubjectRulesReview)(nil), (*authorizationv1.SubjectRulesReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_SubjectRulesReview_To_v1_SubjectRulesReview(a.(*authorization.SubjectRulesReview), b.(*authorizationv1.SubjectRulesReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SubjectRulesReviewSpec)(nil), (*authorization.SubjectRulesReviewSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSpec(a.(*v1.SubjectRulesReviewSpec), b.(*authorization.SubjectRulesReviewSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.SubjectRulesReviewSpec)(nil), (*authorization.SubjectRulesReviewSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSpec(a.(*authorizationv1.SubjectRulesReviewSpec), b.(*authorization.SubjectRulesReviewSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.SubjectRulesReviewSpec)(nil), (*v1.SubjectRulesReviewSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_SubjectRulesReviewSpec_To_v1_SubjectRulesReviewSpec(a.(*authorization.SubjectRulesReviewSpec), b.(*v1.SubjectRulesReviewSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.SubjectRulesReviewSpec)(nil), (*authorizationv1.SubjectRulesReviewSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_SubjectRulesReviewSpec_To_v1_SubjectRulesReviewSpec(a.(*authorization.SubjectRulesReviewSpec), b.(*authorizationv1.SubjectRulesReviewSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SubjectRulesReviewStatus)(nil), (*authorization.SubjectRulesReviewStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SubjectRulesReviewStatus_To_authorization_SubjectRulesReviewStatus(a.(*v1.SubjectRulesReviewStatus), b.(*authorization.SubjectRulesReviewStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.SubjectRulesReviewStatus)(nil), (*authorization.SubjectRulesReviewStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_SubjectRulesReviewStatus_To_authorization_SubjectRulesReviewStatus(a.(*authorizationv1.SubjectRulesReviewStatus), b.(*authorization.SubjectRulesReviewStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.SubjectRulesReviewStatus)(nil), (*v1.SubjectRulesReviewStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_SubjectRulesReviewStatus_To_v1_SubjectRulesReviewStatus(a.(*authorization.SubjectRulesReviewStatus), b.(*v1.SubjectRulesReviewStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.SubjectRulesReviewStatus)(nil), (*authorizationv1.SubjectRulesReviewStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_SubjectRulesReviewStatus_To_v1_SubjectRulesReviewStatus(a.(*authorization.SubjectRulesReviewStatus), b.(*authorizationv1.SubjectRulesReviewStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.UserRestriction)(nil), (*authorization.UserRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_UserRestriction_To_authorization_UserRestriction(a.(*v1.UserRestriction), b.(*authorization.UserRestriction), scope)
+	if err := s.AddGeneratedConversionFunc((*authorizationv1.UserRestriction)(nil), (*authorization.UserRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_UserRestriction_To_authorization_UserRestriction(a.(*authorizationv1.UserRestriction), b.(*authorization.UserRestriction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*authorization.UserRestriction)(nil), (*v1.UserRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_UserRestriction_To_v1_UserRestriction(a.(*authorization.UserRestriction), b.(*v1.UserRestriction), scope)
+	if err := s.AddGeneratedConversionFunc((*authorization.UserRestriction)(nil), (*authorizationv1.UserRestriction)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_UserRestriction_To_v1_UserRestriction(a.(*authorization.UserRestriction), b.(*authorizationv1.UserRestriction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*authorization.ClusterRoleBinding)(nil), (*v1.ClusterRoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_ClusterRoleBinding_To_v1_ClusterRoleBinding(a.(*authorization.ClusterRoleBinding), b.(*v1.ClusterRoleBinding), scope)
+	if err := s.AddConversionFunc((*authorization.ClusterRoleBinding)(nil), (*authorizationv1.ClusterRoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_ClusterRoleBinding_To_v1_ClusterRoleBinding(a.(*authorization.ClusterRoleBinding), b.(*authorizationv1.ClusterRoleBinding), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*authorization.LocalSubjectAccessReview)(nil), (*v1.LocalSubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_LocalSubjectAccessReview_To_v1_LocalSubjectAccessReview(a.(*authorization.LocalSubjectAccessReview), b.(*v1.LocalSubjectAccessReview), scope)
+	if err := s.AddConversionFunc((*authorization.LocalSubjectAccessReview)(nil), (*authorizationv1.LocalSubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_LocalSubjectAccessReview_To_v1_LocalSubjectAccessReview(a.(*authorization.LocalSubjectAccessReview), b.(*authorizationv1.LocalSubjectAccessReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*authorization.PolicyRule)(nil), (*v1.PolicyRule)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_PolicyRule_To_v1_PolicyRule(a.(*authorization.PolicyRule), b.(*v1.PolicyRule), scope)
+	if err := s.AddConversionFunc((*authorization.PolicyRule)(nil), (*authorizationv1.PolicyRule)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_PolicyRule_To_v1_PolicyRule(a.(*authorization.PolicyRule), b.(*authorizationv1.PolicyRule), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*authorization.ResourceAccessReviewResponse)(nil), (*v1.ResourceAccessReviewResponse)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_ResourceAccessReviewResponse_To_v1_ResourceAccessReviewResponse(a.(*authorization.ResourceAccessReviewResponse), b.(*v1.ResourceAccessReviewResponse), scope)
+	if err := s.AddConversionFunc((*authorization.ResourceAccessReviewResponse)(nil), (*authorizationv1.ResourceAccessReviewResponse)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_ResourceAccessReviewResponse_To_v1_ResourceAccessReviewResponse(a.(*authorization.ResourceAccessReviewResponse), b.(*authorizationv1.ResourceAccessReviewResponse), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*authorization.RoleBinding)(nil), (*v1.RoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_RoleBinding_To_v1_RoleBinding(a.(*authorization.RoleBinding), b.(*v1.RoleBinding), scope)
+	if err := s.AddConversionFunc((*authorization.RoleBinding)(nil), (*authorizationv1.RoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_RoleBinding_To_v1_RoleBinding(a.(*authorization.RoleBinding), b.(*authorizationv1.RoleBinding), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*authorization.SelfSubjectRulesReviewSpec)(nil), (*v1.SelfSubjectRulesReviewSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_SelfSubjectRulesReviewSpec_To_v1_SelfSubjectRulesReviewSpec(a.(*authorization.SelfSubjectRulesReviewSpec), b.(*v1.SelfSubjectRulesReviewSpec), scope)
+	if err := s.AddConversionFunc((*authorization.SelfSubjectRulesReviewSpec)(nil), (*authorizationv1.SelfSubjectRulesReviewSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_SelfSubjectRulesReviewSpec_To_v1_SelfSubjectRulesReviewSpec(a.(*authorization.SelfSubjectRulesReviewSpec), b.(*authorizationv1.SelfSubjectRulesReviewSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*authorization.SubjectAccessReview)(nil), (*v1.SubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_authorization_SubjectAccessReview_To_v1_SubjectAccessReview(a.(*authorization.SubjectAccessReview), b.(*v1.SubjectAccessReview), scope)
+	if err := s.AddConversionFunc((*authorization.SubjectAccessReview)(nil), (*authorizationv1.SubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_authorization_SubjectAccessReview_To_v1_SubjectAccessReview(a.(*authorization.SubjectAccessReview), b.(*authorizationv1.SubjectAccessReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.ClusterRoleBinding)(nil), (*authorization.ClusterRoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ClusterRoleBinding_To_authorization_ClusterRoleBinding(a.(*v1.ClusterRoleBinding), b.(*authorization.ClusterRoleBinding), scope)
+	if err := s.AddConversionFunc((*authorizationv1.ClusterRoleBinding)(nil), (*authorization.ClusterRoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_ClusterRoleBinding_To_authorization_ClusterRoleBinding(a.(*authorizationv1.ClusterRoleBinding), b.(*authorization.ClusterRoleBinding), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.LocalSubjectAccessReview)(nil), (*authorization.LocalSubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_LocalSubjectAccessReview_To_authorization_LocalSubjectAccessReview(a.(*v1.LocalSubjectAccessReview), b.(*authorization.LocalSubjectAccessReview), scope)
+	if err := s.AddConversionFunc((*authorizationv1.LocalSubjectAccessReview)(nil), (*authorization.LocalSubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_LocalSubjectAccessReview_To_authorization_LocalSubjectAccessReview(a.(*authorizationv1.LocalSubjectAccessReview), b.(*authorization.LocalSubjectAccessReview), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.PolicyRule)(nil), (*authorization.PolicyRule)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PolicyRule_To_authorization_PolicyRule(a.(*v1.PolicyRule), b.(*authorization.PolicyRule), scope)
+	if err := s.AddConversionFunc((*authorizationv1.PolicyRule)(nil), (*authorization.PolicyRule)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_PolicyRule_To_authorization_PolicyRule(a.(*authorizationv1.PolicyRule), b.(*authorization.PolicyRule), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.ResourceAccessReviewResponse)(nil), (*authorization.ResourceAccessReviewResponse)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ResourceAccessReviewResponse_To_authorization_ResourceAccessReviewResponse(a.(*v1.ResourceAccessReviewResponse), b.(*authorization.ResourceAccessReviewResponse), scope)
+	if err := s.AddConversionFunc((*authorizationv1.ResourceAccessReviewResponse)(nil), (*authorization.ResourceAccessReviewResponse)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_ResourceAccessReviewResponse_To_authorization_ResourceAccessReviewResponse(a.(*authorizationv1.ResourceAccessReviewResponse), b.(*authorization.ResourceAccessReviewResponse), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.RoleBinding)(nil), (*authorization.RoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_RoleBinding_To_authorization_RoleBinding(a.(*v1.RoleBinding), b.(*authorization.RoleBinding), scope)
+	if err := s.AddConversionFunc((*authorizationv1.RoleBinding)(nil), (*authorization.RoleBinding)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_RoleBinding_To_authorization_RoleBinding(a.(*authorizationv1.RoleBinding), b.(*authorization.RoleBinding), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.SelfSubjectRulesReviewSpec)(nil), (*authorization.SelfSubjectRulesReviewSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SelfSubjectRulesReviewSpec_To_authorization_SelfSubjectRulesReviewSpec(a.(*v1.SelfSubjectRulesReviewSpec), b.(*authorization.SelfSubjectRulesReviewSpec), scope)
+	if err := s.AddConversionFunc((*authorizationv1.SelfSubjectRulesReviewSpec)(nil), (*authorization.SelfSubjectRulesReviewSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_SelfSubjectRulesReviewSpec_To_authorization_SelfSubjectRulesReviewSpec(a.(*authorizationv1.SelfSubjectRulesReviewSpec), b.(*authorization.SelfSubjectRulesReviewSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.SubjectAccessReview)(nil), (*authorization.SubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SubjectAccessReview_To_authorization_SubjectAccessReview(a.(*v1.SubjectAccessReview), b.(*authorization.SubjectAccessReview), scope)
+	if err := s.AddConversionFunc((*authorizationv1.SubjectAccessReview)(nil), (*authorization.SubjectAccessReview)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1_SubjectAccessReview_To_authorization_SubjectAccessReview(a.(*authorizationv1.SubjectAccessReview), b.(*authorization.SubjectAccessReview), scope)
 	}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func autoConvert_v1_Action_To_authorization_Action(in *v1.Action, out *authorization.Action, s conversion.Scope) error {
+func autoConvert_v1_Action_To_authorization_Action(in *authorizationv1.Action, out *authorization.Action, s conversion.Scope) error {
 	out.Namespace = in.Namespace
 	out.Verb = in.Verb
 	out.Group = in.Group
@@ -336,11 +336,11 @@ func autoConvert_v1_Action_To_authorization_Action(in *v1.Action, out *authoriza
 }
 
 // Convert_v1_Action_To_authorization_Action is an autogenerated conversion function.
-func Convert_v1_Action_To_authorization_Action(in *v1.Action, out *authorization.Action, s conversion.Scope) error {
+func Convert_v1_Action_To_authorization_Action(in *authorizationv1.Action, out *authorization.Action, s conversion.Scope) error {
 	return autoConvert_v1_Action_To_authorization_Action(in, out, s)
 }
 
-func autoConvert_authorization_Action_To_v1_Action(in *authorization.Action, out *v1.Action, s conversion.Scope) error {
+func autoConvert_authorization_Action_To_v1_Action(in *authorization.Action, out *authorizationv1.Action, s conversion.Scope) error {
 	out.Namespace = in.Namespace
 	out.Verb = in.Verb
 	out.Group = in.Group
@@ -356,11 +356,11 @@ func autoConvert_authorization_Action_To_v1_Action(in *authorization.Action, out
 }
 
 // Convert_authorization_Action_To_v1_Action is an autogenerated conversion function.
-func Convert_authorization_Action_To_v1_Action(in *authorization.Action, out *v1.Action, s conversion.Scope) error {
+func Convert_authorization_Action_To_v1_Action(in *authorization.Action, out *authorizationv1.Action, s conversion.Scope) error {
 	return autoConvert_authorization_Action_To_v1_Action(in, out, s)
 }
 
-func autoConvert_v1_ClusterRole_To_authorization_ClusterRole(in *v1.ClusterRole, out *authorization.ClusterRole, s conversion.Scope) error {
+func autoConvert_v1_ClusterRole_To_authorization_ClusterRole(in *authorizationv1.ClusterRole, out *authorization.ClusterRole, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if in.Rules != nil {
 		in, out := &in.Rules, &out.Rules
@@ -378,15 +378,15 @@ func autoConvert_v1_ClusterRole_To_authorization_ClusterRole(in *v1.ClusterRole,
 }
 
 // Convert_v1_ClusterRole_To_authorization_ClusterRole is an autogenerated conversion function.
-func Convert_v1_ClusterRole_To_authorization_ClusterRole(in *v1.ClusterRole, out *authorization.ClusterRole, s conversion.Scope) error {
+func Convert_v1_ClusterRole_To_authorization_ClusterRole(in *authorizationv1.ClusterRole, out *authorization.ClusterRole, s conversion.Scope) error {
 	return autoConvert_v1_ClusterRole_To_authorization_ClusterRole(in, out, s)
 }
 
-func autoConvert_authorization_ClusterRole_To_v1_ClusterRole(in *authorization.ClusterRole, out *v1.ClusterRole, s conversion.Scope) error {
+func autoConvert_authorization_ClusterRole_To_v1_ClusterRole(in *authorization.ClusterRole, out *authorizationv1.ClusterRole, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if in.Rules != nil {
 		in, out := &in.Rules, &out.Rules
-		*out = make([]v1.PolicyRule, len(*in))
+		*out = make([]authorizationv1.PolicyRule, len(*in))
 		for i := range *in {
 			if err := Convert_authorization_PolicyRule_To_v1_PolicyRule(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -400,11 +400,11 @@ func autoConvert_authorization_ClusterRole_To_v1_ClusterRole(in *authorization.C
 }
 
 // Convert_authorization_ClusterRole_To_v1_ClusterRole is an autogenerated conversion function.
-func Convert_authorization_ClusterRole_To_v1_ClusterRole(in *authorization.ClusterRole, out *v1.ClusterRole, s conversion.Scope) error {
+func Convert_authorization_ClusterRole_To_v1_ClusterRole(in *authorization.ClusterRole, out *authorizationv1.ClusterRole, s conversion.Scope) error {
 	return autoConvert_authorization_ClusterRole_To_v1_ClusterRole(in, out, s)
 }
 
-func autoConvert_v1_ClusterRoleBinding_To_authorization_ClusterRoleBinding(in *v1.ClusterRoleBinding, out *authorization.ClusterRoleBinding, s conversion.Scope) error {
+func autoConvert_v1_ClusterRoleBinding_To_authorization_ClusterRoleBinding(in *authorizationv1.ClusterRoleBinding, out *authorization.ClusterRoleBinding, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	// INFO: in.UserNames opted out of conversion generation
 	// INFO: in.GroupNames opted out of conversion generation
@@ -425,7 +425,7 @@ func autoConvert_v1_ClusterRoleBinding_To_authorization_ClusterRoleBinding(in *v
 	return nil
 }
 
-func autoConvert_authorization_ClusterRoleBinding_To_v1_ClusterRoleBinding(in *authorization.ClusterRoleBinding, out *v1.ClusterRoleBinding, s conversion.Scope) error {
+func autoConvert_authorization_ClusterRoleBinding_To_v1_ClusterRoleBinding(in *authorization.ClusterRoleBinding, out *authorizationv1.ClusterRoleBinding, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if in.Subjects != nil {
 		in, out := &in.Subjects, &out.Subjects
@@ -444,7 +444,7 @@ func autoConvert_authorization_ClusterRoleBinding_To_v1_ClusterRoleBinding(in *a
 	return nil
 }
 
-func autoConvert_v1_ClusterRoleBindingList_To_authorization_ClusterRoleBindingList(in *v1.ClusterRoleBindingList, out *authorization.ClusterRoleBindingList, s conversion.Scope) error {
+func autoConvert_v1_ClusterRoleBindingList_To_authorization_ClusterRoleBindingList(in *authorizationv1.ClusterRoleBindingList, out *authorization.ClusterRoleBindingList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
@@ -461,15 +461,15 @@ func autoConvert_v1_ClusterRoleBindingList_To_authorization_ClusterRoleBindingLi
 }
 
 // Convert_v1_ClusterRoleBindingList_To_authorization_ClusterRoleBindingList is an autogenerated conversion function.
-func Convert_v1_ClusterRoleBindingList_To_authorization_ClusterRoleBindingList(in *v1.ClusterRoleBindingList, out *authorization.ClusterRoleBindingList, s conversion.Scope) error {
+func Convert_v1_ClusterRoleBindingList_To_authorization_ClusterRoleBindingList(in *authorizationv1.ClusterRoleBindingList, out *authorization.ClusterRoleBindingList, s conversion.Scope) error {
 	return autoConvert_v1_ClusterRoleBindingList_To_authorization_ClusterRoleBindingList(in, out, s)
 }
 
-func autoConvert_authorization_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(in *authorization.ClusterRoleBindingList, out *v1.ClusterRoleBindingList, s conversion.Scope) error {
+func autoConvert_authorization_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(in *authorization.ClusterRoleBindingList, out *authorizationv1.ClusterRoleBindingList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.ClusterRoleBinding, len(*in))
+		*out = make([]authorizationv1.ClusterRoleBinding, len(*in))
 		for i := range *in {
 			if err := Convert_authorization_ClusterRoleBinding_To_v1_ClusterRoleBinding(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -482,11 +482,11 @@ func autoConvert_authorization_ClusterRoleBindingList_To_v1_ClusterRoleBindingLi
 }
 
 // Convert_authorization_ClusterRoleBindingList_To_v1_ClusterRoleBindingList is an autogenerated conversion function.
-func Convert_authorization_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(in *authorization.ClusterRoleBindingList, out *v1.ClusterRoleBindingList, s conversion.Scope) error {
+func Convert_authorization_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(in *authorization.ClusterRoleBindingList, out *authorizationv1.ClusterRoleBindingList, s conversion.Scope) error {
 	return autoConvert_authorization_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(in, out, s)
 }
 
-func autoConvert_v1_ClusterRoleList_To_authorization_ClusterRoleList(in *v1.ClusterRoleList, out *authorization.ClusterRoleList, s conversion.Scope) error {
+func autoConvert_v1_ClusterRoleList_To_authorization_ClusterRoleList(in *authorizationv1.ClusterRoleList, out *authorization.ClusterRoleList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
@@ -503,15 +503,15 @@ func autoConvert_v1_ClusterRoleList_To_authorization_ClusterRoleList(in *v1.Clus
 }
 
 // Convert_v1_ClusterRoleList_To_authorization_ClusterRoleList is an autogenerated conversion function.
-func Convert_v1_ClusterRoleList_To_authorization_ClusterRoleList(in *v1.ClusterRoleList, out *authorization.ClusterRoleList, s conversion.Scope) error {
+func Convert_v1_ClusterRoleList_To_authorization_ClusterRoleList(in *authorizationv1.ClusterRoleList, out *authorization.ClusterRoleList, s conversion.Scope) error {
 	return autoConvert_v1_ClusterRoleList_To_authorization_ClusterRoleList(in, out, s)
 }
 
-func autoConvert_authorization_ClusterRoleList_To_v1_ClusterRoleList(in *authorization.ClusterRoleList, out *v1.ClusterRoleList, s conversion.Scope) error {
+func autoConvert_authorization_ClusterRoleList_To_v1_ClusterRoleList(in *authorization.ClusterRoleList, out *authorizationv1.ClusterRoleList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.ClusterRole, len(*in))
+		*out = make([]authorizationv1.ClusterRole, len(*in))
 		for i := range *in {
 			if err := Convert_authorization_ClusterRole_To_v1_ClusterRole(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -524,51 +524,51 @@ func autoConvert_authorization_ClusterRoleList_To_v1_ClusterRoleList(in *authori
 }
 
 // Convert_authorization_ClusterRoleList_To_v1_ClusterRoleList is an autogenerated conversion function.
-func Convert_authorization_ClusterRoleList_To_v1_ClusterRoleList(in *authorization.ClusterRoleList, out *v1.ClusterRoleList, s conversion.Scope) error {
+func Convert_authorization_ClusterRoleList_To_v1_ClusterRoleList(in *authorization.ClusterRoleList, out *authorizationv1.ClusterRoleList, s conversion.Scope) error {
 	return autoConvert_authorization_ClusterRoleList_To_v1_ClusterRoleList(in, out, s)
 }
 
-func autoConvert_v1_GroupRestriction_To_authorization_GroupRestriction(in *v1.GroupRestriction, out *authorization.GroupRestriction, s conversion.Scope) error {
+func autoConvert_v1_GroupRestriction_To_authorization_GroupRestriction(in *authorizationv1.GroupRestriction, out *authorization.GroupRestriction, s conversion.Scope) error {
 	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
 	out.Selectors = *(*[]metav1.LabelSelector)(unsafe.Pointer(&in.Selectors))
 	return nil
 }
 
 // Convert_v1_GroupRestriction_To_authorization_GroupRestriction is an autogenerated conversion function.
-func Convert_v1_GroupRestriction_To_authorization_GroupRestriction(in *v1.GroupRestriction, out *authorization.GroupRestriction, s conversion.Scope) error {
+func Convert_v1_GroupRestriction_To_authorization_GroupRestriction(in *authorizationv1.GroupRestriction, out *authorization.GroupRestriction, s conversion.Scope) error {
 	return autoConvert_v1_GroupRestriction_To_authorization_GroupRestriction(in, out, s)
 }
 
-func autoConvert_authorization_GroupRestriction_To_v1_GroupRestriction(in *authorization.GroupRestriction, out *v1.GroupRestriction, s conversion.Scope) error {
+func autoConvert_authorization_GroupRestriction_To_v1_GroupRestriction(in *authorization.GroupRestriction, out *authorizationv1.GroupRestriction, s conversion.Scope) error {
 	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
 	out.Selectors = *(*[]metav1.LabelSelector)(unsafe.Pointer(&in.Selectors))
 	return nil
 }
 
 // Convert_authorization_GroupRestriction_To_v1_GroupRestriction is an autogenerated conversion function.
-func Convert_authorization_GroupRestriction_To_v1_GroupRestriction(in *authorization.GroupRestriction, out *v1.GroupRestriction, s conversion.Scope) error {
+func Convert_authorization_GroupRestriction_To_v1_GroupRestriction(in *authorization.GroupRestriction, out *authorizationv1.GroupRestriction, s conversion.Scope) error {
 	return autoConvert_authorization_GroupRestriction_To_v1_GroupRestriction(in, out, s)
 }
 
-func autoConvert_v1_IsPersonalSubjectAccessReview_To_authorization_IsPersonalSubjectAccessReview(in *v1.IsPersonalSubjectAccessReview, out *authorization.IsPersonalSubjectAccessReview, s conversion.Scope) error {
+func autoConvert_v1_IsPersonalSubjectAccessReview_To_authorization_IsPersonalSubjectAccessReview(in *authorizationv1.IsPersonalSubjectAccessReview, out *authorization.IsPersonalSubjectAccessReview, s conversion.Scope) error {
 	return nil
 }
 
 // Convert_v1_IsPersonalSubjectAccessReview_To_authorization_IsPersonalSubjectAccessReview is an autogenerated conversion function.
-func Convert_v1_IsPersonalSubjectAccessReview_To_authorization_IsPersonalSubjectAccessReview(in *v1.IsPersonalSubjectAccessReview, out *authorization.IsPersonalSubjectAccessReview, s conversion.Scope) error {
+func Convert_v1_IsPersonalSubjectAccessReview_To_authorization_IsPersonalSubjectAccessReview(in *authorizationv1.IsPersonalSubjectAccessReview, out *authorization.IsPersonalSubjectAccessReview, s conversion.Scope) error {
 	return autoConvert_v1_IsPersonalSubjectAccessReview_To_authorization_IsPersonalSubjectAccessReview(in, out, s)
 }
 
-func autoConvert_authorization_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview(in *authorization.IsPersonalSubjectAccessReview, out *v1.IsPersonalSubjectAccessReview, s conversion.Scope) error {
+func autoConvert_authorization_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview(in *authorization.IsPersonalSubjectAccessReview, out *authorizationv1.IsPersonalSubjectAccessReview, s conversion.Scope) error {
 	return nil
 }
 
 // Convert_authorization_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview is an autogenerated conversion function.
-func Convert_authorization_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview(in *authorization.IsPersonalSubjectAccessReview, out *v1.IsPersonalSubjectAccessReview, s conversion.Scope) error {
+func Convert_authorization_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview(in *authorization.IsPersonalSubjectAccessReview, out *authorizationv1.IsPersonalSubjectAccessReview, s conversion.Scope) error {
 	return autoConvert_authorization_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview(in, out, s)
 }
 
-func autoConvert_v1_LocalResourceAccessReview_To_authorization_LocalResourceAccessReview(in *v1.LocalResourceAccessReview, out *authorization.LocalResourceAccessReview, s conversion.Scope) error {
+func autoConvert_v1_LocalResourceAccessReview_To_authorization_LocalResourceAccessReview(in *authorizationv1.LocalResourceAccessReview, out *authorization.LocalResourceAccessReview, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_Action_To_authorization_Action(&in.Action, &out.Action, s); err != nil {
 		return err
@@ -577,11 +577,11 @@ func autoConvert_v1_LocalResourceAccessReview_To_authorization_LocalResourceAcce
 }
 
 // Convert_v1_LocalResourceAccessReview_To_authorization_LocalResourceAccessReview is an autogenerated conversion function.
-func Convert_v1_LocalResourceAccessReview_To_authorization_LocalResourceAccessReview(in *v1.LocalResourceAccessReview, out *authorization.LocalResourceAccessReview, s conversion.Scope) error {
+func Convert_v1_LocalResourceAccessReview_To_authorization_LocalResourceAccessReview(in *authorizationv1.LocalResourceAccessReview, out *authorization.LocalResourceAccessReview, s conversion.Scope) error {
 	return autoConvert_v1_LocalResourceAccessReview_To_authorization_LocalResourceAccessReview(in, out, s)
 }
 
-func autoConvert_authorization_LocalResourceAccessReview_To_v1_LocalResourceAccessReview(in *authorization.LocalResourceAccessReview, out *v1.LocalResourceAccessReview, s conversion.Scope) error {
+func autoConvert_authorization_LocalResourceAccessReview_To_v1_LocalResourceAccessReview(in *authorization.LocalResourceAccessReview, out *authorizationv1.LocalResourceAccessReview, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_Action_To_v1_Action(&in.Action, &out.Action, s); err != nil {
 		return err
@@ -590,11 +590,11 @@ func autoConvert_authorization_LocalResourceAccessReview_To_v1_LocalResourceAcce
 }
 
 // Convert_authorization_LocalResourceAccessReview_To_v1_LocalResourceAccessReview is an autogenerated conversion function.
-func Convert_authorization_LocalResourceAccessReview_To_v1_LocalResourceAccessReview(in *authorization.LocalResourceAccessReview, out *v1.LocalResourceAccessReview, s conversion.Scope) error {
+func Convert_authorization_LocalResourceAccessReview_To_v1_LocalResourceAccessReview(in *authorization.LocalResourceAccessReview, out *authorizationv1.LocalResourceAccessReview, s conversion.Scope) error {
 	return autoConvert_authorization_LocalResourceAccessReview_To_v1_LocalResourceAccessReview(in, out, s)
 }
 
-func autoConvert_v1_LocalSubjectAccessReview_To_authorization_LocalSubjectAccessReview(in *v1.LocalSubjectAccessReview, out *authorization.LocalSubjectAccessReview, s conversion.Scope) error {
+func autoConvert_v1_LocalSubjectAccessReview_To_authorization_LocalSubjectAccessReview(in *authorizationv1.LocalSubjectAccessReview, out *authorization.LocalSubjectAccessReview, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_Action_To_authorization_Action(&in.Action, &out.Action, s); err != nil {
 		return err
@@ -605,7 +605,7 @@ func autoConvert_v1_LocalSubjectAccessReview_To_authorization_LocalSubjectAccess
 	return nil
 }
 
-func autoConvert_authorization_LocalSubjectAccessReview_To_v1_LocalSubjectAccessReview(in *authorization.LocalSubjectAccessReview, out *v1.LocalSubjectAccessReview, s conversion.Scope) error {
+func autoConvert_authorization_LocalSubjectAccessReview_To_v1_LocalSubjectAccessReview(in *authorization.LocalSubjectAccessReview, out *authorizationv1.LocalSubjectAccessReview, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_Action_To_v1_Action(&in.Action, &out.Action, s); err != nil {
 		return err
@@ -616,7 +616,7 @@ func autoConvert_authorization_LocalSubjectAccessReview_To_v1_LocalSubjectAccess
 	return nil
 }
 
-func autoConvert_v1_PolicyRule_To_authorization_PolicyRule(in *v1.PolicyRule, out *authorization.PolicyRule, s conversion.Scope) error {
+func autoConvert_v1_PolicyRule_To_authorization_PolicyRule(in *authorizationv1.PolicyRule, out *authorization.PolicyRule, s conversion.Scope) error {
 	// WARNING: in.Verbs requires manual conversion: inconvertible types ([]string vs k8s.io/apimachinery/pkg/util/sets.String)
 	if err := runtime.Convert_runtime_RawExtension_To_runtime_Object(&in.AttributeRestrictions, &out.AttributeRestrictions, s); err != nil {
 		return err
@@ -628,7 +628,7 @@ func autoConvert_v1_PolicyRule_To_authorization_PolicyRule(in *v1.PolicyRule, ou
 	return nil
 }
 
-func autoConvert_authorization_PolicyRule_To_v1_PolicyRule(in *authorization.PolicyRule, out *v1.PolicyRule, s conversion.Scope) error {
+func autoConvert_authorization_PolicyRule_To_v1_PolicyRule(in *authorization.PolicyRule, out *authorizationv1.PolicyRule, s conversion.Scope) error {
 	// WARNING: in.Verbs requires manual conversion: inconvertible types (k8s.io/apimachinery/pkg/util/sets.String vs []string)
 	if err := runtime.Convert_runtime_Object_To_runtime_RawExtension(&in.AttributeRestrictions, &out.AttributeRestrictions, s); err != nil {
 		return err
@@ -640,7 +640,7 @@ func autoConvert_authorization_PolicyRule_To_v1_PolicyRule(in *authorization.Pol
 	return nil
 }
 
-func autoConvert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview(in *v1.ResourceAccessReview, out *authorization.ResourceAccessReview, s conversion.Scope) error {
+func autoConvert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview(in *authorizationv1.ResourceAccessReview, out *authorization.ResourceAccessReview, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_Action_To_authorization_Action(&in.Action, &out.Action, s); err != nil {
 		return err
@@ -649,11 +649,11 @@ func autoConvert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview(i
 }
 
 // Convert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview is an autogenerated conversion function.
-func Convert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview(in *v1.ResourceAccessReview, out *authorization.ResourceAccessReview, s conversion.Scope) error {
+func Convert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview(in *authorizationv1.ResourceAccessReview, out *authorization.ResourceAccessReview, s conversion.Scope) error {
 	return autoConvert_v1_ResourceAccessReview_To_authorization_ResourceAccessReview(in, out, s)
 }
 
-func autoConvert_authorization_ResourceAccessReview_To_v1_ResourceAccessReview(in *authorization.ResourceAccessReview, out *v1.ResourceAccessReview, s conversion.Scope) error {
+func autoConvert_authorization_ResourceAccessReview_To_v1_ResourceAccessReview(in *authorization.ResourceAccessReview, out *authorizationv1.ResourceAccessReview, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_Action_To_v1_Action(&in.Action, &out.Action, s); err != nil {
 		return err
@@ -662,11 +662,11 @@ func autoConvert_authorization_ResourceAccessReview_To_v1_ResourceAccessReview(i
 }
 
 // Convert_authorization_ResourceAccessReview_To_v1_ResourceAccessReview is an autogenerated conversion function.
-func Convert_authorization_ResourceAccessReview_To_v1_ResourceAccessReview(in *authorization.ResourceAccessReview, out *v1.ResourceAccessReview, s conversion.Scope) error {
+func Convert_authorization_ResourceAccessReview_To_v1_ResourceAccessReview(in *authorization.ResourceAccessReview, out *authorizationv1.ResourceAccessReview, s conversion.Scope) error {
 	return autoConvert_authorization_ResourceAccessReview_To_v1_ResourceAccessReview(in, out, s)
 }
 
-func autoConvert_v1_ResourceAccessReviewResponse_To_authorization_ResourceAccessReviewResponse(in *v1.ResourceAccessReviewResponse, out *authorization.ResourceAccessReviewResponse, s conversion.Scope) error {
+func autoConvert_v1_ResourceAccessReviewResponse_To_authorization_ResourceAccessReviewResponse(in *authorizationv1.ResourceAccessReviewResponse, out *authorization.ResourceAccessReviewResponse, s conversion.Scope) error {
 	out.Namespace = in.Namespace
 	// INFO: in.UsersSlice opted out of conversion generation
 	// INFO: in.GroupsSlice opted out of conversion generation
@@ -674,7 +674,7 @@ func autoConvert_v1_ResourceAccessReviewResponse_To_authorization_ResourceAccess
 	return nil
 }
 
-func autoConvert_authorization_ResourceAccessReviewResponse_To_v1_ResourceAccessReviewResponse(in *authorization.ResourceAccessReviewResponse, out *v1.ResourceAccessReviewResponse, s conversion.Scope) error {
+func autoConvert_authorization_ResourceAccessReviewResponse_To_v1_ResourceAccessReviewResponse(in *authorization.ResourceAccessReviewResponse, out *authorizationv1.ResourceAccessReviewResponse, s conversion.Scope) error {
 	out.Namespace = in.Namespace
 	// INFO: in.Users opted out of conversion generation
 	// INFO: in.Groups opted out of conversion generation
@@ -682,7 +682,7 @@ func autoConvert_authorization_ResourceAccessReviewResponse_To_v1_ResourceAccess
 	return nil
 }
 
-func autoConvert_v1_Role_To_authorization_Role(in *v1.Role, out *authorization.Role, s conversion.Scope) error {
+func autoConvert_v1_Role_To_authorization_Role(in *authorizationv1.Role, out *authorization.Role, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if in.Rules != nil {
 		in, out := &in.Rules, &out.Rules
@@ -699,15 +699,15 @@ func autoConvert_v1_Role_To_authorization_Role(in *v1.Role, out *authorization.R
 }
 
 // Convert_v1_Role_To_authorization_Role is an autogenerated conversion function.
-func Convert_v1_Role_To_authorization_Role(in *v1.Role, out *authorization.Role, s conversion.Scope) error {
+func Convert_v1_Role_To_authorization_Role(in *authorizationv1.Role, out *authorization.Role, s conversion.Scope) error {
 	return autoConvert_v1_Role_To_authorization_Role(in, out, s)
 }
 
-func autoConvert_authorization_Role_To_v1_Role(in *authorization.Role, out *v1.Role, s conversion.Scope) error {
+func autoConvert_authorization_Role_To_v1_Role(in *authorization.Role, out *authorizationv1.Role, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if in.Rules != nil {
 		in, out := &in.Rules, &out.Rules
-		*out = make([]v1.PolicyRule, len(*in))
+		*out = make([]authorizationv1.PolicyRule, len(*in))
 		for i := range *in {
 			if err := Convert_authorization_PolicyRule_To_v1_PolicyRule(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -720,11 +720,11 @@ func autoConvert_authorization_Role_To_v1_Role(in *authorization.Role, out *v1.R
 }
 
 // Convert_authorization_Role_To_v1_Role is an autogenerated conversion function.
-func Convert_authorization_Role_To_v1_Role(in *authorization.Role, out *v1.Role, s conversion.Scope) error {
+func Convert_authorization_Role_To_v1_Role(in *authorization.Role, out *authorizationv1.Role, s conversion.Scope) error {
 	return autoConvert_authorization_Role_To_v1_Role(in, out, s)
 }
 
-func autoConvert_v1_RoleBinding_To_authorization_RoleBinding(in *v1.RoleBinding, out *authorization.RoleBinding, s conversion.Scope) error {
+func autoConvert_v1_RoleBinding_To_authorization_RoleBinding(in *authorizationv1.RoleBinding, out *authorization.RoleBinding, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	// INFO: in.UserNames opted out of conversion generation
 	// INFO: in.GroupNames opted out of conversion generation
@@ -745,7 +745,7 @@ func autoConvert_v1_RoleBinding_To_authorization_RoleBinding(in *v1.RoleBinding,
 	return nil
 }
 
-func autoConvert_authorization_RoleBinding_To_v1_RoleBinding(in *authorization.RoleBinding, out *v1.RoleBinding, s conversion.Scope) error {
+func autoConvert_authorization_RoleBinding_To_v1_RoleBinding(in *authorization.RoleBinding, out *authorizationv1.RoleBinding, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if in.Subjects != nil {
 		in, out := &in.Subjects, &out.Subjects
@@ -764,7 +764,7 @@ func autoConvert_authorization_RoleBinding_To_v1_RoleBinding(in *authorization.R
 	return nil
 }
 
-func autoConvert_v1_RoleBindingList_To_authorization_RoleBindingList(in *v1.RoleBindingList, out *authorization.RoleBindingList, s conversion.Scope) error {
+func autoConvert_v1_RoleBindingList_To_authorization_RoleBindingList(in *authorizationv1.RoleBindingList, out *authorization.RoleBindingList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
@@ -781,15 +781,15 @@ func autoConvert_v1_RoleBindingList_To_authorization_RoleBindingList(in *v1.Role
 }
 
 // Convert_v1_RoleBindingList_To_authorization_RoleBindingList is an autogenerated conversion function.
-func Convert_v1_RoleBindingList_To_authorization_RoleBindingList(in *v1.RoleBindingList, out *authorization.RoleBindingList, s conversion.Scope) error {
+func Convert_v1_RoleBindingList_To_authorization_RoleBindingList(in *authorizationv1.RoleBindingList, out *authorization.RoleBindingList, s conversion.Scope) error {
 	return autoConvert_v1_RoleBindingList_To_authorization_RoleBindingList(in, out, s)
 }
 
-func autoConvert_authorization_RoleBindingList_To_v1_RoleBindingList(in *authorization.RoleBindingList, out *v1.RoleBindingList, s conversion.Scope) error {
+func autoConvert_authorization_RoleBindingList_To_v1_RoleBindingList(in *authorization.RoleBindingList, out *authorizationv1.RoleBindingList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.RoleBinding, len(*in))
+		*out = make([]authorizationv1.RoleBinding, len(*in))
 		for i := range *in {
 			if err := Convert_authorization_RoleBinding_To_v1_RoleBinding(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -802,11 +802,11 @@ func autoConvert_authorization_RoleBindingList_To_v1_RoleBindingList(in *authori
 }
 
 // Convert_authorization_RoleBindingList_To_v1_RoleBindingList is an autogenerated conversion function.
-func Convert_authorization_RoleBindingList_To_v1_RoleBindingList(in *authorization.RoleBindingList, out *v1.RoleBindingList, s conversion.Scope) error {
+func Convert_authorization_RoleBindingList_To_v1_RoleBindingList(in *authorization.RoleBindingList, out *authorizationv1.RoleBindingList, s conversion.Scope) error {
 	return autoConvert_authorization_RoleBindingList_To_v1_RoleBindingList(in, out, s)
 }
 
-func autoConvert_v1_RoleBindingRestriction_To_authorization_RoleBindingRestriction(in *v1.RoleBindingRestriction, out *authorization.RoleBindingRestriction, s conversion.Scope) error {
+func autoConvert_v1_RoleBindingRestriction_To_authorization_RoleBindingRestriction(in *authorizationv1.RoleBindingRestriction, out *authorization.RoleBindingRestriction, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_RoleBindingRestrictionSpec_To_authorization_RoleBindingRestrictionSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -815,11 +815,11 @@ func autoConvert_v1_RoleBindingRestriction_To_authorization_RoleBindingRestricti
 }
 
 // Convert_v1_RoleBindingRestriction_To_authorization_RoleBindingRestriction is an autogenerated conversion function.
-func Convert_v1_RoleBindingRestriction_To_authorization_RoleBindingRestriction(in *v1.RoleBindingRestriction, out *authorization.RoleBindingRestriction, s conversion.Scope) error {
+func Convert_v1_RoleBindingRestriction_To_authorization_RoleBindingRestriction(in *authorizationv1.RoleBindingRestriction, out *authorization.RoleBindingRestriction, s conversion.Scope) error {
 	return autoConvert_v1_RoleBindingRestriction_To_authorization_RoleBindingRestriction(in, out, s)
 }
 
-func autoConvert_authorization_RoleBindingRestriction_To_v1_RoleBindingRestriction(in *authorization.RoleBindingRestriction, out *v1.RoleBindingRestriction, s conversion.Scope) error {
+func autoConvert_authorization_RoleBindingRestriction_To_v1_RoleBindingRestriction(in *authorization.RoleBindingRestriction, out *authorizationv1.RoleBindingRestriction, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_RoleBindingRestrictionSpec_To_v1_RoleBindingRestrictionSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -828,33 +828,33 @@ func autoConvert_authorization_RoleBindingRestriction_To_v1_RoleBindingRestricti
 }
 
 // Convert_authorization_RoleBindingRestriction_To_v1_RoleBindingRestriction is an autogenerated conversion function.
-func Convert_authorization_RoleBindingRestriction_To_v1_RoleBindingRestriction(in *authorization.RoleBindingRestriction, out *v1.RoleBindingRestriction, s conversion.Scope) error {
+func Convert_authorization_RoleBindingRestriction_To_v1_RoleBindingRestriction(in *authorization.RoleBindingRestriction, out *authorizationv1.RoleBindingRestriction, s conversion.Scope) error {
 	return autoConvert_authorization_RoleBindingRestriction_To_v1_RoleBindingRestriction(in, out, s)
 }
 
-func autoConvert_v1_RoleBindingRestrictionList_To_authorization_RoleBindingRestrictionList(in *v1.RoleBindingRestrictionList, out *authorization.RoleBindingRestrictionList, s conversion.Scope) error {
+func autoConvert_v1_RoleBindingRestrictionList_To_authorization_RoleBindingRestrictionList(in *authorizationv1.RoleBindingRestrictionList, out *authorization.RoleBindingRestrictionList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	out.Items = *(*[]authorization.RoleBindingRestriction)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1_RoleBindingRestrictionList_To_authorization_RoleBindingRestrictionList is an autogenerated conversion function.
-func Convert_v1_RoleBindingRestrictionList_To_authorization_RoleBindingRestrictionList(in *v1.RoleBindingRestrictionList, out *authorization.RoleBindingRestrictionList, s conversion.Scope) error {
+func Convert_v1_RoleBindingRestrictionList_To_authorization_RoleBindingRestrictionList(in *authorizationv1.RoleBindingRestrictionList, out *authorization.RoleBindingRestrictionList, s conversion.Scope) error {
 	return autoConvert_v1_RoleBindingRestrictionList_To_authorization_RoleBindingRestrictionList(in, out, s)
 }
 
-func autoConvert_authorization_RoleBindingRestrictionList_To_v1_RoleBindingRestrictionList(in *authorization.RoleBindingRestrictionList, out *v1.RoleBindingRestrictionList, s conversion.Scope) error {
+func autoConvert_authorization_RoleBindingRestrictionList_To_v1_RoleBindingRestrictionList(in *authorization.RoleBindingRestrictionList, out *authorizationv1.RoleBindingRestrictionList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1.RoleBindingRestriction)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]authorizationv1.RoleBindingRestriction)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_authorization_RoleBindingRestrictionList_To_v1_RoleBindingRestrictionList is an autogenerated conversion function.
-func Convert_authorization_RoleBindingRestrictionList_To_v1_RoleBindingRestrictionList(in *authorization.RoleBindingRestrictionList, out *v1.RoleBindingRestrictionList, s conversion.Scope) error {
+func Convert_authorization_RoleBindingRestrictionList_To_v1_RoleBindingRestrictionList(in *authorization.RoleBindingRestrictionList, out *authorizationv1.RoleBindingRestrictionList, s conversion.Scope) error {
 	return autoConvert_authorization_RoleBindingRestrictionList_To_v1_RoleBindingRestrictionList(in, out, s)
 }
 
-func autoConvert_v1_RoleBindingRestrictionSpec_To_authorization_RoleBindingRestrictionSpec(in *v1.RoleBindingRestrictionSpec, out *authorization.RoleBindingRestrictionSpec, s conversion.Scope) error {
+func autoConvert_v1_RoleBindingRestrictionSpec_To_authorization_RoleBindingRestrictionSpec(in *authorizationv1.RoleBindingRestrictionSpec, out *authorization.RoleBindingRestrictionSpec, s conversion.Scope) error {
 	out.UserRestriction = (*authorization.UserRestriction)(unsafe.Pointer(in.UserRestriction))
 	out.GroupRestriction = (*authorization.GroupRestriction)(unsafe.Pointer(in.GroupRestriction))
 	out.ServiceAccountRestriction = (*authorization.ServiceAccountRestriction)(unsafe.Pointer(in.ServiceAccountRestriction))
@@ -862,23 +862,23 @@ func autoConvert_v1_RoleBindingRestrictionSpec_To_authorization_RoleBindingRestr
 }
 
 // Convert_v1_RoleBindingRestrictionSpec_To_authorization_RoleBindingRestrictionSpec is an autogenerated conversion function.
-func Convert_v1_RoleBindingRestrictionSpec_To_authorization_RoleBindingRestrictionSpec(in *v1.RoleBindingRestrictionSpec, out *authorization.RoleBindingRestrictionSpec, s conversion.Scope) error {
+func Convert_v1_RoleBindingRestrictionSpec_To_authorization_RoleBindingRestrictionSpec(in *authorizationv1.RoleBindingRestrictionSpec, out *authorization.RoleBindingRestrictionSpec, s conversion.Scope) error {
 	return autoConvert_v1_RoleBindingRestrictionSpec_To_authorization_RoleBindingRestrictionSpec(in, out, s)
 }
 
-func autoConvert_authorization_RoleBindingRestrictionSpec_To_v1_RoleBindingRestrictionSpec(in *authorization.RoleBindingRestrictionSpec, out *v1.RoleBindingRestrictionSpec, s conversion.Scope) error {
-	out.UserRestriction = (*v1.UserRestriction)(unsafe.Pointer(in.UserRestriction))
-	out.GroupRestriction = (*v1.GroupRestriction)(unsafe.Pointer(in.GroupRestriction))
-	out.ServiceAccountRestriction = (*v1.ServiceAccountRestriction)(unsafe.Pointer(in.ServiceAccountRestriction))
+func autoConvert_authorization_RoleBindingRestrictionSpec_To_v1_RoleBindingRestrictionSpec(in *authorization.RoleBindingRestrictionSpec, out *authorizationv1.RoleBindingRestrictionSpec, s conversion.Scope) error {
+	out.UserRestriction = (*authorizationv1.UserRestriction)(unsafe.Pointer(in.UserRestriction))
+	out.GroupRestriction = (*authorizationv1.GroupRestriction)(unsafe.Pointer(in.GroupRestriction))
+	out.ServiceAccountRestriction = (*authorizationv1.ServiceAccountRestriction)(unsafe.Pointer(in.ServiceAccountRestriction))
 	return nil
 }
 
 // Convert_authorization_RoleBindingRestrictionSpec_To_v1_RoleBindingRestrictionSpec is an autogenerated conversion function.
-func Convert_authorization_RoleBindingRestrictionSpec_To_v1_RoleBindingRestrictionSpec(in *authorization.RoleBindingRestrictionSpec, out *v1.RoleBindingRestrictionSpec, s conversion.Scope) error {
+func Convert_authorization_RoleBindingRestrictionSpec_To_v1_RoleBindingRestrictionSpec(in *authorization.RoleBindingRestrictionSpec, out *authorizationv1.RoleBindingRestrictionSpec, s conversion.Scope) error {
 	return autoConvert_authorization_RoleBindingRestrictionSpec_To_v1_RoleBindingRestrictionSpec(in, out, s)
 }
 
-func autoConvert_v1_RoleList_To_authorization_RoleList(in *v1.RoleList, out *authorization.RoleList, s conversion.Scope) error {
+func autoConvert_v1_RoleList_To_authorization_RoleList(in *authorizationv1.RoleList, out *authorization.RoleList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
@@ -895,15 +895,15 @@ func autoConvert_v1_RoleList_To_authorization_RoleList(in *v1.RoleList, out *aut
 }
 
 // Convert_v1_RoleList_To_authorization_RoleList is an autogenerated conversion function.
-func Convert_v1_RoleList_To_authorization_RoleList(in *v1.RoleList, out *authorization.RoleList, s conversion.Scope) error {
+func Convert_v1_RoleList_To_authorization_RoleList(in *authorizationv1.RoleList, out *authorization.RoleList, s conversion.Scope) error {
 	return autoConvert_v1_RoleList_To_authorization_RoleList(in, out, s)
 }
 
-func autoConvert_authorization_RoleList_To_v1_RoleList(in *authorization.RoleList, out *v1.RoleList, s conversion.Scope) error {
+func autoConvert_authorization_RoleList_To_v1_RoleList(in *authorization.RoleList, out *authorizationv1.RoleList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.Role, len(*in))
+		*out = make([]authorizationv1.Role, len(*in))
 		for i := range *in {
 			if err := Convert_authorization_Role_To_v1_Role(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -916,11 +916,11 @@ func autoConvert_authorization_RoleList_To_v1_RoleList(in *authorization.RoleLis
 }
 
 // Convert_authorization_RoleList_To_v1_RoleList is an autogenerated conversion function.
-func Convert_authorization_RoleList_To_v1_RoleList(in *authorization.RoleList, out *v1.RoleList, s conversion.Scope) error {
+func Convert_authorization_RoleList_To_v1_RoleList(in *authorization.RoleList, out *authorizationv1.RoleList, s conversion.Scope) error {
 	return autoConvert_authorization_RoleList_To_v1_RoleList(in, out, s)
 }
 
-func autoConvert_v1_SelfSubjectRulesReview_To_authorization_SelfSubjectRulesReview(in *v1.SelfSubjectRulesReview, out *authorization.SelfSubjectRulesReview, s conversion.Scope) error {
+func autoConvert_v1_SelfSubjectRulesReview_To_authorization_SelfSubjectRulesReview(in *authorizationv1.SelfSubjectRulesReview, out *authorization.SelfSubjectRulesReview, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_SelfSubjectRulesReviewSpec_To_authorization_SelfSubjectRulesReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -932,11 +932,11 @@ func autoConvert_v1_SelfSubjectRulesReview_To_authorization_SelfSubjectRulesRevi
 }
 
 // Convert_v1_SelfSubjectRulesReview_To_authorization_SelfSubjectRulesReview is an autogenerated conversion function.
-func Convert_v1_SelfSubjectRulesReview_To_authorization_SelfSubjectRulesReview(in *v1.SelfSubjectRulesReview, out *authorization.SelfSubjectRulesReview, s conversion.Scope) error {
+func Convert_v1_SelfSubjectRulesReview_To_authorization_SelfSubjectRulesReview(in *authorizationv1.SelfSubjectRulesReview, out *authorization.SelfSubjectRulesReview, s conversion.Scope) error {
 	return autoConvert_v1_SelfSubjectRulesReview_To_authorization_SelfSubjectRulesReview(in, out, s)
 }
 
-func autoConvert_authorization_SelfSubjectRulesReview_To_v1_SelfSubjectRulesReview(in *authorization.SelfSubjectRulesReview, out *v1.SelfSubjectRulesReview, s conversion.Scope) error {
+func autoConvert_authorization_SelfSubjectRulesReview_To_v1_SelfSubjectRulesReview(in *authorization.SelfSubjectRulesReview, out *authorizationv1.SelfSubjectRulesReview, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_SelfSubjectRulesReviewSpec_To_v1_SelfSubjectRulesReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -948,65 +948,65 @@ func autoConvert_authorization_SelfSubjectRulesReview_To_v1_SelfSubjectRulesRevi
 }
 
 // Convert_authorization_SelfSubjectRulesReview_To_v1_SelfSubjectRulesReview is an autogenerated conversion function.
-func Convert_authorization_SelfSubjectRulesReview_To_v1_SelfSubjectRulesReview(in *authorization.SelfSubjectRulesReview, out *v1.SelfSubjectRulesReview, s conversion.Scope) error {
+func Convert_authorization_SelfSubjectRulesReview_To_v1_SelfSubjectRulesReview(in *authorization.SelfSubjectRulesReview, out *authorizationv1.SelfSubjectRulesReview, s conversion.Scope) error {
 	return autoConvert_authorization_SelfSubjectRulesReview_To_v1_SelfSubjectRulesReview(in, out, s)
 }
 
-func autoConvert_v1_SelfSubjectRulesReviewSpec_To_authorization_SelfSubjectRulesReviewSpec(in *v1.SelfSubjectRulesReviewSpec, out *authorization.SelfSubjectRulesReviewSpec, s conversion.Scope) error {
+func autoConvert_v1_SelfSubjectRulesReviewSpec_To_authorization_SelfSubjectRulesReviewSpec(in *authorizationv1.SelfSubjectRulesReviewSpec, out *authorization.SelfSubjectRulesReviewSpec, s conversion.Scope) error {
 	// INFO: in.Scopes opted out of conversion generation
 	return nil
 }
 
-func autoConvert_authorization_SelfSubjectRulesReviewSpec_To_v1_SelfSubjectRulesReviewSpec(in *authorization.SelfSubjectRulesReviewSpec, out *v1.SelfSubjectRulesReviewSpec, s conversion.Scope) error {
+func autoConvert_authorization_SelfSubjectRulesReviewSpec_To_v1_SelfSubjectRulesReviewSpec(in *authorization.SelfSubjectRulesReviewSpec, out *authorizationv1.SelfSubjectRulesReviewSpec, s conversion.Scope) error {
 	// INFO: in.Scopes opted out of conversion generation
 	return nil
 }
 
-func autoConvert_v1_ServiceAccountReference_To_authorization_ServiceAccountReference(in *v1.ServiceAccountReference, out *authorization.ServiceAccountReference, s conversion.Scope) error {
+func autoConvert_v1_ServiceAccountReference_To_authorization_ServiceAccountReference(in *authorizationv1.ServiceAccountReference, out *authorization.ServiceAccountReference, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Namespace = in.Namespace
 	return nil
 }
 
 // Convert_v1_ServiceAccountReference_To_authorization_ServiceAccountReference is an autogenerated conversion function.
-func Convert_v1_ServiceAccountReference_To_authorization_ServiceAccountReference(in *v1.ServiceAccountReference, out *authorization.ServiceAccountReference, s conversion.Scope) error {
+func Convert_v1_ServiceAccountReference_To_authorization_ServiceAccountReference(in *authorizationv1.ServiceAccountReference, out *authorization.ServiceAccountReference, s conversion.Scope) error {
 	return autoConvert_v1_ServiceAccountReference_To_authorization_ServiceAccountReference(in, out, s)
 }
 
-func autoConvert_authorization_ServiceAccountReference_To_v1_ServiceAccountReference(in *authorization.ServiceAccountReference, out *v1.ServiceAccountReference, s conversion.Scope) error {
+func autoConvert_authorization_ServiceAccountReference_To_v1_ServiceAccountReference(in *authorization.ServiceAccountReference, out *authorizationv1.ServiceAccountReference, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Namespace = in.Namespace
 	return nil
 }
 
 // Convert_authorization_ServiceAccountReference_To_v1_ServiceAccountReference is an autogenerated conversion function.
-func Convert_authorization_ServiceAccountReference_To_v1_ServiceAccountReference(in *authorization.ServiceAccountReference, out *v1.ServiceAccountReference, s conversion.Scope) error {
+func Convert_authorization_ServiceAccountReference_To_v1_ServiceAccountReference(in *authorization.ServiceAccountReference, out *authorizationv1.ServiceAccountReference, s conversion.Scope) error {
 	return autoConvert_authorization_ServiceAccountReference_To_v1_ServiceAccountReference(in, out, s)
 }
 
-func autoConvert_v1_ServiceAccountRestriction_To_authorization_ServiceAccountRestriction(in *v1.ServiceAccountRestriction, out *authorization.ServiceAccountRestriction, s conversion.Scope) error {
+func autoConvert_v1_ServiceAccountRestriction_To_authorization_ServiceAccountRestriction(in *authorizationv1.ServiceAccountRestriction, out *authorization.ServiceAccountRestriction, s conversion.Scope) error {
 	out.ServiceAccounts = *(*[]authorization.ServiceAccountReference)(unsafe.Pointer(&in.ServiceAccounts))
 	out.Namespaces = *(*[]string)(unsafe.Pointer(&in.Namespaces))
 	return nil
 }
 
 // Convert_v1_ServiceAccountRestriction_To_authorization_ServiceAccountRestriction is an autogenerated conversion function.
-func Convert_v1_ServiceAccountRestriction_To_authorization_ServiceAccountRestriction(in *v1.ServiceAccountRestriction, out *authorization.ServiceAccountRestriction, s conversion.Scope) error {
+func Convert_v1_ServiceAccountRestriction_To_authorization_ServiceAccountRestriction(in *authorizationv1.ServiceAccountRestriction, out *authorization.ServiceAccountRestriction, s conversion.Scope) error {
 	return autoConvert_v1_ServiceAccountRestriction_To_authorization_ServiceAccountRestriction(in, out, s)
 }
 
-func autoConvert_authorization_ServiceAccountRestriction_To_v1_ServiceAccountRestriction(in *authorization.ServiceAccountRestriction, out *v1.ServiceAccountRestriction, s conversion.Scope) error {
-	out.ServiceAccounts = *(*[]v1.ServiceAccountReference)(unsafe.Pointer(&in.ServiceAccounts))
+func autoConvert_authorization_ServiceAccountRestriction_To_v1_ServiceAccountRestriction(in *authorization.ServiceAccountRestriction, out *authorizationv1.ServiceAccountRestriction, s conversion.Scope) error {
+	out.ServiceAccounts = *(*[]authorizationv1.ServiceAccountReference)(unsafe.Pointer(&in.ServiceAccounts))
 	out.Namespaces = *(*[]string)(unsafe.Pointer(&in.Namespaces))
 	return nil
 }
 
 // Convert_authorization_ServiceAccountRestriction_To_v1_ServiceAccountRestriction is an autogenerated conversion function.
-func Convert_authorization_ServiceAccountRestriction_To_v1_ServiceAccountRestriction(in *authorization.ServiceAccountRestriction, out *v1.ServiceAccountRestriction, s conversion.Scope) error {
+func Convert_authorization_ServiceAccountRestriction_To_v1_ServiceAccountRestriction(in *authorization.ServiceAccountRestriction, out *authorizationv1.ServiceAccountRestriction, s conversion.Scope) error {
 	return autoConvert_authorization_ServiceAccountRestriction_To_v1_ServiceAccountRestriction(in, out, s)
 }
 
-func autoConvert_v1_SubjectAccessReview_To_authorization_SubjectAccessReview(in *v1.SubjectAccessReview, out *authorization.SubjectAccessReview, s conversion.Scope) error {
+func autoConvert_v1_SubjectAccessReview_To_authorization_SubjectAccessReview(in *authorizationv1.SubjectAccessReview, out *authorization.SubjectAccessReview, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_Action_To_authorization_Action(&in.Action, &out.Action, s); err != nil {
 		return err
@@ -1017,7 +1017,7 @@ func autoConvert_v1_SubjectAccessReview_To_authorization_SubjectAccessReview(in 
 	return nil
 }
 
-func autoConvert_authorization_SubjectAccessReview_To_v1_SubjectAccessReview(in *authorization.SubjectAccessReview, out *v1.SubjectAccessReview, s conversion.Scope) error {
+func autoConvert_authorization_SubjectAccessReview_To_v1_SubjectAccessReview(in *authorization.SubjectAccessReview, out *authorizationv1.SubjectAccessReview, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_Action_To_v1_Action(&in.Action, &out.Action, s); err != nil {
 		return err
@@ -1028,7 +1028,7 @@ func autoConvert_authorization_SubjectAccessReview_To_v1_SubjectAccessReview(in 
 	return nil
 }
 
-func autoConvert_v1_SubjectAccessReviewResponse_To_authorization_SubjectAccessReviewResponse(in *v1.SubjectAccessReviewResponse, out *authorization.SubjectAccessReviewResponse, s conversion.Scope) error {
+func autoConvert_v1_SubjectAccessReviewResponse_To_authorization_SubjectAccessReviewResponse(in *authorizationv1.SubjectAccessReviewResponse, out *authorization.SubjectAccessReviewResponse, s conversion.Scope) error {
 	out.Namespace = in.Namespace
 	out.Allowed = in.Allowed
 	out.Reason = in.Reason
@@ -1037,11 +1037,11 @@ func autoConvert_v1_SubjectAccessReviewResponse_To_authorization_SubjectAccessRe
 }
 
 // Convert_v1_SubjectAccessReviewResponse_To_authorization_SubjectAccessReviewResponse is an autogenerated conversion function.
-func Convert_v1_SubjectAccessReviewResponse_To_authorization_SubjectAccessReviewResponse(in *v1.SubjectAccessReviewResponse, out *authorization.SubjectAccessReviewResponse, s conversion.Scope) error {
+func Convert_v1_SubjectAccessReviewResponse_To_authorization_SubjectAccessReviewResponse(in *authorizationv1.SubjectAccessReviewResponse, out *authorization.SubjectAccessReviewResponse, s conversion.Scope) error {
 	return autoConvert_v1_SubjectAccessReviewResponse_To_authorization_SubjectAccessReviewResponse(in, out, s)
 }
 
-func autoConvert_authorization_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse(in *authorization.SubjectAccessReviewResponse, out *v1.SubjectAccessReviewResponse, s conversion.Scope) error {
+func autoConvert_authorization_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse(in *authorization.SubjectAccessReviewResponse, out *authorizationv1.SubjectAccessReviewResponse, s conversion.Scope) error {
 	out.Namespace = in.Namespace
 	out.Allowed = in.Allowed
 	out.Reason = in.Reason
@@ -1050,11 +1050,11 @@ func autoConvert_authorization_SubjectAccessReviewResponse_To_v1_SubjectAccessRe
 }
 
 // Convert_authorization_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse is an autogenerated conversion function.
-func Convert_authorization_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse(in *authorization.SubjectAccessReviewResponse, out *v1.SubjectAccessReviewResponse, s conversion.Scope) error {
+func Convert_authorization_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse(in *authorization.SubjectAccessReviewResponse, out *authorizationv1.SubjectAccessReviewResponse, s conversion.Scope) error {
 	return autoConvert_authorization_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse(in, out, s)
 }
 
-func autoConvert_v1_SubjectRulesReview_To_authorization_SubjectRulesReview(in *v1.SubjectRulesReview, out *authorization.SubjectRulesReview, s conversion.Scope) error {
+func autoConvert_v1_SubjectRulesReview_To_authorization_SubjectRulesReview(in *authorizationv1.SubjectRulesReview, out *authorization.SubjectRulesReview, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -1066,11 +1066,11 @@ func autoConvert_v1_SubjectRulesReview_To_authorization_SubjectRulesReview(in *v
 }
 
 // Convert_v1_SubjectRulesReview_To_authorization_SubjectRulesReview is an autogenerated conversion function.
-func Convert_v1_SubjectRulesReview_To_authorization_SubjectRulesReview(in *v1.SubjectRulesReview, out *authorization.SubjectRulesReview, s conversion.Scope) error {
+func Convert_v1_SubjectRulesReview_To_authorization_SubjectRulesReview(in *authorizationv1.SubjectRulesReview, out *authorization.SubjectRulesReview, s conversion.Scope) error {
 	return autoConvert_v1_SubjectRulesReview_To_authorization_SubjectRulesReview(in, out, s)
 }
 
-func autoConvert_authorization_SubjectRulesReview_To_v1_SubjectRulesReview(in *authorization.SubjectRulesReview, out *v1.SubjectRulesReview, s conversion.Scope) error {
+func autoConvert_authorization_SubjectRulesReview_To_v1_SubjectRulesReview(in *authorization.SubjectRulesReview, out *authorizationv1.SubjectRulesReview, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_authorization_SubjectRulesReviewSpec_To_v1_SubjectRulesReviewSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -1082,11 +1082,11 @@ func autoConvert_authorization_SubjectRulesReview_To_v1_SubjectRulesReview(in *a
 }
 
 // Convert_authorization_SubjectRulesReview_To_v1_SubjectRulesReview is an autogenerated conversion function.
-func Convert_authorization_SubjectRulesReview_To_v1_SubjectRulesReview(in *authorization.SubjectRulesReview, out *v1.SubjectRulesReview, s conversion.Scope) error {
+func Convert_authorization_SubjectRulesReview_To_v1_SubjectRulesReview(in *authorization.SubjectRulesReview, out *authorizationv1.SubjectRulesReview, s conversion.Scope) error {
 	return autoConvert_authorization_SubjectRulesReview_To_v1_SubjectRulesReview(in, out, s)
 }
 
-func autoConvert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSpec(in *v1.SubjectRulesReviewSpec, out *authorization.SubjectRulesReviewSpec, s conversion.Scope) error {
+func autoConvert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSpec(in *authorizationv1.SubjectRulesReviewSpec, out *authorization.SubjectRulesReviewSpec, s conversion.Scope) error {
 	out.User = in.User
 	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
 	out.Scopes = *(*[]string)(unsafe.Pointer(&in.Scopes))
@@ -1094,23 +1094,23 @@ func autoConvert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSp
 }
 
 // Convert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSpec is an autogenerated conversion function.
-func Convert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSpec(in *v1.SubjectRulesReviewSpec, out *authorization.SubjectRulesReviewSpec, s conversion.Scope) error {
+func Convert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSpec(in *authorizationv1.SubjectRulesReviewSpec, out *authorization.SubjectRulesReviewSpec, s conversion.Scope) error {
 	return autoConvert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSpec(in, out, s)
 }
 
-func autoConvert_authorization_SubjectRulesReviewSpec_To_v1_SubjectRulesReviewSpec(in *authorization.SubjectRulesReviewSpec, out *v1.SubjectRulesReviewSpec, s conversion.Scope) error {
+func autoConvert_authorization_SubjectRulesReviewSpec_To_v1_SubjectRulesReviewSpec(in *authorization.SubjectRulesReviewSpec, out *authorizationv1.SubjectRulesReviewSpec, s conversion.Scope) error {
 	out.User = in.User
 	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
-	out.Scopes = *(*v1.OptionalScopes)(unsafe.Pointer(&in.Scopes))
+	out.Scopes = *(*authorizationv1.OptionalScopes)(unsafe.Pointer(&in.Scopes))
 	return nil
 }
 
 // Convert_authorization_SubjectRulesReviewSpec_To_v1_SubjectRulesReviewSpec is an autogenerated conversion function.
-func Convert_authorization_SubjectRulesReviewSpec_To_v1_SubjectRulesReviewSpec(in *authorization.SubjectRulesReviewSpec, out *v1.SubjectRulesReviewSpec, s conversion.Scope) error {
+func Convert_authorization_SubjectRulesReviewSpec_To_v1_SubjectRulesReviewSpec(in *authorization.SubjectRulesReviewSpec, out *authorizationv1.SubjectRulesReviewSpec, s conversion.Scope) error {
 	return autoConvert_authorization_SubjectRulesReviewSpec_To_v1_SubjectRulesReviewSpec(in, out, s)
 }
 
-func autoConvert_v1_SubjectRulesReviewStatus_To_authorization_SubjectRulesReviewStatus(in *v1.SubjectRulesReviewStatus, out *authorization.SubjectRulesReviewStatus, s conversion.Scope) error {
+func autoConvert_v1_SubjectRulesReviewStatus_To_authorization_SubjectRulesReviewStatus(in *authorizationv1.SubjectRulesReviewStatus, out *authorization.SubjectRulesReviewStatus, s conversion.Scope) error {
 	if in.Rules != nil {
 		in, out := &in.Rules, &out.Rules
 		*out = make([]authorization.PolicyRule, len(*in))
@@ -1127,14 +1127,14 @@ func autoConvert_v1_SubjectRulesReviewStatus_To_authorization_SubjectRulesReview
 }
 
 // Convert_v1_SubjectRulesReviewStatus_To_authorization_SubjectRulesReviewStatus is an autogenerated conversion function.
-func Convert_v1_SubjectRulesReviewStatus_To_authorization_SubjectRulesReviewStatus(in *v1.SubjectRulesReviewStatus, out *authorization.SubjectRulesReviewStatus, s conversion.Scope) error {
+func Convert_v1_SubjectRulesReviewStatus_To_authorization_SubjectRulesReviewStatus(in *authorizationv1.SubjectRulesReviewStatus, out *authorization.SubjectRulesReviewStatus, s conversion.Scope) error {
 	return autoConvert_v1_SubjectRulesReviewStatus_To_authorization_SubjectRulesReviewStatus(in, out, s)
 }
 
-func autoConvert_authorization_SubjectRulesReviewStatus_To_v1_SubjectRulesReviewStatus(in *authorization.SubjectRulesReviewStatus, out *v1.SubjectRulesReviewStatus, s conversion.Scope) error {
+func autoConvert_authorization_SubjectRulesReviewStatus_To_v1_SubjectRulesReviewStatus(in *authorization.SubjectRulesReviewStatus, out *authorizationv1.SubjectRulesReviewStatus, s conversion.Scope) error {
 	if in.Rules != nil {
 		in, out := &in.Rules, &out.Rules
-		*out = make([]v1.PolicyRule, len(*in))
+		*out = make([]authorizationv1.PolicyRule, len(*in))
 		for i := range *in {
 			if err := Convert_authorization_PolicyRule_To_v1_PolicyRule(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -1148,11 +1148,11 @@ func autoConvert_authorization_SubjectRulesReviewStatus_To_v1_SubjectRulesReview
 }
 
 // Convert_authorization_SubjectRulesReviewStatus_To_v1_SubjectRulesReviewStatus is an autogenerated conversion function.
-func Convert_authorization_SubjectRulesReviewStatus_To_v1_SubjectRulesReviewStatus(in *authorization.SubjectRulesReviewStatus, out *v1.SubjectRulesReviewStatus, s conversion.Scope) error {
+func Convert_authorization_SubjectRulesReviewStatus_To_v1_SubjectRulesReviewStatus(in *authorization.SubjectRulesReviewStatus, out *authorizationv1.SubjectRulesReviewStatus, s conversion.Scope) error {
 	return autoConvert_authorization_SubjectRulesReviewStatus_To_v1_SubjectRulesReviewStatus(in, out, s)
 }
 
-func autoConvert_v1_UserRestriction_To_authorization_UserRestriction(in *v1.UserRestriction, out *authorization.UserRestriction, s conversion.Scope) error {
+func autoConvert_v1_UserRestriction_To_authorization_UserRestriction(in *authorizationv1.UserRestriction, out *authorization.UserRestriction, s conversion.Scope) error {
 	out.Users = *(*[]string)(unsafe.Pointer(&in.Users))
 	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
 	out.Selectors = *(*[]metav1.LabelSelector)(unsafe.Pointer(&in.Selectors))
@@ -1160,11 +1160,11 @@ func autoConvert_v1_UserRestriction_To_authorization_UserRestriction(in *v1.User
 }
 
 // Convert_v1_UserRestriction_To_authorization_UserRestriction is an autogenerated conversion function.
-func Convert_v1_UserRestriction_To_authorization_UserRestriction(in *v1.UserRestriction, out *authorization.UserRestriction, s conversion.Scope) error {
+func Convert_v1_UserRestriction_To_authorization_UserRestriction(in *authorizationv1.UserRestriction, out *authorization.UserRestriction, s conversion.Scope) error {
 	return autoConvert_v1_UserRestriction_To_authorization_UserRestriction(in, out, s)
 }
 
-func autoConvert_authorization_UserRestriction_To_v1_UserRestriction(in *authorization.UserRestriction, out *v1.UserRestriction, s conversion.Scope) error {
+func autoConvert_authorization_UserRestriction_To_v1_UserRestriction(in *authorization.UserRestriction, out *authorizationv1.UserRestriction, s conversion.Scope) error {
 	out.Users = *(*[]string)(unsafe.Pointer(&in.Users))
 	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
 	out.Selectors = *(*[]metav1.LabelSelector)(unsafe.Pointer(&in.Selectors))
@@ -1172,6 +1172,6 @@ func autoConvert_authorization_UserRestriction_To_v1_UserRestriction(in *authori
 }
 
 // Convert_authorization_UserRestriction_To_v1_UserRestriction is an autogenerated conversion function.
-func Convert_authorization_UserRestriction_To_v1_UserRestriction(in *authorization.UserRestriction, out *v1.UserRestriction, s conversion.Scope) error {
+func Convert_authorization_UserRestriction_To_v1_UserRestriction(in *authorization.UserRestriction, out *authorizationv1.UserRestriction, s conversion.Scope) error {
 	return autoConvert_authorization_UserRestriction_To_v1_UserRestriction(in, out, s)
 }
