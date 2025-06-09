@@ -9,7 +9,7 @@ import (
 	"k8s.io/klog/v2"
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
+	internalimageutil "github.com/openshift/openshift-apiserver/pkg/image/apiserver/internal/imageutil"
 )
 
 type cachedImageCreater struct {

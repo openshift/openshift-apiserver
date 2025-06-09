@@ -1,4 +1,4 @@
-package internalimageutil
+package imageutil
 
 import (
 	"reflect"

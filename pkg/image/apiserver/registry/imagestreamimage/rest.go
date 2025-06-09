@@ -15,7 +15,7 @@ import (
 	"github.com/openshift/library-go/pkg/image/imageutil"
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
+	internalimageutil "github.com/openshift/openshift-apiserver/pkg/image/apiserver/internal/imageutil"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
 	imageprinters "github.com/openshift/openshift-apiserver/pkg/image/printers/internalversion"
