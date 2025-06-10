@@ -3,11 +3,13 @@ package proxy
 import (
 	"context"
 	"fmt"
+	"time"
 
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metainternal "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -208,11 +210,66 @@ func (s *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 
 var _ = rest.GracefulDeleter(&REST{})
 
+// maxRetriesOnConflict is the maximum retry count for Delete calls which
+// result in resource conflicts.
+const maxRetriesOnConflict = 10
+
+// maxDuration set max duration of delete retries. Deleting a project affects apiserver latency,
+// so this should be kept as small as possible
+const maxDuration = time.Second
+
 // Delete deletes a Project specified by its name
 func (s *REST) Delete(ctx context.Context, name string, objectFunc rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
 	var opts metav1.DeleteOptions
 	if options != nil {
 		opts = *options
 	}
-	return &metav1.Status{Status: metav1.StatusSuccess}, false, s.client.Delete(ctx, name, opts)
+	var lastErr error
+	err := wait.ExponentialBackoffWithContext(ctx, wait.Backoff{Steps: maxRetriesOnConflict, Duration: maxDuration}, func(ctx context.Context) (bool, error) {
+		var err error
+		if objectFunc != nil {
+			var obj runtime.Object
+			obj, err = s.Get(ctx, name, &metav1.GetOptions{})
+			if err != nil {
+				lastErr = fmt.Errorf("unable to get project: %w", err)
+				return false, nil
+			}
+			projectObj, ok := obj.(*projectapi.Project)
+			if !ok || projectObj == nil {
+				lastErr = fmt.Errorf("not a project: %#v", obj)
+				return false, nil
+			}
+
+			// Make sure the object hasn't changed between Get and Delete - pass UID and RV to delete options
+			// unless Precondition is already set
+			if opts.Preconditions == nil {
+				opts.Preconditions = &metav1.Preconditions{}
+			}
+			if opts.Preconditions.UID == nil {
+				opts.Preconditions.UID = &projectObj.UID
+			}
+			if opts.Preconditions.ResourceVersion == nil {
+				opts.Preconditions.ResourceVersion = &projectObj.ResourceVersion
+			}
+
+			if err := objectFunc(ctx, obj); err != nil {
+				lastErr = fmt.Errorf("validation func failed: %w", err)
+				return false, nil
+			}
+		}
+		err = s.client.Delete(ctx, name, opts)
+		switch {
+		case err == nil:
+			return true, nil
+		case kerrors.IsConflict(err):
+			lastErr = err
+			return false, nil
+		default:
+			return false, err
+		}
+	})
+	if err != nil && wait.Interrupted(err) {
+		return &metav1.Status{Status: metav1.StatusFailure}, false, lastErr
+	}
+	return &metav1.Status{Status: metav1.StatusSuccess}, false, nil
 }
