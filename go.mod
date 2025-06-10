@@ -1,6 +1,6 @@
 module github.com/openshift/openshift-apiserver
 
-go 1.22
+go 1.22.0
 
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
@@ -20,7 +20,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.0-rc2
 	github.com/openshift/api v0.0.0-20240425081546-8203151f085f
 	github.com/openshift/apiserver-library-go v0.0.0-20240313131158-facc40cc7688
-	github.com/openshift/build-machinery-go v0.0.0-20231128094528-1e9b1b0595c8
+	github.com/openshift/build-machinery-go v0.0.0-20250602125535-1b6d00b8c37c
 	github.com/openshift/client-go v0.0.0-20240415214935-be70f772f157
 	github.com/openshift/library-go v0.0.0-20240513090140-e22d25af5587
 	github.com/openshift/runtime-utils v0.0.0-20230921210328-7bdb5b9c177b
