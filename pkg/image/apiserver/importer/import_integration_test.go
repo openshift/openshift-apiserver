@@ -94,10 +94,11 @@ func TestImageStreamImportQuayIO(t *testing.T) {
 	importCtx := importer.NewStaticCredentialsContext(rt, nil, nil)
 
 	repositoryName := quayRegistryName + "/coreos/etcd"
+	tag := "v3.4.37"
 	imports := &imageapi.ImageStreamImport{
 		Spec: imageapi.ImageStreamImportSpec{
 			Images: []imageapi.ImageImportSpec{
-				{From: kapi.ObjectReference{Kind: "DockerImage", Name: repositoryName}},
+				{From: kapi.ObjectReference{Kind: "DockerImage", Name: fmt.Sprintf("%s:%s", repositoryName, tag)}},
 			},
 		},
 	}
