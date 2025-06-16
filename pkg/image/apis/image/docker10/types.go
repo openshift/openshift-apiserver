@@ -28,13 +28,6 @@ type DockerImageManifest struct {
 	SchemaVersion int    `json:"schemaVersion"`
 	MediaType     string `json:"mediaType,omitempty"`
 
-	// schema1
-	Name         string          `json:"name"`
-	Tag          string          `json:"tag"`
-	Architecture string          `json:"architecture"`
-	FSLayers     []DockerFSLayer `json:"fsLayers"`
-	History      []DockerHistory `json:"history"`
-
 	// schema2
 	Layers []Descriptor `json:"layers"`
 	Config Descriptor   `json:"config"`
