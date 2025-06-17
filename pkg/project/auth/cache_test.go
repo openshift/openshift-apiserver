@@ -337,13 +337,6 @@ func TestRoleBindingRemovalNotifiesWatchers(t *testing.T) {
 
 	// simulate removal of all role bindings
 	reviewer.expectedResults["foo"] = &mockReview{users: []string{}, groups: []string{}}
-	// force update
-	rvInt, err := strconv.Atoi(namespace.ResourceVersion)
-	if err != nil {
-		t.Fatalf("failed to parse resource version: %v", err)
-	}
-	namespace.ResourceVersion = strconv.Itoa(rvInt + 1)
-	nsIndexer.Add(&namespace)
 
 	// sync again
 	authCache.synchronize()

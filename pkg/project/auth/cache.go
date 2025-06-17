@@ -545,6 +545,13 @@ func skipReview(request *reviewRequest, lastKnownValue *reviewRecord) bool {
 		return false
 	}
 
+	// if the request has no role binding or role information but we previously had subjects, force review to detect removals
+	if len(request.roleBindingUIDToResourceVersion) == 0 && len(request.roleUIDToResourceVersion) == 0 {
+		if len(lastKnownValue.users) > 0 || len(lastKnownValue.groups) > 0 {
+			return false
+		}
+	}
+
 	// if you see a new role binding, or a newer version, we need to do a review
 	for k, v := range request.roleBindingUIDToResourceVersion {
 		oldValue, exists := lastKnownValue.roleBindingUIDToResourceVersion[k]
@@ -560,6 +567,21 @@ func skipReview(request *reviewRequest, lastKnownValue *reviewRecord) bool {
 			return false
 		}
 	}
+
+	// if you see a role binding that was previously known but is no longer in the request, we need to do a review
+	for oldUID := range lastKnownValue.roleBindingUIDToResourceVersion {
+		if _, exists := request.roleBindingUIDToResourceVersion[oldUID]; !exists {
+			return false
+		}
+	}
+
+	// if you see a role that was previously known but is no longer in the request, we need to do a review
+	for oldUID := range lastKnownValue.roleUIDToResourceVersion {
+		if _, exists := request.roleUIDToResourceVersion[oldUID]; !exists {
+			return false
+		}
+	}
+
 	return true
 }
 
