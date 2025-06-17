@@ -141,6 +141,7 @@ func (w *userProjectWatcher) GroupMembershipChanged(namespaceName string, users,
 		}:
 		default:
 			// remove the watcher so that we wont' be notified again and block
+			panic("would deadlock")
 			w.authCache.RemoveWatcher(w)
 			w.cacheError <- errors.New("delete notification timeout")
 		}
@@ -176,6 +177,7 @@ func (w *userProjectWatcher) GroupMembershipChanged(namespaceName string, users,
 		case w.cacheIncoming <- event:
 		default:
 			// remove the watcher so that we won't be notified again and block
+			panic("would deadlock")
 			w.authCache.RemoveWatcher(w)
 			w.cacheError <- errors.New("add notification timeout")
 		}
