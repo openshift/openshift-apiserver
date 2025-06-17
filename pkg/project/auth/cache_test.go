@@ -296,7 +296,7 @@ func (tw *testWatcher) GroupMembershipChanged(namespaceName string, users, group
 	}{namespaceName, users, groups})
 }
 
-// TestRoleBindingRemovalNotifiesWatchers checks that when role bindings are removed during auth cache synchronization, watchers receive deleted notifications
+// TestRoleBindingRemovalNotifiesWatchers checks that when role bindings are removed, watchers receive deleted notifications
 func TestRoleBindingRemovalNotifiesWatchers(t *testing.T) {
 	namespace := corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "foo", ResourceVersion: "1"}}
 
@@ -307,7 +307,7 @@ func TestRoleBindingRemovalNotifiesWatchers(t *testing.T) {
 	nsIndexer.Add(&namespace)
 	nsLister := corev1listers.NewNamespaceLister(nsIndexer)
 
-	// initial reviewer grants access to user alice\
+	// initial reviewer grants access to user alice
 	reviewer := &mockReviewer{expectedResults: map[string]*mockReview{
 		"foo": {users: []string{alice.GetName()}, groups: []string{}},
 	}}
