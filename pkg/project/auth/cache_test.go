@@ -279,3 +279,87 @@ func TestInvalidateCache(t *testing.T) {
 		})
 	}
 }
+
+type testWatcher struct {
+	events []struct {
+		namespace string
+		users     sets.String
+		groups    sets.String
+	}
+}
+
+func (tw *testWatcher) GroupMembershipChanged(namespaceName string, users, groups sets.String) {
+	tw.events = append(tw.events, struct {
+		namespace string
+		users     sets.String
+		groups    sets.String
+	}{namespaceName, users, groups})
+}
+
+// TestRoleBindingRemovalNotifiesWatchers checks that when role bindings are removed during auth cache synchronization, watchers receive deleted notifications
+func TestRoleBindingRemovalNotifiesWatchers(t *testing.T) {
+	namespace := corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "foo", ResourceVersion: "1"}}
+
+	mockKubeClient := fake.NewSimpleClientset(&corev1.NamespaceList{Items: []corev1.Namespace{namespace}})
+	informers := informers.NewSharedInformerFactory(mockKubeClient, controller.NoResyncPeriodFunc())
+
+	nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+	nsIndexer.Add(&namespace)
+	nsLister := corev1listers.NewNamespaceLister(nsIndexer)
+
+	// initial reviewer grants access to user alice\
+	reviewer := &mockReviewer{expectedResults: map[string]*mockReview{
+		"foo": {users: []string{alice.GetName()}, groups: []string{}},
+	}}
+
+	authCache := NewAuthorizationCache(nsLister, informers.Core().V1().Namespaces().Informer(), reviewer, informers.Rbac().V1())
+	watcher := &testWatcher{}
+	authCache.AddWatcher(watcher)
+
+	// initial sync to populate the cache
+	authCache.synchronize()
+
+	// expect a single notification for namespace "foo" with user alice
+	if len(watcher.events) != 1 {
+		t.Fatalf("expected 1 event, got %d", len(watcher.events))
+	}
+
+	ev := watcher.events[0]
+	if ev.namespace != "foo" {
+		t.Errorf("expected namespace 'foo', got '%s'", ev.namespace)
+	}
+	if ev.users.Len() != 1 || !ev.users.Has(alice.GetName()) {
+		t.Errorf("expected user 'Alice', got %v", ev.users.List())
+	}
+
+	// clear events
+	watcher.events = nil
+
+	// simulate removal of all role bindings
+	reviewer.expectedResults["foo"] = &mockReview{users: []string{}, groups: []string{}}
+	// force update
+	rvInt, err := strconv.Atoi(namespace.ResourceVersion)
+	if err != nil {
+		t.Fatalf("failed to parse resource version: %v", err)
+	}
+	namespace.ResourceVersion = strconv.Itoa(rvInt + 1)
+	nsIndexer.Add(&namespace)
+
+	// sync again
+	authCache.synchronize()
+
+	// expect a single notification for namespace "foo" with no users or groups
+	if len(watcher.events) != 1 {
+		t.Fatalf("expected 1 event, got %d", len(watcher.events))
+	}
+	ev = watcher.events[0]
+	if ev.namespace != "foo" {
+		t.Errorf("expected namespace 'foo', got '%s'", ev.namespace)
+	}
+	if ev.users.Len() != 0 {
+		t.Errorf("expected no users, got %v", ev.users.List())
+	}
+	if ev.groups.Len() != 0 {
+		t.Errorf("expected no groups, got %v", ev.groups.List())
+	}
+}
