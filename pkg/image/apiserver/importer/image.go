@@ -6,7 +6,6 @@ import (
 
 	"github.com/distribution/distribution/v3"
 	"github.com/distribution/distribution/v3/manifest/manifestlist"
-	"github.com/distribution/distribution/v3/manifest/schema1"
 	"github.com/distribution/distribution/v3/registry/api/errcode"
 	godigest "github.com/opencontainers/go-digest"
 
@@ -17,41 +16,6 @@ import (
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	imagedockerpre012 "github.com/openshift/openshift-apiserver/pkg/image/apis/image/dockerpre012"
 )
-
-func schema1ToImage(manifest *schema1.SignedManifest, d godigest.Digest) (*imageapi.Image, error) {
-	if len(manifest.History) == 0 {
-		return nil, fmt.Errorf("image has no v1Compatibility history and cannot be used")
-	}
-	dockerImage, err := unmarshalDockerImage([]byte(manifest.History[0].V1Compatibility))
-	if err != nil {
-		return nil, err
-	}
-	mediatype, payload, err := manifest.Payload()
-	if err != nil {
-		return nil, err
-	}
-
-	if len(manifest.Canonical) == 0 {
-		return nil, fmt.Errorf("unable to load canonical representation from schema1 manifest")
-	}
-	payloadDigest := godigest.FromBytes(manifest.Canonical)
-	if len(d) > 0 && payloadDigest != d {
-		return nil, fmt.Errorf("content integrity error: the schema 1 manifest retrieved with digest %s does not match the digest calculated from the content %s", d, payloadDigest)
-	}
-	dockerImage.ID = payloadDigest.String()
-
-	image := &imageapi.Image{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: dockerImage.ID,
-		},
-		DockerImageMetadata:          *dockerImage,
-		DockerImageManifest:          string(payload),
-		DockerImageManifestMediaType: mediatype,
-		DockerImageMetadataVersion:   "1.0",
-	}
-
-	return image, nil
-}
 
 // schema2OrOCIToImage converts a docker schema 2 or an oci schema manifest into an Image.
 func schema2OrOCIToImage(manifest distribution.Manifest, imageConfig []byte, d godigest.Digest) (*imageapi.Image, error) {
