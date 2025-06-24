@@ -29,7 +29,7 @@ import (
 
 type ExtraConfig struct {
 	KubeAPIServerClientConfig *restclient.Config
-	ProjectAuthorizationCache *projectauth.AuthorizationCache
+	ProjectAuthorizationCache projectauth.AuthorizationCache
 	ProjectCache              *projectcache.ProjectCache
 	ProjectRequestTemplate    string
 	ProjectRequestMessage     string

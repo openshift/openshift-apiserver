@@ -93,7 +93,7 @@ type OpenshiftAPIExtraConfig struct {
 	RouteAllocator                 *routehostassignment.SimpleAllocationPlugin
 	AllowRouteExternalCertificates bool
 
-	ProjectAuthorizationCache *projectauth.AuthorizationCache
+	ProjectAuthorizationCache projectauth.AuthorizationCache
 	ProjectCache              *projectcache.ProjectCache
 	ProjectRequestTemplate    string
 	ProjectRequestMessage     string

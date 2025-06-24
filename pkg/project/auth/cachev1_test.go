@@ -129,7 +129,7 @@ func TestSyncNamespace(t *testing.T) {
 	nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
 	nsLister := corev1listers.NewNamespaceLister(nsIndexer)
 
-	authorizationCache := NewAuthorizationCache(
+	authorizationCache := NewAuthorizationCacheV1(
 		nsLister,
 		informers.Core().V1().Namespaces().Informer(),
 		reviewer,
@@ -253,7 +253,7 @@ func TestInvalidateCache(t *testing.T) {
 			crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
 			crbs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
 
-			ac := &AuthorizationCache{
+			ac := &AuthorizationCacheV1{
 				clusterRoleLister:        syncedClusterRoleLister{ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs)},
 				clusterRoleBindingLister: syncedClusterRoleBindingLister{ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs)},
 			}

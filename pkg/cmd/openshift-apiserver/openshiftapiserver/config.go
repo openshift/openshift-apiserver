@@ -236,11 +236,14 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	}
 
 	subjectLocator := NewSubjectLocator(informers.GetKubernetesInformers().Rbac().V1())
-	projectAuthorizationCache := NewProjectAuthorizationCache(
+	projectAuthorizationCache, err := NewProjectAuthorizationCache(
 		subjectLocator,
 		informers.GetKubernetesInformers().Core().V1().Namespaces(),
 		informers.GetKubernetesInformers().Rbac().V1(),
 	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create project authorization cache: %v", err)
+	}
 
 	routeAllocator, err := routehostassignment.NewSimpleAllocationPlugin(config.RoutingConfig.Subdomain)
 	if err != nil {
