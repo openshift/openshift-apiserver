@@ -663,7 +663,7 @@ func TestConcurrentAccessV2(t *testing.T) {
 
 			for j := 0; j < numOperationsPerGoroutine; j++ {
 				operationType := j % 3
-				
+
 				// Simulate some work
 				// 1/3 will be list operations, 1/3 will update a cluster role, and 1/3 will update a role binding
 				// should exercise both full sync and namespace-specific changes.
