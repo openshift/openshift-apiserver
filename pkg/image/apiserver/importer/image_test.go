@@ -15,7 +15,7 @@ func TestManifestListToImageConversion(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	image, err := manifestListToImage(manifestList, "sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41")
+	image, err := manifestToImage(manifestList, "sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41")
 	if err != nil {
 		t.Fatal(err)
 	}
