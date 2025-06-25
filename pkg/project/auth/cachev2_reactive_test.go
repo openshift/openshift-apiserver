@@ -126,7 +126,7 @@ func TestReactiveCacheV2_EventProcessing(t *testing.T) {
 	reactiveCache.debounceLock.Unlock()
 
 	// Wait for debounce & sync to complete
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(250 * time.Millisecond)
 
 	reactiveCache.debounceLock.Lock()
 	if reactiveCache.isGlobalSyncPending {
@@ -159,7 +159,7 @@ func TestReactiveCacheV2_WatcherNotifications(t *testing.T) {
 	defer reactiveCache.Stop()
 
 	// initial sync
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(200 * time.Millisecond)
 
 	reactiveCache.AddWatcher(watcher)
 
@@ -215,7 +215,7 @@ func TestReactiveCacheV2_WatcherNotifications(t *testing.T) {
 		t.Fatalf("Failed to create clusterrole: %v", err)
 	}
 
-	time.Sleep(150 * time.Millisecond)
+	time.Sleep(250 * time.Millisecond)
 
 	notifications = watcher.getNotifications()
 	if len(notifications) != 1 {
@@ -254,7 +254,7 @@ func TestReactiveCacheV2_WatcherNotifications(t *testing.T) {
 		t.Fatalf("Failed to create role2: %v", err)
 	}
 
-	time.Sleep(150 * time.Millisecond)
+	time.Sleep(250 * time.Millisecond)
 
 	notifications = watcher.getNotifications()
 	if len(notifications) > 0 {
