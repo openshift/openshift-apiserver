@@ -606,7 +606,7 @@ func (c *completedConfig) startProjectCache(context genericapiserver.PostStartHo
 }
 
 func (c *completedConfig) startProjectAuthorizationCache(context genericapiserver.PostStartHookContext) error {
-	period := 1 * time.Second
+	period := 5 * time.Minute // authorization changes are handled by event watchers, so we only need to periodically check for changes as a fallback
 	c.ExtraConfig.ProjectAuthorizationCache.Run(period)
 	return nil
 }

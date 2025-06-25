@@ -731,29 +731,3 @@ func TestConcurrentAccessV2(t *testing.T) {
 
 	validateList(t, authorizationCache, alice, sets.NewString("concurrent-ns"))
 }
-
-type mockWatcher struct {
-	notifications []watcherNotification
-}
-
-type watcherNotification struct {
-	namespace string
-	users     sets.String
-	groups    sets.String
-}
-
-func (mw *mockWatcher) GroupMembershipChanged(namespace string, users, groups sets.String) {
-	mw.notifications = append(mw.notifications, watcherNotification{
-		namespace: namespace,
-		users:     users,
-		groups:    groups,
-	})
-}
-
-func extractNamespaceNames(namespaces []corev1.Namespace) []string {
-	names := make([]string, len(namespaces))
-	for i, ns := range namespaces {
-		names[i] = ns.Name
-	}
-	return names
-}

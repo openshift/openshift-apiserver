@@ -30,9 +30,10 @@ func NewProjectCache(nsInformer corev1informers.NamespaceInformer, privilegedLoo
 }
 
 func NewProjectAuthorizationCache(subjectLocator rbacauthorizer.SubjectLocator, namespaces corev1informers.NamespaceInformer, rbacInformers rbacinformers.Interface) (projectauth.AuthorizationCache, error) {
-	return projectauth.NewAuthorizationCacheV2(
+	return projectauth.NewReactiveAuthorizationCacheV2(
 		namespaces.Lister(),
 		projectauth.NewAuthorizerReviewer(subjectLocator),
 		rbacInformers,
+		namespaces,
 	)
 }
