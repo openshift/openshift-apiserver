@@ -44,14 +44,15 @@ func NewAuthorizationCacheV2(
 		informers.RoleBindings().Informer(),
 	}
 
+	globalRBACCache := NewGlobalRBACCache(scrLister, scrbLister)
+
 	ac := &AuthorizationCacheV2{
 		namespaceLister: namespaceLister,
 		reviewer:        reviewer,
 
-		clusterRoleLister:        scrLister,
-		clusterRoleBindingLister: scrbLister,
-		roleLister:               srLister,
-		roleBindingLister:        srbLister,
+		globalRBACCache:   globalRBACCache,
+		roleLister:        srLister,
+		roleBindingLister: srbLister,
 
 		namespaceHashes:     make(map[string]string),
 		namespaceAccessData: make(map[string]*accessRecord),
@@ -75,20 +76,17 @@ type AuthorizationCacheV2 struct {
 	namespaceLister corev1listers.NamespaceLister
 	reviewer        Reviewer
 
-	// RBAC listers
-	clusterRoleLister        SyncedClusterRoleLister
-	clusterRoleBindingLister SyncedClusterRoleBindingLister
-	roleLister               SyncedRoleLister
-	roleBindingLister        SyncedRoleBindingLister
+	// Global RBAC cache for cluster-scoped resources
+	globalRBACCache *GlobalRBACCache
+
+	// RBAC listers for namespace-scoped resources
+	roleLister        SyncedRoleLister
+	roleBindingLister SyncedRoleBindingLister
 
 	// Namespace change tracking
 	namespaceHashes     map[string]string        // namespace -> computed hash
 	namespaceAccessData map[string]*accessRecord // namespace -> cached access data
 	hashLock            sync.RWMutex
-
-	// Global RBAC resource tracking
-	globalRBACHash string // hash of all cluster roles and cluster role bindings
-	globalRBACLock sync.RWMutex
 
 	// Subject-to-namespace mappings
 	userToNamespaces  map[string]sets.Set[string] // user -> set of accessible namespaces
@@ -126,13 +124,19 @@ type rbacResourceRef struct {
 // Run begins watching and synchronizing the cache
 func (ac *AuthorizationCacheV2) Run(period time.Duration) {
 	go func() {
-		ac.synchronize()
+		err := ac.synchronize()
+		if err != nil {
+			utilruntime.HandleError(fmt.Errorf("failed to synchronize cache: %v", err))
+		}
 
 		ticker := time.NewTicker(period)
 		defer ticker.Stop()
 
 		for range ticker.C {
-			ac.synchronize()
+			err := ac.synchronize()
+			if err != nil {
+				utilruntime.HandleError(fmt.Errorf("failed to synchronize cache: %v", err))
+			}
 		}
 	}()
 }
@@ -161,7 +165,7 @@ func (ac *AuthorizationCacheV2) RemoveWatcher(watcher CacheWatcher) {
 
 // GetClusterRoleLister returns the cluster role lister
 func (ac *AuthorizationCacheV2) GetClusterRoleLister() SyncedClusterRoleLister {
-	return ac.clusterRoleLister
+	return ac.globalRBACCache.GetClusterRoleLister()
 }
 
 // List returns the set of namespaces the user has access to view
@@ -183,7 +187,7 @@ func (ac *AuthorizationCacheV2) List(userInfo user.Info, selector labels.Selecto
 	// Apply scope restrictions
 	allowedNamespaces, err := scope.ScopesToVisibleNamespaces(
 		userInfo.GetExtra()[authorizationapi.ScopesKey],
-		ac.clusterRoleLister,
+		ac.globalRBACCache.GetClusterRoleLister(),
 		true,
 	)
 	if err != nil {
@@ -225,23 +229,20 @@ func (ac *AuthorizationCacheV2) ReadyForAccess() bool {
 // Internal functions
 
 // synchronize is responsible for the synchronization of the cache both initially and periodically
-func (ac *AuthorizationCacheV2) synchronize() {
+func (ac *AuthorizationCacheV2) synchronize() error {
 	if !ac.syncLock.TryLock() {
 		// Another sync is in progress, skip this one (do not attempt to sync concurrently or queue)
-		return
+		return fmt.Errorf("sync is already in progress")
 	}
 	defer ac.syncLock.Unlock()
 
-	skip, newGlobalHash, namespacesToUpdate := ac.shouldSkipSync()
+	skip, namespacesToUpdate := ac.shouldSkipSync()
 	if skip {
-		return
+		return nil
 	}
 
-	ac.globalRBACLock.Lock()
-	ac.globalRBACHash = newGlobalHash
-	ac.globalRBACLock.Unlock()
-
 	if namespacesToUpdate != nil {
+		// Partial sync: only update specific namespaces
 		for ns, hash := range namespacesToUpdate {
 			if err := ac.refreshNamespaceWithHash(ns, hash); err != nil {
 				// Log error but continue with other namespaces
@@ -249,27 +250,28 @@ func (ac *AuthorizationCacheV2) synchronize() {
 			}
 		}
 	} else {
-		// global RBAC changed or first sync
-		if err := ac.synchronizeNamespacesWithGlobalHash(newGlobalHash); err != nil {
-			utilruntime.HandleError(fmt.Errorf("failed to perform full sync: %v", err))
-			return
+		// Full sync: global RBAC changed, hash has already been computed and cached
+		if err := ac.synchronizeAllNamespaces(); err != nil {
+			return fmt.Errorf("full sync failed: %v", err)
 		}
 	}
 
 	ac.readyLock.Lock()
 	defer ac.readyLock.Unlock()
 	ac.ready = true
+
+	return nil
 }
 
 // synchronizeNamespacesWithGlobalHash processes all namespaces using a precomputed global RBAC hash
-func (ac *AuthorizationCacheV2) synchronizeNamespacesWithGlobalHash(globalHash string) error {
+func (ac *AuthorizationCacheV2) synchronizeAllNamespaces() error {
 	namespaces, err := ac.namespaceLister.List(labels.Everything())
 	if err != nil {
 		return fmt.Errorf("failed to list namespaces: %v", err)
 	}
 
 	for _, ns := range namespaces {
-		currentHash, err := ac.computeNamespaceHashWithGlobal(ns.Name, globalHash)
+		currentHash, err := ac.computeNamespaceHash(ns.Name)
 		if err != nil {
 			return fmt.Errorf("failed to compute hash for namespace %s: %v", ns.Name, err)
 		}
@@ -458,43 +460,36 @@ func (ac *AuthorizationCacheV2) notifyWatchersV2(namespace string, oldUsers, new
 }
 
 // shouldSkipSync checks if the cache can skip synchronization based on RBAC changes.
-// If the global RBAC hash has changed, it returns false and the new global hash.
-// If global RBAC has not changed, it then checks for namespace-specific changes.
-// If no namespace-specific changes are detected, it returns true to skip the sync.
-// Any new namespace-specific change hashes are passed back to avoid further calls to the Kube API.
-// Returns: skip (bool), currentGlobalHash (string), namespacesToUpdate (map of ns name string -> new hash string)
-func (ac *AuthorizationCacheV2) shouldSkipSync() (bool, string, map[string]string) {
-	currentGlobalHash, err := ac.computeGlobalRBACHash()
+// Returns: skip (bool), namespacesToUpdate (map of ns name string -> new hash string)
+func (ac *AuthorizationCacheV2) shouldSkipSync() (bool, map[string]string) {
+	// Check if global RBAC has changed
+	skipGlobal, err := ac.globalRBACCache.shouldSkipSyncGlobal()
 	if err != nil {
 		// We cannot continue without a valid global RBAC hash - log it as an error and don't sync
-		utilruntime.HandleError(fmt.Errorf("failed to compute global RBAC hash - sync cannot continue %v", err))
-		return true, ac.globalRBACHash, nil
+		utilruntime.HandleError(fmt.Errorf("failed to compute global RBAC hash - sync cannot continue: %v", err))
+		return true, nil
 	}
-
-	ac.globalRBACLock.RLock()
-	lastGlobalHash := ac.globalRBACHash
-	ac.globalRBACLock.RUnlock()
 
 	// If global RBAC changed, we need to do a full sync
-	if currentGlobalHash != lastGlobalHash {
-		return false, currentGlobalHash, nil
+	if !skipGlobal {
+		return false, nil
 	}
 
-	// Check if any namespace-specific resources changed
-	namespaceHashes := ac.findNamespacesWithChanges(currentGlobalHash)
+	// Global RBAC hasn't changed, check namespace-specific changes
+	namespaceHashes := ac.findNamespacesWithChanges()
 
 	if len(namespaceHashes) == 0 {
-		// If no namespaces need refreshing, we can skip
-		return true, currentGlobalHash, nil
+		// No global or namespace changes, can fully skip
+		return true, nil
 	}
 
-	// Return the namespaces that need refreshing and their computed hashes
-	return false, currentGlobalHash, namespaceHashes
+	// Namespace changes detected, need partial sync
+	return false, namespaceHashes
 }
 
 // findNamespacesWithChanges identifies namespaces whose RBAC hash has changed
 // Returns a map of changed namespaces to their computed hashes
-func (ac *AuthorizationCacheV2) findNamespacesWithChanges(globalRBACHash string) map[string]string {
+func (ac *AuthorizationCacheV2) findNamespacesWithChanges() map[string]string {
 	namespaces, err := ac.namespaceLister.List(labels.Everything())
 	if err != nil {
 		// If we can't list namespaces, assume all need refresh
@@ -511,7 +506,7 @@ func (ac *AuthorizationCacheV2) findNamespacesWithChanges(globalRBACHash string)
 	ac.hashLock.RUnlock()
 
 	for _, ns := range namespaces {
-		currentHash, err := ac.computeNamespaceHashWithGlobal(ns.Name, globalRBACHash)
+		currentHash, err := ac.computeNamespaceHash(ns.Name)
 		if err != nil {
 			// If we can't compute hash, assume it changed
 			// Pass empty hash as placeholder - deletion check & recomputation will be attempted later
@@ -543,10 +538,12 @@ func (ac *AuthorizationCacheV2) findNamespacesWithChanges(globalRBACHash string)
 	return namespaceHashes
 }
 
-// computeNamespaceHashWithGlobal computes a hash for a specific namespace using a precomputed global RBAC hash
+// computeNamespaceHash computes a hash for a specific namespace
 // This ensures that namespace-specific roles and bindings are combined with the global RBAC state to ultimately determine access
-func (ac *AuthorizationCacheV2) computeNamespaceHashWithGlobal(namespace string, globalHash string) (string, error) {
+func (ac *AuthorizationCacheV2) computeNamespaceHash(namespace string) (string, error) {
 	var refs []rbacResourceRef
+
+	globalHash := ac.globalRBACCache.GetCurrentHash()
 
 	roles, err := ac.roleLister.Roles(namespace).List(labels.Everything())
 	if err != nil {
@@ -573,51 +570,11 @@ func (ac *AuthorizationCacheV2) computeNamespaceHashWithGlobal(namespace string,
 	}
 
 	// Combine global hash with namespace-specific hash
-	namespaceSpecificHash := ac.computeHashFromRefs(refs)
-	return ac.combineHashes(globalHash, namespaceSpecificHash), nil
-}
-
-func (ac *AuthorizationCacheV2) computeNamespaceHash(namespace string) (string, error) {
-	globalHash, err := ac.computeGlobalRBACHash()
-	if err != nil {
-		return "", err
-	}
-	return ac.computeNamespaceHashWithGlobal(namespace, globalHash)
-}
-
-// computeGlobalRBACHash computes the hash of all cluster roles and cluster role bindings
-func (ac *AuthorizationCacheV2) computeGlobalRBACHash() (string, error) {
-	var refs []rbacResourceRef
-
-	clusterRoles, err := ac.clusterRoleLister.List(labels.Everything())
-	if err != nil {
-		return "", fmt.Errorf("failed to list cluster roles: %v", err)
-	}
-	for _, cr := range clusterRoles {
-		refs = append(refs, rbacResourceRef{
-			uid:             string(cr.UID),
-			resourceVersion: cr.ResourceVersion,
-			kind:            "ClusterRole",
-		})
-	}
-
-	clusterRoleBindings, err := ac.clusterRoleBindingLister.List(labels.Everything())
-	if err != nil {
-		return "", fmt.Errorf("failed to list cluster role bindings: %v", err)
-	}
-	for _, crb := range clusterRoleBindings {
-		refs = append(refs, rbacResourceRef{
-			uid:             string(crb.UID),
-			resourceVersion: crb.ResourceVersion,
-			kind:            "ClusterRoleBinding",
-		})
-	}
-
-	return ac.computeHashFromRefs(refs), nil
+	return combineHashes(globalHash, computeHashFromRefs(refs)), nil
 }
 
 // computeHashFromRefs computes a deterministic hash from RBAC resource references
-func (ac *AuthorizationCacheV2) computeHashFromRefs(refs []rbacResourceRef) string {
+func computeHashFromRefs(refs []rbacResourceRef) string {
 	// Sort refs to ensure deterministic hash
 	sort.Slice(refs, func(i, j int) bool {
 		if refs[i].kind != refs[j].kind {
@@ -644,7 +601,7 @@ func (ac *AuthorizationCacheV2) computeHashFromRefs(refs []rbacResourceRef) stri
 }
 
 // combineHashes combines two hashes into a single hash
-func (ac *AuthorizationCacheV2) combineHashes(hash1, hash2 string) string {
+func combineHashes(hash1, hash2 string) string {
 	h := fnv.New64a()
 	h.Write([]byte(hash1))
 	h.Write([]byte("|"))
@@ -679,17 +636,14 @@ func (ac *AuthorizationCacheV2) validateConfiguration() error {
 	if ac.reviewer == nil {
 		return fmt.Errorf("reviewer is required")
 	}
-	if ac.clusterRoleLister == nil {
-		return fmt.Errorf("clusterRoleLister is required")
-	}
-	if ac.clusterRoleBindingLister == nil {
-		return fmt.Errorf("clusterRoleBindingLister is required")
-	}
 	if ac.roleLister == nil {
 		return fmt.Errorf("roleLister is required")
 	}
 	if ac.roleBindingLister == nil {
 		return fmt.Errorf("roleBindingLister is required")
+	}
+	if ac.globalRBACCache == nil {
+		return fmt.Errorf("globalRBACCache not initialized")
 	}
 	return nil
 }

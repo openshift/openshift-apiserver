@@ -12,19 +12,24 @@ import (
 	"k8s.io/client-go/informers"
 	kubefake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/util/workqueue"
 )
 
 // Shared test setup helper
 func setupReactiveCacheV2(t *testing.T, config *ReactiveAuthorizationCacheV2Config) (*ReactiveAuthorizationCacheV2, *mockReviewer, context.CancelFunc, *kubefake.Clientset) {
+	// Start with an empty fake client but with proper objects list initialized
 	fakeClient := kubefake.NewSimpleClientset()
-	informerFactory := informers.NewSharedInformerFactory(fakeClient, 0)
+
+	// Use a resync period for testing
+	informerFactory := informers.NewSharedInformerFactory(fakeClient, 30*time.Second)
 	namespaceInformer := informerFactory.Core().V1().Namespaces()
 	rbacInformers := informerFactory.Rbac().V1()
 	reviewer := newMockReviewer()
 
 	if config == nil {
 		config = DefaultReactiveAuthorizationCacheV2Config()
-		config.DebounceDuration = 50 * time.Millisecond // Faster than default for testing
+		config.RateLimiter = workqueue.NewTypedItemFastSlowRateLimiter[string](
+			10*time.Millisecond, 100*time.Millisecond, 5)
 	}
 
 	reactiveCache, err := NewReactiveAuthorizationCacheV2WithConfig(
@@ -40,7 +45,18 @@ func setupReactiveCacheV2(t *testing.T, config *ReactiveAuthorizationCacheV2Conf
 
 	ctx, cancel := context.WithCancel(context.Background())
 	informerFactory.Start(ctx.Done())
-	cache.WaitForCacheSync(ctx.Done(), namespaceInformer.Informer().HasSynced)
+
+	synced := cache.WaitForCacheSync(ctx.Done(),
+		namespaceInformer.Informer().HasSynced,
+		rbacInformers.ClusterRoles().Informer().HasSynced,
+		rbacInformers.ClusterRoleBindings().Informer().HasSynced,
+		rbacInformers.Roles().Informer().HasSynced,
+		rbacInformers.RoleBindings().Informer().HasSynced,
+	)
+	if !synced {
+		cancel()
+		t.Fatalf("Failed to sync informers")
+	}
 
 	return reactiveCache, reviewer, cancel, fakeClient
 }
@@ -49,19 +65,11 @@ func TestReactiveCacheV2_DefaultConfiguration(t *testing.T) {
 	reactiveCache, _, cancel, _ := setupReactiveCacheV2(t, nil)
 	defer cancel()
 
-	if reactiveCache.eventWorkers != 5 {
-		t.Errorf("Expected 5 event workers, got %d", reactiveCache.eventWorkers)
+	if reactiveCache.workers != 5 {
+		t.Errorf("Expected 5 workers, got %d", reactiveCache.workers)
 	}
 
-	// Normal default debounce is 500ms, but we set it to 50ms for simple tests
-	if reactiveCache.debounceDuration != 50*time.Millisecond {
-		t.Errorf("Expected 50ms debounce duration, got %v", reactiveCache.debounceDuration)
-	}
-
-	queued, capacity := reactiveCache.GetEventQueueStatus()
-	if capacity != 1000 {
-		t.Errorf("Expected queue capacity of 1000, got %d", capacity)
-	}
+	queued := reactiveCache.GetQueueStatus()
 	if queued != 0 {
 		t.Errorf("Expected empty queue initially, got %d items", queued)
 	}
@@ -76,63 +84,85 @@ func TestReactiveCacheV2_DefaultConfiguration(t *testing.T) {
 	reactiveCache.Stop()
 }
 
-// covers enqueuing, processing, and basic debouncing
+// covers enqueuing & processing via workqueue deduplication
 func TestReactiveCacheV2_EventProcessing(t *testing.T) {
 	config := &ReactiveAuthorizationCacheV2Config{
-		DebounceDuration: 150 * time.Millisecond,
-		EventQueueSize:   50,
-		EventWorkers:     1,
+		Workers:     1,
+		RateLimiter: workqueue.NewTypedItemFastSlowRateLimiter[string](10*time.Millisecond, 100*time.Millisecond, 5),
+		QueueName:   "test_queue",
 	}
 
-	reactiveCache, reviewer, cancel, _ := setupReactiveCacheV2(t, config)
+	reactiveCache, reviewer, cancel, fakeClient := setupReactiveCacheV2(t, config)
 	defer cancel()
+
+	initialQueueLen := reactiveCache.queue.Len()
+
+	if initialQueueLen != 0 {
+		t.Errorf("Expected empty queue initially, got %d items", initialQueueLen)
+	}
+
+	ctx := context.Background()
+
+	testNS := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "test-ns",
+		},
+	}
+	_, err := fakeClient.CoreV1().Namespaces().Create(ctx, testNS, metav1.CreateOptions{})
+	if err != nil {
+		t.Fatalf("Failed to create test namespace: %v", err)
+	}
 
 	reviewer.setReview("test-ns", []string{"user1"}, []string{"group1"})
 
-	reactiveCache.Run(5 * time.Minute)
-	defer reactiveCache.Stop()
+	time.Sleep(200 * time.Millisecond)
 
-	role := &rbacv1.ClusterRole{
+	queueAfterAddingNamespace := reactiveCache.queue.Len()
+
+	if queueAfterAddingNamespace != 1 {
+		t.Errorf("Expected queue length 1, got %d", queueAfterAddingNamespace)
+	}
+
+	clusterRole := &rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:            "test-role",
 			ResourceVersion: "1",
 		},
 	}
 
-	// Enqueue several events
-	for i := 0; i < 30; i++ {
-		reactiveCache.enqueueEvent(EventTypeClusterRoleChanged, role, "")
+	_, err = fakeClient.RbacV1().ClusterRoles().Create(ctx, clusterRole, metav1.CreateOptions{})
+	if err != nil {
+		t.Fatalf("Failed to create clusterrole: %v", err)
 	}
 
-	// Wait less than debounce duration - events should be processed off the queue but debounce should still be pending
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(200 * time.Millisecond)
 
-	// Check that the event queue has processed the events
-	queued, _ := reactiveCache.GetEventQueueStatus()
-	if queued != 0 {
-		t.Errorf("Expected event queue to have been processed into debounced calls, got %d items still enqueued", queued)
+	queueAfterClusterRoleCreation := reactiveCache.queue.Len()
+	if queueAfterClusterRoleCreation != 2 {
+		t.Errorf("Expected queue length 2 after cluster role creation, got %d", queueAfterClusterRoleCreation)
 	}
 
-	// Check that debounce timer is set up
-	reactiveCache.debounceLock.Lock()
-	if reactiveCache.debounceTimer == nil {
-		t.Error("Expected debounce timer to be initialized")
+	role := &rbacv1.Role{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "test-role",
+			Namespace:       "test-ns",
+			ResourceVersion: "1",
+		},
 	}
 
-	// Check that a global sync is pending
-	if !reactiveCache.isGlobalSyncPending {
-		t.Error("Expected global sync to be pending")
+	_, err = fakeClient.RbacV1().Roles("test-ns").Create(ctx, role, metav1.CreateOptions{})
+	if err != nil {
+		t.Fatalf("Failed to create role: %v", err)
 	}
-	reactiveCache.debounceLock.Unlock()
 
-	// Wait for debounce & sync to complete
-	time.Sleep(250 * time.Millisecond)
+	time.Sleep(200 * time.Millisecond)
 
-	reactiveCache.debounceLock.Lock()
-	if reactiveCache.isGlobalSyncPending {
-		t.Error("Expected global sync to have completed after debounce")
+	queueAfterRoleCreation := reactiveCache.queue.Len()
+	
+	// This namespace should already be in the queue from the initial namespace creation, no new queued workloads expected
+	if queueAfterRoleCreation != 2 {
+		t.Errorf("Expected queue length 2 after role creation, got %d", queueAfterRoleCreation)
 	}
-	reactiveCache.debounceLock.Unlock()
 }
 
 func TestReactiveCacheV2_WatcherNotifications(t *testing.T) {

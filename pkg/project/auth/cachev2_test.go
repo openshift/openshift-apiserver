@@ -214,10 +214,23 @@ func TestShouldSkipSyncV2(t *testing.T) {
 			crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
 			crbs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
 
+			crVersioner := &dynamicVersioner{version: 100}
+			crbVersioner := &dynamicVersioner{version: 200}
+
+			globalRBACCache := NewGlobalRBACCache(
+				syncedClusterRoleLister{
+					ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs),
+					versioner:         crVersioner,
+				},
+				syncedClusterRoleBindingLister{
+					ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs),
+					versioner:                crbVersioner,
+				},
+			)
+
 			ac := &AuthorizationCacheV2{
-				clusterRoleLister:        syncedClusterRoleLister{ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs)},
-				clusterRoleBindingLister: syncedClusterRoleBindingLister{ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs)},
-				namespaceLister:          corev1listers.NewNamespaceLister(cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})),
+				globalRBACCache: globalRBACCache,
+				namespaceLister: corev1listers.NewNamespaceLister(cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})),
 			}
 
 			for i, trial := range tc.trials {
@@ -231,7 +244,7 @@ func TestShouldSkipSyncV2(t *testing.T) {
 						defer crbs.Delete(&trial.crbs[i])
 					}
 
-					skip, _, _ := ac.shouldSkipSync()
+					skip, _ := ac.shouldSkipSync()
 					ac.synchronize()
 
 					if skip != trial.expected {
@@ -498,7 +511,7 @@ func TestHashComputationV2(t *testing.T) {
 	}
 
 	// Test hash computation with no resources
-	hash1, err := authorizationCache.computeGlobalRBACHash()
+	hash1, err := authorizationCache.globalRBACCache.ComputeHash()
 	if err != nil {
 		t.Errorf("Failed to compute initial hash: %v", err)
 	}
@@ -514,7 +527,7 @@ func TestHashComputationV2(t *testing.T) {
 	informers.Rbac().V1().ClusterRoles().Informer().GetIndexer().Add(clusterRole)
 
 	// Hash should change
-	hash2, err := authorizationCache.computeGlobalRBACHash()
+	hash2, err := authorizationCache.globalRBACCache.ComputeHash()
 	if err != nil {
 		t.Errorf("Failed to compute hash after adding cluster role: %v", err)
 	}
@@ -524,7 +537,7 @@ func TestHashComputationV2(t *testing.T) {
 	}
 
 	// Test deterministic hash computation
-	hash3, err := authorizationCache.computeGlobalRBACHash()
+	hash3, err := authorizationCache.globalRBACCache.ComputeHash()
 	if err != nil {
 		t.Errorf("Failed to compute hash again: %v", err)
 	}

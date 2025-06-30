@@ -6,9 +6,11 @@ import (
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apiserver/pkg/authentication/user"
+	rbacv1listers "k8s.io/client-go/listers/rbac/v1"
 )
 
 // common test users
@@ -138,4 +140,66 @@ func extractNamespaceNames(namespaces []corev1.Namespace) []string {
 		names[i] = ns.Name
 	}
 	return names
+}
+
+type mockClusterRoleLister struct {
+	rbacv1listers.ClusterRoleLister
+	resourceVersion string
+	clusterRoles    []*rbacv1.ClusterRole
+}
+
+func (m *mockClusterRoleLister) LastSyncResourceVersion() string {
+	return m.resourceVersion
+}
+
+func (m *mockClusterRoleLister) List(selector labels.Selector) ([]*rbacv1.ClusterRole, error) {
+	if m.clusterRoles == nil {
+		return []*rbacv1.ClusterRole{}, nil
+	}
+	return m.clusterRoles, nil
+}
+
+func (m *mockClusterRoleLister) Get(name string) (*rbacv1.ClusterRole, error) {
+	for _, cr := range m.clusterRoles {
+		if cr.Name == name {
+			return cr, nil
+		}
+	}
+	return nil, fmt.Errorf("cluster role %s not found", name)
+}
+
+type mockClusterRoleBindingLister struct {
+	rbacv1listers.ClusterRoleBindingLister
+	resourceVersion     string
+	clusterRoleBindings []*rbacv1.ClusterRoleBinding
+}
+
+func (m *mockClusterRoleBindingLister) LastSyncResourceVersion() string {
+	return m.resourceVersion
+}
+
+func (m *mockClusterRoleBindingLister) List(selector labels.Selector) ([]*rbacv1.ClusterRoleBinding, error) {
+	if m.clusterRoleBindings == nil {
+		return []*rbacv1.ClusterRoleBinding{}, nil
+	}
+	return m.clusterRoleBindings, nil
+}
+
+func (m *mockClusterRoleBindingLister) Get(name string) (*rbacv1.ClusterRoleBinding, error) {
+	for _, crb := range m.clusterRoleBindings {
+		if crb.Name == name {
+			return crb, nil
+		}
+	}
+	return nil, fmt.Errorf("cluster role binding %s not found", name)
+}
+
+// dynamicVersioner increments the version each time it's accessed
+type dynamicVersioner struct {
+	version int
+}
+
+func (d *dynamicVersioner) LastSyncResourceVersion() string {
+	d.version++
+	return fmt.Sprintf("%d", d.version)
 }

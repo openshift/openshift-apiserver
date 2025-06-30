@@ -2,18 +2,23 @@ package auth
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	"k8s.io/apimachinery/pkg/api/meta"
-	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	corev1informers "k8s.io/client-go/informers/core/v1"
 	rbacv1informers "k8s.io/client-go/informers/rbac/v1"
 	corev1listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/util/workqueue"
+)
+
+const (
+	globalSyncKey      = "global"
+	namespaceKeyPrefix = "namespace:"
 )
 
 // ReactiveAuthorizationCacheV2 extends the base AuthorizationCacheV2 with event-driven
@@ -22,46 +27,18 @@ import (
 type ReactiveAuthorizationCacheV2 struct {
 	*AuthorizationCacheV2
 
-	// Event handling
-	eventQueue   chan eventItem
-	eventWorkers int
-	stopCh       chan struct{}
-	wg           sync.WaitGroup
-
-	// Debouncing for rapid fire events
-	debounceTimer       *time.Timer
-	debounceDuration    time.Duration
-	pendingNamespaces   map[string]struct{}
-	debounceLock        sync.Mutex
-	isGlobalSyncPending bool // Prevent namespace refresh from replacing a global sync during the debounce period
+	// Workqueue for processing sync operations
+	queue   workqueue.TypedRateLimitingInterface[string]
+	workers int
+	stopCh  chan struct{}
+	wg      sync.WaitGroup
 }
 
-// eventItem represents a change event that needs processing
-type eventItem struct {
-	eventType EventType
-	object    runtime.Object
-	namespace string
-}
-
-// EventType represents the type of RBAC change event
-type EventType int
-
-const (
-	EventTypeClusterRoleChanged EventType = iota
-	EventTypeClusterRoleBindingChanged
-	EventTypeRoleChanged
-	EventTypeRoleBindingChanged
-	EventTypeNamespaceChanged
-)
-
-// ReactiveAuthorizationCacheV2Config provides configuration options for the reactive cache
+// ReactiveAuthorizationCacheV2Config provides workqueue configuration options for the reactive cache
 type ReactiveAuthorizationCacheV2Config struct {
-	// DebounceDuration controls how long to wait before processing batched events
-	DebounceDuration time.Duration
-	// EventQueueSize controls the size of the event processing queue
-	EventQueueSize int
-	// EventWorkers controls the number of concurrent event processing workers
-	EventWorkers int
+	Workers     int
+	RateLimiter workqueue.TypedRateLimiter[string]
+	QueueName   string
 }
 
 // NewReactiveAuthorizationCacheV2 creates a new reactive authorization cache
@@ -71,30 +48,21 @@ func NewReactiveAuthorizationCacheV2(
 	informers rbacv1informers.Interface,
 	namespaceInformer corev1informers.NamespaceInformer,
 ) (*ReactiveAuthorizationCacheV2, error) {
-	rac, err := NewReactiveAuthorizationCacheV2WithConfig(
+	return NewReactiveAuthorizationCacheV2WithConfig(
 		namespaceLister,
 		reviewer,
 		informers,
 		namespaceInformer,
 		DefaultReactiveAuthorizationCacheV2Config(),
 	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create reactive authorization cache: %v", err)
-	}
-
-	if err := rac.setupEventHandlers(informers, namespaceInformer); err != nil {
-		return nil, fmt.Errorf("failed to setup event handlers: %v", err)
-	}
-
-	return rac, nil
 }
 
 // DefaultReactiveAuthorizationCacheV2Config returns sensible defaults
 func DefaultReactiveAuthorizationCacheV2Config() *ReactiveAuthorizationCacheV2Config {
 	return &ReactiveAuthorizationCacheV2Config{
-		DebounceDuration: 500 * time.Millisecond,
-		EventQueueSize:   1000,
-		EventWorkers:     5,
+		Workers:     5,
+		RateLimiter: workqueue.DefaultTypedControllerRateLimiter[string](),
+		QueueName:   "reactive_authorization_cache_v2",
 	}
 }
 
@@ -118,11 +86,14 @@ func NewReactiveAuthorizationCacheV2WithConfig(
 
 	rac := &ReactiveAuthorizationCacheV2{
 		AuthorizationCacheV2: baseCache,
-		eventQueue:           make(chan eventItem, config.EventQueueSize),
-		eventWorkers:         config.EventWorkers,
-		stopCh:               make(chan struct{}),
-		debounceDuration:     config.DebounceDuration,
-		pendingNamespaces:    make(map[string]struct{}),
+		queue: workqueue.NewTypedRateLimitingQueueWithConfig(
+			config.RateLimiter,
+			workqueue.TypedRateLimitingQueueConfig[string]{
+				Name: config.QueueName,
+			},
+		),
+		workers: config.Workers,
+		stopCh:  make(chan struct{}),
 	}
 
 	// Set up event handlers
@@ -138,51 +109,30 @@ func (rac *ReactiveAuthorizationCacheV2) setupEventHandlers(
 	informers rbacv1informers.Interface,
 	namespaceInformer corev1informers.NamespaceInformer,
 ) error {
-
-	// Cluster role events
+	// Cluster role events - trigger global sync
 	informers.ClusterRoles().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj any) {
-			rac.enqueueEvent(EventTypeClusterRoleChanged, obj, "")
-		},
-		UpdateFunc: func(oldObj, newObj any) {
-			rac.enqueueEvent(EventTypeClusterRoleChanged, newObj, "")
-		},
-		DeleteFunc: func(obj any) {
-			if missedDeletionObj, ok := obj.(cache.DeletedFinalStateUnknown); ok {
-				obj = missedDeletionObj.Obj
-			}
-			rac.enqueueEvent(EventTypeClusterRoleChanged, obj, "")
-		},
+		AddFunc:    func(obj any) { rac.queue.Add(globalSyncKey) },
+		UpdateFunc: func(oldObj, newObj any) { rac.queue.Add(globalSyncKey) },
+		DeleteFunc: func(obj any) { rac.queue.Add(globalSyncKey) },
 	})
 
-	// Cluster role binding events
+	// Cluster role binding events - trigger global sync
 	informers.ClusterRoleBindings().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj any) {
-			rac.enqueueEvent(EventTypeClusterRoleBindingChanged, obj, "")
-		},
-		UpdateFunc: func(oldObj, newObj any) {
-			rac.enqueueEvent(EventTypeClusterRoleBindingChanged, newObj, "")
-		},
-		DeleteFunc: func(obj any) {
-			if missedDeletionObj, ok := obj.(cache.DeletedFinalStateUnknown); ok {
-				obj = missedDeletionObj.Obj
-			}
-			rac.enqueueEvent(EventTypeClusterRoleBindingChanged, obj, "")
-		},
+		AddFunc:    func(obj any) { rac.queue.Add(globalSyncKey) },
+		UpdateFunc: func(oldObj, newObj any) { rac.queue.Add(globalSyncKey) },
+		DeleteFunc: func(obj any) { rac.queue.Add(globalSyncKey) },
 	})
 
-	// The following resources require type assertion so that we can safely grab the namespace
-
-	// Role events
+	// Role events - trigger namespace sync
 	informers.Roles().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj any) {
 			if role, ok := obj.(*rbacv1.Role); ok {
-				rac.enqueueEvent(EventTypeRoleChanged, obj, role.Namespace)
+				rac.queue.Add(namespaceKeyPrefix + role.Namespace)
 			}
 		},
 		UpdateFunc: func(oldObj, newObj any) {
 			if role, ok := newObj.(*rbacv1.Role); ok {
-				rac.enqueueEvent(EventTypeRoleChanged, newObj, role.Namespace)
+				rac.queue.Add(namespaceKeyPrefix + role.Namespace)
 			}
 		},
 		DeleteFunc: func(obj any) {
@@ -190,21 +140,21 @@ func (rac *ReactiveAuthorizationCacheV2) setupEventHandlers(
 				obj = missedDeletionObj.Obj
 			}
 			if role, ok := obj.(*rbacv1.Role); ok {
-				rac.enqueueEvent(EventTypeRoleChanged, obj, role.Namespace)
+				rac.queue.Add(namespaceKeyPrefix + role.Namespace)
 			}
 		},
 	})
 
-	// Role binding events
+	// Role binding events - trigger namespace sync
 	informers.RoleBindings().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj any) {
 			if rb, ok := obj.(*rbacv1.RoleBinding); ok {
-				rac.enqueueEvent(EventTypeRoleBindingChanged, obj, rb.Namespace)
+				rac.queue.Add(namespaceKeyPrefix + rb.Namespace)
 			}
 		},
 		UpdateFunc: func(oldObj, newObj any) {
 			if rb, ok := newObj.(*rbacv1.RoleBinding); ok {
-				rac.enqueueEvent(EventTypeRoleBindingChanged, newObj, rb.Namespace)
+				rac.queue.Add(namespaceKeyPrefix + rb.Namespace)
 			}
 		},
 		DeleteFunc: func(obj any) {
@@ -212,21 +162,21 @@ func (rac *ReactiveAuthorizationCacheV2) setupEventHandlers(
 				obj = missedDeletionObj.Obj
 			}
 			if rb, ok := obj.(*rbacv1.RoleBinding); ok {
-				rac.enqueueEvent(EventTypeRoleBindingChanged, obj, rb.Namespace)
+				rac.queue.Add(namespaceKeyPrefix + rb.Namespace)
 			}
 		},
 	})
 
-	// Namespace events
+	// Namespace events - trigger namespace sync
 	namespaceInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj any) {
 			if ns, ok := obj.(*corev1.Namespace); ok {
-				rac.enqueueEvent(EventTypeNamespaceChanged, obj, ns.Name)
+				rac.queue.Add(namespaceKeyPrefix + ns.Name)
 			}
 		},
 		UpdateFunc: func(oldObj, newObj any) {
 			if ns, ok := newObj.(*corev1.Namespace); ok {
-				rac.enqueueEvent(EventTypeNamespaceChanged, newObj, ns.Name)
+				rac.queue.Add(namespaceKeyPrefix + ns.Name)
 			}
 		},
 		DeleteFunc: func(obj any) {
@@ -234,7 +184,7 @@ func (rac *ReactiveAuthorizationCacheV2) setupEventHandlers(
 				obj = missedDeletionObj.Obj
 			}
 			if ns, ok := obj.(*corev1.Namespace); ok {
-				rac.enqueueEvent(EventTypeNamespaceChanged, obj, ns.Name)
+				rac.queue.Add(namespaceKeyPrefix + ns.Name)
 			}
 		},
 	})
@@ -242,175 +192,13 @@ func (rac *ReactiveAuthorizationCacheV2) setupEventHandlers(
 	return nil
 }
 
-// enqueueEvent adds an event to the processing queue
-func (rac *ReactiveAuthorizationCacheV2) enqueueEvent(eventType EventType, obj any, namespace string) {
-	runtimeObj, ok := obj.(runtime.Object)
-	if !ok {
-		utilruntime.HandleError(fmt.Errorf("expected runtime.Object but got %T", obj))
-		return
-	}
-
-	event := eventItem{
-		eventType: eventType,
-		object:    runtimeObj,
-		namespace: namespace,
-	}
-
-	select {
-	case rac.eventQueue <- event:
-		// Event queued successfully
-	default:
-		// Queue is full, log warning but don't block
-		utilruntime.HandleError(fmt.Errorf("event queue is full, dropping event for %s", rac.getObjectName(runtimeObj)))
-	}
-}
-
-// getObjectName extracts the name from a runtime object for logging
-func (rac *ReactiveAuthorizationCacheV2) getObjectName(obj runtime.Object) string {
-	if accessor, err := meta.Accessor(obj); err == nil {
-		return accessor.GetName()
-	}
-	return "unknown"
-}
-
-// StartReactive begins the reactive event processing
-func (rac *ReactiveAuthorizationCacheV2) StartReactive() {
-	for i := 0; i < rac.eventWorkers; i++ {
-		rac.wg.Add(1)
-		go rac.eventWorker()
-	}
-}
-
-// StopReactive stops the reactive event processing
-func (rac *ReactiveAuthorizationCacheV2) StopReactive() {
-	select {
-	case <-rac.stopCh:
-		// Already stopped
-		return
-	default:
-		close(rac.stopCh)
-	}
-
-	rac.wg.Wait()
-
-	// Stop any pending debounce timer
-	rac.debounceLock.Lock()
-	if rac.debounceTimer != nil {
-		rac.debounceTimer.Stop()
-		rac.debounceTimer = nil
-	}
-	rac.debounceLock.Unlock()
-}
-
-// eventWorker processes events from the queue
-func (rac *ReactiveAuthorizationCacheV2) eventWorker() {
-	defer rac.wg.Done()
-
-	for {
-		select {
-		case event := <-rac.eventQueue:
-			switch event.eventType {
-			case EventTypeClusterRoleChanged, EventTypeClusterRoleBindingChanged:
-				rac.debounceGlobalRefresh()
-
-			case EventTypeRoleChanged, EventTypeRoleBindingChanged:
-				if event.namespace == "" {
-					utilruntime.HandleError(fmt.Errorf("received namespace RBAC change with empty namespace"))
-					return
-				}
-
-				rac.debounceNamespaceRefresh(event.namespace)
-
-			case EventTypeNamespaceChanged:
-				if event.namespace == "" {
-					utilruntime.HandleError(fmt.Errorf("received namespace lifecycle change with empty namespace"))
-					return
-				}
-
-				// For namespace events, refresh immediately
-				go func() {
-					if err := rac.refreshNamespace(event.namespace); err != nil {
-						utilruntime.HandleError(fmt.Errorf("failed to refresh namespace %s after lifecycle change: %v", event.namespace, err))
-					}
-				}()
-			}
-		case <-rac.stopCh:
-			return
-		}
-	}
-}
-
-// debounceGlobalRefresh implements debouncing for global RBAC changes
-func (rac *ReactiveAuthorizationCacheV2) debounceGlobalRefresh() {
-	rac.debounceLock.Lock()
-	defer rac.debounceLock.Unlock()
-
-	if rac.debounceTimer != nil {
-		rac.debounceTimer.Stop()
-	}
-
-	rac.isGlobalSyncPending = true
-	rac.debounceTimer = time.AfterFunc(rac.debounceDuration, func() {
-		rac.debounceLock.Lock()
-		rac.isGlobalSyncPending = false
-		rac.debounceLock.Unlock()
-		go rac.synchronize()
-	})
-}
-
-// debounceNamespaceRefresh implements debouncing for namespace-specific changes
-func (rac *ReactiveAuthorizationCacheV2) debounceNamespaceRefresh(namespace string) {
-	rac.debounceLock.Lock()
-	defer rac.debounceLock.Unlock()
-
-	// If a more comprehensive global sync is already pending debounce, do not replace it with a namespace refresh
-	if rac.isGlobalSyncPending {
-		return
-	}
-
-	rac.pendingNamespaces[namespace] = struct{}{}
-
-	if rac.debounceTimer != nil {
-		rac.debounceTimer.Stop()
-	}
-
-	rac.debounceTimer = time.AfterFunc(rac.debounceDuration, func() {
-		rac.processPendingNamespaces()
-	})
-}
-
-// processPendingNamespaces processes all namespaces that have pending changes
-func (rac *ReactiveAuthorizationCacheV2) processPendingNamespaces() {
-	rac.debounceLock.Lock()
-	namespacesToProcess := make([]string, 0, len(rac.pendingNamespaces))
-	for ns := range rac.pendingNamespaces {
-		namespacesToProcess = append(namespacesToProcess, ns)
-	}
-	rac.pendingNamespaces = make(map[string]struct{})
-	rac.debounceLock.Unlock()
-
-	globalHash, err := rac.computeGlobalRBACHash()
-	if err != nil {
-		utilruntime.HandleError(fmt.Errorf("failed to compute global RBAC hash: %v", err))
-		return
-	}
-
-	for _, ns := range namespacesToProcess {
-		nsHash, err := rac.computeNamespaceHashWithGlobal(ns, globalHash)
-		if err != nil {
-			utilruntime.HandleError(fmt.Errorf("failed to compute hash for namespace %s: %v", ns, err))
-			continue
-		}
-		if err := rac.refreshNamespaceWithHash(ns, nsHash); err != nil {
-			utilruntime.HandleError(fmt.Errorf("failed to refresh namespace %s: %v", ns, err))
-		}
-	}
-}
-
 // Run starts both the reactive event processing and the periodic synchronization
 func (rac *ReactiveAuthorizationCacheV2) Run(period time.Duration) {
-	// Start reactive processing
-	rac.StartReactive()
+	// Start queue workers
+	for i := 0; i < rac.workers; i++ {
+		rac.wg.Add(1)
+		go rac.worker()
+	}
 
 	// Start periodic synchronization
 	go func() {
@@ -433,10 +221,70 @@ func (rac *ReactiveAuthorizationCacheV2) Run(period time.Duration) {
 
 // Stop stops both reactive processing and periodic synchronization
 func (rac *ReactiveAuthorizationCacheV2) Stop() {
-	rac.StopReactive()
+	select {
+	case <-rac.stopCh:
+		// Already stopped
+		return
+	default:
+		close(rac.stopCh)
+	}
+
+	rac.queue.ShutDown()
+
+	rac.wg.Wait()
 }
 
-// GetEventQueueStatus returns information about the event processing queue
-func (rac *ReactiveAuthorizationCacheV2) GetEventQueueStatus() (queued int, capacity int) {
-	return len(rac.eventQueue), cap(rac.eventQueue)
+// worker processes items from the queue
+func (rac *ReactiveAuthorizationCacheV2) worker() {
+	defer rac.wg.Done()
+
+	for rac.processNextWorkItem() {
+	}
+}
+
+// processNextWorkItem processes a single work item from the queue
+func (rac *ReactiveAuthorizationCacheV2) processNextWorkItem() bool {
+	key, quit := rac.queue.Get()
+	if quit {
+		return false
+	}
+	defer rac.queue.Done(key)
+
+	err := rac.syncHandler(key)
+	if err == nil {
+		rac.queue.Forget(key)
+		return true
+	}
+
+	utilruntime.HandleError(fmt.Errorf("error syncing %q: %v", key, err))
+
+	if rac.queue.NumRequeues(key) < 5 {
+		// Requeue with rate limiting
+		rac.queue.AddRateLimited(key)
+		return true
+	}
+
+	// Give up after too many retries
+	rac.queue.Forget(key)
+	utilruntime.HandleError(fmt.Errorf("dropping %q out of the queue: %v", key, err))
+
+	return true
+}
+
+// syncHandler processes a single sync operation
+func (rac *ReactiveAuthorizationCacheV2) syncHandler(key string) error {
+	if key == globalSyncKey {
+		// Global sync
+		return rac.synchronize()
+	} else if strings.HasPrefix(key, namespaceKeyPrefix) {
+		// Namespace sync
+		return rac.refreshNamespace(strings.TrimPrefix(key, namespaceKeyPrefix))
+	}
+
+	return fmt.Errorf("unknown sync key: %s", key)
+}
+
+// GetQueueStatus returns information about the queue
+func (rac *ReactiveAuthorizationCacheV2) GetQueueStatus() (queued int) {
+	return rac.queue.Len()
 }
