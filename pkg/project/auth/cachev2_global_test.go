@@ -124,24 +124,24 @@ func TestGlobalRBACCache_hasResourceVersionChanged(t *testing.T) {
 
 func TestGlobalRBACCache_updateResourceVersions(t *testing.T) {
 	tests := []struct {
-		name                       string
-		clusterRoleVersion         string
-		clusterRoleBindingVersion  string
+		name                      string
+		clusterRoleVersion        string
+		clusterRoleBindingVersion string
 	}{
 		{
-			name:                       "update both versions",
-			clusterRoleVersion:         "123",
-			clusterRoleBindingVersion:  "456",
+			name:                      "update both versions",
+			clusterRoleVersion:        "123",
+			clusterRoleBindingVersion: "456",
 		},
 		{
-			name:                       "empty cluster role version",
-			clusterRoleVersion:         "",
-			clusterRoleBindingVersion:  "456",
+			name:                      "empty cluster role version",
+			clusterRoleVersion:        "",
+			clusterRoleBindingVersion: "456",
 		},
 		{
-			name:                       "empty cluster role binding version",
-			clusterRoleVersion:         "123",
-			clusterRoleBindingVersion:  "",
+			name:                      "empty cluster role binding version",
+			clusterRoleVersion:        "123",
+			clusterRoleBindingVersion: "",
 		},
 	}
 

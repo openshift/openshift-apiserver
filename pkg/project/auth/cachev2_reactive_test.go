@@ -158,7 +158,7 @@ func TestReactiveCacheV2_EventProcessing(t *testing.T) {
 	time.Sleep(200 * time.Millisecond)
 
 	queueAfterRoleCreation := reactiveCache.queue.Len()
-	
+
 	// This namespace should already be in the queue from the initial namespace creation, no new queued workloads expected
 	if queueAfterRoleCreation != 2 {
 		t.Errorf("Expected queue length 2 after role creation, got %d", queueAfterRoleCreation)
