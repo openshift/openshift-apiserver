@@ -37,7 +37,7 @@ type REST struct {
 	// Allows extended behavior during updates, required
 	updateStrategy rest.RESTUpdateStrategy
 
-	authCache    *projectauth.AuthorizationCache
+	authCache    projectauth.AuthorizationCache
 	projectCache *projectcache.ProjectCache
 
 	rest.TableConvertor
@@ -52,7 +52,7 @@ var _ rest.Storage = &REST{}
 var _ rest.SingularNameProvider = &REST{}
 
 // NewREST returns a RESTStorage object that will work against Project resources
-func NewREST(client corev1client.NamespaceInterface, lister projectauth.Lister, authCache *projectauth.AuthorizationCache, projectCache *projectcache.ProjectCache) *REST {
+func NewREST(client corev1client.NamespaceInterface, lister projectauth.Lister, authCache projectauth.AuthorizationCache, projectCache *projectcache.ProjectCache) *REST {
 	return &REST{
 		client:         client,
 		lister:         lister,
