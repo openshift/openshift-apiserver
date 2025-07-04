@@ -1,4 +1,4 @@
-package internalimageutil
+package imageutil
 
 import (
 	"encoding/json"
@@ -518,4 +518,68 @@ func HasTagCondition(stream *imageapi.ImageStream, tag string, condition imageap
 		}
 	}
 	return false
+}
+
+// UpdateOptionsToSupportedUpdateOptions prepares an UpdateOptions resource by using
+// the specific selected options from the UpdateOptions.
+// In the future, other fields like fieldManager can also be supported.
+func UpdateOptionsToSupportedUpdateOptions(opts *metav1.UpdateOptions) *metav1.UpdateOptions {
+	if opts == nil {
+		return &metav1.UpdateOptions{}
+	}
+	return &metav1.UpdateOptions{
+		DryRun: opts.DryRun,
+	}
+}
+
+// CreateOptionsToSupportedUpdateOptions prepares an UpdateOptions resource by using
+// the specific selected options from the CreateOptions.
+// In the future, other fields like fieldManager can also be supported.
+func CreateOptionsToSupportedUpdateOptions(opts *metav1.CreateOptions) *metav1.UpdateOptions {
+	if opts == nil {
+		return &metav1.UpdateOptions{}
+	}
+
+	return &metav1.UpdateOptions{
+		DryRun: opts.DryRun,
+	}
+}
+
+// CreateOptionsToSupportedCreateOptions prepares an CreateOptions resource by using
+// the specific selected options from the CreateOptions.
+// In the future, other fields like fieldManager can also be supported.
+func CreateOptionsToSupportedCreateOptions(opts *metav1.CreateOptions) *metav1.CreateOptions {
+	if opts == nil {
+		return &metav1.CreateOptions{}
+	}
+
+	return &metav1.CreateOptions{
+		DryRun: opts.DryRun,
+	}
+}
+
+// UpdateOptionsToSupportedCreateOptions prepares an CreateOptions resource by using
+// the specific selected options from the UpdateOptions.
+// In the future, other fields like fieldManager can also be supported.
+func UpdateOptionsToSupportedCreateOptions(opts *metav1.UpdateOptions) *metav1.CreateOptions {
+	if opts == nil {
+		return &metav1.CreateOptions{}
+	}
+
+	return &metav1.CreateOptions{
+		DryRun: opts.DryRun,
+	}
+}
+
+// DeleteOptionsToSupportedUpdateOptions prepares an UpdateOptions resource by using
+// the specific selected options from the DeleteOptions.
+// In the future, other fields like fieldManager can also be supported.
+func DeleteOptionsToSupportedUpdateOptions(opts *metav1.DeleteOptions) *metav1.UpdateOptions {
+	if opts == nil {
+		return &metav1.UpdateOptions{}
+	}
+
+	return &metav1.UpdateOptions{
+		DryRun: opts.DryRun,
+	}
 }
