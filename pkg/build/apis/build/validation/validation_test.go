@@ -3884,7 +3884,7 @@ func TestValidateBuildVolumes(t *testing.T) {
 					},
 				},
 			},
-			errors: []string{"must have at most 63 bytes"},
+			errors: []string{"Too long: may not be more than 63 bytes"},
 		},
 		{
 			name: "csi driver name that is not a DNS 1123 subdomain should fail",

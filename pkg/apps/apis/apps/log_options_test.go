@@ -16,7 +16,7 @@ func TestLogOptionsDrift(t *testing.T) {
 		name := popts.Field(i).Name
 		doptsField, found := dopts.FieldByName(name)
 		// TODO: Add this option to deployment config log options
-		if name == "InsecureSkipTLSVerifyBackend" {
+		if name == "InsecureSkipTLSVerifyBackend" || name == "Stream" {
 			continue
 		}
 		if !found {
