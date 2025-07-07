@@ -7,7 +7,6 @@ import (
 
 	"github.com/distribution/distribution/v3/manifest/manifestlist"
 	"github.com/distribution/distribution/v3/manifest/ocischema"
-	"github.com/distribution/distribution/v3/manifest/schema1"
 	"github.com/distribution/distribution/v3/manifest/schema2"
 	godigest "github.com/opencontainers/go-digest"
 	imgspecv1 "github.com/opencontainers/image-spec/specs-go/v1"
@@ -58,22 +57,6 @@ func InternalImageWithMetadata(image *imageapi.Image) error {
 	}
 
 	switch manifest.SchemaVersion {
-	case 1:
-		image.DockerImageManifestMediaType = schema1.MediaTypeManifest
-
-		if len(manifest.History) == 0 {
-			// It should never have an empty history, but just in case.
-			return fmt.Errorf("the image %s (%s) has a schema 1 manifest, but it doesn't have history", image.Name, image.DockerImageReference)
-		}
-
-		v1Metadata := dockerapi10.DockerV1CompatibilityImage{}
-		if err := json.Unmarshal([]byte(manifest.History[0].DockerV1Compatibility), &v1Metadata); err != nil {
-			return err
-		}
-
-		if err := dockerapi10.Convert_DockerV1CompatibilityImage_to_image_DockerImage(&v1Metadata, &image.DockerImageMetadata); err != nil {
-			return err
-		}
 	case 2:
 		if manifest.MediaType != "" {
 			image.DockerImageManifestMediaType = manifest.MediaType
@@ -127,30 +110,6 @@ func fillImageLayers(image *imageapi.Image, manifest dockerapi10.DockerImageMani
 	}
 
 	switch manifest.SchemaVersion {
-	case 1:
-		if len(manifest.History) != len(manifest.FSLayers) {
-			return fmt.Errorf("the image %s (%s) has mismatched history and fslayer cardinality (%d != %d)", image.Name, image.DockerImageReference, len(manifest.History), len(manifest.FSLayers))
-		}
-
-		image.DockerImageLayers = make([]imageapi.ImageLayer, len(manifest.FSLayers))
-		for i, obj := range manifest.History {
-			layer := manifest.FSLayers[i]
-
-			var size dockerapi10.DockerV1CompatibilityImageSize
-			if err := json.Unmarshal([]byte(obj.DockerV1Compatibility), &size); err != nil {
-				size.Size = 0
-			}
-
-			// reverse order of the layers: in schema1 manifests the
-			// first layer is the youngest (base layers are at the
-			// end), but we want to store layers in the Image resource
-			// in order from the oldest to the youngest.
-			revidx := (len(manifest.History) - 1) - i // n-1, n-2, ..., 1, 0
-
-			image.DockerImageLayers[revidx].Name = layer.DockerBlobSum
-			image.DockerImageLayers[revidx].LayerSize = size.Size
-			image.DockerImageLayers[revidx].MediaType = schema1.MediaTypeManifestLayer
-		}
 	case 2:
 		// The layer list is ordered starting from the base image (opposite order of schema1).
 		// So, we do not need to change the order of layers.
@@ -182,8 +141,6 @@ func reorderImageLayers(image *imageapi.Image) {
 	layersOrder, ok := image.Annotations[imagev1.DockerImageLayersOrderAnnotation]
 	if !ok {
 		switch image.DockerImageManifestMediaType {
-		case schema1.MediaTypeManifest, schema1.MediaTypeSignedManifest:
-			layersOrder = imagev1.DockerImageLayersOrderAscending
 		case schema2.MediaTypeManifest, imgspecv1.MediaTypeImageManifest:
 			layersOrder = imagev1.DockerImageLayersOrderDescending
 		default:
@@ -232,12 +189,6 @@ func ManifestMatchesImage(image *imageapi.Image, newManifest []byte) (bool, erro
 		if err != nil {
 			return false, err
 		}
-	case schema1.MediaTypeManifest, "":
-		var m schema1.SignedManifest
-		if err := json.Unmarshal(newManifest, &m); err != nil {
-			return false, err
-		}
-		canonical = m.Canonical
 	default:
 		return false, fmt.Errorf("unsupported manifest mediatype: %s", image.DockerImageManifestMediaType)
 	}

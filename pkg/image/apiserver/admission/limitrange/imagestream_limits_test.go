@@ -13,7 +13,7 @@ import (
 	"github.com/openshift/library-go/pkg/quota/quotautil"
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	imagetest "github.com/openshift/openshift-apiserver/pkg/image/apiserver/testutil"
+	imagetest "github.com/openshift/openshift-apiserver/pkg/image/apiserver/internal/testutil"
 )
 
 func TestGetMaxLimits(t *testing.T) {

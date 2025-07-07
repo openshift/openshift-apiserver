@@ -12,7 +12,6 @@ import (
 	"github.com/distribution/distribution/v3"
 	"github.com/distribution/distribution/v3/manifest/manifestlist"
 	"github.com/distribution/distribution/v3/manifest/ocischema"
-	"github.com/distribution/distribution/v3/manifest/schema1"
 	"github.com/distribution/distribution/v3/manifest/schema2"
 	"github.com/distribution/distribution/v3/reference"
 	"github.com/distribution/distribution/v3/registry/api/errcode"
@@ -743,8 +742,6 @@ func (imp *ImageStreamImporter) importManifest(
 	if isManifestList && !legacyManifestListImport {
 		image, err = manifestListToImage(manifestList, d)
 		return
-	} else if signedManifest, isSchema1 := manifest.(*schema1.SignedManifest); isSchema1 {
-		image, err = schema1ToImage(signedManifest, d)
 	} else if deserializedManifest, isSchema2 := manifest.(*schema2.DeserializedManifest); isSchema2 {
 		imageConfig, getImportConfigErr := b.Get(ctx, deserializedManifest.Config.Digest)
 		if getImportConfigErr != nil {
