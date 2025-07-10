@@ -3,6 +3,7 @@ package importer
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -11,7 +12,7 @@ import (
 	"github.com/containers/image/v5/pkg/sysregistriesv2"
 	"github.com/distribution/distribution/v3"
 	"github.com/distribution/distribution/v3/manifest/schema2"
-	"github.com/distribution/distribution/v3/reference"
+	"github.com/distribution/reference"
 	godigest "github.com/opencontainers/go-digest"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -113,7 +114,7 @@ func (r *mockBlobStore) ServeBlob(ctx context.Context, w http.ResponseWriter, re
 	return r.serveErr
 }
 
-func (r *mockBlobStore) Open(ctx context.Context, dgst godigest.Digest) (distribution.ReadSeekCloser, error) {
+func (r *mockBlobStore) Open(ctx context.Context, dgst godigest.Digest) (io.ReadSeekCloser, error) {
 	return nil, r.openErr
 }
 

@@ -3,9 +3,7 @@ package importer
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/distribution/distribution/v3"
-	"github.com/distribution/distribution/v3/manifest/manifestlist"
 	"github.com/distribution/distribution/v3/registry/api/errcode"
 	godigest "github.com/opencontainers/go-digest"
 
@@ -56,10 +54,7 @@ func schema2OrOCIToImage(manifest distribution.Manifest, imageConfig []byte, d g
 	return image, nil
 }
 
-func manifestListToImage(
-	manifest *manifestlist.DeserializedManifestList,
-	d godigest.Digest,
-) (*imageapi.Image, error) {
+func manifestToImage(manifest distribution.Manifest, d godigest.Digest) (*imageapi.Image, error) {
 	mediatype, payload, err := manifest.Payload()
 	if err != nil {
 		return nil, err
@@ -88,7 +83,7 @@ func manifestListToImage(
 		DockerImageManifestMediaType: mediatype,
 	}
 
-	for _, manifest := range manifest.Manifests {
+	for _, manifest := range manifest.References() {
 		m := imageapi.ImageManifest{
 			Digest:       manifest.Digest.String(),
 			MediaType:    manifest.MediaType,

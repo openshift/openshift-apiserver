@@ -13,9 +13,9 @@ import (
 	"github.com/distribution/distribution/v3/manifest/manifestlist"
 	"github.com/distribution/distribution/v3/manifest/ocischema"
 	"github.com/distribution/distribution/v3/manifest/schema2"
-	"github.com/distribution/distribution/v3/reference"
 	"github.com/distribution/distribution/v3/registry/api/errcode"
 	v2 "github.com/distribution/distribution/v3/registry/api/v2"
+	"github.com/distribution/reference"
 	godigest "github.com/opencontainers/go-digest"
 
 	kapierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -668,14 +668,15 @@ func (imp *ImageStreamImporter) getManifest(
 	return nil, nil, nil, utilerrors.NewAggregate(errs)
 }
 
-func manifestFromManifestList(
+func selectManifestForPlatform(
 	ctx context.Context,
-	manifestList *manifestlist.DeserializedManifestList,
+	manifest distribution.Manifest,
 	ref reference.Named,
 	s distribution.ManifestService,
 	preferArch, preferOS string,
 ) (distribution.Manifest, godigest.Digest, error) {
-	if len(manifestList.Manifests) == 0 {
+	descriptors := manifest.References()
+	if len(descriptors) == 0 {
 		return nil, "", fmt.Errorf("no manifests in manifest list")
 	}
 
@@ -687,7 +688,7 @@ func manifestFromManifestList(
 	}
 
 	var manifestDigest godigest.Digest
-	for _, manifestDescriptor := range manifestList.Manifests {
+	for _, manifestDescriptor := range descriptors {
 		if manifestDescriptor.Platform.Architecture == preferArch && manifestDescriptor.Platform.OS == preferOS {
 			manifestDigest = manifestDescriptor.Digest
 			break
@@ -698,7 +699,7 @@ func manifestFromManifestList(
 	// arch/os, prefer x86/linux before falling back to "first image in the manifestlist"
 	// as a last resort.
 	if manifestDigest == "" {
-		for _, manifestDescriptor := range manifestList.Manifests {
+		for _, manifestDescriptor := range descriptors {
 			if manifestDescriptor.Platform.Architecture == "amd64" && manifestDescriptor.Platform.OS == "linux" {
 				manifestDigest = manifestDescriptor.Digest
 				break
@@ -707,8 +708,11 @@ func manifestFromManifestList(
 	}
 
 	if manifestDigest == "" {
-		klog.V(5).Infof("unable to find %s/%s manifest in manifest list %s, doing conservative fail by switching to the first one: %#+v", preferOS, preferArch, ref.String(), manifestList.Manifests[0])
-		manifestDigest = manifestList.Manifests[0].Digest
+		klog.V(5).Infof(
+			"unable to find %s/%s manifest in manifest list %s, doing conservative fail by switching to the first one: %#+v",
+			preferOS, preferArch, ref.String(), descriptors[0],
+		)
+		manifestDigest = descriptors[0].Digest
 	}
 
 	manifest, err := s.Get(ctx, manifestDigest)
@@ -730,33 +734,39 @@ func (imp *ImageStreamImporter) importManifest(
 	preferArch, preferOS string,
 	importMode imageapi.ImportModeType,
 ) (image *imageapi.Image, err error) {
-	legacyManifestListImport := importMode == "" || importMode == imageapi.ImportModeLegacy
-	manifestList, isManifestList := manifest.(*manifestlist.DeserializedManifestList)
-	if isManifestList && legacyManifestListImport {
-		manifest, d, err = manifestFromManifestList(ctx, manifestList, ref, s, preferArch, preferOS)
+
+	// In case we are dealing with an image index or a manifest list, select the right image.
+	_, isIndex := manifest.(*ocischema.DeserializedImageIndex)
+	_, isList := manifest.(*manifestlist.DeserializedManifestList)
+	if isIndex || isList {
+		if importMode != "" && importMode != imageapi.ImportModeLegacy {
+			return manifestToImage(manifest, d)
+		}
+
+		manifest, d, err = selectManifestForPlatform(ctx, manifest, ref, s, preferArch, preferOS)
 		if err != nil {
 			return nil, formatRepositoryError(ref, err)
 		}
 	}
 
-	if isManifestList && !legacyManifestListImport {
-		image, err = manifestListToImage(manifestList, d)
-		return
-	} else if deserializedManifest, isSchema2 := manifest.(*schema2.DeserializedManifest); isSchema2 {
-		imageConfig, getImportConfigErr := b.Get(ctx, deserializedManifest.Config.Digest)
-		if getImportConfigErr != nil {
-			klog.V(5).Infof("unable to get image config by digest %q for image %s: %#v", d, ref.String(), getImportConfigErr)
-			return image, formatRepositoryError(ref, getImportConfigErr)
-		}
-		image, err = schema2OrOCIToImage(deserializedManifest, imageConfig, d)
-	} else if deserializedManifest, isOCISchema := manifest.(*ocischema.DeserializedManifest); isOCISchema {
-		imageConfig, getImportConfigErr := b.Get(ctx, deserializedManifest.Config.Digest)
+	switch manifest := manifest.(type) {
+	case *schema2.DeserializedManifest:
+		imageConfig, getImportConfigErr := b.Get(ctx, manifest.Config.Digest)
 		if getImportConfigErr != nil {
 			klog.V(5).Infof("unable to get image config by digest %q for image %s: %#v", d, ref.String(), getImportConfigErr)
 			return image, formatRepositoryError(ref, getImportConfigErr)
 		}
 		image, err = schema2OrOCIToImage(manifest, imageConfig, d)
-	} else {
+
+	case *ocischema.DeserializedManifest:
+		imageConfig, getImportConfigErr := b.Get(ctx, manifest.Config.Digest)
+		if getImportConfigErr != nil {
+			klog.V(5).Infof("unable to get image config by digest %q for image %s: %#v", d, ref.String(), getImportConfigErr)
+			return image, formatRepositoryError(ref, getImportConfigErr)
+		}
+		image, err = schema2OrOCIToImage(manifest, imageConfig, d)
+
+	default:
 		err = fmt.Errorf("unsupported image manifest type: %T", manifest)
 		klog.V(5).Info(err)
 	}

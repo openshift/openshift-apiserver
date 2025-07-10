@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/distribution/distribution/v3/reference"
+	"github.com/distribution/reference"
 
 	kmeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/validation/path"

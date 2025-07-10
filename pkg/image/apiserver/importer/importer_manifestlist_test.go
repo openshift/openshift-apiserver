@@ -23,6 +23,16 @@ import (
 //go:embed testdata/manifest-list.json
 var manifestListJSON []byte
 
+const manifestListDigest = "sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41"
+
+func newManifestList(t *testing.T) *manifestlist.DeserializedManifestList {
+	manifestList := &manifestlist.DeserializedManifestList{}
+	if err := manifestList.UnmarshalJSON(manifestListJSON); err != nil {
+		t.Fatal(err)
+	}
+	return manifestList
+}
+
 //go:embed testdata/manifest-linux-amd64.json
 var amd64ManifestJSON []byte
 
@@ -36,10 +46,10 @@ var arm64ManifestJSON []byte
 var arm64ConfigJSON []byte
 
 func TestImportManifestListWithError(t *testing.T) {
-	manifestList := &manifestlist.DeserializedManifestList{}
-	if err := manifestList.UnmarshalJSON(manifestListJSON); err != nil {
-		t.Fatal(err)
-	}
+	testImportRootManifestWithError(t, newManifestList(t), manifestListDigest)
+}
+
+func testImportRootManifestWithError(t *testing.T, manifest distribution.Manifest, manifestDigest godigest.Digest) {
 	amd64Manifest := &schema2.DeserializedManifest{}
 	if err := amd64Manifest.UnmarshalJSON(amd64ManifestJSON); err != nil {
 		t.Fatal(err)
@@ -60,7 +70,7 @@ func TestImportManifestListWithError(t *testing.T) {
 			name:     "missingManifestErrorByDigest",
 			fromName: "test@sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
 			manifests: map[godigest.Digest]distribution.Manifest{
-				"sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41": manifestList,
+				manifestDigest: manifest,
 				"sha256:ca013ac5c09f9a9f6db8370c1b759a29fe997d64d6591e9a75b71748858f7da0": amd64Manifest,
 			},
 			blobs: map[godigest.Digest][]byte{
@@ -72,7 +82,7 @@ func TestImportManifestListWithError(t *testing.T) {
 			name:     "missingConfigBlobErrorByDigest",
 			fromName: "test@sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
 			manifests: map[godigest.Digest]distribution.Manifest{
-				"sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41": manifestList,
+				manifestDigest: manifest,
 				"sha256:ca013ac5c09f9a9f6db8370c1b759a29fe997d64d6591e9a75b71748858f7da0": amd64Manifest,
 				"sha256:1a06d68cb9117b52965035a5b0fa4c1470ef892e6062ffedb1af1922952e0950": arm64Manifest,
 			},
@@ -121,15 +131,14 @@ func TestImportManifestListWithError(t *testing.T) {
 }
 
 func TestImportManifestList(t *testing.T) {
-	manifestList := &manifestlist.DeserializedManifestList{}
-	if err := manifestList.UnmarshalJSON(manifestListJSON); err != nil {
-		t.Fatal(err)
-	}
+	testImportRootManifest(t, newManifestList(t), manifestListDigest)
+}
 
+func testImportRootManifest(t *testing.T, manifest distribution.Manifest, manifestDigest godigest.Digest) {
 	testCases := []struct {
 		name             string
 		isImport         imageapi.ImageStreamImport
-		manifestList     *manifestlist.DeserializedManifestList
+		root             distribution.Manifest
 		importEntireRepo bool
 		// the sub manifests that will be imported, as listed in importPlatforms
 		manifests []struct {
@@ -156,7 +165,7 @@ func TestImportManifestList(t *testing.T) {
 				},
 			},
 			importEntireRepo: true,
-			manifestList:     manifestList,
+			root:             manifest,
 			manifests: []struct {
 				raw              []byte
 				digest           godigest.Digest
@@ -177,7 +186,7 @@ func TestImportManifestList(t *testing.T) {
 				},
 			},
 			expectedRequests: []godigest.Digest{
-				// manifest list digest will be empty when importing by tag
+				// root digest will be empty when importing by tag
 				"",
 				// amd64 manifest digest
 				"sha256:ca013ac5c09f9a9f6db8370c1b759a29fe997d64d6591e9a75b71748858f7da0",
@@ -202,7 +211,7 @@ func TestImportManifestList(t *testing.T) {
 					},
 				},
 			},
-			manifestList: manifestList,
+			root: manifest,
 			manifests: []struct {
 				raw              []byte
 				digest           godigest.Digest
@@ -223,7 +232,7 @@ func TestImportManifestList(t *testing.T) {
 				},
 			},
 			expectedRequests: []godigest.Digest{
-				// manifest list digest will be empty when importing by tag
+				// root digest will be empty when importing by tag
 				"",
 				// amd64 manifest digest
 				"sha256:ca013ac5c09f9a9f6db8370c1b759a29fe997d64d6591e9a75b71748858f7da0",
@@ -242,13 +251,13 @@ func TestImportManifestList(t *testing.T) {
 							},
 							From: kapi.ObjectReference{
 								Kind: "DockerImage",
-								Name: "test@sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
+								Name: "test@" + manifestDigest.String(),
 							},
 						},
 					},
 				},
 			},
-			manifestList: manifestList,
+			root: manifest,
 			manifests: []struct {
 				raw              []byte
 				digest           godigest.Digest
@@ -269,8 +278,8 @@ func TestImportManifestList(t *testing.T) {
 				},
 			},
 			expectedRequests: []godigest.Digest{
-				// manifest list digest
-				"sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
+				// root digest
+				manifestDigest,
 				// amd64 manifest digest
 				"sha256:ca013ac5c09f9a9f6db8370c1b759a29fe997d64d6591e9a75b71748858f7da0",
 				// arm64 manifest digest
@@ -288,7 +297,7 @@ func TestImportManifestList(t *testing.T) {
 							},
 							From: kapi.ObjectReference{
 								Kind: "DockerImage",
-								Name: "test@sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
+								Name: "test@" + manifestDigest.String(),
 							},
 						},
 						{
@@ -297,13 +306,13 @@ func TestImportManifestList(t *testing.T) {
 							},
 							From: kapi.ObjectReference{
 								Kind: "DockerImage",
-								Name: "test@sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
+								Name: "test@" + manifestDigest.String(),
 							},
 						},
 					},
 				},
 			},
-			manifestList: manifestList,
+			root: manifest,
 			manifests: []struct {
 				raw              []byte
 				digest           godigest.Digest
@@ -324,14 +333,14 @@ func TestImportManifestList(t *testing.T) {
 				},
 			},
 			expectedRequests: []godigest.Digest{
-				// manifest list digest
-				"sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
+				// root digest
+				manifestDigest,
 				// amd64 manifest digest
 				"sha256:ca013ac5c09f9a9f6db8370c1b759a29fe997d64d6591e9a75b71748858f7da0",
 				// arm64 manifest digest
 				"sha256:1a06d68cb9117b52965035a5b0fa4c1470ef892e6062ffedb1af1922952e0950",
-				// manifest list digest
-				"sha256:5020d54ec2de60c4e187128b5a03adda261a7fe78c9c500ffd24ff4af476fb41",
+				// root digest
+				manifestDigest,
 				// amd64 manifest digest
 				"sha256:ca013ac5c09f9a9f6db8370c1b759a29fe997d64d6591e9a75b71748858f7da0",
 			},
@@ -352,7 +361,7 @@ func TestImportManifestList(t *testing.T) {
 			}
 
 			mockRepo := &mockRepository{
-				manifest:       testCase.manifestList,
+				manifest:       testCase.root,
 				blobs:          &mockBlobStore{blobs: configBlobs},
 				extraManifests: subManifests,
 			}
@@ -400,6 +409,10 @@ func TestImportManifestList(t *testing.T) {
 }
 
 func TestImportManifestListSingleManifest(t *testing.T) {
+	testImportRootManifestSingleManifest(t, newManifestList(t))
+}
+
+func testImportRootManifestSingleManifest(t *testing.T, manifest distribution.Manifest) {
 	testCases := []struct {
 		name             string
 		fromName         string
@@ -446,24 +459,20 @@ func TestImportManifestListSingleManifest(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			manifestList := &manifestlist.DeserializedManifestList{}
-			if err := manifestList.UnmarshalJSON(manifestListJSON); err != nil {
-				t.Fatal(err)
-			}
 			innerManifest := &schema2.DeserializedManifest{}
 			if err := innerManifest.UnmarshalJSON(amd64ManifestJSON); err != nil {
 				t.Fatal(err)
 			}
 
 			mockRepo := &mockRepository{
-				manifest: manifestList,
+				manifest: manifest,
 				blobs: &mockBlobStore{
 					blobs: map[godigest.Digest][]byte{
 						"sha256:a2a15febcdf362f6115e801d37b5e60d6faaeedcb9896155e5fe9d754025be12": amd64ConfigJSON,
 					},
 				},
 				extraManifests: map[godigest.Digest]distribution.Manifest{
-					manifestList.Manifests[0].Descriptor.Digest: innerManifest,
+					manifest.References()[0].Digest: innerManifest,
 				},
 			}
 			retriever := &mockRetriever{repo: mockRepo}
