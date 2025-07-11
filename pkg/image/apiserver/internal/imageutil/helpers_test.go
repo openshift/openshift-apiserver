@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/diff"
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
+	kapihelper "k8s.io/kubernetes/pkg/apis/core/helper"
 
 	imagev1 "github.com/openshift/api/image/v1"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
@@ -41,7 +41,95 @@ func TestImageWithMetadata(t *testing.T) {
 			},
 			expectError: true,
 		},
-		"happy path schema v2": {
+		"error unmarshalling v1 compat": {
+			image: imageapi.Image{
+				DockerImageManifest: "{\"name\": \"library/ubuntu\", \"tag\": \"latest\", \"history\": [\"v1Compatibility\": \"{ not valid {{ json\" }",
+			},
+			expectError: true,
+		},
+		"happy path": {
+			image: validImageWithManifestData(),
+			expectedImage: imageapi.Image{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "id",
+					Annotations: map[string]string{
+						imagev1.DockerImageLayersOrderAnnotation: imagev1.DockerImageLayersOrderAscending,
+					},
+				},
+				DockerImageManifest: validImageWithManifestData().DockerImageManifest,
+				DockerImageLayers: []imageapi.ImageLayer{
+					{Name: "tarsum.dev+sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", MediaType: "application/vnd.docker.container.image.rootfs.diff+x-gtar", LayerSize: 0},
+					{Name: "tarsum.dev+sha256:2aaacc362ac6be2b9e9ae8c6029f6f616bb50aec63746521858e47841b90fabd", MediaType: "application/vnd.docker.container.image.rootfs.diff+x-gtar", LayerSize: 188097705},
+					{Name: "tarsum.dev+sha256:c937c4bb1c1a21cc6d94340812262c6472092028972ae69b551b1a70d4276171", MediaType: "application/vnd.docker.container.image.rootfs.diff+x-gtar", LayerSize: 194533},
+					{Name: "tarsum.dev+sha256:b194de3772ebbcdc8f244f663669799ac1cb141834b7cb8b69100285d357a2b0", MediaType: "application/vnd.docker.container.image.rootfs.diff+x-gtar", LayerSize: 1895},
+					{Name: "tarsum.dev+sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", MediaType: "application/vnd.docker.container.image.rootfs.diff+x-gtar", LayerSize: 0},
+				},
+				DockerImageManifestMediaType: "application/vnd.docker.distribution.manifest.v1+json",
+				DockerImageMetadata: imageapi.DockerImage{
+					ID:        "2d24f826cb16146e2016ff349a8a33ed5830f3b938d45c0f82943f4ab8c097e7",
+					Parent:    "117ee323aaa9d1b136ea55e4421f4ce413dfc6c0cc6b2186dea6c88d93e1ad7c",
+					Comment:   "",
+					Created:   metav1.Date(2015, 2, 21, 2, 11, 6, 735146646, time.UTC),
+					Container: "c9a3eda5951d28aa8dbe5933be94c523790721e4f80886d0a8e7a710132a38ec",
+					ContainerConfig: imageapi.DockerConfig{
+						Hostname:        "43bd710ec89a",
+						Domainname:      "",
+						User:            "",
+						Memory:          0,
+						MemorySwap:      0,
+						CPUShares:       0,
+						CPUSet:          "",
+						AttachStdin:     false,
+						AttachStdout:    false,
+						AttachStderr:    false,
+						PortSpecs:       nil,
+						ExposedPorts:    nil,
+						Tty:             false,
+						OpenStdin:       false,
+						StdinOnce:       false,
+						Env:             []string{"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"},
+						Cmd:             []string{"/bin/sh", "-c", "#(nop) CMD [/bin/bash]"},
+						Image:           "117ee323aaa9d1b136ea55e4421f4ce413dfc6c0cc6b2186dea6c88d93e1ad7c",
+						Volumes:         nil,
+						WorkingDir:      "",
+						Entrypoint:      nil,
+						NetworkDisabled: false,
+						SecurityOpts:    nil,
+						OnBuild:         []string{},
+					},
+					DockerVersion: "1.4.1",
+					Author:        "",
+					Config: &imageapi.DockerConfig{
+						Hostname:        "43bd710ec89a",
+						Domainname:      "",
+						User:            "",
+						Memory:          0,
+						MemorySwap:      0,
+						CPUShares:       0,
+						CPUSet:          "",
+						AttachStdin:     false,
+						AttachStdout:    false,
+						AttachStderr:    false,
+						PortSpecs:       nil,
+						ExposedPorts:    nil,
+						Tty:             false,
+						OpenStdin:       false,
+						StdinOnce:       false,
+						Env:             []string{"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"},
+						Cmd:             []string{"/bin/bash"},
+						Image:           "117ee323aaa9d1b136ea55e4421f4ce413dfc6c0cc6b2186dea6c88d93e1ad7c",
+						Volumes:         nil,
+						WorkingDir:      "",
+						Entrypoint:      nil,
+						NetworkDisabled: false,
+						OnBuild:         []string{},
+					},
+					Architecture: "amd64",
+					Size:         188294133,
+				},
+			},
+		},
+		"valid metadata size": {
 			image: validImageWithManifestV2Data(),
 			expectedImage: imageapi.Image{
 				ObjectMeta: metav1.ObjectMeta{
@@ -94,7 +182,6 @@ func TestImageWithMetadata(t *testing.T) {
 						NetworkDisabled: false,
 						SecurityOpts:    nil,
 						OnBuild:         []string{},
-						Labels:          map[string]string{},
 					},
 					Config: &imageapi.DockerConfig{
 						Hostname:        "23304fc829f9",
@@ -120,192 +207,6 @@ func TestImageWithMetadata(t *testing.T) {
 						Entrypoint:      nil,
 						NetworkDisabled: false,
 						OnBuild:         []string{},
-						Labels:          map[string]string{},
-					},
-				},
-			},
-		},
-		"happy path OCI": {
-			image: validImageWithManifestOCIData(),
-			expectedImage: imageapi.Image{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "id",
-					Annotations: map[string]string{
-						imagev1.DockerImageLayersOrderAnnotation: imagev1.DockerImageLayersOrderAscending,
-					},
-				},
-				DockerImageConfig:            validImageWithManifestOCIData().DockerImageConfig,
-				DockerImageManifest:          validImageWithManifestOCIData().DockerImageManifest,
-				DockerImageManifestMediaType: "application/vnd.oci.image.manifest.v1+json",
-				DockerImageLayers: []imageapi.ImageLayer{
-					{
-						Name:      "sha256:d9d352c11bbd3880007953ed6eec1cbace76898828f3434984a0ca60672fdf5a",
-						LayerSize: 29715337,
-						MediaType: "application/vnd.oci.image.layer.v1.tar+gzip",
-					},
-				},
-				DockerImageMetadata: imageapi.DockerImage{
-					ID:            "sha256:bf16bdcff9c96b76a6d417bd8f0a3abe0e55c0ed9bdb3549e906834e2592fd5f",
-					Parent:        "",
-					Comment:       "",
-					Created:       metav1.Date(2025, 5, 29, 4, 21, 1, 971275965, time.UTC),
-					Container:     "57d2303e19c80641e487894fdb01e8e26ab42726f45e72624efe9d812e1c8889",
-					DockerVersion: "24.0.7",
-					Author:        "",
-					Architecture:  "amd64",
-					Size:          29718508,
-					ContainerConfig: imageapi.DockerConfig{
-						Hostname:        "57d2303e19c8",
-						Domainname:      "",
-						User:            "",
-						Memory:          0,
-						MemorySwap:      0,
-						CPUShares:       0,
-						CPUSet:          "",
-						AttachStdin:     false,
-						AttachStdout:    false,
-						AttachStderr:    false,
-						PortSpecs:       nil,
-						ExposedPorts:    nil,
-						Tty:             false,
-						OpenStdin:       false,
-						StdinOnce:       false,
-						Env:             []string{"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"},
-						Cmd:             []string{"/bin/sh", "-c", "#(nop) ", `CMD ["/bin/bash"]`},
-						Image:           "sha256:825befda5d2b1a76b71f4e1d6d31f5d82d4488b8337b1ad42e29b1340d766647",
-						Volumes:         nil,
-						WorkingDir:      "",
-						Entrypoint:      nil,
-						NetworkDisabled: false,
-						SecurityOpts:    nil,
-						OnBuild:         nil,
-						Labels: map[string]string{
-							"org.opencontainers.image.ref.name": "ubuntu",
-							"org.opencontainers.image.version":  "24.04",
-						},
-					},
-					Config: &imageapi.DockerConfig{
-						Hostname:        "",
-						Domainname:      "",
-						User:            "",
-						Memory:          0,
-						MemorySwap:      0,
-						CPUShares:       0,
-						CPUSet:          "",
-						AttachStdin:     false,
-						AttachStdout:    false,
-						AttachStderr:    false,
-						PortSpecs:       nil,
-						ExposedPorts:    nil,
-						Tty:             false,
-						OpenStdin:       false,
-						StdinOnce:       false,
-						Env:             []string{"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"},
-						Cmd:             []string{"/bin/bash"},
-						Image:           "sha256:825befda5d2b1a76b71f4e1d6d31f5d82d4488b8337b1ad42e29b1340d766647",
-						Volumes:         nil,
-						WorkingDir:      "",
-						Entrypoint:      nil,
-						NetworkDisabled: false,
-						OnBuild:         nil,
-						Labels: map[string]string{
-							"org.opencontainers.image.ref.name": "ubuntu",
-							"org.opencontainers.image.version":  "24.04",
-						},
-					},
-				},
-			},
-		},
-		"happy path OCI multiple layers": {
-			image: validImageWithManifestOCIDataMultipleLayers(),
-			expectedImage: imageapi.Image{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "sha256:99a93c48631257c32751cc64aaa73adc2bcc1e95ef5011d975f71a04b970646b",
-					Annotations: map[string]string{
-						imagev1.DockerImageLayersOrderAnnotation: imagev1.DockerImageLayersOrderAscending,
-					},
-				},
-				DockerImageConfig:            validImageWithManifestOCIDataMultipleLayers().DockerImageConfig,
-				DockerImageManifest:          validImageWithManifestOCIDataMultipleLayers().DockerImageManifest,
-				DockerImageManifestMediaType: "application/vnd.oci.image.manifest.v1+json",
-				DockerImageLayers: []imageapi.ImageLayer{
-					{
-						Name:      "sha256:0c01110621e0ec1eded421406c9f117f7ae5486c8f7b0a0d1a37cc7bc9317226",
-						LayerSize: 48494272,
-						MediaType: "application/vnd.oci.image.layer.v1.tar+gzip",
-					},
-					{
-						Name:      "sha256:3b1eb73e993990490aa137c00e60ff4ca9d1715bafb8e888dbb0986275edb13f",
-						LayerSize: 24015708,
-						MediaType: "application/vnd.oci.image.layer.v1.tar+gzip",
-					},
-					{
-						Name:      "sha256:b1b8a0660a31403a35d70b276c3c86b1200b8683e83cd77a92ec98744017684a",
-						LayerSize: 64399794,
-						MediaType: "application/vnd.oci.image.layer.v1.tar+gzip",
-					},
-					{
-						Name:      "sha256:420c602e8633734081b143b180e927a7c4b2993e514b8b19d91b935983d0dc88",
-						LayerSize: 92355229,
-						MediaType: "application/vnd.oci.image.layer.v1.tar+gzip",
-					},
-					{
-						Name:      "sha256:a8f67fead7e33763b5fa924cb2e4644bbf5332ed056eb32ba0bcd3bdb68eea3b",
-						LayerSize: 78981811,
-						MediaType: "application/vnd.oci.image.layer.v1.tar+gzip",
-					},
-					{
-						Name:      "sha256:1f64d3b080beb286622037cab1eea6b66361f7824c5935c00e96deac1a3dadbc",
-						LayerSize: 125,
-						MediaType: "application/vnd.oci.image.layer.v1.tar+gzip",
-					},
-					{
-						Name:      "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
-						LayerSize: 32,
-						MediaType: "application/vnd.oci.image.layer.v1.tar+gzip",
-					},
-				},
-				DockerImageMetadata: imageapi.DockerImage{
-					ID:              "sha256:99a93c48631257c32751cc64aaa73adc2bcc1e95ef5011d975f71a04b970646b",
-					Parent:          "",
-					Comment:         "",
-					Created:         metav1.Date(2025, 6, 5, 18, 53, 13, 0, time.UTC),
-					Container:       "",
-					DockerVersion:   "",
-					Author:          "",
-					Architecture:    "amd64",
-					Size:            308250765,
-					ContainerConfig: imageapi.DockerConfig{},
-					Config: &imageapi.DockerConfig{
-						Hostname:     "",
-						Domainname:   "",
-						User:         "",
-						Memory:       0,
-						MemorySwap:   0,
-						CPUShares:    0,
-						CPUSet:       "",
-						AttachStdin:  false,
-						AttachStdout: false,
-						AttachStderr: false,
-						PortSpecs:    nil,
-						ExposedPorts: nil,
-						Tty:          false,
-						OpenStdin:    false,
-						StdinOnce:    false,
-						Env: []string{
-							"PATH=/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-							"GOLANG_VERSION=1.24.4",
-							"GOTOOLCHAIN=local",
-							"GOPATH=/go",
-						},
-						Cmd:             []string{"bash"},
-						Image:           "",
-						Volumes:         nil,
-						WorkingDir:      "/go",
-						Entrypoint:      nil,
-						NetworkDisabled: false,
-						OnBuild:         nil,
-						Labels:          nil,
 					},
 				},
 			},
@@ -323,8 +224,8 @@ func TestImageWithMetadata(t *testing.T) {
 			if test.expectError {
 				return
 			}
-			if e, a := test.expectedImage, imageWithMetadata; !cmp.Equal(e, a) {
-				t.Errorf("image: %s", cmp.Diff(e, a))
+			if e, a := test.expectedImage, imageWithMetadata; !kapihelper.Semantic.DeepEqual(e, a) {
+				t.Errorf("image: %s", diff.ObjectDiff(e, a))
 			}
 		})
 	}
@@ -344,6 +245,70 @@ func TestImageWithMetadataWithManifestList(t *testing.T) {
 	}
 	if image.DockerImageMetadata.Created.IsZero() {
 		t.Error("expected image metadata created field to not be zero")
+	}
+}
+
+func validImageWithManifestData() imageapi.Image {
+	return imageapi.Image{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "id",
+		},
+		DockerImageManifest: `{
+   "name": "library/ubuntu",
+   "tag": "latest",
+   "architecture": "amd64",
+   "fsLayers": [
+      {
+         "blobSum": "tarsum.dev+sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+         "blobSum": "tarsum.dev+sha256:b194de3772ebbcdc8f244f663669799ac1cb141834b7cb8b69100285d357a2b0"
+      },
+      {
+         "blobSum": "tarsum.dev+sha256:c937c4bb1c1a21cc6d94340812262c6472092028972ae69b551b1a70d4276171"
+      },
+      {
+         "blobSum": "tarsum.dev+sha256:2aaacc362ac6be2b9e9ae8c6029f6f616bb50aec63746521858e47841b90fabd"
+      },
+      {
+         "blobSum": "tarsum.dev+sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+   ],
+   "history": [
+      {
+         "v1Compatibility": "{\"id\":\"2d24f826cb16146e2016ff349a8a33ed5830f3b938d45c0f82943f4ab8c097e7\",\"parent\":\"117ee323aaa9d1b136ea55e4421f4ce413dfc6c0cc6b2186dea6c88d93e1ad7c\",\"created\":\"2015-02-21T02:11:06.735146646Z\",\"container\":\"c9a3eda5951d28aa8dbe5933be94c523790721e4f80886d0a8e7a710132a38ec\",\"container_config\":{\"Hostname\":\"43bd710ec89a\",\"Domainname\":\"\",\"User\":\"\",\"Memory\":0,\"MemorySwap\":0,\"CpuShares\":0,\"Cpuset\":\"\",\"AttachStdin\":false,\"AttachStdout\":false,\"AttachStderr\":false,\"PortSpecs\":null,\"ExposedPorts\":null,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Cmd\":[\"/bin/sh\",\"-c\",\"#(nop) CMD [/bin/bash]\"],\"Image\":\"117ee323aaa9d1b136ea55e4421f4ce413dfc6c0cc6b2186dea6c88d93e1ad7c\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"NetworkDisabled\":false,\"MacAddress\":\"\",\"OnBuild\":[]},\"docker_version\":\"1.4.1\",\"config\":{\"Hostname\":\"43bd710ec89a\",\"Domainname\":\"\",\"User\":\"\",\"Memory\":0,\"MemorySwap\":0,\"CpuShares\":0,\"Cpuset\":\"\",\"AttachStdin\":false,\"AttachStdout\":false,\"AttachStderr\":false,\"PortSpecs\":null,\"ExposedPorts\":null,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Cmd\":[\"/bin/bash\"],\"Image\":\"117ee323aaa9d1b136ea55e4421f4ce413dfc6c0cc6b2186dea6c88d93e1ad7c\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"NetworkDisabled\":false,\"MacAddress\":\"\",\"OnBuild\":[]},\"architecture\":\"amd64\",\"os\":\"linux\",\"checksum\":\"tarsum.dev+sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"Size\":0}\n"
+      },
+      {
+         "v1Compatibility": "{\"id\":\"117ee323aaa9d1b136ea55e4421f4ce413dfc6c0cc6b2186dea6c88d93e1ad7c\",\"parent\":\"1c8294cc516082dfbb731f062806b76b82679ce38864dd87635f08869c993e45\",\"created\":\"2015-02-21T02:11:02.473113442Z\",\"container\":\"b4d4c42c196081cdb8e032446e9db92c0ce8ddeeeb1ef4e582b0275ad62b9af2\",\"container_config\":{\"Hostname\":\"43bd710ec89a\",\"Domainname\":\"\",\"User\":\"\",\"Memory\":0,\"MemorySwap\":0,\"CpuShares\":0,\"Cpuset\":\"\",\"AttachStdin\":false,\"AttachStdout\":false,\"AttachStderr\":false,\"PortSpecs\":null,\"ExposedPorts\":null,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Cmd\":[\"/bin/sh\",\"-c\",\"sed -i 's/^#\\\\s*\\\\(deb.*universe\\\\)$/\\\\1/g' /etc/apt/sources.list\"],\"Image\":\"1c8294cc516082dfbb731f062806b76b82679ce38864dd87635f08869c993e45\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"NetworkDisabled\":false,\"MacAddress\":\"\",\"OnBuild\":[]},\"docker_version\":\"1.4.1\",\"config\":{\"Hostname\":\"43bd710ec89a\",\"Domainname\":\"\",\"User\":\"\",\"Memory\":0,\"MemorySwap\":0,\"CpuShares\":0,\"Cpuset\":\"\",\"AttachStdin\":false,\"AttachStdout\":false,\"AttachStderr\":false,\"PortSpecs\":null,\"ExposedPorts\":null,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Cmd\":null,\"Image\":\"1c8294cc516082dfbb731f062806b76b82679ce38864dd87635f08869c993e45\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"NetworkDisabled\":false,\"MacAddress\":\"\",\"OnBuild\":[]},\"architecture\":\"amd64\",\"os\":\"linux\",\"checksum\":\"tarsum.dev+sha256:b194de3772ebbcdc8f244f663669799ac1cb141834b7cb8b69100285d357a2b0\",\"Size\":1895}\n"
+      },
+      {
+         "v1Compatibility": "{\"id\":\"1c8294cc516082dfbb731f062806b76b82679ce38864dd87635f08869c993e45\",\"parent\":\"fa4fd76b09ce9b87bfdc96515f9a5dd5121c01cc996cf5379050d8e13d4a864b\",\"created\":\"2015-02-21T02:10:56.648624065Z\",\"container\":\"d6323d4f92bf13dd2a7d2957e8970c8dc8ba3c2df08ffebdf4a04b4b658c83fb\",\"container_config\":{\"Hostname\":\"43bd710ec89a\",\"Domainname\":\"\",\"User\":\"\",\"Memory\":0,\"MemorySwap\":0,\"CpuShares\":0,\"Cpuset\":\"\",\"AttachStdin\":false,\"AttachStdout\":false,\"AttachStderr\":false,\"PortSpecs\":null,\"ExposedPorts\":null,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Cmd\":[\"/bin/sh\",\"-c\",\"echo '#!/bin/sh' \\u003e /usr/sbin/policy-rc.d \\u0009\\u0026\\u0026 echo 'exit 101' \\u003e\\u003e /usr/sbin/policy-rc.d \\u0009\\u0026\\u0026 chmod +x /usr/sbin/policy-rc.d \\u0009\\u0009\\u0026\\u0026 dpkg-divert --local --rename --add /sbin/initctl \\u0009\\u0026\\u0026 cp -a /usr/sbin/policy-rc.d /sbin/initctl \\u0009\\u0026\\u0026 sed -i 's/^exit.*/exit 0/' /sbin/initctl \\u0009\\u0009\\u0026\\u0026 echo 'force-unsafe-io' \\u003e /etc/dpkg/dpkg.cfg.d/docker-apt-speedup \\u0009\\u0009\\u0026\\u0026 echo 'DPkg::Post-Invoke { \\\"rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true\\\"; };' \\u003e /etc/apt/apt.conf.d/docker-clean \\u0009\\u0026\\u0026 echo 'APT::Update::Post-Invoke { \\\"rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true\\\"; };' \\u003e\\u003e /etc/apt/apt.conf.d/docker-clean \\u0009\\u0026\\u0026 echo 'Dir::Cache::pkgcache \\\"\\\"; Dir::Cache::srcpkgcache \\\"\\\";' \\u003e\\u003e /etc/apt/apt.conf.d/docker-clean \\u0009\\u0009\\u0026\\u0026 echo 'Acquire::Languages \\\"none\\\";' \\u003e /etc/apt/apt.conf.d/docker-no-languages \\u0009\\u0009\\u0026\\u0026 echo 'Acquire::GzipIndexes \\\"true\\\"; Acquire::CompressionTypes::Order:: \\\"gz\\\";' \\u003e /etc/apt/apt.conf.d/docker-gzip-indexes\"],\"Image\":\"fa4fd76b09ce9b87bfdc96515f9a5dd5121c01cc996cf5379050d8e13d4a864b\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"NetworkDisabled\":false,\"MacAddress\":\"\",\"OnBuild\":[]},\"docker_version\":\"1.4.1\",\"config\":{\"Hostname\":\"43bd710ec89a\",\"Domainname\":\"\",\"User\":\"\",\"Memory\":0,\"MemorySwap\":0,\"CpuShares\":0,\"Cpuset\":\"\",\"AttachStdin\":false,\"AttachStdout\":false,\"AttachStderr\":false,\"PortSpecs\":null,\"ExposedPorts\":null,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Cmd\":null,\"Image\":\"fa4fd76b09ce9b87bfdc96515f9a5dd5121c01cc996cf5379050d8e13d4a864b\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"NetworkDisabled\":false,\"MacAddress\":\"\",\"OnBuild\":[]},\"architecture\":\"amd64\",\"os\":\"linux\",\"checksum\":\"tarsum.dev+sha256:c937c4bb1c1a21cc6d94340812262c6472092028972ae69b551b1a70d4276171\",\"Size\":194533}\n"
+      },
+      {
+         "v1Compatibility": "{\"id\":\"fa4fd76b09ce9b87bfdc96515f9a5dd5121c01cc996cf5379050d8e13d4a864b\",\"parent\":\"511136ea3c5a64f264b78b5433614aec563103b4d4702f3ba7d4d2698e22c158\",\"created\":\"2015-02-21T02:10:48.627646094Z\",\"container\":\"43bd710ec89aa1d61685c5ddb8737b315f2152d04c9e127ea2a9cf79f950fa5d\",\"container_config\":{\"Hostname\":\"43bd710ec89a\",\"Domainname\":\"\",\"User\":\"\",\"Memory\":0,\"MemorySwap\":0,\"CpuShares\":0,\"Cpuset\":\"\",\"AttachStdin\":false,\"AttachStdout\":false,\"AttachStderr\":false,\"PortSpecs\":null,\"ExposedPorts\":null,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Cmd\":[\"/bin/sh\",\"-c\",\"#(nop) ADD file:0018ff77d038472f52512fd66ae2466e6325e5d91289e10a6b324f40582298df in /\"],\"Image\":\"511136ea3c5a64f264b78b5433614aec563103b4d4702f3ba7d4d2698e22c158\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"NetworkDisabled\":false,\"MacAddress\":\"\",\"OnBuild\":[]},\"docker_version\":\"1.4.1\",\"config\":{\"Hostname\":\"43bd710ec89a\",\"Domainname\":\"\",\"User\":\"\",\"Memory\":0,\"MemorySwap\":0,\"CpuShares\":0,\"Cpuset\":\"\",\"AttachStdin\":false,\"AttachStdout\":false,\"AttachStderr\":false,\"PortSpecs\":null,\"ExposedPorts\":null,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Cmd\":null,\"Image\":\"511136ea3c5a64f264b78b5433614aec563103b4d4702f3ba7d4d2698e22c158\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"NetworkDisabled\":false,\"MacAddress\":\"\",\"OnBuild\":[]},\"architecture\":\"amd64\",\"os\":\"linux\",\"checksum\":\"tarsum.dev+sha256:2aaacc362ac6be2b9e9ae8c6029f6f616bb50aec63746521858e47841b90fabd\",\"Size\":188097705}\n"
+      },
+      {
+         "v1Compatibility": "{\"id\":\"511136ea3c5a64f264b78b5433614aec563103b4d4702f3ba7d4d2698e22c158\",\"comment\":\"Imported from -\",\"created\":\"2013-06-13T14:03:50.821769-07:00\",\"container_config\":{\"Hostname\":\"\",\"Domainname\":\"\",\"User\":\"\",\"Memory\":0,\"MemorySwap\":0,\"CpuShares\":0,\"Cpuset\":\"\",\"AttachStdin\":false,\"AttachStdout\":false,\"AttachStderr\":false,\"PortSpecs\":null,\"ExposedPorts\":null,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":null,\"Cmd\":null,\"Image\":\"\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"NetworkDisabled\":false,\"MacAddress\":\"\",\"OnBuild\":null},\"docker_version\":\"0.4.0\",\"architecture\":\"x86_64\",\"checksum\":\"tarsum.dev+sha256:324d4cf44ee7daa46266c1df830c61a7df615c0632176a339e7310e34723d67a\",\"Size\":0}\n"
+      }
+   ],
+   "schemaVersion": 1,
+   "signatures": [
+      {
+         "header": {
+            "jwk": {
+               "crv": "P-256",
+               "kid": "OIH7:HQFS:44FK:45VB:3B53:OIAG:TPL4:ATF5:6PNE:MGHN:NHQX:2GE4",
+               "kty": "EC",
+               "x": "Cu_UyxwLgHzE9rvlYSmvVdqYCXY42E9eNhBb0xNv0SQ",
+               "y": "zUsjWJkeKQ5tv7S-hl1Tg71cd-CqnrtiiLxSi6N_yc8"
+            },
+            "alg": "ES256"
+         },
+         "signature": "JafVC022gLJbK8fEp9UrW-GWAi53nD4Xf0-fmb766nV6zGTq7g9RutSWHcpv3OqhV8t5b-4j-bXhvnGBjXA7Yg",
+         "protected": "eyJmb3JtYXRMZW5ndGgiOjEwMDc2LCJmb3JtYXRUYWlsIjoiQ24wIiwidGltZSI6IjIwMTUtMDMtMDdUMTI6Mzk6MjJaIn0"
+      }
+   ]
+}`,
 	}
 }
 
@@ -480,283 +445,6 @@ func validImageWithManifestV2Data() imageapi.Image {
             "digest": "sha256:b4ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4"
         }
     ]
-}`,
-	}
-}
-
-func validImageWithManifestOCIData() imageapi.Image {
-	return imageapi.Image{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "id",
-		},
-		DockerImageConfig: `{
-    "architecture": "amd64",
-    "config": {
-        "Hostname": "",
-        "Domainname": "",
-        "User": "",
-        "AttachStdin": false,
-        "AttachStdout": false,
-        "AttachStderr": false,
-        "Tty": false,
-        "OpenStdin": false,
-        "StdinOnce": false,
-        "Env": [
-            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-        ],
-        "Cmd": [
-            "/bin/bash"
-        ],
-        "Image": "sha256:825befda5d2b1a76b71f4e1d6d31f5d82d4488b8337b1ad42e29b1340d766647",
-        "Volumes": null,
-        "WorkingDir": "",
-        "Entrypoint": null,
-        "OnBuild": null,
-        "Labels": {
-            "org.opencontainers.image.ref.name": "ubuntu",
-            "org.opencontainers.image.version": "24.04"
-        }
-    },
-    "container": "57d2303e19c80641e487894fdb01e8e26ab42726f45e72624efe9d812e1c8889",
-    "container_config": {
-        "Hostname": "57d2303e19c8",
-        "Domainname": "",
-        "User": "",
-        "AttachStdin": false,
-        "AttachStdout": false,
-        "AttachStderr": false,
-        "Tty": false,
-        "OpenStdin": false,
-        "StdinOnce": false,
-        "Env": [
-            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-        ],
-        "Cmd": [
-            "/bin/sh",
-            "-c",
-            "#(nop) ",
-            "CMD [\"/bin/bash\"]"
-        ],
-        "Image": "sha256:825befda5d2b1a76b71f4e1d6d31f5d82d4488b8337b1ad42e29b1340d766647",
-        "Volumes": null,
-        "WorkingDir": "",
-        "Entrypoint": null,
-        "OnBuild": null,
-        "Labels": {
-            "org.opencontainers.image.ref.name": "ubuntu",
-            "org.opencontainers.image.version": "24.04"
-        }
-    },
-    "created": "2025-05-29T04:21:01.971275965Z",
-    "docker_version": "24.0.7",
-    "history": [
-        {
-            "created": "2025-05-29T04:20:59.390476489Z",
-            "created_by": "/bin/sh -c #(nop)  ARG RELEASE",
-            "empty_layer": true
-        },
-        {
-            "created": "2025-05-29T04:20:59.425928067Z",
-            "created_by": "/bin/sh -c #(nop)  ARG LAUNCHPAD_BUILD_ARCH",
-            "empty_layer": true
-        },
-        {
-            "created": "2025-05-29T04:20:59.461048974Z",
-            "created_by": "/bin/sh -c #(nop)  LABEL org.opencontainers.image.ref.name=ubuntu",
-            "empty_layer": true
-        },
-        {
-            "created": "2025-05-29T04:20:59.498669132Z",
-            "created_by": "/bin/sh -c #(nop)  LABEL org.opencontainers.image.version=24.04",
-            "empty_layer": true
-        },
-        {
-            "created": "2025-05-29T04:21:01.6549815Z",
-            "created_by": "/bin/sh -c #(nop) ADD file:598ca0108009b5c2e9e6f4fc4bd19a6bcd604fccb5b9376fac14a75522a5cfa3 in / "
-        },
-        {
-            "created": "2025-05-29T04:21:01.971275965Z",
-            "created_by": "/bin/sh -c #(nop)  CMD [\"/bin/bash\"]",
-            "empty_layer": true
-        }
-    ],
-    "os": "linux",
-    "rootfs": {
-        "type": "layers",
-        "diff_ids": [
-            "sha256:a8346d259389bc6221b4f3c61bad4e48087c5b82308e8f53ce703cfc8333c7b3"
-        ]
-    }
-}`,
-		DockerImageManifest: `{
-    "schemaVersion": 2,
-    "mediaType": "application/vnd.oci.image.manifest.v1+json",
-    "config": {
-        "mediaType": "application/vnd.oci.image.config.v1+json",
-        "size": 2295,
-        "digest": "sha256:bf16bdcff9c96b76a6d417bd8f0a3abe0e55c0ed9bdb3549e906834e2592fd5f"
-    },
-    "layers": [
-        {
-            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
-            "size": 29715337,
-            "digest": "sha256:d9d352c11bbd3880007953ed6eec1cbace76898828f3434984a0ca60672fdf5a"
-        }
-    ]
-}`,
-	}
-}
-
-func validImageWithManifestOCIDataMultipleLayers() imageapi.Image {
-	return imageapi.Image{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "sha256:99a93c48631257c32751cc64aaa73adc2bcc1e95ef5011d975f71a04b970646b",
-		},
-		DockerImageConfig: `{
-    "architecture": "amd64",
-    "config": {
-        "Env": [
-            "PATH=/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-            "GOLANG_VERSION=1.24.4",
-            "GOTOOLCHAIN=local",
-            "GOPATH=/go"
-        ],
-        "Cmd": [
-            "bash"
-        ],
-        "WorkingDir": "/go"
-    },
-    "created": "2025-06-05T18:53:13Z",
-    "history": [
-        {
-            "created": "2023-05-10T23:29:59Z",
-            "created_by": "# debian.sh --arch 'amd64' out/ 'bookworm' '@1749513600'",
-            "comment": "debuerreotype 0.15"
-        },
-        {
-            "created": "2023-05-10T23:29:59Z",
-            "created_by": "RUN /bin/sh -c set -eux; \tapt-get update; \tapt-get install -y --no-install-recommends \t\tca-certificates \t\tcurl \t\tgnupg \t\tnetbase \t\tsq \t\twget \t; \trm -rf /var/lib/apt/lists/* # buildkit",
-            "comment": "buildkit.dockerfile.v0"
-        },
-        {
-            "created": "2024-01-09T01:14:25Z",
-            "created_by": "RUN /bin/sh -c set -eux; \tapt-get update; \tapt-get install -y --no-install-recommends \t\tgit \t\tmercurial \t\topenssh-client \t\tsubversion \t\t\t\tprocps \t; \trm -rf /var/lib/apt/lists/* # buildkit",
-            "comment": "buildkit.dockerfile.v0"
-        },
-        {
-            "created": "2025-06-05T18:53:13Z",
-            "created_by": "RUN /bin/sh -c set -eux; \tapt-get update; \tapt-get install -y --no-install-recommends \t\tg++ \t\tgcc \t\tlibc6-dev \t\tmake \t\tpkg-config \t; \trm -rf /var/lib/apt/lists/* # buildkit",
-            "comment": "buildkit.dockerfile.v0"
-        },
-        {
-            "created": "2025-06-05T18:53:13Z",
-            "created_by": "ENV GOLANG_VERSION=1.24.4",
-            "comment": "buildkit.dockerfile.v0",
-            "empty_layer": true
-        },
-        {
-            "created": "2025-06-05T18:53:13Z",
-            "created_by": "ENV GOTOOLCHAIN=local",
-            "comment": "buildkit.dockerfile.v0",
-            "empty_layer": true
-        },
-        {
-            "created": "2025-06-05T18:53:13Z",
-            "created_by": "ENV GOPATH=/go",
-            "comment": "buildkit.dockerfile.v0",
-            "empty_layer": true
-        },
-        {
-            "created": "2025-06-05T18:53:13Z",
-            "created_by": "ENV PATH=/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-            "comment": "buildkit.dockerfile.v0",
-            "empty_layer": true
-        },
-        {
-            "created": "2025-06-05T18:53:13Z",
-            "created_by": "COPY /target/ / # buildkit",
-            "comment": "buildkit.dockerfile.v0"
-        },
-        {
-            "created": "2025-06-05T18:53:13Z",
-            "created_by": "RUN /bin/sh -c mkdir -p \"$GOPATH/src\" \"$GOPATH/bin\" && chmod -R 1777 \"$GOPATH\" # buildkit",
-            "comment": "buildkit.dockerfile.v0"
-        },
-        {
-            "created": "2025-06-05T18:53:13Z",
-            "created_by": "WORKDIR /go",
-            "comment": "buildkit.dockerfile.v0"
-        }
-    ],
-    "os": "linux",
-    "rootfs": {
-        "type": "layers",
-        "diff_ids": [
-            "sha256:8f003894a7efc4178494f1e133497ed2f325ae53b6a65869e54c04d1c51d588f",
-            "sha256:f5b8fb1def00d5f185660b75bac1eed1fce467d44cebd868dae2f344711321ef",
-            "sha256:1c49688bd8ebe54298be2b61f7d5efd32467862f115b5439b87c19e56e57c6b4",
-            "sha256:c291adf4681b803d1a3fdd12233811fb566c89cf1d423bd62f853d35aeb2c32f",
-            "sha256:86d0740ea51f822cea0316cc9b0aaf705545175ab281342f460f0f14e8742502",
-            "sha256:7c5761aef9e0522152cc129c12b38d65073013ae75888975e1b8469556f3af70",
-            "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
-        ]
-    }
-}`,
-		DockerImageManifest: `{
-    "schemaVersion": 2,
-    "mediaType": "application/vnd.oci.image.manifest.v1+json",
-    "config": {
-        "mediaType": "application/vnd.oci.image.config.v1+json",
-        "digest": "sha256:99a93c48631257c32751cc64aaa73adc2bcc1e95ef5011d975f71a04b970646b",
-        "size": 2803
-    },
-    "layers": [
-        {
-            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
-            "digest": "sha256:0c01110621e0ec1eded421406c9f117f7ae5486c8f7b0a0d1a37cc7bc9317226",
-            "size": 48494272
-        },
-        {
-            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
-            "digest": "sha256:3b1eb73e993990490aa137c00e60ff4ca9d1715bafb8e888dbb0986275edb13f",
-            "size": 24015708
-        },
-        {
-            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
-            "digest": "sha256:b1b8a0660a31403a35d70b276c3c86b1200b8683e83cd77a92ec98744017684a",
-            "size": 64399794
-        },
-        {
-            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
-            "digest": "sha256:420c602e8633734081b143b180e927a7c4b2993e514b8b19d91b935983d0dc88",
-            "size": 92355229
-        },
-        {
-            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
-            "digest": "sha256:a8f67fead7e33763b5fa924cb2e4644bbf5332ed056eb32ba0bcd3bdb68eea3b",
-            "size": 78981811
-        },
-        {
-            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
-            "digest": "sha256:1f64d3b080beb286622037cab1eea6b66361f7824c5935c00e96deac1a3dadbc",
-            "size": 125
-        },
-        {
-            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
-            "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
-            "size": 32
-        }
-    ],
-    "annotations": {
-        "com.docker.official-images.bashbrew.arch": "amd64",
-        "org.opencontainers.image.base.digest": "sha256:fab1b6389a07a117b06169a1c2bc5a4a3d3f5d7315dea5ebf4d7ad49606d7f32",
-        "org.opencontainers.image.base.name": "buildpack-deps:bookworm-scm",
-        "org.opencontainers.image.created": "2025-06-05T18:53:13Z",
-        "org.opencontainers.image.revision": "205cf586b0d0c7200e0fd642feaf738ddb382da0",
-        "org.opencontainers.image.source": "https://github.com/docker-library/golang.git#205cf586b0d0c7200e0fd642feaf738ddb382da0:1.24/bookworm",
-        "org.opencontainers.image.url": "https://hub.docker.com/_/golang",
-        "org.opencontainers.image.version": "1.24.4-bookworm"
-    }
 }`,
 	}
 }

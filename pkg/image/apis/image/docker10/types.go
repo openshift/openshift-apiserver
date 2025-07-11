@@ -28,9 +28,51 @@ type DockerImageManifest struct {
 	SchemaVersion int    `json:"schemaVersion"`
 	MediaType     string `json:"mediaType,omitempty"`
 
+	// schema1
+	Name         string          `json:"name"`
+	Tag          string          `json:"tag"`
+	Architecture string          `json:"architecture"`
+	FSLayers     []DockerFSLayer `json:"fsLayers"`
+	History      []DockerHistory `json:"history"`
+
 	// schema2
 	Layers []Descriptor `json:"layers"`
 	Config Descriptor   `json:"config"`
+}
+
+// DockerFSLayer is a container struct for BlobSums defined in an image manifest
+type DockerFSLayer struct {
+	// DockerBlobSum is the tarsum of the referenced filesystem image layer
+	// TODO make this digest.Digest once distribution/distribution/v3 is in Godeps
+	DockerBlobSum string `json:"blobSum"`
+}
+
+// DockerHistory stores unstructured v1 compatibility information
+type DockerHistory struct {
+	// DockerV1Compatibility is the raw v1 compatibility information
+	DockerV1Compatibility string `json:"v1Compatibility"`
+}
+
+// DockerV1CompatibilityImage represents the structured v1
+// compatibility information.
+type DockerV1CompatibilityImage struct {
+	ID              string                 `json:"id"`
+	Parent          string                 `json:"parent,omitempty"`
+	Comment         string                 `json:"comment,omitempty"`
+	Created         time.Time              `json:"created"`
+	Container       string                 `json:"container,omitempty"`
+	ContainerConfig docker10.DockerConfig  `json:"container_config,omitempty"`
+	DockerVersion   string                 `json:"docker_version,omitempty"`
+	Author          string                 `json:"author,omitempty"`
+	Config          *docker10.DockerConfig `json:"config,omitempty"`
+	Architecture    string                 `json:"architecture,omitempty"`
+	Size            int64                  `json:"size,omitempty"`
+}
+
+// DockerV1CompatibilityImageSize represents the structured v1
+// compatibility information for size
+type DockerV1CompatibilityImageSize struct {
+	Size int64 `json:"size,omitempty"`
 }
 
 // DockerImageConfig stores the image configuration

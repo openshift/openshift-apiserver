@@ -18,7 +18,7 @@ import (
 	kapitesting "k8s.io/kubernetes/pkg/api/testing"
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internal/testutil"
+	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/testutil"
 )
 
 func fuzzImage(t *testing.T, image *imageapi.Image, seed int64) *imageapi.Image {

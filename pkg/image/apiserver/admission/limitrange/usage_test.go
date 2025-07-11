@@ -13,7 +13,7 @@ import (
 	imagev1 "github.com/openshift/api/image/v1"
 	"github.com/openshift/library-go/pkg/image/imageutil"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	imagetest "github.com/openshift/openshift-apiserver/pkg/image/apiserver/internal/testutil"
+	imagetest "github.com/openshift/openshift-apiserver/pkg/image/apiserver/testutil"
 )
 
 func TestGetImageReferenceForObjectReference(t *testing.T) {
