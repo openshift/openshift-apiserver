@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
+	internalimageutil "github.com/openshift/openshift-apiserver/pkg/image/apiserver/internal/imageutil"
 
 	"k8s.io/klog/v2"
 
