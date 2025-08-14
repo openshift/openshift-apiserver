@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"k8s.io/klog/v2"
@@ -105,6 +106,41 @@ func (rs *statelessSkipSynchronizer) SkipSynchronize(prevState string, versioned
 	skip = currentState == prevState
 
 	return skip, currentState
+}
+
+func newOverridableSkipSynchronizer() *overridableSkipSynchronizer {
+	return &overridableSkipSynchronizer{
+		skipSynchronizer: &statelessSkipSynchronizer{},
+	}
+}
+
+var (
+	bTrue  = true
+	bFalse = false
+	pTrue  = &bTrue
+	pFalse = &bFalse
+)
+
+// overridableSkipSynchronizer wraps a base skipSynchronizer with the ability to
+// override the next SkipSynchronize call.
+type overridableSkipSynchronizer struct {
+	override atomic.Pointer[bool]
+	skipSynchronizer
+}
+
+func (o *overridableSkipSynchronizer) SkipSynchronize(prevState string, versionedObjects ...LastSyncResourceVersioner) (bool, string) {
+	if override := o.override.Swap(nil); override != nil {
+		return *override, prevState
+	}
+	return o.skipSynchronizer.SkipSynchronize(prevState, versionedObjects...)
+}
+
+func (o *overridableSkipSynchronizer) ForceDoNotSkip() {
+	o.override.Store(pFalse)
+}
+
+func (o *overridableSkipSynchronizer) ForceSkip() {
+	o.override.Store(pTrue)
 }
 
 type neverSkipSynchronizer struct{}
@@ -244,6 +280,14 @@ func NewAuthorizationCache(
 
 		watchers: []CacheWatcher{},
 	}
+	skipSyncer := newOverridableSkipSynchronizer()
+	if _, err := informers.Roles().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{DeleteFunc: func(obj interface{}) { skipSyncer.ForceDoNotSkip() }}); err != nil {
+		utilruntime.HandleError(err)
+	}
+	if _, err := informers.RoleBindings().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{DeleteFunc: func(obj interface{}) { skipSyncer.ForceDoNotSkip() }}); err != nil {
+		utilruntime.HandleError(err)
+	}
+	ac.skip = skipSyncer
 	ac.lastSyncResourceVersioner = namespaceLastSyncResourceVersioner
 	ac.syncHandler = ac.syncRequest
 	return ac
@@ -251,8 +295,6 @@ func NewAuthorizationCache(
 
 // Run begins watching and synchronizing the cache
 func (ac *AuthorizationCache) Run(period time.Duration) {
-	ac.skip = &statelessSkipSynchronizer{}
-
 	go utilwait.Forever(func() { ac.synchronize() }, period)
 }
 
