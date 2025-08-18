@@ -1,3 +1,4 @@
 /openshift-apiserver
 /_output
 .idea
+/openshift-apiserver-tests-ext
