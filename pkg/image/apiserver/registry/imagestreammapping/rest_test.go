@@ -134,7 +134,7 @@ func TestCreateConflictingNamespace(t *testing.T) {
 	}
 	expectedError := "the namespace of the provided object does not match the namespace sent on the request"
 	if err == nil {
-		t.Fatalf("Expected '" + expectedError + "', but we didn't get one")
+		t.Fatal("Expected '" + expectedError + "', but we didn't get one")
 	}
 	if !strings.Contains(err.Error(), expectedError) {
 		t.Errorf("Expected '"+expectedError+"' error, got '%v'", err.Error())

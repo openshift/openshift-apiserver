@@ -250,37 +250,37 @@ func (h *binaryInstantiateHandler) handle(r io.Reader) (runtime.Object, error) {
 	// err checks, no ok check, needs to occur before ref to latest
 	case err == buildwait.ErrBuildDeleted:
 		errLog := fmt.Sprintf("build %s was deleted before it started: %s", build.Name, apiserverbuildutil.NoBuildLogsMessage)
-		klog.Warningf(errLog)
+		klog.Warning(errLog)
 		return nil, errors.NewBadRequest(errLog)
 	case err != nil:
 		errLog := fmt.Sprintf("unable to wait for build %s to run: %v", build.Name, err)
-		klog.Warningf(errLog)
+		klog.Warning(errLog)
 		return nil, errors.NewBadRequest(errLog)
 	case !ok:
 		errLog := fmt.Sprintf("timed out waiting for build %s to start after %s", build.Name, h.r.Timeout)
-		klog.Warningf(errLog)
+		klog.Warning(errLog)
 		return nil, errors.NewTimeoutError(errLog, 0)
 	case latest.Status.Phase == buildv1.BuildPhaseError:
 		// don't cancel the build if it reached a terminal state on its own
 		cancel = false
 		errLog := fmt.Sprintf("build %s encountered an error: %s", build.Name, apiserverbuildutil.NoBuildLogsMessage)
-		klog.Warningf(errLog)
+		klog.Warning(errLog)
 		return nil, errors.NewBadRequest(errLog)
 	case latest.Status.Phase == buildv1.BuildPhaseFailed:
 		// don't cancel the build if it reached a terminal state on its own
 		cancel = false
 		errLog := fmt.Sprintf("build %s failed: %s: %s", build.Name, latest.Status.Reason, latest.Status.Message)
-		klog.Warningf(errLog)
+		klog.Warning(errLog)
 		return nil, errors.NewBadRequest(errLog)
 	case latest.Status.Phase == buildv1.BuildPhaseCancelled:
 		// don't cancel the build if it reached a terminal state on its own
 		cancel = false
 		errLog := fmt.Sprintf("build %s was cancelled: %s", build.Name, apiserverbuildutil.NoBuildLogsMessage)
-		klog.Warningf(errLog)
+		klog.Warning(errLog)
 		return nil, errors.NewBadRequest(errLog)
 	case latest.Status.Phase != buildv1.BuildPhaseRunning:
 		errLog := fmt.Sprintf("cannot upload file to build %s with status %s", build.Name, latest.Status.Phase)
-		klog.Warningf(errLog)
+		klog.Warning(errLog)
 		return nil, errors.NewBadRequest(errLog)
 	}
 

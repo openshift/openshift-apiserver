@@ -75,7 +75,7 @@ func (s *REST) Create(ctx context.Context, obj runtime.Object, _ rest.ValidateOb
 	}
 	processor := templateprocessing.NewProcessor(generators)
 	if errs := processor.Process(externalTemplate); len(errs) > 0 {
-		klog.V(1).Infof(errs.ToAggregate().Error())
+		klog.V(1).Info(errs.ToAggregate().Error())
 		return nil, errors.NewInvalid(template.Kind("Template"), tpl.Name, errs)
 	}
 
