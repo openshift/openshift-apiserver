@@ -21,11 +21,11 @@ require (
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc2
 	github.com/openshift-eng/openshift-tests-extension v0.0.0-20250804142706-7b3ab438a292
-	github.com/openshift/api v0.0.0-20250124212313-a770960d61e0
+	github.com/openshift/api v0.0.0-20250320170726-75d64d71980b
 	github.com/openshift/apiserver-library-go v0.0.0-20241021160823-f6d544efa1ab
 	github.com/openshift/build-machinery-go v0.0.0-20250102153059-e85a1a7ecb5c
 	github.com/openshift/client-go v0.0.0-20250125113824-8e1f0b8fa9a7
-	github.com/openshift/library-go v0.0.0-20250325143551-78a24021cf40
+	github.com/openshift/library-go v0.0.0-20250623173617-60108c9616bf
 	github.com/openshift/runtime-utils v0.0.0-20230921210328-7bdb5b9c177b
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5

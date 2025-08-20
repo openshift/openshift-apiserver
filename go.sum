@@ -252,8 +252,8 @@ github.com/opencontainers/runtime-spec v1.2.0 h1:z97+pHb3uELt/yiAWD691HNHQIF07bE
 github.com/opencontainers/runtime-spec v1.2.0/go.mod h1:jwyrGlmzljRJv/Fgzds9SsS/C5hL+LL3ko9hs6T5lQ0=
 github.com/openshift-eng/openshift-tests-extension v0.0.0-20250804142706-7b3ab438a292 h1:3athg6KQ+TaNfW4BWZDlGFt1ImSZEJWgzXtPC1VPITI=
 github.com/openshift-eng/openshift-tests-extension v0.0.0-20250804142706-7b3ab438a292/go.mod h1:6gkP5f2HL0meusT0Aim8icAspcD1cG055xxBZ9yC68M=
-github.com/openshift/api v0.0.0-20250124212313-a770960d61e0 h1:dCvNfygMrPLVNQ06bpHXrxKfrXHiprO4+etHrRUqI8g=
-github.com/openshift/api v0.0.0-20250124212313-a770960d61e0/go.mod h1:yk60tHAmHhtVpJQo3TwVYq2zpuP70iJIFDCmeKMIzPw=
+github.com/openshift/api v0.0.0-20250320170726-75d64d71980b h1:GGuFSHESP0BSOu70AqV4u9IVrjYdaeu4Id+HXRIOvkw=
+github.com/openshift/api v0.0.0-20250320170726-75d64d71980b/go.mod h1:yk60tHAmHhtVpJQo3TwVYq2zpuP70iJIFDCmeKMIzPw=
 github.com/openshift/apiserver-library-go v0.0.0-20241021160823-f6d544efa1ab h1:SzGBZrUElmpDKY2NQxJDHQhXSD7mV6oTwMzhFE5X/3s=
 github.com/openshift/apiserver-library-go v0.0.0-20241021160823-f6d544efa1ab/go.mod h1:9Anrq7+DZmmw1Brchx4zmh26hAZbe6Dv7bGXRclnhYI=
 github.com/openshift/build-machinery-go v0.0.0-20250102153059-e85a1a7ecb5c h1:6XcszPFZpan4qll5XbdLll7n1So3IsPn28aw2j1obMo=
@@ -264,8 +264,8 @@ github.com/openshift/docker-distribution/v3 v3.0.0-20240215131201-6b2f5d2f1f43 h
 github.com/openshift/docker-distribution/v3 v3.0.0-20240215131201-6b2f5d2f1f43/go.mod h1:+fqBJ4vPYo4Uu1ZE4d+bUtTLRXfdSL3NvCZIZ9GHv58=
 github.com/openshift/kubernetes-apiserver v0.0.0-20250526074939-69bc847b1ee3 h1:D/jrK28YMd/W+b2iOht8NZUwfcIvexJ+5k+diMvNDFw=
 github.com/openshift/kubernetes-apiserver v0.0.0-20250526074939-69bc847b1ee3/go.mod h1:UcB9tWjBY7aryeI5zAgzVJB/6k7E97bkr1RgqDz0jPw=
-github.com/openshift/library-go v0.0.0-20250325143551-78a24021cf40 h1:he++2Lr5qeZqgczkEMmOXYpLlO30SXfnqXrDKpxfik8=
-github.com/openshift/library-go v0.0.0-20250325143551-78a24021cf40/go.mod h1:GHwvopE5KXXCz4ULHp871sTPLLW+FB+hu/RIzlNwxx8=
+github.com/openshift/library-go v0.0.0-20250623173617-60108c9616bf h1:/96nQHlZGvjd/cBj+8OrMThgDin3SP9sVxUxe95cXkE=
+github.com/openshift/library-go v0.0.0-20250623173617-60108c9616bf/go.mod h1:DAa3BGl0CFtkfJn/g5rU8kDDTErfMVA/QlFm4cvU+MI=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d h1:fLITXDjxMSvUDjnXs/zljIWktbST9+Om8XbrmmM7T4I=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d/go.mod h1:LJM49W8fBVSj+rvcopJZu9mgH5Tx6HwLHySIYeGeu4k=
 github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20241205171354-8006f302fd12 h1:AKx/w1qpS8We43bsRgf8Nll3CGlDHpr/WAXvuedTNZI=
