@@ -79,6 +79,7 @@ func (mr *mockReviewer) Review(name string) (Review, error) {
 }
 
 func validateList(t *testing.T, lister Lister, user user.Info, expectedSet sets.String) {
+	t.Helper()
 	namespaceList, err := lister.List(user, labels.Everything())
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
@@ -135,6 +136,7 @@ func TestSyncNamespace(t *testing.T) {
 		reviewer,
 		informers.Rbac().V1(),
 	)
+	authorizationCache.skip = &neverSkipSynchronizer{}
 	// we prime the data we need here since we are not running reflectors
 	for i := range namespaceList.Items {
 		nsIndexer.Add(&namespaceList.Items[i])
