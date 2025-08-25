@@ -10,8 +10,6 @@ import (
 	"testing"
 	"time"
 
-	fuzz "github.com/google/gofuzz"
-
 	"k8s.io/apimachinery/pkg/api/apitesting"
 	"k8s.io/apimachinery/pkg/api/apitesting/fuzzer"
 	"k8s.io/apimachinery/pkg/api/apitesting/roundtrip"
@@ -27,6 +25,7 @@ import (
 	corev1 "k8s.io/kubernetes/pkg/apis/core/v1"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 	extensionsv1beta1 "k8s.io/kubernetes/pkg/apis/extensions/v1beta1"
+	"sigs.k8s.io/randfill"
 
 	buildv1 "github.com/openshift/api/build/v1"
 	"github.com/openshift/library-go/pkg/image/imageutil"
@@ -47,12 +46,12 @@ import (
 	_ "github.com/openshift/openshift-apiserver/pkg/quota/apis/quota/install"
 )
 
-func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
+func originFuzzer(t *testing.T, seed int64) *randfill.Filler {
 	f := fuzzer.FuzzerFor(kapitesting.FuzzerFuncs, rand.NewSource(seed), legacyscheme.Codecs)
 	f.Funcs(
 		// Roles and RoleBindings maps are never nil
-		func(j *authorizationapi.RoleBinding, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *authorizationapi.RoleBinding, c randfill.Continue) {
+			c.FillNoCustom(j)
 			for i := range j.Subjects {
 				kinds := []string{authorizationapi.UserKind, authorizationapi.SystemUserKind, authorizationapi.GroupKind, authorizationapi.SystemGroupKind, authorizationapi.ServiceAccountKind}
 				j.Subjects[i].Kind = kinds[c.Intn(len(kinds))]
@@ -89,16 +88,16 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 				j.Subjects[i].FieldPath = ""
 			}
 		},
-		func(j *authorizationapi.PolicyRule, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *authorizationapi.PolicyRule, c randfill.Continue) {
+			c.FillNoCustom(j)
 			// if no groups are found, then we assume "".  This matches defaulting
 			if len(j.APIGroups) == 0 {
 				j.APIGroups = []string{""}
 			}
 			j.AttributeRestrictions = nil
 		},
-		func(j *authorizationapi.ClusterRoleBinding, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *authorizationapi.ClusterRoleBinding, c randfill.Continue) {
+			c.FillNoCustom(j)
 			for i := range j.Subjects {
 				kinds := []string{authorizationapi.UserKind, authorizationapi.SystemUserKind, authorizationapi.GroupKind, authorizationapi.SystemGroupKind, authorizationapi.ServiceAccountKind}
 				j.Subjects[i].Kind = kinds[c.Intn(len(kinds))]
@@ -135,8 +134,8 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 				j.Subjects[i].FieldPath = ""
 			}
 		},
-		func(j *templateapi.Template, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *templateapi.Template, c randfill.Continue) {
+			c.FillNoCustom(j)
 			j.Objects = nil
 
 			objs := []runtime.Object{
@@ -147,7 +146,7 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 			}
 
 			for _, obj := range objs {
-				c.Fuzz(obj)
+				c.Fill(obj)
 
 				var codec runtime.Codec
 				switch obj.(type) {
@@ -178,17 +177,17 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 				Raw:         []byte(`{"kind":"Foo","apiVersion":"mygroup/v1","complex":{"a":true},"list":["item"],"bool":true,"int":1,"string":"hello"}`),
 			})
 		},
-		func(j *image.Image, c fuzz.Continue) {
-			c.Fuzz(&j.ObjectMeta)
-			c.Fuzz(&j.DockerImageMetadata)
-			c.Fuzz(&j.Signatures)
+		func(j *image.Image, c randfill.Continue) {
+			c.Fill(&j.ObjectMeta)
+			c.Fill(&j.DockerImageMetadata)
+			c.Fill(&j.Signatures)
 			j.DockerImageMetadata.APIVersion = ""
 			j.DockerImageMetadata.Kind = ""
 			j.DockerImageMetadataVersion = []string{"pre012", "1.0"}[c.Rand.Intn(2)]
-			j.DockerImageReference = c.RandString()
+			j.DockerImageReference = c.String(0)
 		},
-		func(j *image.ImageSignature, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *image.ImageSignature, c randfill.Continue) {
+			c.FillNoCustom(j)
 			j.Conditions = nil
 			j.ImageIdentity = ""
 			j.SignedClaims = nil
@@ -196,8 +195,8 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 			j.IssuedBy = nil
 			j.IssuedTo = nil
 		},
-		func(j *image.ImageStream, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *image.ImageStream, c randfill.Continue) {
+			c.FillNoCustom(j)
 			for k, v := range j.Spec.Tags {
 				if len(v.ReferencePolicy.Type) == 0 {
 					v.ReferencePolicy.Type = image.SourceTagReferencePolicy
@@ -205,31 +204,31 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 				}
 			}
 		},
-		func(j *image.TagImportPolicy, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *image.TagImportPolicy, c randfill.Continue) {
+			c.FillNoCustom(j)
 			if len(j.ImportMode) == 0 {
 				j.ImportMode = image.ImportModeLegacy
 			}
 		},
-		func(j *image.ImageStreamMapping, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *image.ImageStreamMapping, c randfill.Continue) {
+			c.FillNoCustom(j)
 			j.DockerImageRepository = ""
 		},
-		func(j *image.ImageImportSpec, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *image.ImageImportSpec, c randfill.Continue) {
+			c.FillNoCustom(j)
 			if j.To == nil {
 				// To is defaulted to be not nil
 				j.To = &kapi.LocalObjectReference{}
 			}
 		},
-		func(j *image.ImageStreamImage, c fuzz.Continue) {
-			c.Fuzz(&j.Image)
+		func(j *image.ImageStreamImage, c randfill.Continue) {
+			c.Fill(&j.Image)
 			// because we de-embedded Image from ImageStreamImage, in order to round trip
 			// successfully, the ImageStreamImage's ObjectMeta must match the Image's.
 			j.ObjectMeta = j.Image.ObjectMeta
 		},
-		func(j *image.ImageStreamSpec, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *image.ImageStreamSpec, c randfill.Continue) {
+			c.FillNoCustom(j)
 			// if the generated fuzz value has a tag or image id, strip it
 			if strings.ContainsAny(j.DockerImageRepository, ":@") {
 				j.DockerImageRepository = ""
@@ -242,52 +241,52 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 				j.Tags[k] = v
 			}
 		},
-		func(j *image.ImageStreamStatus, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *image.ImageStreamStatus, c randfill.Continue) {
+			c.FillNoCustom(j)
 			// if the generated fuzz value has a tag or image id, strip it
 			if strings.ContainsAny(j.DockerImageRepository, ":@") {
 				j.DockerImageRepository = ""
 			}
 		},
-		func(j *image.ImageStreamTag, c fuzz.Continue) {
-			c.Fuzz(&j.Image)
+		func(j *image.ImageStreamTag, c randfill.Continue) {
+			c.Fill(&j.Image)
 			// because we de-embedded Image from ImageStreamTag, in order to round trip
 			// successfully, the ImageStreamTag's ObjectMeta must match the Image's.
 			j.ObjectMeta = j.Image.ObjectMeta
 		},
-		func(j *image.TagReference, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *image.TagReference, c randfill.Continue) {
+			c.FillNoCustom(j)
 			if j.From != nil {
 				specs := []string{"", "ImageStreamTag", "ImageStreamImage"}
 				j.From.Kind = specs[c.Intn(len(specs))]
 			}
 		},
-		func(j *image.TagReferencePolicy, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *image.TagReferencePolicy, c randfill.Continue) {
+			c.FillNoCustom(j)
 			j.Type = image.SourceTagReferencePolicy
 		},
-		func(j *build.BuildConfigSpec, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *build.BuildConfigSpec, c randfill.Continue) {
+			c.FillNoCustom(j)
 			j.RunPolicy = build.BuildRunPolicySerial
 		},
-		func(j *build.SourceBuildStrategy, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *build.SourceBuildStrategy, c randfill.Continue) {
+			c.FillNoCustom(j)
 			j.From.Kind = "ImageStreamTag"
 			j.From.Name = "image:tag"
 			j.From.APIVersion = ""
 			j.From.ResourceVersion = ""
 			j.From.FieldPath = ""
 		},
-		func(j *build.CustomBuildStrategy, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *build.CustomBuildStrategy, c randfill.Continue) {
+			c.FillNoCustom(j)
 			j.From.Kind = "ImageStreamTag"
 			j.From.Name = "image:tag"
 			j.From.APIVersion = ""
 			j.From.ResourceVersion = ""
 			j.From.FieldPath = ""
 		},
-		func(j *build.DockerBuildStrategy, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *build.DockerBuildStrategy, c randfill.Continue) {
+			c.FillNoCustom(j)
 			if j.From != nil {
 				j.From.Kind = "ImageStreamTag"
 				j.From.Name = "image:tag"
@@ -296,8 +295,8 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 				j.From.FieldPath = ""
 			}
 		},
-		func(j *build.BuildOutput, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *build.BuildOutput, c randfill.Continue) {
+			c.FillNoCustom(j)
 			if j.To != nil && (len(j.To.Kind) == 0 || j.To.Kind == "ImageStream") {
 				j.To.Kind = "ImageStreamTag"
 			}
@@ -305,20 +304,20 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 				j.To.Name = strings.Replace(j.To.Name, ":", "-", -1)
 			}
 		},
-		func(j *routeapi.RouteTargetReference, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *routeapi.RouteTargetReference, c randfill.Continue) {
+			c.FillNoCustom(j)
 			j.Kind = "Service"
 			j.Weight = new(int32)
 			*j.Weight = 100
 		},
-		func(j *routeapi.TLSConfig, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *routeapi.TLSConfig, c randfill.Continue) {
+			c.FillNoCustom(j)
 			if len(j.Termination) == 0 && len(j.DestinationCACertificate) == 0 {
 				j.Termination = routeapi.TLSTerminationEdge
 			}
 		},
-		func(j *oapps.DeploymentConfig, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *oapps.DeploymentConfig, c randfill.Continue) {
+			c.FillNoCustom(j)
 
 			if len(j.Spec.Selector) == 0 && j.Spec.Template != nil {
 				j.Spec.Selector = j.Spec.Template.Labels
@@ -338,12 +337,12 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 				}
 			}
 		},
-		func(j *oapps.DeploymentStrategy, c fuzz.Continue) {
+		func(j *oapps.DeploymentStrategy, c randfill.Continue) {
 			randInt64 := func() *int64 {
-				p := int64(c.RandUint64())
+				p := int64(c.Uint64())
 				return &p
 			}
-			c.FuzzNoCustom(j)
+			c.FillNoCustom(j)
 			j.RecreateParams, j.RollingParams, j.CustomParams = nil, nil, nil
 			strategyTypes := []oapps.DeploymentStrategyType{oapps.DeploymentStrategyTypeRecreate, oapps.DeploymentStrategyTypeRolling, oapps.DeploymentStrategyTypeCustom}
 			j.Type = strategyTypes[c.Rand.Intn(len(strategyTypes))]
@@ -351,7 +350,7 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 			switch j.Type {
 			case oapps.DeploymentStrategyTypeRecreate:
 				params := &oapps.RecreateDeploymentStrategyParams{}
-				c.Fuzz(params)
+				c.Fill(params)
 				if params.TimeoutSeconds == nil {
 					s := int64(120)
 					params.TimeoutSeconds = &s
@@ -368,34 +367,34 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 					oapps.LifecycleHookFailurePolicyAbort,
 					oapps.LifecycleHookFailurePolicyIgnore,
 				}
-				if c.RandBool() {
+				if c.Bool() {
 					params.Pre = &oapps.LifecycleHook{
 						FailurePolicy: policyTypes[c.Rand.Intn(len(policyTypes))],
 						ExecNewPod: &oapps.ExecNewPodHook{
-							ContainerName: c.RandString(),
+							ContainerName: c.String(0),
 						},
 					}
 				}
-				if c.RandBool() {
+				if c.Bool() {
 					params.Post = &oapps.LifecycleHook{
 						FailurePolicy: policyTypes[c.Rand.Intn(len(policyTypes))],
 						ExecNewPod: &oapps.ExecNewPodHook{
-							ContainerName: c.RandString(),
+							ContainerName: c.String(0),
 						},
 					}
 				}
-				if c.RandBool() {
+				if c.Bool() {
 					params.MaxUnavailable = intstr.FromInt(int(c.Rand.Int31()))
 					params.MaxSurge = intstr.FromInt(int(c.Rand.Int31()))
 				} else {
-					params.MaxSurge = intstr.FromString(fmt.Sprintf("%d%%", c.RandUint64()))
-					params.MaxUnavailable = intstr.FromString(fmt.Sprintf("%d%%", c.RandUint64()))
+					params.MaxSurge = intstr.FromString(fmt.Sprintf("%d%%", c.Uint64()))
+					params.MaxUnavailable = intstr.FromString(fmt.Sprintf("%d%%", c.Uint64()))
 				}
 				j.RollingParams = params
 			}
 		},
-		func(j *oapps.DeploymentCauseImageTrigger, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *oapps.DeploymentCauseImageTrigger, c randfill.Continue) {
+			c.FillNoCustom(j)
 			specs := []string{"", "a/b", "a/b/c", "a:5000/b/c", "a/b", "a/b"}
 			tags := []string{"stuff", "other"}
 			j.From.Name = specs[c.Intn(len(specs))]
@@ -403,8 +402,8 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 				j.From.Name = imageutil.JoinImageStreamTag(j.From.Name, tags[c.Intn(len(tags))])
 			}
 		},
-		func(j *oapps.DeploymentTriggerImageChangeParams, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *oapps.DeploymentTriggerImageChangeParams, c randfill.Continue) {
+			c.FillNoCustom(j)
 			specs := []string{"a/b", "a/b/c", "a:5000/b/c", "a/b:latest", "a/b@test"}
 			j.From.Kind = "DockerImage"
 			j.From.Name = specs[c.Intn(len(specs))]
@@ -412,40 +411,40 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 
 		// TODO: uncomment when round tripping for init containers is available (the annotation is
 		// not supported on security context review for now)
-		func(j *securityapi.PodSecurityPolicyReview, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *securityapi.PodSecurityPolicyReview, c randfill.Continue) {
+			c.FillNoCustom(j)
 			j.Spec.Template.Spec.InitContainers = nil
 			for i := range j.Status.AllowedServiceAccounts {
 				j.Status.AllowedServiceAccounts[i].Template.Spec.InitContainers = nil
 			}
 		},
-		func(j *securityapi.PodSecurityPolicySelfSubjectReview, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *securityapi.PodSecurityPolicySelfSubjectReview, c randfill.Continue) {
+			c.FillNoCustom(j)
 			j.Spec.Template.Spec.InitContainers = nil
 			j.Status.Template.Spec.InitContainers = nil
 		},
-		func(j *securityapi.PodSecurityPolicySubjectReview, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *securityapi.PodSecurityPolicySubjectReview, c randfill.Continue) {
+			c.FillNoCustom(j)
 			j.Spec.Template.Spec.InitContainers = nil
 			j.Status.Template.Spec.InitContainers = nil
 		},
-		func(j *routeapi.RouteSpec, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *routeapi.RouteSpec, c randfill.Continue) {
+			c.FillNoCustom(j)
 			if len(j.WildcardPolicy) == 0 {
 				j.WildcardPolicy = routeapi.WildcardPolicyNone
 			}
 		},
-		func(j *routeapi.RouteIngress, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *routeapi.RouteIngress, c randfill.Continue) {
+			c.FillNoCustom(j)
 			if len(j.WildcardPolicy) == 0 {
 				j.WildcardPolicy = routeapi.WildcardPolicyNone
 			}
 		},
 
-		func(j *runtime.Object, c fuzz.Continue) {
+		func(j *runtime.Object, c randfill.Continue) {
 			// runtime.EmbeddedObject causes a panic inside of fuzz because runtime.Object isn't handled.
 		},
-		func(t *time.Time, c fuzz.Continue) {
+		func(t *time.Time, c randfill.Continue) {
 			// This is necessary because the standard fuzzed time.Time object is
 			// completely nil, but when JSON unmarshals dates it fills in the
 			// unexported loc field with the time.UTC object, resulting in
@@ -453,13 +452,13 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 			// by using a date that will be identical to the one JSON unmarshals.
 			*t = time.Date(2000, 1, 1, 1, 1, 1, 0, time.UTC)
 		},
-		func(u64 *uint64, c fuzz.Continue) {
+		func(u64 *uint64, c randfill.Continue) {
 			// TODO: uint64's are NOT handled right.
-			*u64 = c.RandUint64() >> 8
+			*u64 = c.Uint64() >> 8
 		},
 
-		func(scc *securityapi.SecurityContextConstraints, c fuzz.Continue) {
-			c.FuzzNoCustom(scc) // fuzz self without calling this function again
+		func(scc *securityapi.SecurityContextConstraints, c randfill.Continue) {
+			c.FillNoCustom(scc) // fuzz self without calling this function again
 			userTypes := []securityapi.RunAsUserStrategyType{securityapi.RunAsUserStrategyMustRunAsNonRoot, securityapi.RunAsUserStrategyMustRunAs, securityapi.RunAsUserStrategyRunAsAny, securityapi.RunAsUserStrategyMustRunAsRange}
 			scc.RunAsUser.Type = userTypes[c.Rand.Intn(len(userTypes))]
 			seLinuxTypes := []securityapi.SELinuxContextStrategyType{securityapi.SELinuxStrategyRunAsAny, securityapi.SELinuxStrategyMustRunAs}
@@ -469,7 +468,7 @@ func originFuzzer(t *testing.T, seed int64) *fuzz.Fuzzer {
 			fsGroupTypes := []securityapi.FSGroupStrategyType{securityapi.FSGroupStrategyMustRunAs, securityapi.FSGroupStrategyRunAsAny}
 			scc.FSGroup.Type = fsGroupTypes[c.Rand.Intn(len(fsGroupTypes))]
 			// avoid the defaulting logic for this field by making it never nil
-			allowPrivilegeEscalation := c.RandBool()
+			allowPrivilegeEscalation := c.Bool()
 			scc.AllowPrivilegeEscalation = &allowPrivilegeEscalation
 
 			// when fuzzing the volume types ensure it is set to avoid the defaulter's expansion.
@@ -557,7 +556,7 @@ func TestBinaryBuildRequestOptionsFuzz(t *testing.T) {
 	seed := rand.Int63()
 	fuzzer := originFuzzer(t, seed)
 	r := &buildv1.BinaryBuildRequestOptions{}
-	fuzzer.Fuzz(r)
+	fuzzer.Fill(r)
 	urlOut := &url.Values{}
 	err := legacyscheme.Scheme.Convert(r, urlOut, nil)
 	if err != nil {

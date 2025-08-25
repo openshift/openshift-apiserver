@@ -6,18 +6,18 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"k8s.io/apimachinery/pkg/api/apitesting"
 	"k8s.io/apimachinery/pkg/api/apitesting/fuzzer"
 	metafuzzer "k8s.io/apimachinery/pkg/apis/meta/fuzzer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/util/diff"
 	"k8s.io/apimachinery/pkg/util/sets"
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 	"k8s.io/kubernetes/pkg/apis/rbac"
+	"sigs.k8s.io/randfill"
 
-	fuzz "github.com/google/gofuzz"
 	"github.com/openshift/api"
 	uservalidation "github.com/openshift/apiserver-library-go/pkg/apivalidation"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
@@ -40,7 +40,7 @@ func TestOriginClusterRoleFidelity(t *testing.T) {
 		ocr := &authorizationapi.ClusterRole{}
 		ocr2 := &authorizationapi.ClusterRole{}
 		rcr := &rbac.ClusterRole{}
-		customFuzzer.Fuzz(ocr)
+		customFuzzer.Fill(ocr)
 		if err := Convert_authorization_ClusterRole_To_rbac_ClusterRole(ocr, rcr, nil); err != nil {
 			t.Fatal(err)
 		}
@@ -48,7 +48,7 @@ func TestOriginClusterRoleFidelity(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(ocr, ocr2) {
-			t.Errorf("origin cluster data not preserved; the diff is %s", diff.ObjectDiff(ocr, ocr2))
+			t.Errorf("origin cluster data not preserved; the diff is %s", cmp.Diff(ocr, ocr2))
 		}
 	}
 }
@@ -58,7 +58,7 @@ func TestOriginRoleFidelity(t *testing.T) {
 		or := &authorizationapi.Role{}
 		or2 := &authorizationapi.Role{}
 		rr := &rbac.Role{}
-		customFuzzer.Fuzz(or)
+		customFuzzer.Fill(or)
 		if err := Convert_authorization_Role_To_rbac_Role(or, rr, nil); err != nil {
 			t.Fatal(err)
 		}
@@ -66,7 +66,7 @@ func TestOriginRoleFidelity(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(or, or2) {
-			t.Errorf("origin local data not preserved; the diff is %s", diff.ObjectDiff(or, or2))
+			t.Errorf("origin local data not preserved; the diff is %s", cmp.Diff(or, or2))
 		}
 	}
 }
@@ -76,7 +76,7 @@ func TestOriginClusterRoleBindingFidelity(t *testing.T) {
 		ocrb := &authorizationapi.ClusterRoleBinding{}
 		ocrb2 := &authorizationapi.ClusterRoleBinding{}
 		rcrb := &rbac.ClusterRoleBinding{}
-		customFuzzer.Fuzz(ocrb)
+		customFuzzer.Fill(ocrb)
 		if err := Convert_authorization_ClusterRoleBinding_To_rbac_ClusterRoleBinding(ocrb, rcrb, nil); err != nil {
 			t.Fatal(err)
 		}
@@ -84,7 +84,7 @@ func TestOriginClusterRoleBindingFidelity(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(ocrb, ocrb2) {
-			t.Errorf("origin cluster binding data not preserved; the diff is %s", diff.ObjectDiff(ocrb, ocrb2))
+			t.Errorf("origin cluster binding data not preserved; the diff is %s", cmp.Diff(ocrb, ocrb2))
 		}
 	}
 }
@@ -94,7 +94,7 @@ func TestOriginRoleBindingFidelity(t *testing.T) {
 		orb := &authorizationapi.RoleBinding{}
 		orb2 := &authorizationapi.RoleBinding{}
 		rrb := &rbac.RoleBinding{}
-		customFuzzer.Fuzz(orb)
+		customFuzzer.Fill(orb)
 		if err := Convert_authorization_RoleBinding_To_rbac_RoleBinding(orb, rrb, nil); err != nil {
 			t.Fatal(err)
 		}
@@ -102,7 +102,7 @@ func TestOriginRoleBindingFidelity(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(orb, orb2) {
-			t.Errorf("origin local binding data not preserved; the diff is %s", diff.ObjectDiff(orb, orb2))
+			t.Errorf("origin local binding data not preserved; the diff is %s", cmp.Diff(orb, orb2))
 		}
 	}
 }
@@ -112,7 +112,7 @@ func TestRBACClusterRoleFidelity(t *testing.T) {
 		rcr := &rbac.ClusterRole{}
 		rcr2 := &rbac.ClusterRole{}
 		ocr := &authorizationapi.ClusterRole{}
-		customFuzzer.Fuzz(rcr)
+		customFuzzer.Fill(rcr)
 		if err := Convert_rbac_ClusterRole_To_authorization_ClusterRole(rcr, ocr, nil); err != nil {
 			t.Fatal(err)
 		}
@@ -120,7 +120,7 @@ func TestRBACClusterRoleFidelity(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(rcr, rcr2) {
-			t.Errorf("rbac cluster data not preserved; the diff is %s", diff.ObjectDiff(rcr, rcr2))
+			t.Errorf("rbac cluster data not preserved; the diff is %s", cmp.Diff(rcr, rcr2))
 		}
 	}
 }
@@ -130,7 +130,7 @@ func TestRBACRoleFidelity(t *testing.T) {
 		rr := &rbac.Role{}
 		rr2 := &rbac.Role{}
 		or := &authorizationapi.Role{}
-		customFuzzer.Fuzz(rr)
+		customFuzzer.Fill(rr)
 		if err := Convert_rbac_Role_To_authorization_Role(rr, or, nil); err != nil {
 			t.Fatal(err)
 		}
@@ -138,7 +138,7 @@ func TestRBACRoleFidelity(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(rr, rr2) {
-			t.Errorf("rbac local data not preserved; the diff is %s", diff.ObjectDiff(rr, rr2))
+			t.Errorf("rbac local data not preserved; the diff is %s", cmp.Diff(rr, rr2))
 		}
 	}
 }
@@ -148,7 +148,7 @@ func TestRBACClusterRoleBindingFidelity(t *testing.T) {
 		rcrb := &rbac.ClusterRoleBinding{}
 		rcrb2 := &rbac.ClusterRoleBinding{}
 		ocrb := &authorizationapi.ClusterRoleBinding{}
-		customFuzzer.Fuzz(rcrb)
+		customFuzzer.Fill(rcrb)
 		if err := Convert_rbac_ClusterRoleBinding_To_authorization_ClusterRoleBinding(rcrb, ocrb, nil); err != nil {
 			t.Fatal(err)
 		}
@@ -156,7 +156,7 @@ func TestRBACClusterRoleBindingFidelity(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(rcrb, rcrb2) {
-			t.Errorf("rbac cluster binding data not preserved; the diff is %s", diff.ObjectDiff(rcrb, rcrb2))
+			t.Errorf("rbac cluster binding data not preserved; the diff is %s", cmp.Diff(rcrb, rcrb2))
 		}
 	}
 }
@@ -166,7 +166,7 @@ func TestRBACRoleBindingFidelity(t *testing.T) {
 		rrb := &rbac.RoleBinding{}
 		rrb2 := &rbac.RoleBinding{}
 		orb := &authorizationapi.RoleBinding{}
-		customFuzzer.Fuzz(rrb)
+		customFuzzer.Fill(rrb)
 		if err := Convert_rbac_RoleBinding_To_authorization_RoleBinding(rrb, orb, nil); err != nil {
 			t.Fatal(err)
 		}
@@ -174,7 +174,7 @@ func TestRBACRoleBindingFidelity(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(rrb, rrb2) {
-			t.Errorf("rbac local binding data not preserved; the diff is %s", diff.ObjectDiff(rrb, rrb2))
+			t.Errorf("rbac local binding data not preserved; the diff is %s", cmp.Diff(rrb, rrb2))
 		}
 	}
 }
@@ -331,7 +331,7 @@ func TestAnnotationsConversion(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(ocr, ocr2) {
-			t.Errorf("origin cluster data not preserved; the diff is %s", diff.ObjectDiff(ocr, ocr2))
+			t.Errorf("origin cluster data not preserved; the diff is %s", cmp.Diff(ocr, ocr2))
 		}
 
 		rcr := &rbac.ClusterRole{
@@ -355,50 +355,50 @@ func TestAnnotationsConversion(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(rcr, rcr2) {
-			t.Errorf("rbac cluster data not preserved; the diff is %s", diff.ObjectDiff(rcr, rcr2))
+			t.Errorf("rbac cluster data not preserved; the diff is %s", cmp.Diff(rcr, rcr2))
 		}
 	}
 }
 
 var customFuzzerFuncs = []interface{}{
-	func(*metav1.TypeMeta, fuzz.Continue) {}, // Ignore TypeMeta
-	func(*runtime.Object, fuzz.Continue) {},  // Ignore AttributeRestrictions since they are deprecated
-	func(ocrb *authorizationapi.ClusterRoleBinding, c fuzz.Continue) {
-		c.FuzzNoCustom(ocrb)
+	func(*metav1.TypeMeta, randfill.Continue) {}, // Ignore TypeMeta
+	func(*runtime.Object, randfill.Continue) {},  // Ignore AttributeRestrictions since they are deprecated
+	func(ocrb *authorizationapi.ClusterRoleBinding, c randfill.Continue) {
+		c.FillNoCustom(ocrb)
 		setRandomOriginRoleBindingData(ocrb.Subjects, &ocrb.RoleRef, "", c)
 	},
-	func(orb *authorizationapi.RoleBinding, c fuzz.Continue) {
-		c.FuzzNoCustom(orb)
+	func(orb *authorizationapi.RoleBinding, c randfill.Continue) {
+		c.FillNoCustom(orb)
 		setRandomOriginRoleBindingData(orb.Subjects, &orb.RoleRef, orb.Namespace, c)
 	},
-	func(or *authorizationapi.Role, c fuzz.Continue) {
-		c.FuzzNoCustom(or)
-		setOriginRuleType(or.Rules, c.RandBool())
+	func(or *authorizationapi.Role, c randfill.Continue) {
+		c.FillNoCustom(or)
+		setOriginRuleType(or.Rules, c.Bool())
 	},
-	func(ocr *authorizationapi.ClusterRole, c fuzz.Continue) {
-		c.FuzzNoCustom(ocr)
-		setOriginRuleType(ocr.Rules, c.RandBool())
+	func(ocr *authorizationapi.ClusterRole, c randfill.Continue) {
+		c.FillNoCustom(ocr)
+		setOriginRuleType(ocr.Rules, c.Bool())
 	},
-	func(rcrb *rbac.ClusterRoleBinding, c fuzz.Continue) {
-		c.FuzzNoCustom(rcrb)
+	func(rcrb *rbac.ClusterRoleBinding, c randfill.Continue) {
+		c.FillNoCustom(rcrb)
 		setRandomRBACRoleBindingData(rcrb.Subjects, &rcrb.RoleRef, "", c)
 	},
-	func(rrb *rbac.RoleBinding, c fuzz.Continue) {
-		c.FuzzNoCustom(rrb)
+	func(rrb *rbac.RoleBinding, c randfill.Continue) {
+		c.FillNoCustom(rrb)
 		setRandomRBACRoleBindingData(rrb.Subjects, &rrb.RoleRef, rrb.Namespace, c)
 	},
-	func(rr *rbac.Role, c fuzz.Continue) {
-		c.FuzzNoCustom(rr)
-		setRBACRuleType(rr.Rules, c.RandBool())
+	func(rr *rbac.Role, c randfill.Continue) {
+		c.FillNoCustom(rr)
+		setRBACRuleType(rr.Rules, c.Bool())
 		sortAndDeduplicateRBACRulesFields(rr.Rules) // []string <-> sets.String
 	},
-	func(rcr *rbac.ClusterRole, c fuzz.Continue) {
-		c.FuzzNoCustom(rcr)
-		setRBACRuleType(rcr.Rules, c.RandBool())
+	func(rcr *rbac.ClusterRole, c randfill.Continue) {
+		c.FillNoCustom(rcr)
+		setRBACRuleType(rcr.Rules, c.Bool())
 		sortAndDeduplicateRBACRulesFields(rcr.Rules) // []string <-> sets.String
 	},
 }
-var customFuzzer *fuzz.Fuzzer
+var customFuzzer *randfill.Filler
 
 func setOriginRuleType(in []authorizationapi.PolicyRule, isResourceRule bool) {
 	if isResourceRule {
@@ -432,7 +432,7 @@ func setRBACRuleType(in []rbac.PolicyRule, isResourceRule bool) {
 	}
 }
 
-func setRandomRBACRoleBindingData(subjects []rbac.Subject, roleRef *rbac.RoleRef, namespace string, c fuzz.Continue) {
+func setRandomRBACRoleBindingData(subjects []rbac.Subject, roleRef *rbac.RoleRef, namespace string, c randfill.Continue) {
 	for i := range subjects {
 		subject := &subjects[i]
 		subject.APIGroup = rbac.GroupName
@@ -442,7 +442,7 @@ func setRandomRBACRoleBindingData(subjects []rbac.Subject, roleRef *rbac.RoleRef
 	roleRef.Kind = getRBACRoleRefKind(getRandomScope(namespace, c))
 }
 
-func setValidRBACKindAndNamespace(subject *rbac.Subject, i int, c fuzz.Continue) {
+func setValidRBACKindAndNamespace(subject *rbac.Subject, i int, c randfill.Continue) {
 	kinds := []string{rbac.UserKind, rbac.GroupKind, rbac.ServiceAccountKind}
 	kind := kinds[c.Intn(len(kinds))]
 	subject.Kind = kind
@@ -457,7 +457,7 @@ func setValidRBACKindAndNamespace(subject *rbac.Subject, i int, c fuzz.Continue)
 	}
 }
 
-func setRandomOriginRoleBindingData(subjects []coreapi.ObjectReference, roleRef *coreapi.ObjectReference, namespace string, c fuzz.Continue) {
+func setRandomOriginRoleBindingData(subjects []coreapi.ObjectReference, roleRef *coreapi.ObjectReference, namespace string, c randfill.Continue) {
 	for i := range subjects {
 		subject := &subjects[i]
 		unsetUnusedOriginFields(subject)
@@ -469,14 +469,14 @@ func setRandomOriginRoleBindingData(subjects []coreapi.ObjectReference, roleRef 
 }
 
 // we want bindings to both cluster and local roles
-func getRandomScope(namespace string, c fuzz.Continue) string {
-	if c.RandBool() {
+func getRandomScope(namespace string, c randfill.Continue) string {
+	if c.Bool() {
 		return ""
 	}
 	return namespace
 }
 
-func setValidOriginKindAndNamespace(subject *coreapi.ObjectReference, i int, c fuzz.Continue) {
+func setValidOriginKindAndNamespace(subject *coreapi.ObjectReference, i int, c randfill.Continue) {
 	kinds := []string{authorizationapi.UserKind, authorizationapi.SystemUserKind, authorizationapi.GroupKind, authorizationapi.SystemGroupKind, authorizationapi.ServiceAccountKind}
 	kind := kinds[c.Intn(len(kinds))]
 	subject.Kind = kind

@@ -46,7 +46,7 @@ type StaticCredentialsContext struct {
 // Repository retrieves ref docker repository.
 //
 // Kubernetes Secrets and node pull credentials are merged, the first has
-// higher priority. In case of failure reading node pull credentials only
+// higher priority. In case of failure reading node pull credentials, only
 // kubernetes secrets are taken into account and a log entry is created.
 func (s *StaticCredentialsContext) Repository(
 	ctx context.Context,
@@ -68,7 +68,7 @@ func (s *StaticCredentialsContext) Repository(
 	); err != nil {
 		klog.V(5).Infof("proceeding without node credentials: %v", err)
 	} else {
-		nodeKeyring.Add(config)
+		nodeKeyring.Add(nil, config)
 	}
 
 	keyring, err := secrets.MakeDockerKeyring(s.secrets, nodeKeyring)
