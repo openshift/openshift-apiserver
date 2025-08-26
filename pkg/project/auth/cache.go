@@ -313,11 +313,20 @@ func (ac *AuthorizationCache) synchronizePolicies(userSubjectRecordStore cache.S
 		utilruntime.HandleError(err)
 		return
 	}
+
+	reviewRequests := map[string]*reviewRequest{}
 	for _, role := range roleList {
-		reviewRequest := &reviewRequest{
+		if _, exists := reviewRequests[role.Namespace]; exists {
+			reviewRequests[role.Namespace].roleUIDToResourceVersion[role.UID] = role.ResourceVersion
+			continue
+		}
+		reviewRequests[role.Namespace] = &reviewRequest{
 			namespace:                role.Namespace,
 			roleUIDToResourceVersion: map[types.UID]string{role.UID: role.ResourceVersion},
 		}
+	}
+
+	for _, reviewRequest := range reviewRequests {
 		if err := ac.syncHandler(reviewRequest, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore); err != nil {
 			utilruntime.HandleError(fmt.Errorf("error synchronizing: %v", err))
 		}
@@ -331,11 +340,20 @@ func (ac *AuthorizationCache) synchronizeRoleBindings(userSubjectRecordStore cac
 		utilruntime.HandleError(err)
 		return
 	}
+
+	reviewRequests := map[string]*reviewRequest{}
 	for _, roleBinding := range roleBindingList {
-		reviewRequest := &reviewRequest{
+		if _, exists := reviewRequests[roleBinding.Namespace]; exists {
+			reviewRequests[roleBinding.Namespace].roleBindingUIDToResourceVersion[roleBinding.UID] = roleBinding.ResourceVersion
+			continue
+		}
+		reviewRequests[roleBinding.Namespace] = &reviewRequest{
 			namespace:                       roleBinding.Namespace,
 			roleBindingUIDToResourceVersion: map[types.UID]string{roleBinding.UID: roleBinding.ResourceVersion},
 		}
+	}
+
+	for _, reviewRequest := range reviewRequests {
 		if err := ac.syncHandler(reviewRequest, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore); err != nil {
 			utilruntime.HandleError(fmt.Errorf("error synchronizing: %v", err))
 		}
@@ -553,6 +571,17 @@ func skipReview(request *reviewRequest, lastKnownValue *reviewRecord) bool {
 		}
 	}
 
+	// if an existing role binding went missing we also need to do a review
+	// but we can only check that if the request contains all current
+	// bindings found on the namespace.
+	if len(request.roleBindingUIDToResourceVersion) > 0 {
+		for k := range lastKnownValue.roleBindingUIDToResourceVersion {
+			if _, exists := request.roleBindingUIDToResourceVersion[k]; !exists {
+				return false
+			}
+		}
+	}
+
 	// if you see a new role, or a newer version, we need to do a review
 	for k, v := range request.roleUIDToResourceVersion {
 		oldValue, exists := lastKnownValue.roleUIDToResourceVersion[k]
@@ -560,6 +589,18 @@ func skipReview(request *reviewRequest, lastKnownValue *reviewRecord) bool {
 			return false
 		}
 	}
+
+	// if an existing role went missing we also need to do a review
+	// but we can only check that if the request contains all current
+	// roles found on the namespace.
+	if len(request.roleUIDToResourceVersion) > 0 {
+		for k := range lastKnownValue.roleUIDToResourceVersion {
+			if _, exists := request.roleUIDToResourceVersion[k]; !exists {
+				return false
+			}
+		}
+	}
+
 	return true
 }
 
@@ -611,11 +652,15 @@ func cacheReviewRecord(request *reviewRequest, lastKnownValue *reviewRecord, rev
 	// keep what we last believe we knew by default
 	if lastKnownValue != nil {
 		reviewRecord.namespaceResourceVersion = lastKnownValue.namespaceResourceVersion
-		for k, v := range lastKnownValue.roleUIDToResourceVersion {
-			reviewRecord.roleUIDToResourceVersion[k] = v
+		if len(reviewRecord.roleUIDToResourceVersion) == 0 {
+			for k, v := range lastKnownValue.roleUIDToResourceVersion {
+				reviewRecord.roleUIDToResourceVersion[k] = v
+			}
 		}
-		for k, v := range lastKnownValue.roleBindingUIDToResourceVersion {
-			reviewRecord.roleBindingUIDToResourceVersion[k] = v
+		if len(reviewRecord.roleBindingUIDToResourceVersion) == 0 {
+			for k, v := range lastKnownValue.roleBindingUIDToResourceVersion {
+				reviewRecord.roleBindingUIDToResourceVersion[k] = v
+			}
 		}
 	}
 
