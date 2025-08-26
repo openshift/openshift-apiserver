@@ -553,6 +553,13 @@ func skipReview(request *reviewRequest, lastKnownValue *reviewRecord) bool {
 		}
 	}
 
+	// we also need to check if any role binding was removed.
+	for k := range lastKnownValue.roleBindingUIDToResourceVersion {
+		if _, exists := request.roleBindingUIDToResourceVersion[k]; !exists {
+			return false
+		}
+	}
+
 	// if you see a new role, or a newer version, we need to do a review
 	for k, v := range request.roleUIDToResourceVersion {
 		oldValue, exists := lastKnownValue.roleUIDToResourceVersion[k]
@@ -560,6 +567,14 @@ func skipReview(request *reviewRequest, lastKnownValue *reviewRecord) bool {
 			return false
 		}
 	}
+
+	// we also need to check if any role was removed.
+	for k := range lastKnownValue.roleUIDToResourceVersion {
+		if _, exists := request.roleUIDToResourceVersion[k]; !exists {
+			return false
+		}
+	}
+
 	return true
 }
 
