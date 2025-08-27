@@ -26,6 +26,11 @@ import (
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 )
 
+// defaultMaxCacheLifespan is used to control how long the cache can live
+// without being invalidated. This is a workaround for a bug, see
+// https://issues.redhat.com/browse/OCPBUGS-57474 for further details.
+const defaultMaxCacheLifespan = 15 * time.Second
+
 // Lister enforces ability to enumerate a resource based on role
 type Lister interface {
 	// List returns the list of Namespace items that the user can access
@@ -197,6 +202,16 @@ type AuthorizationCache struct {
 
 	watchers    []CacheWatcher
 	watcherLock sync.Mutex
+
+	// lastCacheInvalidation and maxCacheLifespan are used together.
+	// We use them to control the maximum time allowed between cache
+	// invalidations. This is a workaround for a bug. We deemed the
+	// risk of refactoring the cache to be too high so close to the
+	// release date, so close to the release so here we are. For
+	// further details see:
+	// https://issues.redhat.com/browse/OCPBUGS-57474
+	lastCacheInvalidation time.Time
+	maxCacheLifespan      time.Duration
 }
 
 // NewAuthorizationCache creates a new AuthorizationCache
@@ -360,8 +375,32 @@ func (ac *AuthorizationCache) purgeDeletedNamespaces(oldNamespaces, newNamespace
 }
 
 // invalidateCache returns true if there was a change in the cluster namespace that holds cluster role and role bindings
-func (ac *AuthorizationCache) invalidateCache() bool {
-	invalidateCache := false
+func (ac *AuthorizationCache) invalidateCache() (invalidateCache bool) {
+	// XXX we ensure that we always invalidate the cache from time to time.
+	// Workaround for https://issues.redhat.com/browse/OCPBUGS-57474.
+	defer func() {
+		// we need to know how long is the cache interval. if none is
+		// provided then we must assume a default one.
+		if ac.maxCacheLifespan == 0 {
+			ac.maxCacheLifespan = defaultMaxCacheLifespan
+		}
+
+		// if either we are returning true or this is the first time we
+		// run the invalidateCache we need to set the cache interval
+		// start to now. we will start counting from now.
+		if invalidateCache || ac.lastCacheInvalidation.IsZero() {
+			ac.lastCacheInvalidation = time.Now()
+			return
+		}
+
+		// we only reach here if we are returning false. on this case
+		// we want to change the return to true if the interval has
+		// been exceeded.
+		if time.Since(ac.lastCacheInvalidation) > ac.maxCacheLifespan {
+			ac.lastCacheInvalidation = time.Now()
+			invalidateCache = true
+		}
+	}()
 
 	clusterRoleList, err := ac.clusterRoleLister.List(labels.Everything())
 	if err != nil {
@@ -397,9 +436,11 @@ func (ac *AuthorizationCache) invalidateCache() bool {
 
 // synchronize runs a a full synchronization over the cache data.  it must be run in a single-writer model, it's not thread-safe by design.
 func (ac *AuthorizationCache) synchronize() {
-	// if none of our internal reflectors changed, then we can skip reviewing the cache
+	// if none of our internal reflectors changed, and the cache hasn't
+	// expired yet we can skip reviewing the cache.
+	expired := time.Since(ac.lastCacheInvalidation) > ac.maxCacheLifespan
 	skip, currentState := ac.skip.SkipSynchronize(ac.lastState, ac.lastSyncResourceVersioner, ac.roleLastSyncResourceVersioner)
-	if skip {
+	if skip && !expired {
 		return
 	}
 

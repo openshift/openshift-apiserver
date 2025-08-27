@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"testing"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -278,4 +279,94 @@ func TestInvalidateCache(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestInvalidateCacheAfterLifespan(t *testing.T) {
+	crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+	crbs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+
+	start := time.Now()
+	ac := &AuthorizationCache{
+		clusterRoleLister: syncedClusterRoleLister{
+			ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs),
+		},
+		clusterRoleBindingLister: syncedClusterRoleBindingLister{
+			ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs),
+		},
+
+		// these two values are set during the AuthorizationCache
+		// construction on the NewAuthorizationCache function, we
+		// override the maxCacheLifespan here to speed up the test.
+		maxCacheLifespan:      time.Second,
+		lastCacheInvalidation: start,
+	}
+
+	// we do a check right away, as the objects haven't changed we expect
+	// no invalidation to be required.
+	if invalidate := ac.invalidateCache(); invalidate {
+		t.Errorf("expected false on check first check, got true")
+	}
+
+	// the last invalidation time should be unchanged.
+	if !ac.lastCacheInvalidation.Equal(start) {
+		t.Errorf("expected last invalidation time to be unchanged")
+	}
+
+	// give the lifespan time to expire.
+	time.Sleep(time.Second + 50*time.Millisecond)
+
+	// after the lifespan of one second has passed the cache should be
+	// invalidated.
+	if invalidate := ac.invalidateCache(); !invalidate {
+		t.Errorf("expected true after cache lifespan exceeded, got false")
+	}
+
+	// we check that the last invalidation time has been updated now that
+	// the max lifespan has been exceeded.
+	if ac.lastCacheInvalidation.Equal(start) {
+		t.Errorf("expected last invalidation time to be updated")
+	}
+
+	// immediately after invalidation the cache should not be invalidated.
+	if invalidate := ac.invalidateCache(); invalidate {
+		t.Errorf("expected false immediately after invalidation, got true")
+	}
+
+	// if we add an object then the cache should be invalidated not due to
+	// the lifespan but due to the change. we expect the last invalidation
+	// time to be updated as well.
+	previousInvalidation := ac.lastCacheInvalidation
+	crs.Add(
+		&rbacv1.ClusterRole{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "clusterrole-new", ResourceVersion: "new",
+			},
+		},
+	)
+
+	// it should be time to invalidate the cache because a new role has
+	// been added to the cluster.
+	if invalidate := ac.invalidateCache(); !invalidate {
+		t.Errorf("expected true after adding an object, got false")
+	}
+
+	// and now the last invalidation time should have been updated.
+	if ac.lastCacheInvalidation.Equal(previousInvalidation) {
+		t.Errorf("expected last invalidation time to be updated after adding an object")
+	}
+
+	// validate that the default values are being set once the first call
+	// for invaldiateCache() is made.
+	ac.lastCacheInvalidation = time.Time{}
+	ac.maxCacheLifespan = 0
+	if invalidate := ac.invalidateCache(); invalidate {
+		t.Errorf("we should not invalidate the cache upon the first check")
+	}
+	if ac.lastCacheInvalidation.IsZero() {
+		t.Errorf("the last invalidation time should be set after the first check")
+	}
+	if ac.maxCacheLifespan == 0 {
+		t.Errorf("the max cache lifespan should have been set to the default value")
+	}
+
 }
