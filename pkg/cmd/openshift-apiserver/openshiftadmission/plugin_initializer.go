@@ -1,9 +1,6 @@
 package openshiftadmission
 
 import (
-	"fmt"
-	"io/ioutil"
-
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -77,15 +74,6 @@ func NewPluginInitializer(
 		quotaRegistry.Add(imageEvaluators[i])
 	}
 
-	var cloudConfig []byte
-	if len(config.CloudProviderFile) != 0 {
-		var err error
-		cloudConfig, err = ioutil.ReadFile(config.CloudProviderFile)
-		if err != nil {
-			return nil, fmt.Errorf("error reading from cloud configuration file %s: %v", config.CloudProviderFile, err)
-		}
-	}
-
 	// note: we are passing a combined quota registry here...
 	genericInitializer := initializer.New(
 		kubeClient,
@@ -101,7 +89,7 @@ func NewPluginInitializer(
 	// It's used for informational type checking of Validating Admission Policy
 	// expressions which are disabled by default.
 	// Injecting a nil SchemaResolver only disables the type checker status warnings.
-	kubePluginInitializer := kubeapiserveradmission.NewPluginInitializer(cloudConfig)
+	kubePluginInitializer := kubeapiserveradmission.NewPluginInitializer()
 
 	quotaConfigurationInitializer := controlplaneadmission.NewPluginInitializer(
 		generic.NewConfiguration(quotaRegistry.List(), map[schema.GroupResource]struct{}{}),

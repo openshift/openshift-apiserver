@@ -28,7 +28,7 @@ func TestProjectFidelity(t *testing.T) {
 
 	p := &projectapi.Project{}
 	for i := 0; i < 100; i++ {
-		f.Fuzz(p)
+		f.Fill(p)
 		p.Annotations = map[string]string{}           // we mutate annotations
 		p.Spec.Finalizers = []coreapi.FinalizerName{} // we mutate finalizers
 		p.TypeMeta = metav1.TypeMeta{}                // Ignore TypeMeta
@@ -58,7 +58,7 @@ func TestNamespaceFidelity(t *testing.T) {
 
 	n := &corev1.Namespace{}
 	for i := 0; i < 100; i++ {
-		f.Fuzz(n)
+		f.Fill(n)
 		n.Annotations = map[string]string{}          // we mutate annotations
 		n.Spec.Finalizers = []corev1.FinalizerName{} // we mutate finalizers
 		n.TypeMeta = metav1.TypeMeta{}               // Ignore TypeMeta
