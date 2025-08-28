@@ -262,8 +262,14 @@ func TestInvalidateCache(t *testing.T) {
 
 			crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
 			crbs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
-			ac.clusterRoleLister = syncedClusterRoleLister{ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs)}
-			ac.clusterRoleBindingLister = syncedClusterRoleBindingLister{ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs)}
+			ac.clusterRoleLister = syncedClusterRoleLister{
+				ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs),
+				versioner:         informers.Rbac().V1().ClusterRoleBindings().Informer(),
+			}
+			ac.clusterRoleBindingLister = syncedClusterRoleBindingLister{
+				ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs),
+				versioner:                informers.Rbac().V1().ClusterRoleBindings().Informer(),
+			}
 
 			for i, trial := range tc.trials {
 				func() {
@@ -314,6 +320,7 @@ func TestInvalidateCacheAfterLifespan(t *testing.T) {
 	crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
 	ac.clusterRoleLister = syncedClusterRoleLister{
 		ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs),
+		versioner:         informers.Rbac().V1().ClusterRoleBindings().Informer(),
 	}
 	crs.Add(
 		&rbacv1.ClusterRole{
