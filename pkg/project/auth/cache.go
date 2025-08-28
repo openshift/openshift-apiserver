@@ -258,6 +258,9 @@ func NewAuthorizationCache(
 		skip:     &neverSkipSynchronizer{},
 
 		watchers: []CacheWatcher{},
+
+		lastCacheInvalidation: time.Now(),
+		maxCacheLifespan:      defaultMaxCacheLifespan,
 	}
 	ac.lastSyncResourceVersioner = namespaceLastSyncResourceVersioner
 	ac.syncHandler = ac.syncRequest
@@ -375,33 +378,12 @@ func (ac *AuthorizationCache) purgeDeletedNamespaces(oldNamespaces, newNamespace
 }
 
 // invalidateCache returns true if there was a change in the cluster namespace that holds cluster role and role bindings
-func (ac *AuthorizationCache) invalidateCache() (invalidateCache bool) {
-	// XXX we ensure that we always invalidate the cache from time to time.
-	// Workaround for https://issues.redhat.com/browse/OCPBUGS-57474.
-	defer func() {
-		// we need to know how long is the cache interval. if none is
-		// provided then we must assume a default one.
-		if ac.maxCacheLifespan == 0 {
-			ac.maxCacheLifespan = defaultMaxCacheLifespan
-		}
+func (ac *AuthorizationCache) invalidateCache(lastCacheInvalidation time.Time) bool {
+	if ac.cacheHasExpired(lastCacheInvalidation) {
+		return true
+	}
 
-		// if either we are returning true or this is the first time we
-		// run the invalidateCache we need to set the cache interval
-		// start to now. we will start counting from now.
-		if invalidateCache || ac.lastCacheInvalidation.IsZero() {
-			ac.lastCacheInvalidation = time.Now()
-			return
-		}
-
-		// we only reach here if we are returning false. on this case
-		// we want to change the return to true if the interval has
-		// been exceeded.
-		if time.Since(ac.lastCacheInvalidation) > ac.maxCacheLifespan {
-			ac.lastCacheInvalidation = time.Now()
-			invalidateCache = true
-		}
-	}()
-
+	invalidateCache := false
 	clusterRoleList, err := ac.clusterRoleLister.List(labels.Everything())
 	if err != nil {
 		utilruntime.HandleError(err)
@@ -434,13 +416,18 @@ func (ac *AuthorizationCache) invalidateCache() (invalidateCache bool) {
 	return invalidateCache
 }
 
+// cacheHasExpired is used to evaluate when it is time to do a full cache
+// invalidation.
+func (ac *AuthorizationCache) cacheHasExpired(lastCacheInvalidation time.Time) bool {
+	return time.Since(lastCacheInvalidation) > ac.maxCacheLifespan
+}
+
 // synchronize runs a a full synchronization over the cache data.  it must be run in a single-writer model, it's not thread-safe by design.
 func (ac *AuthorizationCache) synchronize() {
 	// if none of our internal reflectors changed, and the cache hasn't
 	// expired yet we can skip reviewing the cache.
-	expired := time.Since(ac.lastCacheInvalidation) > ac.maxCacheLifespan
 	skip, currentState := ac.skip.SkipSynchronize(ac.lastState, ac.lastSyncResourceVersioner, ac.roleLastSyncResourceVersioner)
-	if skip && !expired {
+	if skip && !ac.cacheHasExpired(ac.lastCacheInvalidation) {
 		return
 	}
 
@@ -450,8 +437,9 @@ func (ac *AuthorizationCache) synchronize() {
 	reviewRecordStore := ac.reviewRecordStore
 
 	// if there was a global change that forced complete invalidation, we rebuild our cache and do a fast swap at end
-	invalidateCache := ac.invalidateCache()
+	invalidateCache := ac.invalidateCache(ac.lastCacheInvalidation)
 	if invalidateCache {
+		ac.lastCacheInvalidation = time.Now()
 		userSubjectRecordStore = cache.NewStore(subjectRecordKeyFn)
 		groupSubjectRecordStore = cache.NewStore(subjectRecordKeyFn)
 		reviewRecordStore = cache.NewStore(reviewRecordKeyFn)

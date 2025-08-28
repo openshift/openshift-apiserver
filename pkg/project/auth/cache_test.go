@@ -251,13 +251,19 @@ func TestInvalidateCache(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			mockKubeClient := fake.NewSimpleClientset()
+			nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+			nsLister := corev1listers.NewNamespaceLister(nsIndexer)
+			informers := informers.NewSharedInformerFactory(mockKubeClient, controller.NoResyncPeriodFunc())
+			reviewer := &mockReviewer{}
+			ac := NewAuthorizationCache(
+				nsLister, informers.Core().V1().Namespaces().Informer(), reviewer, informers.Rbac().V1(),
+			)
+
 			crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
 			crbs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
-
-			ac := &AuthorizationCache{
-				clusterRoleLister:        syncedClusterRoleLister{ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs)},
-				clusterRoleBindingLister: syncedClusterRoleBindingLister{ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs)},
-			}
+			ac.clusterRoleLister = syncedClusterRoleLister{ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs)}
+			ac.clusterRoleBindingLister = syncedClusterRoleBindingLister{ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs)}
 
 			for i, trial := range tc.trials {
 				func() {
@@ -270,7 +276,7 @@ func TestInvalidateCache(t *testing.T) {
 						defer crbs.Delete(&trial.crbs[i])
 					}
 
-					actual := ac.invalidateCache()
+					actual := ac.invalidateCache(time.Now())
 
 					if actual != trial.expected {
 						t.Errorf("expected %t on trial %d of %d, got %t", trial.expected, i+1, len(tc.trials), actual)
@@ -282,91 +288,44 @@ func TestInvalidateCache(t *testing.T) {
 }
 
 func TestInvalidateCacheAfterLifespan(t *testing.T) {
-	crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
-	crbs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+	mockKubeClient := fake.NewSimpleClientset()
+	informers := informers.NewSharedInformerFactory(
+		mockKubeClient, controller.NoResyncPeriodFunc(),
+	)
+	nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+	nsLister := corev1listers.NewNamespaceLister(nsIndexer)
+	reviewer := &mockReviewer{}
+	nsInformer := informers.Core().V1().Namespaces().Informer()
+	ac := NewAuthorizationCache(
+		nsLister, nsInformer, reviewer, informers.Rbac().V1(),
+	)
 
-	start := time.Now()
-	ac := &AuthorizationCache{
-		clusterRoleLister: syncedClusterRoleLister{
-			ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs),
-		},
-		clusterRoleBindingLister: syncedClusterRoleBindingLister{
-			ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs),
-		},
-
-		// these two values are set during the AuthorizationCache
-		// construction on the NewAuthorizationCache function, we
-		// override the maxCacheLifespan here to speed up the test.
-		maxCacheLifespan:      time.Second,
-		lastCacheInvalidation: start,
-	}
-
-	// we do a check right away, as the objects haven't changed we expect
-	// no invalidation to be required.
-	if invalidate := ac.invalidateCache(); invalidate {
+	if invalidate := ac.invalidateCache(time.Now()); invalidate {
 		t.Errorf("expected false on check first check, got true")
 	}
 
-	// the last invalidation time should be unchanged.
-	if !ac.lastCacheInvalidation.Equal(start) {
-		t.Errorf("expected last invalidation time to be unchanged")
-	}
-
-	// give the lifespan time to expire.
-	time.Sleep(time.Second + 50*time.Millisecond)
-
-	// after the lifespan of one second has passed the cache should be
-	// invalidated.
-	if invalidate := ac.invalidateCache(); !invalidate {
+	past := time.Now().Add(-2 * defaultMaxCacheLifespan)
+	if invalidate := ac.invalidateCache(past); !invalidate {
 		t.Errorf("expected true after cache lifespan exceeded, got false")
 	}
 
-	// we check that the last invalidation time has been updated now that
-	// the max lifespan has been exceeded.
-	if ac.lastCacheInvalidation.Equal(start) {
-		t.Errorf("expected last invalidation time to be updated")
-	}
-
-	// immediately after invalidation the cache should not be invalidated.
-	if invalidate := ac.invalidateCache(); invalidate {
-		t.Errorf("expected false immediately after invalidation, got true")
-	}
-
 	// if we add an object then the cache should be invalidated not due to
-	// the lifespan but due to the change. we expect the last invalidation
-	// time to be updated as well.
-	previousInvalidation := ac.lastCacheInvalidation
+	// the lifespan but due to the change.
+	crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+	ac.clusterRoleLister = syncedClusterRoleLister{
+		ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs),
+	}
 	crs.Add(
 		&rbacv1.ClusterRole{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "clusterrole-new", ResourceVersion: "new",
+				Name: "clusterrole", ResourceVersion: "rv",
 			},
 		},
 	)
 
 	// it should be time to invalidate the cache because a new role has
 	// been added to the cluster.
-	if invalidate := ac.invalidateCache(); !invalidate {
+	if invalidate := ac.invalidateCache(time.Now()); !invalidate {
 		t.Errorf("expected true after adding an object, got false")
 	}
-
-	// and now the last invalidation time should have been updated.
-	if ac.lastCacheInvalidation.Equal(previousInvalidation) {
-		t.Errorf("expected last invalidation time to be updated after adding an object")
-	}
-
-	// validate that the default values are being set once the first call
-	// for invaldiateCache() is made.
-	ac.lastCacheInvalidation = time.Time{}
-	ac.maxCacheLifespan = 0
-	if invalidate := ac.invalidateCache(); invalidate {
-		t.Errorf("we should not invalidate the cache upon the first check")
-	}
-	if ac.lastCacheInvalidation.IsZero() {
-		t.Errorf("the last invalidation time should be set after the first check")
-	}
-	if ac.maxCacheLifespan == 0 {
-		t.Errorf("the max cache lifespan should have been set to the default value")
-	}
-
 }
