@@ -34,8 +34,8 @@ import (
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/restmapper"
+	"k8s.io/component-base/compatibility"
 	"k8s.io/component-base/featuregate"
-	utilversion "k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 )
@@ -56,7 +56,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	kubeInformers := informers.NewSharedInformerFactory(kubeClient, 10*time.Minute)
 
 	openshiftVersion := version.Get()
-	effectiveVersion := utilversion.NewEffectiveVersion(openshiftVersion.String())
+	effectiveVersion := compatibility.NewEffectiveVersionFromString(openshiftVersion.String(), "", "")
 
 	genericConfig := genericapiserver.NewRecommendedConfig(legacyscheme.Codecs)
 	// Current default values

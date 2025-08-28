@@ -7,7 +7,6 @@ import (
 
 	"github.com/distribution/distribution/v3"
 	"github.com/distribution/distribution/v3/manifest/manifestlist"
-	fuzz "github.com/google/gofuzz"
 
 	"k8s.io/apimachinery/pkg/api/apitesting/fuzzer"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -16,6 +15,7 @@ import (
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	kapitesting "k8s.io/kubernetes/pkg/api/testing"
+	"sigs.k8s.io/randfill"
 
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/testutil"
@@ -24,29 +24,29 @@ import (
 func fuzzImage(t *testing.T, image *imageapi.Image, seed int64) *imageapi.Image {
 	f := fuzzer.FuzzerFor(kapitesting.FuzzerFuncs, rand.NewSource(seed), legacyscheme.Codecs)
 	f.Funcs(
-		func(j *imageapi.Image, c fuzz.Continue) {
-			c.FuzzNoCustom(j)
+		func(j *imageapi.Image, c randfill.Continue) {
+			c.FillNoCustom(j)
 			j.Annotations = make(map[string]string)
 			j.Labels = make(map[string]string)
 			j.Signatures = make([]imageapi.ImageSignature, c.Rand.Intn(3)+2)
 			for i := range j.Signatures {
 				sign := &j.Signatures[i]
-				c.Fuzz(sign)
+				c.Fill(sign)
 				sign.Conditions = make([]imageapi.SignatureCondition, c.Rand.Intn(3)+2)
 				for ci := range sign.Conditions {
 					cond := &sign.Conditions[ci]
-					c.Fuzz(cond)
+					c.Fill(cond)
 				}
 			}
 			for i := 0; i < c.Rand.Intn(3)+2; i++ {
-				j.Labels[c.RandString()] = c.RandString()
-				j.Annotations[c.RandString()] = c.RandString()
+				j.Labels[c.String(0)] = c.String(0)
+				j.Annotations[c.String(0)] = c.String(0)
 			}
 		},
 	)
 
 	updated := imageapi.Image{}
-	f.Fuzz(&updated)
+	f.Fill(&updated)
 	updated.Namespace = image.Namespace
 	updated.Name = image.Name
 
