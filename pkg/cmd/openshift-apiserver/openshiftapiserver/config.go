@@ -214,8 +214,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	}
 	admissionOptions.DisablePlugins = config.AdmissionConfig.DisabledAdmissionPlugins
 	admissionOptions.ConfigFile = admissionConfigFile
-	// TODO:
-	if err := admissionOptions.ApplyTo(&genericConfig.Config, kubeInformers, kubeClient, dynamicClient, nil, admissionInitializer); err != nil {
+	if err := admissionOptions.ApplyTo(&genericConfig.Config, kubeInformers, kubeClient, dynamicClient, feature.DefaultFeatureGate, admissionInitializer); err != nil {
 		return nil, err
 	}
 
