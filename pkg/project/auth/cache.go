@@ -203,13 +203,10 @@ type AuthorizationCache struct {
 	watchers    []CacheWatcher
 	watcherLock sync.Mutex
 
-	// lastCacheInvalidation and maxCacheLifespan are used together.
-	// We use them to control the maximum time allowed between cache
-	// invalidations. This is a workaround for a bug. We deemed the
-	// risk of refactoring the cache to be too high so close to the
-	// release date, so close to the release so here we are. For
-	// further details see:
-	// https://issues.redhat.com/browse/OCPBUGS-57474
+	// lastCacheInvalidation and maxCacheLifespan control the maximum time
+	// between cache invalidations. This is a temporary workaround due to
+	// release timing risk.
+	// See https://issues.redhat.com/browse/OCPBUGS-57474 for details.
 	lastCacheInvalidation time.Time
 	maxCacheLifespan      time.Duration
 }
@@ -417,7 +414,7 @@ func (ac *AuthorizationCache) invalidateCache(lastCacheInvalidation time.Time) b
 }
 
 // cacheHasExpired is used to evaluate when it is time to do a full cache
-// invalidation.
+// invalidation due to age.
 func (ac *AuthorizationCache) cacheHasExpired(lastCacheInvalidation time.Time) bool {
 	return time.Since(lastCacheInvalidation) > ac.maxCacheLifespan
 }

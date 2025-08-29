@@ -264,7 +264,7 @@ func TestInvalidateCache(t *testing.T) {
 			crbs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
 			ac.clusterRoleLister = syncedClusterRoleLister{
 				ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs),
-				versioner:         informers.Rbac().V1().ClusterRoleBindings().Informer(),
+				versioner:         informers.Rbac().V1().ClusterRoles().Informer(),
 			}
 			ac.clusterRoleBindingLister = syncedClusterRoleBindingLister{
 				ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs),
@@ -302,9 +302,8 @@ func TestInvalidateCacheAfterLifespan(t *testing.T) {
 	nsLister := corev1listers.NewNamespaceLister(nsIndexer)
 	reviewer := &mockReviewer{}
 	nsInformer := informers.Core().V1().Namespaces().Informer()
-	ac := NewAuthorizationCache(
-		nsLister, nsInformer, reviewer, informers.Rbac().V1(),
-	)
+	rbacClient := informers.Rbac().V1()
+	ac := NewAuthorizationCache(nsLister, nsInformer, reviewer, rbacClient)
 
 	if invalidate := ac.invalidateCache(time.Now()); invalidate {
 		t.Errorf("expected false on check first check, got true")
@@ -320,7 +319,7 @@ func TestInvalidateCacheAfterLifespan(t *testing.T) {
 	crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
 	ac.clusterRoleLister = syncedClusterRoleLister{
 		ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs),
-		versioner:         informers.Rbac().V1().ClusterRoleBindings().Informer(),
+		versioner:         informers.Rbac().V1().ClusterRoles().Informer(),
 	}
 	crs.Add(
 		&rbacv1.ClusterRole{
