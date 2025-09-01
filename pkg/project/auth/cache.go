@@ -21,10 +21,16 @@ import (
 	corev1listers "k8s.io/client-go/listers/core/v1"
 	rbacv1listers "k8s.io/client-go/listers/rbac/v1"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/utils/clock"
 
 	"github.com/openshift/apiserver-library-go/pkg/authorization/scope"
 	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 )
+
+// defaultMaxCacheLifespan is used to control how long the cache can live
+// without being invalidated. This is a workaround for a bug, see
+// https://issues.redhat.com/browse/OCPBUGS-57474 for further details.
+const defaultMaxCacheLifespan = 15 * time.Second
 
 // Lister enforces ability to enumerate a resource based on role
 type Lister interface {
@@ -197,6 +203,16 @@ type AuthorizationCache struct {
 
 	watchers    []CacheWatcher
 	watcherLock sync.Mutex
+
+	// lastCacheInvalidation, maxCacheLifespan and clock exist so we can
+	// control the maximum time between cache invalidations. This is a
+	// temporary workaround due to release timing risk. Cache expires when
+	// clock.Since(lastCacheInvalidation) > maxCacheLifespan, according to
+	// the internal clock implementation.
+	// See https://issues.redhat.com/browse/OCPBUGS-57474 for details.
+	lastCacheInvalidation time.Time
+	maxCacheLifespan      time.Duration
+	clock                 clock.PassiveClock
 }
 
 // NewAuthorizationCache creates a new AuthorizationCache
@@ -222,6 +238,10 @@ func NewAuthorizationCache(
 		informers.RoleBindings().Lister(),
 		informers.RoleBindings().Informer(),
 	}
+
+	// create a real clock so we can compute cache expiration times.
+	realClock := clock.RealClock{}
+
 	ac := &AuthorizationCache{
 		allKnownNamespaces: sets.String{},
 		namespaceLister:    namespaceLister,
@@ -243,10 +263,20 @@ func NewAuthorizationCache(
 		skip:     &neverSkipSynchronizer{},
 
 		watchers: []CacheWatcher{},
+
+		clock:                 realClock,
+		lastCacheInvalidation: realClock.Now(),
+		maxCacheLifespan:      defaultMaxCacheLifespan,
 	}
 	ac.lastSyncResourceVersioner = namespaceLastSyncResourceVersioner
 	ac.syncHandler = ac.syncRequest
 	return ac
+}
+
+// cacheHasExpired is used to evaluate when it is time to do a full cache
+// invalidation due to age.
+func (ac *AuthorizationCache) cacheHasExpired() bool {
+	return ac.clock.Since(ac.lastCacheInvalidation) > ac.maxCacheLifespan
 }
 
 // Run begins watching and synchronizing the cache
@@ -360,9 +390,8 @@ func (ac *AuthorizationCache) purgeDeletedNamespaces(oldNamespaces, newNamespace
 }
 
 // invalidateCache returns true if there was a change in the cluster namespace that holds cluster role and role bindings
-func (ac *AuthorizationCache) invalidateCache() bool {
-	invalidateCache := false
-
+func (ac *AuthorizationCache) invalidateCache(expired bool) bool {
+	invalidateCache := expired
 	clusterRoleList, err := ac.clusterRoleLister.List(labels.Everything())
 	if err != nil {
 		utilruntime.HandleError(err)
@@ -397,9 +426,10 @@ func (ac *AuthorizationCache) invalidateCache() bool {
 
 // synchronize runs a a full synchronization over the cache data.  it must be run in a single-writer model, it's not thread-safe by design.
 func (ac *AuthorizationCache) synchronize() {
+	expired := ac.cacheHasExpired()
 	// if none of our internal reflectors changed, then we can skip reviewing the cache
 	skip, currentState := ac.skip.SkipSynchronize(ac.lastState, ac.lastSyncResourceVersioner, ac.roleLastSyncResourceVersioner)
-	if skip {
+	if skip && !expired {
 		return
 	}
 
@@ -409,8 +439,9 @@ func (ac *AuthorizationCache) synchronize() {
 	reviewRecordStore := ac.reviewRecordStore
 
 	// if there was a global change that forced complete invalidation, we rebuild our cache and do a fast swap at end
-	invalidateCache := ac.invalidateCache()
+	invalidateCache := ac.invalidateCache(expired)
 	if invalidateCache {
+		ac.lastCacheInvalidation = ac.clock.Now()
 		userSubjectRecordStore = cache.NewStore(subjectRecordKeyFn)
 		groupSubjectRecordStore = cache.NewStore(subjectRecordKeyFn)
 		reviewRecordStore = cache.NewStore(reviewRecordKeyFn)
