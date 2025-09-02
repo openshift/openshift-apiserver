@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"testing"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -17,7 +18,24 @@ import (
 	rbacv1listers "k8s.io/client-go/listers/rbac/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/kubernetes/pkg/controller"
+	"k8s.io/utils/clock"
 )
+
+// mockedClock returns always the same values for Now() and Since().
+type mockedClock struct {
+	now   time.Time
+	since time.Duration
+}
+
+// Now returns always the same time.
+func (m *mockedClock) Now() time.Time {
+	return m.now
+}
+
+// Since returns always the same duration regardless of the input time.
+func (m *mockedClock) Since(time.Time) time.Duration {
+	return m.since
+}
 
 // mockReview implements the Review interface for test cases
 type mockReview struct {
@@ -269,12 +287,151 @@ func TestInvalidateCache(t *testing.T) {
 						defer crbs.Delete(&trial.crbs[i])
 					}
 
-					actual := ac.invalidateCache()
+					actual := ac.invalidateCache(false)
 
 					if actual != trial.expected {
 						t.Errorf("expected %t on trial %d of %d, got %t", trial.expected, i+1, len(tc.trials), actual)
 					}
 				}()
+			}
+		})
+	}
+}
+
+func TestAuthorizationCache_cacheHasExpired(t *testing.T) {
+	for _, tt := range []struct {
+		name             string
+		clock            clock.PassiveClock
+		maxCacheLifespan time.Duration
+		expected         bool
+	}{
+		{
+			name:             "no time elapsed and zero lifespan",
+			clock:            &mockedClock{},
+			maxCacheLifespan: 0,
+			expected:         false,
+		},
+		{
+			name:             "some time has elapsed but not enough",
+			clock:            &mockedClock{since: time.Minute},
+			maxCacheLifespan: 2 * time.Minute,
+			expected:         false,
+		},
+		{
+			name:             "exactly at max lifespan",
+			clock:            &mockedClock{since: time.Minute},
+			maxCacheLifespan: time.Minute,
+			expected:         false,
+		},
+		{
+			name:             "more than enough time has elapsed",
+			clock:            &mockedClock{since: time.Minute},
+			maxCacheLifespan: time.Minute - time.Second,
+			expected:         true,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			ac := AuthorizationCache{
+				clock:            tt.clock,
+				maxCacheLifespan: tt.maxCacheLifespan,
+			}
+			if result := ac.cacheHasExpired(); result != tt.expected {
+				t.Errorf("expected %t, got %t", tt.expected, result)
+			}
+		})
+	}
+}
+
+func TestAuthorizationCache_invalidateCache(t *testing.T) {
+	for _, tt := range []struct {
+		name                     string
+		expired                  bool
+		expected                 bool
+		extraClusterRoles        []*rbacv1.ClusterRole
+		extraClusterRoleBindings []*rbacv1.ClusterRoleBinding
+	}{
+		{
+			name:     "zero time elapsed",
+			expired:  false,
+			expected: false,
+		},
+		{
+			name:     "expired cache",
+			expired:  true,
+			expected: true,
+		},
+		{
+			name:     "zero time elapsed but extra clusterrole",
+			expired:  false,
+			expected: true,
+			extraClusterRoles: []*rbacv1.ClusterRole{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "clusterrole", ResourceVersion: "rv",
+					},
+				},
+			},
+		},
+		{
+			name:     "zero time elapsed but extra clusterrolebinding",
+			expired:  false,
+			expected: true,
+			extraClusterRoleBindings: []*rbacv1.ClusterRoleBinding{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "clusterrolebinding", ResourceVersion: "rv",
+					},
+				},
+			},
+		},
+		{
+			name:     "expired cache with extra clusterrole",
+			expired:  true,
+			expected: true,
+			extraClusterRoles: []*rbacv1.ClusterRole{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "clusterrole", ResourceVersion: "rv",
+					},
+				},
+			},
+		},
+		{
+			name:     "expired cache with extra clusterrolebindings",
+			expired:  true,
+			expected: true,
+			extraClusterRoleBindings: []*rbacv1.ClusterRoleBinding{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "clusterrole", ResourceVersion: "rv",
+					},
+				},
+			},
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+			crbs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+
+			ac := &AuthorizationCache{
+				clusterRoleLister: syncedClusterRoleLister{
+					ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs),
+				},
+				clusterRoleBindingLister: syncedClusterRoleBindingLister{
+					ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs),
+				},
+			}
+
+			for _, cr := range tt.extraClusterRoles {
+				crs.Add(cr)
+			}
+
+			for _, crb := range tt.extraClusterRoleBindings {
+				crbs.Add(crb)
+			}
+
+			if result := ac.invalidateCache(tt.expired); result != tt.expected {
+				t.Errorf("expected %t, got %t", tt.expected, result)
 			}
 		})
 	}
