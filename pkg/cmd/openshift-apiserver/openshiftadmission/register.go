@@ -53,7 +53,7 @@ var (
 		"build.openshift.io/BuildConfigSecretInjector",
 		"build.openshift.io/BuildByStrategy",
 		"image.openshift.io/ImageLimitRange",
-		"image.openshift.io/ImagePolicy",
+		//"image.openshift.io/ImagePolicy",
 		"quota.openshift.io/ClusterResourceQuota",
 		"route.openshift.io/RequiredRouteAnnotations",
 
