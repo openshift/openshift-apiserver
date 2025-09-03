@@ -6,7 +6,6 @@ import (
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/kubernetes/plugin/pkg/admission/gc"
 
-	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy"
 	quotaclusterresourcequota "github.com/openshift/apiserver-library-go/pkg/admission/quota/clusterresourcequota"
 	buildsecretinjector "github.com/openshift/openshift-apiserver/pkg/build/apiserver/admission/secretinjector"
 	buildstrategyrestrictions "github.com/openshift/openshift-apiserver/pkg/build/apiserver/admission/strategyrestrictions"
@@ -37,7 +36,7 @@ func RegisterOpenshiftAdmissionPlugins(plugins *admission.Plugins) {
 	buildsecretinjector.Register(plugins)
 	buildstrategyrestrictions.Register(plugins)
 	imageadmission.Register(plugins)
-	imagepolicy.Register(plugins)
+	//imagepolicy.Register(plugins)
 	quotaclusterresourcequota.Register(plugins)
 	requiredrouteannotations.Register(plugins)
 }
