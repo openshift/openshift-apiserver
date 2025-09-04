@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	authorizationapi "k8s.io/api/authorization/v1"
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -66,6 +67,7 @@ func (s routeStrategy) routeValidationOptions() routecommon.RouteValidationOptio
 func (s routeStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 	route := obj.(*routeapi.Route)
 	route.Status = routeapi.RouteStatus{}
+	route.Generation = 1
 	stripEmptyDestinationCACertificate(route)
 
 	// In kube APIs, disabled fields are stripped from inbound objects.
@@ -95,6 +97,15 @@ func (s routeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 		if route.Spec.TLS != nil && route.Spec.TLS.ExternalCertificate != nil {
 			route.Spec.TLS.ExternalCertificate = nil
 		}
+	}
+
+	// Any changes to the spec increment the generation number.
+	// Changes to status, or to any metadata field (eg.: labels and annotations)
+	// should not impact on the generation
+	// Preserve existing generation unless the Spec changes.
+	route.Generation = oldRoute.Generation
+	if !apiequality.Semantic.DeepEqual(oldRoute.Spec, route.Spec) {
+		route.Generation = oldRoute.Generation + 1
 	}
 }
 

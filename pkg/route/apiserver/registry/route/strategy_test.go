@@ -120,6 +120,7 @@ func TestEmptyDefaultCACertificate(t *testing.T) {
 					Name:            "myroute",
 					UID:             types.UID("abc"),
 					ResourceVersion: "1",
+					Generation:      1,
 				},
 				Spec: routeapi.RouteSpec{
 					Host: "myhost.com",
@@ -1110,5 +1111,47 @@ func TestExternalCertRemoval(t *testing.T) {
 		if freshRoute.Spec.TLS.ExternalCertificate == nil {
 			t.Errorf("should have external cert")
 		}
+	}
+}
+
+func TestRouteGenerationManagement(t *testing.T) {
+	ctx := apirequest.NewContext()
+	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, &testSecretGetter{}, true)
+
+	simpleRoute := &routeapi.Route{}
+	strategy.Validate(ctx, simpleRoute)
+	if simpleRoute.Spec.Host != "mygeneratedhost.com" {
+		t.Fatalf("Expected host to be allocated, got %s", simpleRoute.Spec.Host)
+	}
+
+	if simpleRoute.Generation > 0 {
+		t.Fatalf("Expected generation to not be allocated yet, got %d", simpleRoute.Generation)
+	}
+
+	// PrepareForCreate should set a generation 1
+	strategy.PrepareForCreate(ctx, simpleRoute)
+	if simpleRoute.Generation != 1 {
+		t.Fatalf("Expected generation after create to be 1, got %d", simpleRoute.Generation)
+	}
+
+	newRoute := simpleRoute.DeepCopy()
+	// Changing annotations and labels should not bump the generation
+	newRoute.Annotations = map[string]string{
+		"someannotation": "novalue",
+	}
+	newRoute.Labels = map[string]string{
+		"somelabel": "novalue",
+	}
+
+	strategy.PrepareForUpdate(ctx, newRoute, simpleRoute)
+	if newRoute.Generation != 1 {
+		t.Fatalf("Expected generation after metadata update to still be 1, got %d", newRoute.Generation)
+	}
+
+	// Updating the spec should bump the generation
+	newRoute.Spec.Path = "/xpto"
+	strategy.PrepareForUpdate(ctx, newRoute, simpleRoute)
+	if newRoute.Generation != 2 {
+		t.Fatalf("Expected generation after spec update to be 2, got %d", newRoute.Generation)
 	}
 }
