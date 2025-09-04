@@ -102,6 +102,8 @@ func (s routeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 	// Any changes to the spec increment the generation number.
 	// Changes to status, or to any metadata field (eg.: labels and annotations)
 	// should not impact on the generation
+	// Preserve existing generation unless the Spec changes.
+	route.Generation = oldRoute.Generation
 	if !apiequality.Semantic.DeepEqual(oldRoute.Spec, route.Spec) {
 		route.Generation = oldRoute.Generation + 1
 	}

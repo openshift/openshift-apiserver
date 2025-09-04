@@ -120,6 +120,7 @@ func TestEmptyDefaultCACertificate(t *testing.T) {
 					Name:            "myroute",
 					UID:             types.UID("abc"),
 					ResourceVersion: "1",
+					Generation:      1,
 				},
 				Spec: routeapi.RouteSpec{
 					Host: "myhost.com",
@@ -1144,13 +1145,13 @@ func TestRouteGenerationManagement(t *testing.T) {
 
 	strategy.PrepareForUpdate(ctx, newRoute, simpleRoute)
 	if newRoute.Generation != 1 {
-		t.Fatalf("Expected generation after metadata update to still be 1, got %d", simpleRoute.Generation)
+		t.Fatalf("Expected generation after metadata update to still be 1, got %d", newRoute.Generation)
 	}
 
 	// Updating the spec should bump the generation
 	newRoute.Spec.Path = "/xpto"
 	strategy.PrepareForUpdate(ctx, newRoute, simpleRoute)
 	if newRoute.Generation != 2 {
-		t.Fatalf("Expected generation after spec update to be 2, got %d", simpleRoute.Generation)
+		t.Fatalf("Expected generation after spec update to be 2, got %d", newRoute.Generation)
 	}
 }
