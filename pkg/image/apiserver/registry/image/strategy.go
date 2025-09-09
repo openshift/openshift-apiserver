@@ -52,28 +52,40 @@ func (s imageStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object)
 		utilruntime.HandleError(fmt.Errorf("unable to update image metadata for %q: %v", newImage.Name, err))
 	}
 
-	manifest, _, err := distribution.UnmarshalManifest(
-		newImage.DockerImageManifestMediaType,
-		[]byte(newImage.DockerImageManifest),
-	)
-	if err != nil {
-		utilruntime.HandleError(fmt.Errorf("unable to parse manifest for %q: %v", newImage.Name, err))
-	}
-
-	if mlist, ok := manifest.(*manifestlist.DeserializedManifestList); ok {
-		subManifests := []imageapi.ImageManifest{}
-		for _, m := range mlist.Manifests {
-			im := imageapi.ImageManifest{
-				Digest:       m.Digest.String(),
-				MediaType:    m.MediaType,
-				ManifestSize: m.Size,
-				Architecture: m.Platform.Architecture,
-				OS:           m.Platform.OS,
-				Variant:      m.Platform.Variant,
-			}
-			subManifests = append(subManifests, im)
+	// initially, the code in this function did not account for these
+	// different contexts.
+	// the code in this function is called from two contexts:
+	//   1. image stream imports, which are also triggered by creating image
+	//      streams and adding tags to them;
+	//   2. direct pushes to the internal registry, i.e. podman push
+	// on 1. the raw manifest json is cleared from image.DockerImageManifest
+	// to avoid unbound growth of Image objects in etcd; and on 2. the raw
+	// manifest json is still set in the image.DockerImageManifest.
+	// the code block below should not cause side effects on either path.
+	if len(newImage.DockerImageManifest) != 0 {
+		manifest, _, err := distribution.UnmarshalManifest(
+			newImage.DockerImageManifestMediaType,
+			[]byte(newImage.DockerImageManifest),
+		)
+		if err != nil {
+			utilruntime.HandleError(fmt.Errorf("unable to parse manifest for %q: %v", newImage.Name, err))
 		}
-		newImage.DockerImageManifests = subManifests
+
+		if mlist, ok := manifest.(*manifestlist.DeserializedManifestList); ok {
+			subManifests := []imageapi.ImageManifest{}
+			for _, m := range mlist.Manifests {
+				im := imageapi.ImageManifest{
+					Digest:       m.Digest.String(),
+					MediaType:    m.MediaType,
+					ManifestSize: m.Size,
+					Architecture: m.Platform.Architecture,
+					OS:           m.Platform.OS,
+					Variant:      m.Platform.Variant,
+				}
+				subManifests = append(subManifests, im)
+			}
+			newImage.DockerImageManifests = subManifests
+		}
 	}
 
 	if newImage.Annotations[imagev1.ImageManifestBlobStoredAnnotation] == "true" {
