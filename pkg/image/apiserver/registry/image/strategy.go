@@ -72,7 +72,7 @@ func (s imageStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object)
 		}
 
 		if mlist, ok := manifest.(*manifestlist.DeserializedManifestList); ok {
-			subManifests := []imageapi.ImageManifest{}
+			subManifests := make([]imageapi.ImageManifest, 0, len(mlist.Manifests))
 			for _, m := range mlist.Manifests {
 				im := imageapi.ImageManifest{
 					Digest:       m.Digest.String(),
