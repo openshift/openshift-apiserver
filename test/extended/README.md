@@ -5,6 +5,10 @@ This repository contains the tests for the OpenShift API Server for OpenShift.
 These tests run against OpenShift clusters and are meant to be used in the OpenShift CI/CD pipeline.
 They use the framework: https://github.com/openshift-eng/openshift-tests-extension
 
+## Sequence Diagram(s)
+<img width="875" height="536" alt="image" src="https://github.com/user-attachments/assets/9e72cf2f-6f5b-4ec5-9603-a96f5de4599f" />
+
+
 ## How to Run the Tests Locally
 
 | Command                                                                    | Description                                                              |
