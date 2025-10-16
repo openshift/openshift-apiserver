@@ -22,6 +22,7 @@ import (
 
 	// The import below is necessary to ensure that the OAS operator tests are registered with the extension.
 	_ "github.com/openshift/openshift-apiserver/test/extended"
+	_ "github.com/openshift/openshift-apiserver/test/extended/apiserver"
 )
 
 func main() {
