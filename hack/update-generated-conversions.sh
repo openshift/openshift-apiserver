@@ -50,6 +50,8 @@ ALL_PEERS=(
 sed -i "s/$K8S_TAG/$TEMP_TAG/g" "$PATH_TO_FILE"
 
 echo "Generating conversions"
+# conversion-gen expects the pre-1.23 go/types alias behavior in Kubernetes 1.31 (https://go.dev/doc/go1.23#gotypespkggotypes)
+GODEBUG=gotypesalias=0 \
 ${GOPATH}/bin/conversion-gen "${ALL_FQ_APIS[@]}" --extra-peer-dirs $(codegen::join , "${ALL_PEERS[@]}") --output-file zz_generated.conversion.go --go-header-file ${SCRIPT_ROOT}/hack/boilerplate.txt --v=8 "$@"
 
 # Restore the build tag back to the original one
