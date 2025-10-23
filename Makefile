@@ -14,7 +14,7 @@ IMAGE_REGISTRY?=registry.svc.ci.openshift.org
 # OpenShift Tests Extension (OpenShift API Server)
 # -------------------------------------------------------------------
 TESTS_EXT_BINARY := openshift-apiserver-tests-ext
-TESTS_EXT_PACKAGE := ./cmd/openshift-apiserver-tests-ext
+TESTS_EXT_PACKAGE := ./test/tests-extension/cmd
 
 TESTS_EXT_GIT_COMMIT := $(shell git rev-parse --short HEAD)
 TESTS_EXT_BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
@@ -71,3 +71,36 @@ tests-ext-update: tests-ext-build
 	for f in .openshift-tests-extension/*.json; do \
 		jq 'map(del(.codeLocations))' "$f" > tmpp && mv tmpp "$f"; \
 	done
+
+# -------------------------------------------------------------------
+# Additional tests-extension targets
+# -------------------------------------------------------------------
+.PHONY: tests-ext-verify
+tests-ext-verify:
+	cd test/tests-extension && make verify
+
+.PHONY: tests-ext-clean
+tests-ext-clean:
+	cd test/tests-extension && make clean
+
+.PHONY: tests-ext-run-suite
+tests-ext-run-suite:
+	cd test/tests-extension && make run-suite SUITE=$(SUITE) ARTIFACT_DIR=$(ARTIFACT_DIR)
+
+.PHONY: tests-ext-list
+tests-ext-list:
+	cd test/tests-extension && make list-test-names
+
+.PHONY: tests-ext-build-update
+tests-ext-build-update:
+	cd test/tests-extension && make build-update
+
+# Add tests-extension targets to main targets
+all: tests-ext-build
+.PHONY: all
+
+clean: tests-ext-clean
+.PHONY: clean
+
+verify: tests-ext-verify
+.PHONY: verify
