@@ -3,11 +3,11 @@ WORKDIR /go/src/github.com/openshift/openshift-apiserver
 COPY . .
 RUN make build --warn-undefined-variables \
     && make tests-ext-build \
-    && gzip test/extended/tests-extension/openshift-apiserver-tests-ext
+    && gzip test/extended/tests-extension/bin/openshift-apiserver-tests-ext
 
 FROM registry.ci.openshift.org/ocp/4.21:base-rhel9
 COPY --from=builder /go/src/github.com/openshift/openshift-apiserver/openshift-apiserver /usr/bin/
-COPY --from=builder /go/src/github.com/openshift/openshift-apiserver/test/extended/tests-extension/openshift-apiserver-tests-ext.gz /usr/bin/
+COPY --from=builder /go/src/github.com/openshift/openshift-apiserver/test/extended/tests-extension/bin/openshift-apiserver-tests-ext.gz /usr/bin/
 ENTRYPOINT ["/usr/bin/openshift-apiserver"]
 LABEL io.k8s.display-name="OpenShift API Server Command" \
       io.k8s.description="OpenShift is a platform for developing, building, and deploying containerized applications." \

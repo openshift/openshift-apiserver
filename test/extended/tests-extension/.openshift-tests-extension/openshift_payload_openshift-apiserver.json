@@ -8,5 +8,15 @@
     "source": "openshift:payload:openshift-apiserver",
     "lifecycle": "blocking",
     "environmentSelector": {}
+  },
+  {
+    "name": "[Jira:openshift-apiserver][sig-api-machinery][openshift-apiserver][encryption] Force encryption key rotation for etcd datastore should rotate keys and update encryption prefixes [Slow][Serial][Disruptive][Suite:openshift/openshift-apiserver/conformance/serial]",
+    "labels": {},
+    "resources": {
+      "isolation": {}
+    },
+    "source": "openshift:payload:openshift-apiserver",
+    "lifecycle": "blocking",
+    "environmentSelector": {}
   }
 ]
