@@ -10,9 +10,9 @@ They use the framework: https://github.com/openshift-eng/openshift-tests-extensi
 | Command                                                                    | Description                                                              |
 |----------------------------------------------------------------------------|--------------------------------------------------------------------------|
 | `make tests-ext-build`                                                     | Builds the test extension binary.                                        |
-| `test/extended/tests-extension/openshift-apiserver-tests-ext list`        | Lists all available test cases.                                          |
-| `test/extended/tests-extension/openshift-apiserver-tests-ext run-suite <suite-name>` | Runs a test suite. e.g., `openshift/openshift-apiserver/conformance/parallel` |
-| `test/extended/tests-extension/openshift-apiserver-tests-ext run <test-name>` | Runs one specific test.                                              |
+| `test/extended/tests-extension/bin/openshift-apiserver-tests-ext list`    | Lists all available test cases.                                          |
+| `test/extended/tests-extension/bin/openshift-apiserver-tests-ext run-suite <suite-name>` | Runs a test suite. e.g., `openshift/openshift-apiserver/conformance/parallel` |
+| `test/extended/tests-extension/bin/openshift-apiserver-tests-ext run <test-name>` | Runs one specific test.                                              |
 
 
 ## How to Run the Tests Locally
@@ -22,7 +22,7 @@ Use the environment variable `KUBECONFIG` to point to your cluster configuration
 
 ```shell
 export KUBECONFIG=path/to/kubeconfig
-test/extended/tests-extension/openshift-apiserver-tests-ext run <test-name>
+test/extended/tests-extension/bin/openshift-apiserver-tests-ext run <test-name>
 ```
 
 ### Local Test using OCP
@@ -48,7 +48,7 @@ export KUBECONFIG=~/.kube/cluster-bot.kubeconfig
 
 **Example:**
 ```shell
-test/extended/tests-extension/openshift-apiserver-tests-ext run-suite openshift/openshift-apiserver/all
+test/extended/tests-extension/bin/openshift-apiserver-tests-ext run-suite openshift/openshift-apiserver/all
 ```
 
 ## Writing Tests
@@ -63,6 +63,9 @@ This test extension uses a **separate Go module** to isolate test dependencies f
 test/extended/tests-extension/
 ├── go.mod                           # Separate module with test dependencies
 ├── go.sum
+├── Makefile                         # Build targets for test binary
+├── bin/                             # Built test binaries (gitignored)
+│   └── openshift-apiserver-tests-ext
 ├── cmd/openshift-apiserver-tests-ext/
 │   └── main.go                      # Test binary entry point
 ├── apiserver/                       # Test packages
@@ -88,7 +91,7 @@ test/extended/tests-extension/
 
 ## How to Rename a Test
 
-1. Run `test/extended/tests-extension/openshift-apiserver-tests-ext list` to see the current test names
+1. Run `test/extended/tests-extension/bin/openshift-apiserver-tests-ext list` to see the current test names
 2. Find the name of the test you want to rename
 3. Add a Ginkgo label with the original name, like this:
 
@@ -106,7 +109,7 @@ It("should pass a renamed sanity check",
 
 ## How to Delete a Test
 
-1. Run `test/extended/tests-extension/openshift-apiserver-tests-ext list` to find the test name
+1. Run `test/extended/tests-extension/bin/openshift-apiserver-tests-ext list` to find the test name
 2. Add the test name to the `IgnoreObsoleteTests` block in `test/extended/tests-extension/cmd/openshift-apiserver-tests-ext/main.go`, like this:
 
 ```go
@@ -158,7 +161,7 @@ More info: https://docs.ci.openshift.org/docs/architecture/ci-operator/#testing-
 | Target                   | Description                                                                  |
 |--------------------------|------------------------------------------------------------------------------|
 | `make build`             | Builds the operator binary.                                                      |
-| `make tests-ext-build`   | Builds the test extension binary.                                            |
+| `make tests-ext-build`   | Builds the test extension binary into `test/extended/tests-extension/bin/`. |
 | `make tests-ext-update`  | Updates the metadata JSON file and cleans machine-specific codeLocations.    |
 | `make verify`            | Runs formatting, vet, and linter.                                            |
 
