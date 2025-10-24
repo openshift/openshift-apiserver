@@ -21,8 +21,8 @@ import (
 	"github.com/spf13/cobra"
 
 	// The import below is necessary to ensure that the OAS operator tests are registered with the extension.
-	_ "github.com/openshift/openshift-apiserver/test/extended"
-	_ "github.com/openshift/openshift-apiserver/test/extended/apiserver"
+	_ "github.com/openshift/openshift-apiserver/test/extended/tests-extension"
+	_ "github.com/openshift/openshift-apiserver/test/extended/tests-extension/apiserver"
 )
 
 func main() {
