@@ -61,16 +61,11 @@ verify:
 # -------------------------------------------------------------------
 .PHONY: tests-ext-build
 tests-ext-build:
-	cd $(TESTS_EXT_DIR) && \
-	GOOS=$(GOOS) GOARCH=$(GOARCH) GO_COMPLIANCE_POLICY=exempt_all CGO_ENABLED=0 \
-	go build -mod=mod -o $(TESTS_EXT_BINARY) -ldflags "$(TESTS_EXT_LDFLAGS)" $(TESTS_EXT_PACKAGE)
+	$(MAKE) -C $(TESTS_EXT_DIR) build
 
 # -------------------------------------------------------------------
 # Run "update" and strip env-specific metadata
 # -------------------------------------------------------------------
 .PHONY: tests-ext-update
-tests-ext-update: tests-ext-build
-	cd $(TESTS_EXT_DIR) && ./$(TESTS_EXT_BINARY) update
-	for f in $(TESTS_EXT_DIR)/.openshift-tests-extension/*.json; do \
-		jq 'map(del(.codeLocations))' "$$f" > tmpp && mv tmpp "$$f"; \
-	done
+tests-ext-update:
+	$(MAKE) -C $(TESTS_EXT_DIR) build-update
