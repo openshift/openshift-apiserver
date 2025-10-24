@@ -14,6 +14,8 @@ IMAGE_REGISTRY?=registry.svc.ci.openshift.org
 # OpenShift Tests Extension (OpenShift API Server)
 # -------------------------------------------------------------------
 TESTS_EXT_BINARY := openshift-apiserver-tests-ext
+TESTS_EXT_DIR := ./test/extended/tests-extension
+TESTS_EXT_OUTPUT := $(TESTS_EXT_DIR)/$(TESTS_EXT_BINARY)
 TESTS_EXT_PACKAGE := ./cmd/openshift-apiserver-tests-ext
 
 TESTS_EXT_GIT_COMMIT := $(shell git rev-parse --short HEAD)
@@ -59,6 +61,7 @@ verify:
 # -------------------------------------------------------------------
 .PHONY: tests-ext-build
 tests-ext-build:
+	cd $(TESTS_EXT_DIR) && \
 	GOOS=$(GOOS) GOARCH=$(GOARCH) GO_COMPLIANCE_POLICY=exempt_all CGO_ENABLED=0 \
 	go build -o $(TESTS_EXT_BINARY) -ldflags "$(TESTS_EXT_LDFLAGS)" $(TESTS_EXT_PACKAGE)
 
@@ -67,7 +70,7 @@ tests-ext-build:
 # -------------------------------------------------------------------
 .PHONY: tests-ext-update
 tests-ext-update: tests-ext-build
-	./$(TESTS_EXT_BINARY) update
-	for f in .openshift-tests-extension/*.json; do \
-		jq 'map(del(.codeLocations))' "$f" > tmpp && mv tmpp "$f"; \
+	cd $(TESTS_EXT_DIR) && ./$(TESTS_EXT_BINARY) update
+	for f in $(TESTS_EXT_DIR)/.openshift-tests-extension/*.json; do \
+		jq 'map(del(.codeLocations))' "$$f" > tmpp && mv tmpp "$$f"; \
 	done
