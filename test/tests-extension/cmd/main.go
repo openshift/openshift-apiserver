@@ -89,7 +89,7 @@ func main() {
 
 	// Ignore obsolete tests
 	ext.IgnoreObsoleteTests(
-		// "[sig-openshift-apiserver] <test name here>",
+	// "[sig-openshift-apiserver] <test name here>",
 	)
 
 	// Initialize environment before running any tests
