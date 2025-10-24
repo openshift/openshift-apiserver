@@ -61,7 +61,9 @@ var _ = g.Describe("[Jira:openshift-apiserver][sig-api-machinery] OpenShift API 
 
 		g.By("verifying the deployment is ready")
 		o.Expect(apiserverDeployment.Status.ReadyReplicas).To(o.BeNumerically(">", 0))
-		o.Expect(apiserverDeployment.Status.UpdatedReplicas).To(o.Equal(*apiserverDeployment.Spec.Replicas))
+		if apiserverDeployment.Spec.Replicas != nil {
+			o.Expect(apiserverDeployment.Status.UpdatedReplicas).To(o.Equal(*apiserverDeployment.Spec.Replicas))
+		}
 	})
 
 	g.It("should have openshift-apiserver pods running [Suite:openshift/openshift-apiserver/conformance/parallel]", func() {

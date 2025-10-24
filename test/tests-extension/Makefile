@@ -13,8 +13,8 @@ LDFLAGS := -X '$(GO_PKG_NAME)/pkg/version.CommitFromGit=$(GIT_COMMIT)' \
            -X '$(GO_PKG_NAME)/pkg/version.BuildDate=$(BUILD_DATE)' \
            -X '$(GO_PKG_NAME)/pkg/version.GitTreeState=$(GIT_TREE_STATE)'
 
-
-METADATA := $(shell pwd)/.openshift-tests-extension/openshift_payload_openshift-apiserver.json
+REPO_ROOT := $(shell git rev-parse --show-toplevel)
+METADATA := $(REPO_ROOT)/.openshift-tests-extension/openshift_payload_openshift-apiserver.json
 
 .PHONY: help
 help: #HELP Display essential help.
@@ -35,12 +35,10 @@ run-suite: build #HELP Run tests by suite name and generate JUnit report
 		echo "Usage: make run-suite SUITE=openshift/openshift-apiserver/all [ARTIFACT_DIR=/tmp/artifacts]"; \
 		exit 1; \
 	fi
-	@if [ -z "$(ARTIFACT_DIR)" ]; then \
-		echo "Warning: ARTIFACT_DIR not set, using current directory for JUnit report"; \
-		ARTIFACT_DIR=.; \
-	fi
-	@mkdir -p $(ARTIFACT_DIR)
-	$(TOOLS_BIN_DIR)/openshift-apiserver-tests-ext run-suite $(SUITE) -j $(ARTIFACT_DIR)/junit_$(shell date +%Y%m%d-%H%M%S).xml
+	@ARTIFACT_DIR_FINAL=$${ARTIFACT_DIR:-$(CURDIR)}; \
+	echo "Using ARTIFACT_DIR: $$ARTIFACT_DIR_FINAL"; \
+	mkdir -p $$ARTIFACT_DIR_FINAL; \
+	$(TOOLS_BIN_DIR)/openshift-apiserver-tests-ext run-suite $(SUITE) -j $$ARTIFACT_DIR_FINAL/junit_$(shell date +%Y%m%d-%H%M%S).xml
 
 #SECTION Development
 .PHONY: verify #HELP To verify the code
