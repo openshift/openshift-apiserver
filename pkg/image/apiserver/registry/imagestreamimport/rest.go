@@ -39,7 +39,7 @@ import (
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/importer"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
+	internalimageutil "github.com/openshift/openshift-apiserver/pkg/image/apiserver/internal/imageutil"
 	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/registry/imagestream"
 	"github.com/openshift/runtime-utils/pkg/registries"
 )
