@@ -59,8 +59,9 @@ verify:
 # -------------------------------------------------------------------
 .PHONY: tests-ext-build
 tests-ext-build:
+	cd test/tests-extension && \
 	GOOS=$(GOOS) GOARCH=$(GOARCH) GO_COMPLIANCE_POLICY=exempt_all CGO_ENABLED=0 \
-	go build -o $(TESTS_EXT_BINARY) -ldflags "$(TESTS_EXT_LDFLAGS)" $(TESTS_EXT_PACKAGE)
+	go build -o ../../$(TESTS_EXT_BINARY) -ldflags "$(TESTS_EXT_LDFLAGS)" ./cmd
 
 # -------------------------------------------------------------------
 # Run "update" and strip env-specific metadata
