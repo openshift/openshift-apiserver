@@ -106,7 +106,7 @@ update-metadata: build #HELP Build and run 'update-metadata' to generate test me
 #    ext.IgnoreObsoleteTests(
 #        "[sig-openshift-apiserver] My removed test name",
 #    )
-# 3. Delete the test code in your suite file (e.g. openshift_apiserver.go)
+# 3. Delete the test code in your suite file (e.g. oas.go)
 # 4. Run: make build-update.
 # This will regenerate the metadata without the test entry.
 #────────────────────────────────────────────────────────────────────
@@ -124,7 +124,7 @@ list-test-names: build #HELP Show current full test names
 	@$(TOOLS_BIN_DIR)/openshift-apiserver-tests-ext list -o names
 
 # Remove 'codeLocations' to avoid absolute paths like:
-# "/Users/$(USER)/go/src/.../openshift_apiserver.go:12"
+# "/Users/$(USER)/go/src/.../oas.go:12"
 # These are machine-specific and make the metadata non-idempotent.
 # More info: https://issues.redhat.com/browse/TRT-2186
 .PHONY: clean-metadata
