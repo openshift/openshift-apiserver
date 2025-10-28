@@ -5,15 +5,31 @@ This repository contains the tests for the OpenShift API Server for OpenShift.
 These tests run against OpenShift clusters and are meant to be used in the OpenShift CI/CD pipeline.
 They use the framework: https://github.com/openshift-eng/openshift-tests-extension
 
-## How to Run the Tests Locally
+## Quick Start
+### Building the Test Extension
+
+From the repository root:
+```bash
+make tests-ext-build
+```
+
+Or from the test extension directory:
+```bash
+cd test/extended/tests-extension
+make build
+```
+
+The binary will be located at: `test/extended/tests-extension/bin/openshift-apiserver-tests-ext`
+
+### Running Tests
 
 | Command                                                                    | Description                                                              |
 |----------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| `make tests-ext-build`                                                     | Builds the test extension binary.                                        |
-| `./openshift-apiserver-tests-ext list`                                     | Lists all available test cases.                                          |
-| `./openshift-apiserver-tests-ext run-suite <suite-name>`                   | Runs a test suite. e.g., `openshift/openshift-apiserver/conformance/parallel` |
-| `./openshift-apiserver-tests-ext run <test-name>`                          | Runs one specific test.                                                  |
-
+| `make tests-ext-build`                                                     | Builds the test extension binary (from root).                           |
+| `make run-suite SUITE=<suite-name> [JUNIT_DIR=<dir>]`                     | Runs a test suite from root (e.g., `SUITE=openshift/openshift-apiserver/conformance/parallel`). |
+| `./test/extended/tests-extension/bin/openshift-apiserver-tests-ext list`  | Lists all available test cases.                                          |
+| `./test/extended/tests-extension/bin/openshift-apiserver-tests-ext run-suite <suite-name>` | Runs a test suite directly. |
+| `./test/extended/tests-extension/bin/openshift-apiserver-tests-ext run-test <test-name>` | Runs one specific test. |
 
 ## How to Run the Tests Locally
 
@@ -22,7 +38,7 @@ Use the environment variable `KUBECONFIG` to point to your cluster configuration
 
 ```shell
 export KUBECONFIG=path/to/kubeconfig
-./openshift-apiserver-tests-ext run <test-name>
+./test/extended/tests-extension/bin/openshift-apiserver-tests-ext run-test <test-name>
 ```
 
 ### Local Test using OCP
@@ -48,25 +64,53 @@ export KUBECONFIG=~/.kube/cluster-bot.kubeconfig
 
 **Example:**
 ```shell
-./openshift-apiserver-tests-ext run-suite openshift/openshift-apiserver/all
+./test/extended/tests-extension/bin/openshift-apiserver-tests-ext run-suite openshift/openshift-apiserver/all
 ```
+
+Or using make from the root directory:
+```shell
+make run-suite SUITE=openshift/openshift-apiserver/all JUNIT_DIR=/tmp/junit-results
+```
+
+## Test Module Structure
+
+The test extension has been isolated into its own Go module to separate test dependencies from production code:
+
+```
+test/extended/tests-extension/
+├── bin/                           # Test binaries (gitignored)
+├── cmd/                           # Test extension main package
+├── .openshift-tests-extension/    # Test metadata
+├── go.mod                         # Separate module with test dependencies
+├── go.sum
+├── Makefile                       # Test-specific build targets
+├── main.go                        # Ginkgo test specs
+└── README.md
+```
+
+### Key Benefits of Dependency Isolation
+
+- **Smaller production images**: Test dependencies (ginkgo, gomega, etc.) are not included in production builds
+- **Faster builds**: Production builds don't need to vendor test dependencies (~388K+ lines removed from root vendor)
+- **Cleaner dependency management**: Test dependencies isolated in `test/extended/tests-extension/go.mod`
+- **Better CI performance**: Smaller images, faster pulls, less storage
 
 ## Writing Tests
 
-You can write tests in the `test/extended/` directory.
+You can write tests in the `test/extended/tests-extension/` directory.
 
 ## Development Workflow
 
-- Add or update tests in: `test/extended/`
+- Add or update tests in: `test/extended/tests-extension/`
 - Run `make build` to build the operator binary and `make tests-ext-build` for the test binary.
 - You can run the full suite or one test using the commands in the table above.
 - Before committing your changes:
-    - Run `make tests-ext-update`
+    - Run `make tests-ext-update` (updates test metadata)
     - Run `make verify` to check formatting, linting, and validation
 
 ## How to Rename a Test
 
-1. Run `./openshift-apiserver-tests-ext list` to see the current test names
+1. Run `./test/extended/tests-extension/bin/openshift-apiserver-tests-ext list` to see the current test names
 2. Find the name of the test you want to rename
 3. Add a Ginkgo label with the original name, like this:
 
@@ -84,8 +128,8 @@ It("should pass a renamed sanity check",
 
 ## How to Delete a Test
 
-1. Run `./openshift-apiserver-tests-ext list` to find the test name
-2. Add the test name to the `IgnoreObsoleteTests` block in `cmd/openshift-apiserver-tests-ext/main.go`, like this:
+1. Run `./test/extended/tests-extension/bin/openshift-apiserver-tests-ext list` to find the test name
+2. Add the test name to the `IgnoreObsoleteTests` block in `test/extended/tests-extension/cmd/main.go`, like this:
 
 ```go
 ext.IgnoreObsoleteTests(
@@ -133,14 +177,31 @@ More info: https://docs.ci.openshift.org/docs/architecture/ci-operator/#testing-
 
 ## Makefile Commands
 
+### Root Makefile (from repository root)
+
 | Target                   | Description                                                                  |
 |--------------------------|------------------------------------------------------------------------------|
 | `make build`             | Builds the operator binary.                                                      |
-| `make tests-ext-build`   | Builds the test extension binary.                                            |
-| `make tests-ext-update`  | Updates the metadata JSON file and cleans machine-specific codeLocations.    |
+| `make tests-ext-build`   | Builds the test extension binary (delegates to test Makefile).              |
+| `make tests-ext-update`  | Updates test metadata (delegates to test Makefile).                         |
+| `make tests-ext-clean`   | Cleans test extension binaries (delegates to test Makefile).                |
+| `make run-suite SUITE=<name> [JUNIT_DIR=<dir>]` | Runs a test suite (delegates to test Makefile). |
+| `make clean`             | Cleans both operator and test binaries.                                      |
 | `make verify`            | Runs formatting, vet, and linter.                                            |
 
-**Note:** Metadata is stored in: `.openshift-tests-extension/openshift_payload_openshift-apiserver.json`
+### Test Extension Makefile (from test/extended/tests-extension/)
+
+| Target                   | Description                                                                  |
+|--------------------------|------------------------------------------------------------------------------|
+| `make build`             | Builds the test extension binary to `bin/openshift-apiserver-tests-ext`.    |
+| `make update-metadata`   | Builds and updates test metadata JSON file.                                  |
+| `make build-update`      | Builds binary and updates metadata (cleans machine-specific codeLocations).  |
+| `make clean`             | Removes the `bin/` directory.                                                |
+| `make run-suite SUITE=<name> [JUNIT_DIR=<dir>]` | Runs a specific test suite with optional JUnit XML output. |
+| `make list-test-names`   | Lists all test names.                                                        |
+| `make verify-metadata`   | Verifies metadata is up to date.                                             |
+
+**Note:** Metadata is stored in: `test/extended/tests-extension/.openshift-tests-extension/openshift_payload_openshift-apiserver.json`
 
 ## FAQ
 
