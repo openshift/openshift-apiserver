@@ -36,7 +36,7 @@ $(call build-image,ocp-openshift-apiserver,$(IMAGE_REGISTRY)/ocp/4.3:openshift-a
 
 $(call verify-golang-versions,images/Dockerfile.rhel)
 
-clean:
+clean: tests-ext-clean
 	$(RM) ./openshift-apiserver
 .PHONY: clean
 
@@ -69,3 +69,17 @@ tests-ext-build:
 .PHONY: tests-ext-update
 tests-ext-update:
 	$(MAKE) -C $(TESTS_EXT_DIR) build-update
+
+# -------------------------------------------------------------------
+# Clean test extension binaries
+# -------------------------------------------------------------------
+.PHONY: tests-ext-clean
+tests-ext-clean:
+	$(MAKE) -C $(TESTS_EXT_DIR) clean
+
+# -------------------------------------------------------------------
+# Run test suite
+# -------------------------------------------------------------------
+.PHONY: run-suite
+run-suite:
+	$(MAKE) -C $(TESTS_EXT_DIR) run-suite SUITE=$(SUITE) ARTIFACT_DIR=$(ARTIFACT_DIR)
