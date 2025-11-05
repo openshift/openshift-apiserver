@@ -1,0 +1,17 @@
+reviewers:
+  - p0lyn0mial
+  - benluddy
+  - dgrisonnet
+  - dinhxuanvu
+  - xingxingxia
+  - wangke19
+  - gangwgr
+approvers:
+  - p0lyn0mial
+  - benluddy
+  - dgrisonnet
+  - dinhxuanvu
+  - xingxingxia
+  - wangke19
+  - gangwgr
+component: openshift-apiserver-tests

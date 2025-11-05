@@ -14,6 +14,8 @@ IMAGE_REGISTRY?=registry.svc.ci.openshift.org
 # OpenShift Tests Extension (OpenShift API Server)
 # -------------------------------------------------------------------
 TESTS_EXT_BINARY := openshift-apiserver-tests-ext
+TESTS_EXT_DIR := ./test/extended/tests-extension
+TESTS_EXT_OUTPUT := $(TESTS_EXT_DIR)/$(TESTS_EXT_BINARY)
 TESTS_EXT_PACKAGE := ./cmd/openshift-apiserver-tests-ext
 
 TESTS_EXT_GIT_COMMIT := $(shell git rev-parse --short HEAD)
@@ -34,7 +36,7 @@ $(call build-image,ocp-openshift-apiserver,$(IMAGE_REGISTRY)/ocp/4.3:openshift-a
 
 $(call verify-golang-versions,images/Dockerfile.rhel)
 
-clean:
+clean: tests-ext-clean
 	$(RM) ./openshift-apiserver
 .PHONY: clean
 
@@ -59,15 +61,25 @@ verify:
 # -------------------------------------------------------------------
 .PHONY: tests-ext-build
 tests-ext-build:
-	GOOS=$(GOOS) GOARCH=$(GOARCH) GO_COMPLIANCE_POLICY=exempt_all CGO_ENABLED=0 \
-	go build -o $(TESTS_EXT_BINARY) -ldflags "$(TESTS_EXT_LDFLAGS)" $(TESTS_EXT_PACKAGE)
+	$(MAKE) -C $(TESTS_EXT_DIR) build
 
 # -------------------------------------------------------------------
 # Run "update" and strip env-specific metadata
 # -------------------------------------------------------------------
 .PHONY: tests-ext-update
-tests-ext-update: tests-ext-build
-	./$(TESTS_EXT_BINARY) update
-	for f in .openshift-tests-extension/*.json; do \
-		jq 'map(del(.codeLocations))' "$f" > tmpp && mv tmpp "$f"; \
-	done
+tests-ext-update:
+	$(MAKE) -C $(TESTS_EXT_DIR) build-update
+
+# -------------------------------------------------------------------
+# Clean test extension binaries
+# -------------------------------------------------------------------
+.PHONY: tests-ext-clean
+tests-ext-clean:
+	$(MAKE) -C $(TESTS_EXT_DIR) clean
+
+# -------------------------------------------------------------------
+# Run test suite
+# -------------------------------------------------------------------
+.PHONY: run-suite
+run-suite:
+	$(MAKE) -C $(TESTS_EXT_DIR) run-suite SUITE=$(SUITE) JUNIT_DIR=$(JUNIT_DIR)

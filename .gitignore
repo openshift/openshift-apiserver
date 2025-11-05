@@ -1,4 +1,4 @@
 /openshift-apiserver
 /_output
 .idea
-/openshift-apiserver-tests-ext
+/test/extended/tests-extension/bin/
