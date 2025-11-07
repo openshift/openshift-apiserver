@@ -29,29 +29,35 @@ func main() {
 	ext := e.NewExtension("openshift", "payload", "openshift-apiserver")
 
 	// Suite: conformance/parallel (fast, parallel-safe)
+	// Rule 1: Tests without [Serial], [Slow], or [Timeout:] tags run in parallel
 	ext.AddSuite(e.Suite{
 		Name:    "openshift/openshift-apiserver/conformance/parallel",
 		Parents: []string{"openshift/conformance/parallel"},
 		Qualifiers: []string{
-			`!(name.contains("[Serial]") || name.contains("[Slow]"))`,
+			`!(name.contains("[Serial]") || name.contains("[Slow]") || name.contains("[Timeout:"))`,
 		},
 	})
 
-	// Suite: conformance/serial (explicitly serial tests)
+	// Suite: conformance/serial (explicitly serial tests, but NOT slow tests)
+	// Rule 2 & 4: Tests with [Serial] or [Serial][Disruptive] run only in serial suite
+	// Tests with [Serial][Timeout:] go to serial (timeout on serial test)
+	// Exclude [Slow] tests - they go to slow suite instead
 	ext.AddSuite(e.Suite{
 		Name:    "openshift/openshift-apiserver/conformance/serial",
 		Parents: []string{"openshift/conformance/serial"},
 		Qualifiers: []string{
-			`name.contains("[Serial]")`,
+			`name.contains("[Serial]") && !name.contains("[Slow]")`,
 		},
 	})
 
-	// Suite: optional/slow (long-running tests)
+	// Suite: optional/slow (long-running tests and non-serial timeout tests)
+	// Rule 3 & 5: Tests with [Slow] OR tests with [Timeout:] that are NOT [Serial]
+	// Tests with [Slow][Disruptive][Timeout:] will run serially due to [Serial] tag
 	ext.AddSuite(e.Suite{
 		Name:    "openshift/openshift-apiserver/optional/slow",
 		Parents: []string{"openshift/optional/slow"},
 		Qualifiers: []string{
-			`name.contains("[Slow]")`,
+			`name.contains("[Slow]") || (name.contains("[Timeout:") && !name.contains("[Serial]"))`,
 		},
 	})
 
@@ -83,6 +89,25 @@ func main() {
 				parts := strings.SplitN(label, "original-name:", 2)
 				if len(parts) > 1 {
 					spec.OriginalName = parts[1]
+				}
+			}
+		}
+	})
+
+	// Extract timeout from test name if present (e.g., [Timeout:50m])
+	specs = specs.Walk(func(spec *et.ExtensionTestSpec) {
+		// Look for [Timeout:XXm] or [Timeout:XXh] pattern in test name
+		if strings.Contains(spec.Name, "[Timeout:") {
+			start := strings.Index(spec.Name, "[Timeout:")
+			if start != -1 {
+				end := strings.Index(spec.Name[start:], "]")
+				if end != -1 {
+					// Extract the timeout value (e.g., "50m" from "[Timeout:50m]")
+					timeoutTag := spec.Name[start+len("[Timeout:") : start+end]
+					if spec.Tags == nil {
+						spec.Tags = make(map[string]string)
+					}
+					spec.Tags["timeout"] = timeoutTag
 				}
 			}
 		}
