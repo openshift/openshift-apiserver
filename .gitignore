@@ -2,3 +2,4 @@
 /_output
 .idea
 /test/extended/tests-extension/bin/
+/test/extended/tests-extension/.openshift-tests-extension/
