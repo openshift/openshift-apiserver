@@ -39,6 +39,8 @@ APIEXTENSIONS_INPUT_DIRS=(
 function join { local IFS="$1"; shift; echo "$*"; }
 
 echo "Generating origin openapi"
+# conversion-gen expects the pre-1.23 go/types alias behavior in Kubernetes 1.31 (https://go.dev/doc/go1.23#gotypespkggotypes)
+GODEBUG=gotypesalias=0 \
 ${GOPATH}/bin/openapi-gen \
   --output-file zz_generated.openapi.go \
   --go-header-file ${SCRIPT_ROOT}/hack/boilerplate.txt \
