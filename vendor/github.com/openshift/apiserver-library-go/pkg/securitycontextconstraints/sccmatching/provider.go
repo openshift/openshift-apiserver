@@ -13,6 +13,7 @@ import (
 	securityv1 "github.com/openshift/api/security/v1"
 	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/capabilities"
 	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/group"
+	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/runasgroup"
 	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/seccomp"
 	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/selinux"
 	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sysctl"
@@ -32,6 +33,7 @@ const (
 type simpleProvider struct {
 	scc                       *securityv1.SecurityContextConstraints
 	runAsUserStrategy         user.RunAsUserSecurityContextConstraintsStrategy
+	runAsGroupStrategy        runasgroup.RunAsGroupSecurityContextConstraintsStrategy
 	seLinuxStrategy           selinux.SELinuxSecurityContextConstraintsStrategy
 	fsGroupStrategy           group.GroupSecurityContextConstraintsStrategy
 	supplementalGroupStrategy group.GroupSecurityContextConstraintsStrategy
@@ -50,6 +52,11 @@ func NewSimpleProvider(scc *securityv1.SecurityContextConstraints) (SecurityCont
 	}
 
 	userStrat, err := createUserStrategy(&scc.RunAsUser)
+	if err != nil {
+		return nil, err
+	}
+
+	groupStrat, err := createRunAsGroupStrategy(&scc.RunAsGroup)
 	if err != nil {
 		return nil, err
 	}
@@ -87,6 +94,7 @@ func NewSimpleProvider(scc *securityv1.SecurityContextConstraints) (SecurityCont
 	return &simpleProvider{
 		scc:                       scc,
 		runAsUserStrategy:         userStrat,
+		runAsGroupStrategy:        groupStrat,
 		seLinuxStrategy:           seLinuxStrat,
 		fsGroupStrategy:           fsGroupStrat,
 		supplementalGroupStrategy: supGroupStrat,
@@ -159,6 +167,14 @@ func (s *simpleProvider) CreateContainerSecurityContext(pod *api.Pod, container 
 			return nil, err
 		}
 		sc.SetRunAsUser(uid)
+	}
+
+	if sc.RunAsGroup() == nil {
+		gid, err := s.runAsGroupStrategy.Generate(pod, container)
+		if err != nil {
+			return nil, err
+		}
+		sc.SetRunAsGroup(gid)
 	}
 
 	if sc.SELinuxOptions() == nil {
@@ -337,6 +353,7 @@ func (s *simpleProvider) ValidateContainerSecurityContext(pod *api.Pod, containe
 	sc := securitycontext.NewEffectiveContainerSecurityContextAccessor(podSC, securitycontext.NewContainerSecurityContextMutator(container.SecurityContext))
 
 	allErrs = append(allErrs, s.runAsUserStrategy.Validate(fldPath, pod, container, sc.RunAsNonRoot(), sc.RunAsUser())...)
+	allErrs = append(allErrs, s.runAsGroupStrategy.Validate(fldPath, pod, container, sc.RunAsGroup())...)
 	allErrs = append(allErrs, s.seLinuxStrategy.Validate(fldPath.Child("seLinuxOptions"), pod, container, sc.SELinuxOptions())...)
 	allErrs = append(allErrs, s.seccompStrategy.ValidateContainer(pod, container)...)
 
@@ -430,6 +447,37 @@ func createUserStrategy(opts *securityv1.RunAsUserStrategyOptions) (user.RunAsUs
 		return user.NewRunAsAny(opts)
 	default:
 		return nil, fmt.Errorf("Unrecognized RunAsUser strategy type %s", opts.Type)
+	}
+}
+
+// createRunAsGroupStrategy creates a new group strategy.
+func createRunAsGroupStrategy(opts *securityv1.RunAsGroupStrategyOptions) (runasgroup.RunAsGroupSecurityContextConstraintsStrategy, error) {
+	// If no strategy is specified, default to RunAsAny
+	if opts.Type == "" {
+		return runasgroup.NewRunAsAny(opts)
+	}
+
+	switch opts.Type {
+	case securityv1.RunAsGroupStrategyMustRunAs:
+		// The MustRunAs strategy type can be used in two ways:
+		// 1. Single GID: exactly one range with min==max (enforces a specific GID)
+		// 2. Range(s): one or more ranges where GID can vary within the range(s)
+		//
+		// We use different implementations for these two cases:
+		// - NewMustRunAs: validates against a single required GID
+		// - NewMustRunAsRange: validates against one or more allowed ranges
+		if len(opts.Ranges) == 1 && opts.Ranges[0].Min != nil && opts.Ranges[0].Max != nil && *opts.Ranges[0].Min == *opts.Ranges[0].Max {
+			// Exactly one range with min==max means a single required GID
+			return runasgroup.NewMustRunAs(opts)
+		}
+		// Multiple ranges, or a single range with min!=max
+		return runasgroup.NewMustRunAsRange(opts)
+	case securityv1.RunAsGroupStrategyMustRunAsRange:
+		return runasgroup.NewMustRunAsRange(opts)
+	case securityv1.RunAsGroupStrategyRunAsAny:
+		return runasgroup.NewRunAsAny(opts)
+	default:
+		return nil, fmt.Errorf("Unrecognized RunAsGroup strategy type %s", opts.Type)
 	}
 }
 
