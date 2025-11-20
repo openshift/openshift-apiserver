@@ -75,6 +75,9 @@ type SecurityContextConstraints struct {
 	SupplementalGroups SupplementalGroupsStrategyOptions
 	// FSGroup is the strategy that will dictate what fs group is used by the SecurityContext.
 	FSGroup FSGroupStrategyOptions
+	// RunAsGroup is the strategy that will dictate what RunAsGroup is used in the SecurityContext.
+	// +optional
+	RunAsGroup RunAsGroupStrategyOptions
 	// ReadOnlyRootFilesystem when set to true will force containers to run with a read only root file
 	// system.  If the container specifically requests to run with a non-read only root file system
 	// the SCC should deny the pod.
@@ -177,6 +180,30 @@ type RunAsUserStrategyOptions struct {
 	UIDRangeMax *int64
 }
 
+// RunAsGroupStrategyOptions defines the strategy type and any options used to create the strategy.
+type RunAsGroupStrategyOptions struct {
+	// Type is the strategy that will dictate what RunAsGroup is used in the SecurityContext.
+	Type RunAsGroupStrategyType
+	// GID is the group id that containers must run as. Required for the MustRunAs strategy if not using
+	// namespace/service account allocated gids.
+	GID *int64
+	// GIDRangeMin defines the min value for a strategy that allocates by range.
+	GIDRangeMin *int64
+	// GIDRangeMax defines the max value for a strategy that allocates by range.
+	GIDRangeMax *int64
+	// Ranges are the allowed ranges of gids. If you would like to force a single
+	// gid then supply a single range with the same start and end.
+	Ranges []RunAsGroupIDRange
+}
+
+// RunAsGroupIDRange provides a min/max of an allowed range of group IDs for RunAsGroup strategy.
+type RunAsGroupIDRange struct {
+	// Min is the start of the range, inclusive.
+	Min *int64
+	// Max is the end of the range, inclusive.
+	Max *int64
+}
+
 // FSGroupStrategyOptions defines the strategy type and options used to create the strategy.
 type FSGroupStrategyOptions struct {
 	// Type is the strategy that will dictate what FSGroup is used in the SecurityContext.
@@ -220,6 +247,10 @@ type SupplementalGroupsStrategyType string
 // SecurityContext
 type FSGroupStrategyType string
 
+// RunAsGroupStrategyType denotes strategy types for generating RunAsGroup values for a
+// SecurityContext
+type RunAsGroupStrategyType string
+
 const (
 	// container must have SELinux labels of X applied.
 	SELinuxStrategyMustRunAs SELinuxContextStrategyType = "MustRunAs"
@@ -234,6 +265,13 @@ const (
 	RunAsUserStrategyMustRunAsNonRoot RunAsUserStrategyType = "MustRunAsNonRoot"
 	// container may make requests for any uid.
 	RunAsUserStrategyRunAsAny RunAsUserStrategyType = "RunAsAny"
+
+	// container must run as a particular gid.
+	RunAsGroupStrategyMustRunAs RunAsGroupStrategyType = "MustRunAs"
+	// container must run with a gid in a range.
+	RunAsGroupStrategyMustRunAsRange RunAsGroupStrategyType = "MustRunAsRange"
+	// container may make requests for any gid.
+	RunAsGroupStrategyRunAsAny RunAsGroupStrategyType = "RunAsAny"
 
 	// container must have FSGroup of X applied.
 	FSGroupStrategyMustRunAs FSGroupStrategyType = "MustRunAs"

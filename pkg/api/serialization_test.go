@@ -467,6 +467,8 @@ func originFuzzer(t *testing.T, seed int64) *randfill.Filler {
 			scc.SupplementalGroups.Type = supGroupTypes[c.Rand.Intn(len(supGroupTypes))]
 			fsGroupTypes := []securityapi.FSGroupStrategyType{securityapi.FSGroupStrategyMustRunAs, securityapi.FSGroupStrategyRunAsAny}
 			scc.FSGroup.Type = fsGroupTypes[c.Rand.Intn(len(fsGroupTypes))]
+			runAsGroupTypes := []securityapi.RunAsGroupStrategyType{securityapi.RunAsGroupStrategyMustRunAs, securityapi.RunAsGroupStrategyMustRunAsRange, securityapi.RunAsGroupStrategyRunAsAny}
+			scc.RunAsGroup.Type = runAsGroupTypes[c.Rand.Intn(len(runAsGroupTypes))]
 			// avoid the defaulting logic for this field by making it never nil
 			allowPrivilegeEscalation := c.Bool()
 			scc.AllowPrivilegeEscalation = &allowPrivilegeEscalation
