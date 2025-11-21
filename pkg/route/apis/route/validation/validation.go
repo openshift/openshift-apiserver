@@ -2,6 +2,7 @@ package validation
 
 import (
 	"context"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -21,6 +22,18 @@ func toRouteV1(internal *routeapi.Route) (*routev1.Route, field.ErrorList) {
 	return &external, nil
 }
 
+// validatePath validates that the route path does not contain problematic characters
+// that can cause HaProxy errors or route degradation.
+func validatePath(pathValue string, fldPath *field.Path) field.ErrorList {
+	result := field.ErrorList{}
+
+	if strings.ContainsAny(pathValue, "# ") {
+		result = append(result, field.Invalid(fldPath, pathValue, "cannot contain # or spaces"))
+	}
+
+	return result
+}
+
 // ValidateRoute tests if required fields in the route are set.
 func ValidateRoute(ctx context.Context, route *routeapi.Route, sarClient routecommon.SubjectAccessReviewCreator, secretsGetter corev1client.SecretsGetter, opts routecommon.RouteValidationOptions) field.ErrorList {
 	external, errs := toRouteV1(route)
@@ -28,7 +41,14 @@ func ValidateRoute(ctx context.Context, route *routeapi.Route, sarClient routeco
 		return errs
 	}
 
-	return routevalidation.ValidateRoute(ctx, external, sarClient, secretsGetter, opts)
+	// First, perform standard library-go validation
+	allErrs := routevalidation.ValidateRoute(ctx, external, sarClient, secretsGetter, opts)
+
+	// Add additional path validation to reject routes with '#' or whitespace
+	pathFieldPath := field.NewPath("spec", "path")
+	allErrs = append(allErrs, validatePath(external.Spec.Path, pathFieldPath)...)
+
+	return allErrs
 }
 
 func ValidateRouteUpdate(ctx context.Context, route *routeapi.Route, oldRoute *routeapi.Route, sarClient routecommon.SubjectAccessReviewCreator, secretsGetter corev1client.SecretsGetter, opts routecommon.RouteValidationOptions) field.ErrorList {
@@ -42,7 +62,14 @@ func ValidateRouteUpdate(ctx context.Context, route *routeapi.Route, oldRoute *r
 		return errs
 	}
 
-	return routevalidation.ValidateRouteUpdate(ctx, external, oldExternal, sarClient, secretsGetter, opts)
+	// First, perform standard library-go validation
+	allErrs := routevalidation.ValidateRouteUpdate(ctx, external, oldExternal, sarClient, secretsGetter, opts)
+
+	// Add additional path validation to reject routes with '#' or whitespace
+	pathFieldPath := field.NewPath("spec", "path")
+	allErrs = append(allErrs, validatePath(external.Spec.Path, pathFieldPath)...)
+
+	return allErrs
 }
 
 // ValidateRouteStatusUpdate validates status updates for routes.
