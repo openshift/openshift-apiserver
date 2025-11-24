@@ -1,7 +1,5 @@
 reviewers:
   - deads2k
-  - mfojtik
-  - sttts
   - tkashem
   - p0lyn0mial
   - benluddy
@@ -9,8 +7,6 @@ reviewers:
   - dgrisonnet
 approvers:
   - deads2k
-  - mfojtik
-  - sttts
   - tkashem
   - p0lyn0mial
   - benluddy
