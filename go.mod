@@ -2,8 +2,6 @@ module github.com/openshift/openshift-apiserver
 
 go 1.23.0
 
-toolchain go1.23.0
-
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/containers/image/v5 v5.24.3
