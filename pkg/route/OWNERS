@@ -1,16 +1,29 @@
 reviewers:
-  - smarterclayton
-  - pweil-
-  - imcsk8
   - knobunc
-  - ironcladlou
-  - pecameron
-  - pravisankar
-  - rajatchopra
-  - jacobtanenbaum
+  - Miciah
+  - alebedev87
+  - rikatz
+  - candita
+  - rfredette
+  - gcs278
+  - davidesalerno
+  - bentito
+  - Thealisyed
+  - grzpiotrowski
 approvers:
+  - knobunc
+  - Miciah
+  - alebedev87
+  - rikatz
+  - candita
+  - rfredette
+  - gcs278
+  - davidesalerno
+  - bentito
+  - Thealisyed
+  - grzpiotrowski
+emeritus_approvers:
   - smarterclayton
   - pweil-
-  - knobunc
-  - ironcladlou
   - rajatchopra
+  - ironcladlou
