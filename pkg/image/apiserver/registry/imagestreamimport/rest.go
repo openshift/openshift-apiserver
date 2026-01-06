@@ -3,7 +3,9 @@ package imagestreamimport
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
+	"net/netip"
 	"strings"
 	"time"
 
@@ -25,6 +27,7 @@ import (
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 	kapihelper "k8s.io/kubernetes/pkg/apis/core/helper"
 
+	configv1 "github.com/openshift/api/config/v1"
 	"github.com/openshift/api/image"
 	imagev1 "github.com/openshift/api/image/v1"
 	configclientv1 "github.com/openshift/client-go/config/clientset/versioned/typed/config/v1"
@@ -61,7 +64,8 @@ type REST struct {
 	icspLister        operatorv1lister.ImageContentSourcePolicyLister
 	idmsLister        configv1lister.ImageDigestMirrorSetLister
 	itmsLister        configv1lister.ImageTagMirrorSetLister
-	imageCfgV1Client  configclientv1.ImagesGetter
+	configV1Client    configclientv1.ConfigV1Interface
+	ipLookup          validation.IPLookup
 }
 
 var _ rest.Creater = &REST{}
@@ -82,7 +86,7 @@ func NewREST(importFn ImporterFunc, streams imagestream.Registry, internalStream
 	icspLister operatorv1lister.ImageContentSourcePolicyLister,
 	idmsLister configv1lister.ImageDigestMirrorSetLister,
 	itmsLister configv1lister.ImageTagMirrorSetLister,
-	imageCfgV1Client configclientv1.ImagesGetter,
+	configV1Client configclientv1.ConfigV1Interface,
 ) *REST {
 	return &REST{
 		importFn:          importFn,
@@ -97,7 +101,8 @@ func NewREST(importFn ImporterFunc, streams imagestream.Registry, internalStream
 		icspLister:        icspLister,
 		idmsLister:        idmsLister,
 		itmsLister:        itmsLister,
-		imageCfgV1Client:  imageCfgV1Client,
+		configV1Client:    configV1Client,
+		ipLookup:          net.DefaultResolver.LookupIPAddr,
 	}
 }
 
@@ -193,6 +198,115 @@ func (r *REST) createImages(
 	}
 
 	return nil
+}
+
+// getForbiddenCIDRs retrieves the list of CIDRs that should be blocked for
+// image imports. This includes the service CIDR and pod CIDRs.
+func (r *REST) getForbiddenCIDRs(ctx context.Context) ([]netip.Prefix, error) {
+	var prefixes []netip.Prefix
+
+	network, err := r.configV1Client.Networks().Get(ctx, "cluster", metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	// adds the service network CIDRs to the list of forbidden CIDRs.
+	for _, cidr := range network.Status.ServiceNetwork {
+		prefix, err := netip.ParsePrefix(cidr)
+		if err != nil {
+			return nil, err
+		}
+		prefixes = append(prefixes, prefix)
+	}
+
+	// adds the pod network CIDRs to the list of forbidden CIDRs.
+	for _, cidr := range network.Status.ClusterNetwork {
+		prefix, err := netip.ParsePrefix(cidr.CIDR)
+		if err != nil {
+			return nil, err
+		}
+		prefixes = append(prefixes, prefix)
+	}
+
+	return prefixes, nil
+}
+
+// getAllowedPrefixes retrieves the list of IP prefixes that should be allowed
+// to bypass IP-based restrictions. This includes the IPs of the internal
+// registry. It resolves hostnames (like the internal registry hostname) to
+// their IP addresses and returns them as /32 (IPv4) or /128 (IPv6) prefixes.
+//
+// This function is called on every ImageStreamImport operation and performs
+// DNS resolution if the internal registry hostname is a domain name (not an IP).
+// DNS results are NOT cached to ensure we always use fresh IP addresses in case
+// the registry's IP changes (e.g., during redeployment or scaling).
+//
+// If the internal registry hostname is not configured (empty), returns an empty
+// list without error. If DNS resolution fails, returns an error which will cause
+// the entire import operation to fail with an internal server error.
+//
+// The function supports dual-stack configurations: if a hostname resolves to both
+// IPv4 and IPv6 addresses, all addresses are added to the allowed list.
+func (r *REST) getAllowedPrefixes(ctx context.Context, imageConfig *configv1.Image) ([]netip.Prefix, error) {
+	var allowed []netip.Prefix
+
+	if imageConfig.Status.InternalRegistryHostname == "" {
+		return allowed, nil
+	}
+
+	// The internal registry hostname may contain a port suffix (e.g.,
+	// :5000). Strip it before processing.
+	hostname, _, err := net.SplitHostPort(imageConfig.Status.InternalRegistryHostname)
+	if err != nil {
+		if !strings.Contains(err.Error(), "missing port in address") {
+			return nil, fmt.Errorf("invalid registry url: %w", err)
+		}
+
+		// now we know that we only miss the port in the registry. we
+		// set a zeroed out port so SplitHostPort can succeed. XXX we
+		// use this approach because SplitHostPort takes care of
+		// properly parsing IPv6 addresses and strips out the brackets.
+		withPort := fmt.Sprintf("%s:0", imageConfig.Status.InternalRegistryHostname)
+		if hostname, _, err = net.SplitHostPort(withPort); err != nil {
+			return nil, fmt.Errorf("invalid registry url: %w", err)
+		}
+	}
+
+	// check if hostname is already an IP address. if so we don't need  to
+	// resolve. if not an ip then we resolve and append the returned ips
+	// as allowed ips.
+	var ips []net.IP
+	if ip := net.ParseIP(hostname); ip != nil {
+		ips = append(ips, ip)
+	} else {
+		addrs, err := r.ipLookup(ctx, hostname)
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve internal registry hostname %q: %w", hostname, err)
+		}
+		for _, addr := range addrs {
+			ips = append(ips, addr.IP)
+		}
+	}
+
+	// convert each IP to a prefix (/32 for IPv4, /128 for IPv6). in
+	// essence: turns ip addresses into prefixes containing a single
+	// address.
+	for _, ip := range ips {
+		suffix := "128"
+		if ip.To4() != nil {
+			suffix = "32"
+		}
+		addrstr := fmt.Sprintf("%s/%s", ip.String(), suffix)
+
+		prefix, err := netip.ParsePrefix(addrstr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse IP prefix %q: %w", addrstr, err)
+		}
+
+		allowed = append(allowed, prefix)
+	}
+
+	return allowed, nil
 }
 
 func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
@@ -307,9 +421,29 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 
 	}
 
-	imageConfig, err := r.imageCfgV1Client.Images().Get(ctx, "cluster", metav1.GetOptions{})
+	imageConfig, err := r.configV1Client.Images().Get(ctx, "cluster", metav1.GetOptions{})
 	if err != nil {
 		return nil, kapierrors.NewInternalError(err)
+	}
+
+	// if the import points to a place we should not generate outbound
+	// requests to, such as link-local addresses, block it.
+	blocked, err := r.getForbiddenCIDRs(ctx)
+	if err != nil {
+		err := fmt.Errorf("failed to retrieve network configuration: %w", err)
+		return nil, kapierrors.NewInternalError(err)
+	}
+
+	// get the list of allowed IP prefixes (e.g., internal registry IPs) that should
+	// bypass IP-based restrictions.
+	allowed, err := r.getAllowedPrefixes(ctx, imageConfig)
+	if err != nil {
+		err := fmt.Errorf("failed to get allowed IP prefixes: %w", err)
+		return nil, kapierrors.NewInternalError(err)
+	}
+
+	if errs := validation.ValidateImageStreamImportDisallowedHosts(ctx, isi, blocked, allowed); len(errs) != 0 {
+		return nil, kapierrors.NewInvalid(image.Kind("ImageStreamImport"), isi.Name, errs)
 	}
 
 	v2regConf := &sysregistriesv2.V2RegistriesConf{}
@@ -330,9 +464,10 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 		return nil, kapierrors.NewInternalError(err)
 	}
 
-	importCtx := importer.NewStaticCredentialsContext(
-		r.transport, r.insecureTransport, secretsList.Items,
-	)
+	transport := NewRestrictedTransport(r.transport, blocked, allowed)
+	itransport := NewRestrictedTransport(r.insecureTransport, blocked, allowed)
+
+	importCtx := importer.NewStaticCredentialsContext(transport, itransport, secretsList.Items)
 	imports := r.importFn(importCtx, v2regConf)
 	if err := imports.Import(ctx, isi, stream); err != nil {
 		return nil, kapierrors.NewInternalError(err)
@@ -353,9 +488,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	}
 	// try import IS without auth if it failed before
 	if importFailed {
-		importCtx := importer.NewStaticCredentialsContext(
-			r.transport, r.insecureTransport, nil,
-		)
+		importCtx := importer.NewStaticCredentialsContext(transport, itransport, nil)
 		imports := r.importFn(importCtx, v2regConf)
 		if err := imports.Import(ctx, isi, stream); err != nil {
 			return nil, kapierrors.NewInternalError(err)
