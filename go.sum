@@ -88,6 +88,8 @@ github.com/envoyproxy/protoc-gen-validate v1.0.2 h1:QkIBuU5k+x7/QXPvPPnWXWlCdaBF
 github.com/envoyproxy/protoc-gen-validate v1.0.2/go.mod h1:GpiZQP3dDbg4JouG/NNS7QWXpgx6x8QiMKdmN72jogE=
 github.com/evanphx/json-patch v4.12.0+incompatible h1:4onqiflcdA9EOZ4RxV643DvftH5pOlLGNtQ5lPWQu84=
 github.com/evanphx/json-patch v4.12.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=
+github.com/everettraven/openshift-kubernetes-apiserver v0.0.0-20260119193913-2efba10eeca6 h1:l6tZtVMg/+tvbdNb0PXFkOZaQ6A2nkcKKedvpZ2s6QA=
+github.com/everettraven/openshift-kubernetes-apiserver v0.0.0-20260119193913-2efba10eeca6/go.mod h1:6Oa88y1CZqnzetd2JdepO0UXzQX4ZnOekx2/PtEjrOg=
 github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d h1:105gxyaGwCFad8crR9dcMQWvV9Hvulu6hwUh4tWPJnM=
 github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d/go.mod h1:ZZMPRZwes7CROmyNKgQzC3XPs6L/G2EJLHddWejkmf4=
 github.com/felixge/httpsnoop v1.0.3 h1:s/nj+GCswXYzN5v2DpNMuMQYe+0DDwt5WVCU6CWBdXk=
@@ -266,8 +268,6 @@ github.com/openshift/client-go v0.0.0-20240528061634-b054aa794d87 h1:JtLhaGpSEco
 github.com/openshift/client-go v0.0.0-20240528061634-b054aa794d87/go.mod h1:3IPD4U0qyovZS4EFady2kqY32m8lGcbs/Wx+yprg9z8=
 github.com/openshift/docker-distribution/v3 v3.0.0-20240215131201-6b2f5d2f1f43 h1:iFiveehT5yqHvAxdTwHGZLTxyxzMqP8bLcQKz6Y7NQQ=
 github.com/openshift/docker-distribution/v3 v3.0.0-20240215131201-6b2f5d2f1f43/go.mod h1:+fqBJ4vPYo4Uu1ZE4d+bUtTLRXfdSL3NvCZIZ9GHv58=
-github.com/openshift/kubernetes-apiserver v0.0.0-20241004073616-76bd25424ac8 h1:6X0dh+YTQDwvy1sotv4R8/o4D9LUo8ECsZy4NaQ0Zxc=
-github.com/openshift/kubernetes-apiserver v0.0.0-20241004073616-76bd25424ac8/go.mod h1:6Oa88y1CZqnzetd2JdepO0UXzQX4ZnOekx2/PtEjrOg=
 github.com/openshift/library-go v0.0.0-20240528102242-9c194599a149 h1:7mdQKqnSJMoIl6gkxpu5LXwmRN9IWYWpzgusOn5pC6E=
 github.com/openshift/library-go v0.0.0-20240528102242-9c194599a149/go.mod h1:PdASVamWinll2BPxiUpXajTwZxV8A1pQbWEsCN1od7I=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d h1:fLITXDjxMSvUDjnXs/zljIWktbST9+Om8XbrmmM7T4I=
