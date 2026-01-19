@@ -33,7 +33,7 @@ import (
 	"github.com/openshift/library-go/pkg/image/imageutil"
 	imageref "github.com/openshift/library-go/pkg/image/reference"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
-	"github.com/openshift/openshift-apiserver/pkg/image/apiserver/internalimageutil"
+	internalimageutil "github.com/openshift/openshift-apiserver/pkg/image/apiserver/internal/imageutil"
 )
 
 // Interface loads images into an image stream import request.
@@ -138,6 +138,9 @@ func (imp *ImageStreamImporter) blockedRegistry(ref imageapi.DockerImageReferenc
 	}
 	regURL := ref.DockerClientDefaults().Registry
 	for _, reg := range imp.regConf.Registries {
+		if len(reg.Mirrors) > 0 {
+			continue
+		}
 		if reg.Location == regURL {
 			return reg.Blocked
 		}
@@ -295,6 +298,22 @@ func (imp *ImageStreamImporter) importImages(ctx context.Context, isi *imageapi.
 				cache[j] = digest.Image
 			}
 			for _, index := range ids[j] {
+				// we have seen the below state in our internal CI clusters. we think
+				// it's caused by outages in the upstream registry, but we're not sure
+				// exactly how we end up in this situation where neither error or image
+				// are set. to protect against that we throw a generic error when it
+				// happens.
+				// See https://issues.redhat.com/browse/OCPBUGS-35036 for details.
+				if digest.Image == nil && digest.Err == nil {
+					errMsg := fmt.Sprintf(
+						"unknown error while importing digest %q from repository %q with import mode %q, please try again.",
+						digest.Name,
+						repo.Name,
+						digest.ImportMode,
+					)
+					digest.Err = errors.New(errMsg)
+					klog.Infof("importImages: both digest image and error are nil! repo=%+v digest=%+v", repo, digest)
+				}
 				if digest.Err != nil {
 					setImageImportStatus(isi, index, "", digest.Err)
 					continue
@@ -390,6 +409,26 @@ func (imp *ImageStreamImporter) importFromRepository(ctx context.Context, isi *i
 	status.Images = make([]imageapi.ImageImportStatus, len(repo.Tags))
 	for i, tag := range repo.Tags {
 		status.Images[i].Tag = tag.Name
+
+		// we have seen the below state in our internal CI clusters. we think
+		// it's caused by outages in the upstream registry, but we're not sure
+		// exactly how we end up in this situation where neither error or image
+		// are set. to protect against that we throw a generic error when it
+		// happens.
+		// See the following issues for details:
+		// - https://issues.redhat.com/browse/OCPBUGS-45861
+		// - https://issues.redhat.com/browse/OCPBUGS-35036
+		if tag.Image == nil && tag.Err == nil {
+			errMsg := fmt.Sprintf(
+				"unknown error while importing tag %q from repository %q with import mode %q, please try again.",
+				tag.Name,
+				repo.Name,
+				tag.ImportMode,
+			)
+			tag.Err = errors.New(errMsg)
+			klog.Infof("importFromRepository: both tag image and error are nil! repo=%+v tag=%+v", repo, tag)
+		}
+
 		if tag.Err != nil {
 			failures++
 			status.Images[i].Status = imageImportStatus(tag.Err, "", "repository")
@@ -791,7 +830,7 @@ func (imp *ImageStreamImporter) importRepositoryFromDocker(ctx context.Context, 
 					"unable to import manifest list %q: %v",
 					ref.Exact(), err)
 				importDigest.Err = err
-				return
+				continue
 			}
 			importDigest.Manifests = images
 		}
@@ -886,7 +925,7 @@ func (imp *ImageStreamImporter) importRepositoryFromDocker(ctx context.Context, 
 					"unable to import manifest list %q: %v",
 					ref.Exact(), err)
 				importTag.Err = err
-				return
+				continue
 			}
 			importTag.Manifests = images
 		}

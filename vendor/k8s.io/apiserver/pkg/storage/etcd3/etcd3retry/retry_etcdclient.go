@@ -2,6 +2,9 @@ package etcd3retry
 
 import (
 	"context"
+	"fmt"
+	"regexp"
+	"strings"
 	"time"
 
 	etcdrpc "go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
@@ -141,7 +144,10 @@ func IsRetriableEtcdError(err error) (errorLabel string, retry bool) {
 			}
 		}
 	}
-	return
+	if etcdError, ok := etcdrpc.Error(err).(etcdrpc.EtcdError); ok && etcdError.Code() == codes.Unavailable {
+		return "Unavailable", true
+	}
+	return "", false
 }
 
 // OnError allows the caller to retry fn in case the error returned by fn is retriable
@@ -163,6 +169,9 @@ func OnError(ctx context.Context, backoff wait.Backoff, retriable func(error) (s
 		}
 
 		lastErrLabel, retry = retriable(err)
+		if klog.V(6).Enabled() {
+			klog.V(6).InfoS("observed storage error", "err", err, "retriable", retry)
+		}
 		if retry {
 			lastErr = err
 			retryCounter++
