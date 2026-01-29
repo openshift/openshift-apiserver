@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"net/netip"
 	"reflect"
 	"strings"
 	"testing"
@@ -15,6 +16,7 @@ import (
 
 	imagev1 "github.com/openshift/api/image/v1"
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
+	imageref "github.com/openshift/library-go/pkg/image/reference"
 	imageapi "github.com/openshift/openshift-apiserver/pkg/image/apis/image"
 	"github.com/openshift/openshift-apiserver/pkg/image/apis/image/validation/whitelist"
 )
@@ -2048,6 +2050,540 @@ func TestValidateImageStreamLayers(t *testing.T) {
 			errs := ValidateImageStreamLayers(tc.isl)
 			if !reflect.DeepEqual(errs, tc.expected) {
 				t.Errorf("unexpected errors: %s", diff.ObjectDiff(tc.expected, errs))
+			}
+		})
+	}
+}
+
+func Test_shouldContactRegistry(t *testing.T) {
+	ctx := context.Background()
+
+	mockIPLookup := func(ctx context.Context, host string) ([]net.IPAddr, error) {
+		switch host {
+		case "localmachine":
+			return []net.IPAddr{{IP: net.ParseIP("127.0.0.1")}}, nil
+		case "metadata":
+			return []net.IPAddr{{IP: net.ParseIP("169.254.169.254")}}, nil
+		case "oneninetwo":
+			return []net.IPAddr{{IP: net.ParseIP("192.168.0.4")}}, nil
+		case "multipleips":
+			return []net.IPAddr{
+				{IP: net.ParseIP("2.3.4.5")},
+				{IP: net.ParseIP("192.168.0.4")},
+				{IP: net.ParseIP("1.1.1.1")},
+			}, nil
+		case "mixedallowedandblocked":
+			// This hostname resolves to both an allowed IP and a loopback IP
+			// Should be BLOCKED because one of the IPs is loopback
+			return []net.IPAddr{
+				{IP: net.ParseIP("10.0.0.1")},  // Could be in allowed list
+				{IP: net.ParseIP("127.0.0.1")}, // Loopback - must block!
+			}, nil
+		default:
+			return net.DefaultResolver.LookupIPAddr(ctx, host)
+		}
+	}
+
+	testCases := []struct {
+		name     string
+		registry string
+		blocked  []netip.Prefix
+		allowed  []netip.Prefix
+		errorstr string
+	}{
+		{
+			name:     "empty registry - allowed",
+			registry: "",
+		},
+		{
+			name:     "loopback IPv4 - blocked",
+			registry: "127.0.0.1:5000",
+			errorstr: "loopback",
+		},
+		{
+			name:     "loopback IPv4 without port - blocked",
+			registry: "127.0.0.1",
+			errorstr: "loopback",
+		},
+		{
+			name:     "loopback IPv4 alternate - blocked",
+			registry: "127.0.0.2:443",
+			errorstr: "loopback",
+		},
+		{
+			name:     "loopback IPv6 - blocked",
+			registry: "[::1]:5000",
+			errorstr: "loopback",
+		},
+		{
+			name:     "IPv4-mapped IPv6 loopback - blocked",
+			registry: "[::ffff:127.0.0.1]:5000",
+			errorstr: "loopback",
+		},
+		{
+			name:     "link-local metadata endpoint - blocked",
+			registry: "169.254.169.254",
+			errorstr: "link-local",
+		},
+		{
+			name:     "link-local metadata endpoint with port - blocked",
+			registry: "169.254.169.254:80",
+			errorstr: "link-local",
+		},
+		{
+			name:     "link-local IPv4 - blocked",
+			registry: "169.254.1.1:5000",
+			errorstr: "link-local",
+		},
+		{
+			name:     "link-local IPv6 - blocked",
+			registry: "[fe80::1]:5000",
+			errorstr: "link-local",
+		},
+		{
+			name:     "public IPv4 - allowed",
+			registry: "1.2.3.4:5000",
+		},
+		{
+			name:     "public IPv6 - allowed",
+			registry: "[2001:db8::1]:5000",
+		},
+		{
+			name:     "public IPv6 without port - allowed",
+			registry: "[2001:db8::1]",
+		},
+		{
+			name:     "IP in custom CIDR block - blocked",
+			registry: "10.96.0.1:443",
+			blocked:  []netip.Prefix{netip.MustParsePrefix("10.96.0.0/12")},
+			errorstr: "not allowed",
+		},
+		{
+			name:     "IP in custom CIDR block without port - blocked",
+			registry: "10.96.5.10",
+			blocked:  []netip.Prefix{netip.MustParsePrefix("10.96.0.0/12")},
+			errorstr: "not allowed",
+		},
+		{
+			name:     "IP NOT in custom CIDR block - allowed",
+			registry: "10.95.0.1:5000",
+			blocked:  []netip.Prefix{netip.MustParsePrefix("10.96.0.0/12")},
+		},
+		{
+			name:     "IP in multiple custom CIDRs - blocked",
+			registry: "192.168.1.100:5000",
+			blocked: []netip.Prefix{
+				netip.MustParsePrefix("10.0.0.0/8"),
+				netip.MustParsePrefix("192.168.0.0/16"),
+			},
+			errorstr: "not allowed",
+		},
+		{
+			name:     "private IP not in custom CIDR - allowed",
+			registry: "172.16.0.1:5000",
+			blocked: []netip.Prefix{
+				netip.MustParsePrefix("10.0.0.0/8"),
+				netip.MustParsePrefix("192.168.0.0/16"),
+			},
+		},
+		{
+			name:     "resolving to local machine",
+			registry: "localmachine",
+			errorstr: "loopback",
+		},
+		{
+			name:     "metadata ip resolved via DNS",
+			registry: "metadata",
+			errorstr: "link-local",
+		},
+		{
+			name:     "local network address - allowed",
+			registry: "oneninetwo",
+		},
+		{
+			name:     "local network address - blocked",
+			registry: "oneninetwo",
+			blocked:  []netip.Prefix{netip.MustParsePrefix("192.168.0.0/24")},
+			errorstr: "not allowed",
+		},
+		{
+			name:     "multiple resolved ips - allowed",
+			registry: "multipleips",
+		},
+		{
+			name:     "multiple resolved ips - one blocked",
+			registry: "multipleips",
+			blocked:  []netip.Prefix{netip.MustParsePrefix("192.168.0.0/24")},
+			errorstr: "not allowed",
+		},
+		{
+			name:     "allowed IP bypasses loopback",
+			registry: "localmachine",
+			allowed:  []netip.Prefix{netip.MustParsePrefix("127.0.0.1/32")},
+		},
+		{
+			name:     "allowed IP bypasses custom CIDR",
+			registry: "oneninetwo",
+			blocked:  []netip.Prefix{netip.MustParsePrefix("192.168.0.0/24")},
+			allowed:  []netip.Prefix{netip.MustParsePrefix("192.168.0.4/32")},
+		},
+		{
+			name:     "allowed IP does not match - still blocked",
+			registry: "localmachine",
+			allowed:  []netip.Prefix{netip.MustParsePrefix("10.0.0.1/32")},
+			errorstr: "loopback",
+		},
+		{
+			name:     "hostname resolves to allowed IP and loopback - blocked",
+			registry: "mixedallowedandblocked",
+			allowed:  []netip.Prefix{netip.MustParsePrefix("10.0.0.1/32")},
+			errorstr: "loopback",
+		},
+		{
+			name:     "malformed registry - IPv6 without brackets",
+			registry: "::1:5000",
+			errorstr: "invalid registry url",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ref := imageref.DockerImageReference{Registry: tc.registry}
+
+			err := shouldContactRegistry(ctx, ref, tc.blocked, tc.allowed, mockIPLookup)
+			if err == nil {
+				if tc.errorstr != "" {
+					t.Errorf("expected error but got none")
+					return
+				}
+				return
+			}
+
+			if tc.errorstr == "" {
+				t.Errorf("unexpected error: %v", err)
+				return
+			}
+
+			if !strings.Contains(err.Error(), tc.errorstr) {
+				t.Errorf("expected error to contain %q but got: %v", tc.errorstr, err)
+			}
+		})
+	}
+}
+
+func Test_validateImageStreamImportDisallowedHosts(t *testing.T) {
+	mockIPLookup := func(ctx context.Context, host string) ([]net.IPAddr, error) {
+		switch host {
+		case "evil.local":
+			return []net.IPAddr{{IP: net.ParseIP("127.0.0.1")}}, nil
+		case "metadata.local":
+			return []net.IPAddr{{IP: net.ParseIP("169.254.169.254")}}, nil
+		case "safe.local":
+			return []net.IPAddr{{IP: net.ParseIP("1.2.3.4")}}, nil
+		case "mixed.local":
+			// Hostname resolves to both an allowed IP and a link-local IP
+			return []net.IPAddr{
+				{IP: net.ParseIP("10.0.0.1")},        // Could be allowed
+				{IP: net.ParseIP("169.254.169.254")}, // Metadata endpoint - must block!
+			}, nil
+		default:
+			return []net.IPAddr{{IP: net.ParseIP("8.8.8.8")}}, nil
+		}
+	}
+
+	testCases := []struct {
+		name          string
+		isi           *imageapi.ImageStreamImport
+		blocked       []netip.Prefix
+		allowed       []netip.Prefix
+		errorContains []string
+	}{
+		{
+			name: "repository from loopback hostname - blocked",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Repository: &imageapi.RepositoryImportSpec{
+						From: kapi.ObjectReference{
+							Kind: "DockerImage",
+							Name: "evil.local/image:latest",
+						},
+					},
+				},
+			},
+			errorContains: []string{"loopback import not allowed"},
+		},
+		{
+			name: "image from metadata endpoint - blocked",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "metadata.local/image:v1",
+							},
+						},
+					},
+				},
+			},
+			errorContains: []string{"link-local import not allowed"},
+		},
+		{
+			name: "safe registry - allowed",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "safe.local/image:v1",
+							},
+						},
+					},
+				},
+			},
+			errorContains: nil,
+		},
+		{
+			name: "multiple images - one blocked",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "safe.local/image:v1",
+							},
+						},
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "evil.local/image:v2",
+							},
+						},
+					},
+				},
+			},
+			errorContains: []string{"loopback import not allowed"},
+		},
+		{
+			name: "registry in custom CIDR - blocked",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "safe.local/image:v1",
+							},
+						},
+					},
+				},
+			},
+			blocked:       []netip.Prefix{netip.MustParsePrefix("1.2.3.0/24")},
+			errorContains: []string{"import from 1.2.3.0/24 not allowed"},
+		},
+		{
+			name: "non-docker image kind - ignored",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "ImageStreamTag",
+								Name: "evil.local/image:v1",
+							},
+						},
+					},
+				},
+			},
+			errorContains: nil,
+		},
+		{
+			name: "both repository and image blocked",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Repository: &imageapi.RepositoryImportSpec{
+						From: kapi.ObjectReference{
+							Kind: "DockerImage",
+							Name: "evil.local/repo:latest",
+						},
+					},
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "metadata.local/image:v1",
+							},
+						},
+					},
+				},
+			},
+			errorContains: []string{"loopback import not allowed", "link-local import not allowed"},
+		},
+		{
+			name: "IP address without port - blocked",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "127.0.0.1/image:latest",
+							},
+						},
+					},
+				},
+			},
+			errorContains: []string{"loopback import not allowed"},
+		},
+		{
+			name: "IP address with port - blocked",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "169.254.169.254:5000/image:v1",
+							},
+						},
+					},
+				},
+			},
+			errorContains: []string{"link-local import not allowed"},
+		},
+		{
+			name: "allowed IP bypasses loopback check",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "evil.local/image:latest",
+							},
+						},
+					},
+				},
+			},
+			allowed:       []netip.Prefix{netip.MustParsePrefix("127.0.0.1/32")},
+			errorContains: nil,
+		},
+		{
+			name: "allowed IP in custom CIDR bypasses block",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "safe.local/image:v1",
+							},
+						},
+					},
+				},
+			},
+			blocked:       []netip.Prefix{netip.MustParsePrefix("1.2.3.0/24")},
+			allowed:       []netip.Prefix{netip.MustParsePrefix("1.2.3.4/32")},
+			errorContains: nil,
+		},
+		{
+			name: "multiple allowed IPs",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "evil.local/image:v1",
+							},
+						},
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "metadata.local/image:v2",
+							},
+						},
+					},
+				},
+			},
+			allowed: []netip.Prefix{
+				netip.MustParsePrefix("127.0.0.1/32"),
+				netip.MustParsePrefix("169.254.169.254/32"),
+			},
+			errorContains: nil,
+		},
+		{
+			name: "allowed IP does not match - still blocked",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "evil.local/image:latest",
+							},
+						},
+					},
+				},
+			},
+			allowed:       []netip.Prefix{netip.MustParsePrefix("1.2.3.4/32")},
+			errorContains: []string{"loopback import not allowed"},
+		},
+		{
+			name: "hostname resolves to allowed IP and metadata endpoint - blocked",
+			isi: &imageapi.ImageStreamImport{
+				ObjectMeta: metav1.ObjectMeta{Name: "test"},
+				Spec: imageapi.ImageStreamImportSpec{
+					Images: []imageapi.ImageImportSpec{
+						{
+							From: kapi.ObjectReference{
+								Kind: "DockerImage",
+								Name: "mixed.local/image:latest",
+							},
+						},
+					},
+				},
+			},
+			allowed:       []netip.Prefix{netip.MustParsePrefix("10.0.0.1/32")},
+			errorContains: []string{"link-local import not allowed"},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			errs := validateImageStreamImportDisallowedHosts(context.Background(), tc.isi, tc.blocked, tc.allowed, mockIPLookup)
+
+			if len(tc.errorContains) == 0 {
+				if len(errs) != 0 {
+					t.Errorf("expected no errors but got: %v", errs)
+				}
+				return
+			}
+
+			if len(errs) != len(tc.errorContains) {
+				t.Errorf("expected %d errors but got %d: %v", len(tc.errorContains), len(errs), errs)
+				return
+			}
+
+			for i, expectedMsg := range tc.errorContains {
+				if !strings.Contains(errs[i].Error(), expectedMsg) {
+					t.Errorf("error[%d]: expected to contain %q but got %q", i, expectedMsg, errs[i].Error())
+				}
 			}
 		})
 	}

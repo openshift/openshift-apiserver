@@ -3,8 +3,10 @@ package validation
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"net"
+	"net/netip"
 	"regexp"
 	"strings"
 
@@ -780,6 +782,153 @@ func ValidateImageStreamImport(isi *imageapi.ImageStreamImport) field.ErrorList 
 	}
 
 	errs = append(errs, validation.ValidateObjectMeta(&isi.ObjectMeta, true, ValidateImageStreamName, field.NewPath("metadata"))...)
+	return errs
+}
+
+// IPLookup is the function signature for the net's Default LookupIPAddr
+// function.
+type IPLookup func(context.Context, string) ([]net.IPAddr, error)
+
+// shouldContactRegistry returns an error if the given DockerImageReference
+// points to an IP address we should not be reaching to. IPs in the allowed list
+// bypass all checks; IPs not in allowed are checked against the blocked list.
+func shouldContactRegistry(ctx context.Context, ref imageref.DockerImageReference, blocked, allowed []netip.Prefix, resolve IPLookup) error {
+	// Using the default registry, just allow it.
+	if ref.Registry == "" {
+		return nil
+	}
+
+	// Extract the host portion of the registry url. we do not care
+	// about the port for this validation.
+	host, _, err := net.SplitHostPort(ref.Registry)
+	if err != nil {
+		if !strings.Contains(err.Error(), "missing port in address") {
+			return fmt.Errorf("invalid registry url: %w", err)
+		}
+
+		// now we know that we only miss the port in the registry. we
+		// set a zeroed out port so SplitHostPort can succeed. XXX we
+		// use this approach because SplitHostPort takes care of
+		// properly parsing IPv6 addresses and strips out the brackets.
+		withPort := fmt.Sprintf("%s:0", ref.Registry)
+		if host, _, err = net.SplitHostPort(withPort); err != nil {
+			return fmt.Errorf("invalid registry url: %w", err)
+		}
+	}
+
+	return shouldContactHost(ctx, host, blocked, allowed, resolve)
+}
+
+// ShouldContactHost returns an error if the given host points to an IP address
+// we should not be reaching to. IPs in the allowed list bypass all checks; IPs
+// not in allowed are checked against loopback, link-local, and the blocked list.
+func ShouldContactHost(ctx context.Context, host string, blocked, allowed []netip.Prefix) error {
+	return shouldContactHost(ctx, host, blocked, allowed, net.DefaultResolver.LookupIPAddr)
+}
+
+// shouldContactHost is the internal implementation that allows for a custom dns
+// resolve function for testing purposes.
+func shouldContactHost(ctx context.Context, host string, blocked, allowed []netip.Prefix, resolve IPLookup) error {
+	// Either we have a name or an IP address here. if we manage to parse
+	// it as an IP then use it as so otherwise we need to do a dns lookup.
+	var ips []net.IP
+	if ip := net.ParseIP(host); ip != nil {
+		ips = append(ips, ip)
+	} else {
+		ipAddrs, err := resolve(ctx, host)
+		if err != nil {
+			return err
+		}
+		for _, addr := range ipAddrs {
+			ips = append(ips, addr.IP)
+		}
+	}
+
+	for _, ip := range ips {
+		// This next call should never fail as we got the ip from the
+		// net package.
+		ntip, valid := netip.AddrFromSlice(ip)
+		if !valid {
+			return fmt.Errorf("cannot parse ip %s", ip.String())
+		}
+
+		ntip = ntip.Unmap()
+
+		// Check if this IP is in the allowed list. If so, bypass all
+		// other checks for the current IP.
+		var skip bool
+		for _, allowedPrefix := range allowed {
+			if allowedPrefix.Contains(ntip) {
+				skip = true
+				break
+			}
+		}
+		if skip {
+			continue
+		}
+
+		if ip.IsLoopback() {
+			return errors.New("loopback import not allowed")
+		}
+
+		if ip.IsLinkLocalUnicast() {
+			return errors.New("link-local import not allowed")
+		}
+
+		for _, blockedPrefix := range blocked {
+			if blockedPrefix.Contains(ntip) {
+				return fmt.Errorf("import from %s not allowed", blockedPrefix.String())
+			}
+		}
+	}
+
+	return nil
+}
+
+// ValidateImageStreamImportDisallowedHosts validates that image imports don't
+// target network addresses we know it should not be allowed to contact. IPs in
+// the allowed list bypass all checks; IPs not in allowed are checked against
+// loopback, link-local, and the blocked list.
+func ValidateImageStreamImportDisallowedHosts(ctx context.Context, isi *imageapi.ImageStreamImport, blocked, allowed []netip.Prefix) field.ErrorList {
+	return validateImageStreamImportDisallowedHosts(ctx, isi, blocked, allowed, net.DefaultResolver.LookupIPAddr)
+}
+
+// validateImageStreamImportDisallowedHosts does the same thing as
+// ValidateImageStreamImportDisallowedHosts but allows for a custom dns resolve
+// function.
+func validateImageStreamImportDisallowedHosts(ctx context.Context, isi *imageapi.ImageStreamImport, blocked, allowed []netip.Prefix, resolve IPLookup) field.ErrorList {
+	errs := field.ErrorList{}
+
+	path := field.NewPath("spec", "repository", "from", "name")
+	if repository := isi.Spec.Repository; repository != nil && repository.From.Kind == "DockerImage" {
+		if ref, err := imageref.Parse(repository.From.Name); err != nil {
+			errs = append(errs, field.Invalid(path, repository.From.Name, err.Error()))
+		} else if err := shouldContactRegistry(ctx, ref, blocked, allowed, resolve); err != nil {
+			klog.V(4).Infof("blocking import of repository %q: %v", repository.From.Name, err)
+			errstr := fmt.Sprintf("forbidden import from %q: %s", repository.From.Name, err.Error())
+			errs = append(errs, field.Forbidden(path, errstr))
+		}
+	}
+
+	for i, image := range isi.Spec.Images {
+		if image.From.Kind != "DockerImage" {
+			continue
+		}
+
+		path = field.NewPath("spec", "images").Index(i).Child("from", "name")
+		ref, err := imageref.Parse(image.From.Name)
+		if err != nil {
+			errs = append(errs, field.Invalid(path, image.From.Name, err.Error()))
+			continue
+		}
+
+		if err := shouldContactRegistry(ctx, ref, blocked, allowed, resolve); err != nil {
+			klog.V(4).Infof("blocking import of image %q: %v", image.From.Name, err)
+			errstr := fmt.Sprintf("forbidden import from %q: %s", image.From.Name, err.Error())
+			errs = append(errs, field.Forbidden(path, errstr))
+		}
+	}
+
 	return errs
 }
 
