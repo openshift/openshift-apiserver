@@ -121,10 +121,10 @@ require (
 	github.com/prometheus/common v0.44.0 // indirect
 	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/sirupsen/logrus v1.9.4 // indirect
 	github.com/soheilhy/cmux v0.1.5 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20220101234140-673ab2c3ae75 // indirect
 	github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 // indirect
