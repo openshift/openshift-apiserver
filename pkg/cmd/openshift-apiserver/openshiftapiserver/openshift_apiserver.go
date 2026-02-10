@@ -90,8 +90,7 @@ type OpenshiftAPIExtraConfig struct {
 	AdditionalTrustedCA                []byte
 	ImageStreamImportMode              apisimage.ImportModeType
 
-	RouteAllocator                 *routehostassignment.SimpleAllocationPlugin
-	AllowRouteExternalCertificates bool
+	RouteAllocator *routehostassignment.SimpleAllocationPlugin
 
 	ProjectAuthorizationCache *projectauth.AuthorizationCache
 	ProjectCache              *projectcache.ProjectCache
@@ -328,7 +327,7 @@ func (c *completedConfig) withRouteAPIServer(delegateAPIServer genericapiserver.
 		ExtraConfig: routeapiserver.ExtraConfig{
 			KubeAPIServerClientConfig: c.ExtraConfig.KubeAPIServerClientConfig,
 			RouteAllocator:            c.ExtraConfig.RouteAllocator,
-			AllowExternalCertificates: c.ExtraConfig.AllowRouteExternalCertificates,
+			AllowExternalCertificates: true,
 			Codecs:                    legacyscheme.Codecs,
 			Scheme:                    legacyscheme.Scheme,
 		},

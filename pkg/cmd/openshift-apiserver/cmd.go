@@ -104,7 +104,7 @@ func (o *OpenShiftAPIServer) Validate() error {
 
 // RunAPIServer takes the options, starts the API server and waits until stopCh is closed or initial listening fails.
 func (o *OpenShiftAPIServer) RunAPIServer(stopCh <-chan struct{}) error {
-	if err := features.InitializeFeatureGates(feature.DefaultMutableFeatureGate, openshiftfeatures.SelfManaged, openshiftfeatures.FeatureGateRouteExternalCertificate); err != nil {
+	if err := features.InitializeFeatureGates(feature.DefaultMutableFeatureGate, openshiftfeatures.SelfManaged); err != nil {
 		return err
 	}
 

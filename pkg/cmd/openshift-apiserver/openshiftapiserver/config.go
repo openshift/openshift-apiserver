@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	openshiftfeatures "github.com/openshift/api/features"
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
 	"github.com/openshift/apiserver-library-go/pkg/configflags"
 	"github.com/openshift/library-go/pkg/apiserver/admission/admissiontimeout"
@@ -35,7 +34,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/component-base/compatibility"
-	"k8s.io/component-base/featuregate"
 	"k8s.io/klog/v2"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 )
@@ -266,7 +264,6 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 			AdditionalTrustedCA:                caData,
 			ImageStreamImportMode:              apisimage.ImportModeType(config.ImagePolicyConfig.ImageStreamImportMode),
 			RouteAllocator:                     routeAllocator,
-			AllowRouteExternalCertificates:     feature.DefaultFeatureGate.Enabled(featuregate.Feature(openshiftfeatures.FeatureGateRouteExternalCertificate)),
 			ProjectAuthorizationCache:          projectAuthorizationCache,
 			ProjectCache:                       projectCache,
 			ProjectRequestTemplate:             config.ProjectConfig.ProjectRequestTemplate,
