@@ -48,7 +48,7 @@ func TestRoundTripVersionedObject(t *testing.T) {
 	}
 	image.DockerImageMetadataVersion = ""
 	if !reflect.DeepEqual(i, image) {
-		t.Errorf("unable to round trip object: %s", diff.ObjectDiff(i, image))
+		t.Errorf("unable to round trip object: %s", diff.Diff(i, image))
 	}
 }
 

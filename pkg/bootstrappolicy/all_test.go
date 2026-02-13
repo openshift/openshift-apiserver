@@ -116,6 +116,6 @@ func TestPolicyAggregation(t *testing.T) {
 	// at this point we have checked everything except to make sure that no cluster role has added a label
 	// that causes it to start aggregating into an existing cluster role that already had an aggregation rule
 	if !reflect.DeepEqual(expectedAggregationMap, aggregationMap) {
-		t.Errorf("unexpected data in aggregationMap:\n%s", diff.ObjectDiff(expectedAggregationMap, aggregationMap))
+		t.Errorf("unexpected data in aggregationMap:\n%s", diff.Diff(expectedAggregationMap, aggregationMap))
 	}
 }

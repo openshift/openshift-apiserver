@@ -34,6 +34,12 @@ func SetObjectDefaults_Build(in *buildv1.Build) {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 				}
+				if a.ValueFrom.FileKeyRef != nil {
+					if a.ValueFrom.FileKeyRef.Optional == nil {
+						var ptrVar1 bool = false
+						a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+					}
+				}
 			}
 		}
 		for i := range in.Spec.CommonSpec.Strategy.DockerStrategy.BuildArgs {
@@ -41,6 +47,12 @@ func SetObjectDefaults_Build(in *buildv1.Build) {
 			if a.ValueFrom != nil {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
+				}
+				if a.ValueFrom.FileKeyRef != nil {
+					if a.ValueFrom.FileKeyRef.Optional == nil {
+						var ptrVar1 bool = false
+						a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+					}
 				}
 			}
 		}
@@ -62,6 +74,12 @@ func SetObjectDefaults_Build(in *buildv1.Build) {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 				}
+				if a.ValueFrom.FileKeyRef != nil {
+					if a.ValueFrom.FileKeyRef.Optional == nil {
+						var ptrVar1 bool = false
+						a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+					}
+				}
 			}
 		}
 		for i := range in.Spec.CommonSpec.Strategy.SourceStrategy.Volumes {
@@ -82,6 +100,12 @@ func SetObjectDefaults_Build(in *buildv1.Build) {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 				}
+				if a.ValueFrom.FileKeyRef != nil {
+					if a.ValueFrom.FileKeyRef.Optional == nil {
+						var ptrVar1 bool = false
+						a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+					}
+				}
 			}
 		}
 	}
@@ -91,6 +115,12 @@ func SetObjectDefaults_Build(in *buildv1.Build) {
 			if a.ValueFrom != nil {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
+				}
+				if a.ValueFrom.FileKeyRef != nil {
+					if a.ValueFrom.FileKeyRef.Optional == nil {
+						var ptrVar1 bool = false
+						a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+					}
 				}
 			}
 		}
@@ -115,6 +145,12 @@ func SetObjectDefaults_BuildConfig(in *buildv1.BuildConfig) {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 				}
+				if a.ValueFrom.FileKeyRef != nil {
+					if a.ValueFrom.FileKeyRef.Optional == nil {
+						var ptrVar1 bool = false
+						a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+					}
+				}
 			}
 		}
 		for i := range in.Spec.CommonSpec.Strategy.DockerStrategy.BuildArgs {
@@ -122,6 +158,12 @@ func SetObjectDefaults_BuildConfig(in *buildv1.BuildConfig) {
 			if a.ValueFrom != nil {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
+				}
+				if a.ValueFrom.FileKeyRef != nil {
+					if a.ValueFrom.FileKeyRef.Optional == nil {
+						var ptrVar1 bool = false
+						a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+					}
 				}
 			}
 		}
@@ -143,6 +185,12 @@ func SetObjectDefaults_BuildConfig(in *buildv1.BuildConfig) {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 				}
+				if a.ValueFrom.FileKeyRef != nil {
+					if a.ValueFrom.FileKeyRef.Optional == nil {
+						var ptrVar1 bool = false
+						a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+					}
+				}
 			}
 		}
 		for i := range in.Spec.CommonSpec.Strategy.SourceStrategy.Volumes {
@@ -163,6 +211,12 @@ func SetObjectDefaults_BuildConfig(in *buildv1.BuildConfig) {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 				}
+				if a.ValueFrom.FileKeyRef != nil {
+					if a.ValueFrom.FileKeyRef.Optional == nil {
+						var ptrVar1 bool = false
+						a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+					}
+				}
 			}
 		}
 	}
@@ -172,6 +226,12 @@ func SetObjectDefaults_BuildConfig(in *buildv1.BuildConfig) {
 			if a.ValueFrom != nil {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
+				}
+				if a.ValueFrom.FileKeyRef != nil {
+					if a.ValueFrom.FileKeyRef.Optional == nil {
+						var ptrVar1 bool = false
+						a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+					}
 				}
 			}
 		}
@@ -201,6 +261,12 @@ func SetObjectDefaults_BuildRequest(in *buildv1.BuildRequest) {
 			if a.ValueFrom.FieldRef != nil {
 				corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 			}
+			if a.ValueFrom.FileKeyRef != nil {
+				if a.ValueFrom.FileKeyRef.Optional == nil {
+					var ptrVar1 bool = false
+					a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+				}
+			}
 		}
 	}
 	if in.DockerStrategyOptions != nil {
@@ -209,6 +275,12 @@ func SetObjectDefaults_BuildRequest(in *buildv1.BuildRequest) {
 			if a.ValueFrom != nil {
 				if a.ValueFrom.FieldRef != nil {
 					corev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
+				}
+				if a.ValueFrom.FileKeyRef != nil {
+					if a.ValueFrom.FileKeyRef.Optional == nil {
+						var ptrVar1 bool = false
+						a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+					}
 				}
 			}
 		}

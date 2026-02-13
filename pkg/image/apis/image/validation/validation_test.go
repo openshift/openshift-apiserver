@@ -244,7 +244,7 @@ func TestValidateImageSignature(t *testing.T) {
 	} {
 		errs := validateImageSignature(&tc.signature, nil)
 		if e, a := tc.expected, errs; !reflect.DeepEqual(a, e) {
-			t.Errorf("[%s] unexpected errors: %s", tc.name, diff.ObjectDiff(e, a))
+			t.Errorf("[%s] unexpected errors: %s", tc.name, diff.Diff(e, a))
 		}
 	}
 
@@ -351,7 +351,7 @@ func TestValidateImageManifests(t *testing.T) {
 			if !reflect.DeepEqual(errs, testCase.expected) {
 				t.Errorf(
 					"unexpected errors: %s",
-					diff.ObjectDiff(testCase.expected, errs),
+					diff.Diff(testCase.expected, errs),
 				)
 			}
 		})
@@ -749,7 +749,7 @@ func TestValidateImageStream(t *testing.T) {
 
 			errs := ValidateImageStream(&stream)
 			if e, a := test.expected, errs; !reflect.DeepEqual(e, a) {
-				t.Errorf("unexpected errors: %s", diff.ObjectDiff(e, a))
+				t.Errorf("unexpected errors: %s", diff.Diff(e, a))
 			}
 		})
 	}
@@ -994,7 +994,7 @@ func TestValidateImageStreamWithWhitelister(t *testing.T) {
 
 			errs := ValidateImageStreamWithWhitelister(context.TODO(), mkWhitelister(t, test.whitelist), &stream)
 			if e, a := test.expected, errs; !reflect.DeepEqual(e, a) {
-				t.Errorf("unexpected errors: %s", diff.ObjectDiff(e, a))
+				t.Errorf("unexpected errors: %s", diff.Diff(e, a))
 			}
 		})
 	}
@@ -1183,7 +1183,7 @@ func TestValidateImageStreamUpdateWithWhitelister(t *testing.T) {
 			}
 			errs := ValidateImageStreamUpdateWithWhitelister(context.TODO(), whitelister, &newStream, &oldStream)
 			if e, a := tc.expected, errs; !reflect.DeepEqual(e, a) {
-				t.Errorf("unexpected errors: %s", diff.ObjectDiff(a, e))
+				t.Errorf("unexpected errors: %s", diff.Diff(a, e))
 			}
 		})
 	}
@@ -1404,7 +1404,7 @@ func TestValidateISTUpdateWithWhitelister(t *testing.T) {
 			}
 			errs := ValidateImageStreamTagUpdateWithWhitelister(context.TODO(), whitelister, &istNew, &istOld)
 			if e, a := tc.expected, errs; !reflect.DeepEqual(e, a) {
-				t.Errorf("unexpected errors: %s", diff.ObjectDiff(a, e))
+				t.Errorf("unexpected errors: %s", diff.Diff(a, e))
 			}
 		})
 	}
@@ -1639,7 +1639,7 @@ func TestValidateITUpdateWithWhitelister(t *testing.T) {
 			}
 			errs := ValidateImageTagUpdateWithWhitelister(context.TODO(), whitelister, &istNew, &istOld)
 			if e, a := tc.expected, errs; !reflect.DeepEqual(e, a) {
-				t.Errorf("unexpected errors: %s", diff.ObjectDiff(a, e))
+				t.Errorf("unexpected errors: %s", diff.Diff(a, e))
 			}
 		})
 	}
@@ -1689,7 +1689,7 @@ func TestValidateRegistryAllowedForImport(t *testing.T) {
 			}
 			errs := ValidateRegistryAllowedForImport(context.TODO(), whitelister, nil, fieldName, host, port)
 			if e, a := tc.expected, errs; !reflect.DeepEqual(e, a) {
-				t.Errorf("unexpected errors: %s", diff.ObjectDiff(e, a))
+				t.Errorf("unexpected errors: %s", diff.Diff(e, a))
 			}
 		})
 	}
@@ -1939,7 +1939,7 @@ func TestValidateImageStreamImport(t *testing.T) {
 		}
 		errs := ValidateImageStreamImport(test.isi)
 		if e, a := test.expected, errs; !reflect.DeepEqual(e, a) {
-			t.Errorf("%s: unexpected errors: %s", name, diff.ObjectDiff(e, a))
+			t.Errorf("%s: unexpected errors: %s", name, diff.Diff(e, a))
 		}
 	}
 }
@@ -2047,7 +2047,7 @@ func TestValidateImageStreamLayers(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			errs := ValidateImageStreamLayers(tc.isl)
 			if !reflect.DeepEqual(errs, tc.expected) {
-				t.Errorf("unexpected errors: %s", diff.ObjectDiff(tc.expected, errs))
+				t.Errorf("unexpected errors: %s", diff.Diff(tc.expected, errs))
 			}
 		})
 	}

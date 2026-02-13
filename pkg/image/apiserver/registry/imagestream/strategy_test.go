@@ -485,7 +485,7 @@ func TestTagVerifier(t *testing.T) {
 				},
 			}
 			if e, a := expectedSar, record.request; !reflect.DeepEqual(e, a) {
-				t.Errorf("%s: unexpected SAR request: %s", name, diff.ObjectDiff(e, a))
+				t.Errorf("%s: unexpected SAR request: %s", name, diff.Diff(e, a))
 			}
 		}
 
@@ -496,7 +496,7 @@ func TestTagVerifier(t *testing.T) {
 			return errs[i].Field < errs[j].Field
 		})
 		if e, a := test.expected, errs; !reflect.DeepEqual(e, a) {
-			t.Errorf("%s: unexpected validation errors: %s", name, diff.ObjectDiff(e, a))
+			t.Errorf("%s: unexpected validation errors: %s", name, diff.Diff(e, a))
 		}
 	}
 }
@@ -700,7 +700,7 @@ func TestLimitVerifier(t *testing.T) {
 		ctx := apirequest.WithUser(apirequest.NewDefaultContext(), &fakeUser{})
 		err := s.Validate(ctx, &tc.is)
 		if e, a := tc.expected, err; !reflect.DeepEqual(e, a) {
-			t.Errorf("%s: unexpected validation errors: %s", tc.name, diff.ObjectReflectDiff(e, a))
+			t.Errorf("%s: unexpected validation errors: %s", tc.name, diff.Diff(e, a))
 		}
 
 		// Update must fail the exact same way
@@ -714,7 +714,7 @@ func TestLimitVerifier(t *testing.T) {
 		}
 		err = s.ValidateUpdate(ctx, &tc.is, old)
 		if e, a := tc.expected, err; !reflect.DeepEqual(e, a) {
-			t.Errorf("%s: unexpected validation errors: %s", tc.name, diff.ObjectReflectDiff(e, a))
+			t.Errorf("%s: unexpected validation errors: %s", tc.name, diff.Diff(e, a))
 		}
 
 		// Update with no change should pass even for violating image streams

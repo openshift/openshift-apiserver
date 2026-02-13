@@ -32,6 +32,12 @@ func SetObjectDefaults_DeploymentConfig(in *appsv1.DeploymentConfig) {
 				if a.ValueFrom.FieldRef != nil {
 					apiscorev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 				}
+				if a.ValueFrom.FileKeyRef != nil {
+					if a.ValueFrom.FileKeyRef.Optional == nil {
+						var ptrVar1 bool = false
+						a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+					}
+				}
 			}
 		}
 	}
@@ -45,6 +51,12 @@ func SetObjectDefaults_DeploymentConfig(in *appsv1.DeploymentConfig) {
 						if a.ValueFrom.FieldRef != nil {
 							apiscorev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 						}
+						if a.ValueFrom.FileKeyRef != nil {
+							if a.ValueFrom.FileKeyRef.Optional == nil {
+								var ptrVar1 bool = false
+								a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+							}
+						}
 					}
 				}
 			}
@@ -57,6 +69,12 @@ func SetObjectDefaults_DeploymentConfig(in *appsv1.DeploymentConfig) {
 						if a.ValueFrom.FieldRef != nil {
 							apiscorev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 						}
+						if a.ValueFrom.FileKeyRef != nil {
+							if a.ValueFrom.FileKeyRef.Optional == nil {
+								var ptrVar1 bool = false
+								a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+							}
+						}
 					}
 				}
 			}
@@ -68,6 +86,12 @@ func SetObjectDefaults_DeploymentConfig(in *appsv1.DeploymentConfig) {
 					if a.ValueFrom != nil {
 						if a.ValueFrom.FieldRef != nil {
 							apiscorev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
+						}
+						if a.ValueFrom.FileKeyRef != nil {
+							if a.ValueFrom.FileKeyRef.Optional == nil {
+								var ptrVar1 bool = false
+								a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+							}
 						}
 					}
 				}
@@ -84,6 +108,12 @@ func SetObjectDefaults_DeploymentConfig(in *appsv1.DeploymentConfig) {
 						if a.ValueFrom.FieldRef != nil {
 							apiscorev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
 						}
+						if a.ValueFrom.FileKeyRef != nil {
+							if a.ValueFrom.FileKeyRef.Optional == nil {
+								var ptrVar1 bool = false
+								a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+							}
+						}
 					}
 				}
 			}
@@ -95,6 +125,12 @@ func SetObjectDefaults_DeploymentConfig(in *appsv1.DeploymentConfig) {
 					if a.ValueFrom != nil {
 						if a.ValueFrom.FieldRef != nil {
 							apiscorev1.SetDefaults_ObjectFieldSelector(a.ValueFrom.FieldRef)
+						}
+						if a.ValueFrom.FileKeyRef != nil {
+							if a.ValueFrom.FileKeyRef.Optional == nil {
+								var ptrVar1 bool = false
+								a.ValueFrom.FileKeyRef.Optional = &ptrVar1
+							}
 						}
 					}
 				}
@@ -208,6 +244,12 @@ func SetObjectDefaults_DeploymentConfig(in *appsv1.DeploymentConfig) {
 					if b.ValueFrom.FieldRef != nil {
 						apiscorev1.SetDefaults_ObjectFieldSelector(b.ValueFrom.FieldRef)
 					}
+					if b.ValueFrom.FileKeyRef != nil {
+						if b.ValueFrom.FileKeyRef.Optional == nil {
+							var ptrVar1 bool = false
+							b.ValueFrom.FileKeyRef.Optional = &ptrVar1
+						}
+					}
 				}
 			}
 			apiscorev1.SetDefaults_ResourceList(&a.Resources.Limits)
@@ -276,6 +318,12 @@ func SetObjectDefaults_DeploymentConfig(in *appsv1.DeploymentConfig) {
 					if b.ValueFrom.FieldRef != nil {
 						apiscorev1.SetDefaults_ObjectFieldSelector(b.ValueFrom.FieldRef)
 					}
+					if b.ValueFrom.FileKeyRef != nil {
+						if b.ValueFrom.FileKeyRef.Optional == nil {
+							var ptrVar1 bool = false
+							b.ValueFrom.FileKeyRef.Optional = &ptrVar1
+						}
+					}
 				}
 			}
 			apiscorev1.SetDefaults_ResourceList(&a.Resources.Limits)
@@ -343,6 +391,12 @@ func SetObjectDefaults_DeploymentConfig(in *appsv1.DeploymentConfig) {
 				if b.ValueFrom != nil {
 					if b.ValueFrom.FieldRef != nil {
 						apiscorev1.SetDefaults_ObjectFieldSelector(b.ValueFrom.FieldRef)
+					}
+					if b.ValueFrom.FileKeyRef != nil {
+						if b.ValueFrom.FileKeyRef.Optional == nil {
+							var ptrVar1 bool = false
+							b.ValueFrom.FileKeyRef.Optional = &ptrVar1
+						}
 					}
 				}
 			}

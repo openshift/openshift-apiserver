@@ -164,7 +164,7 @@ func TestLegacyStrategy_PrepareForCreate(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			LegacyStrategy.PrepareForCreate(ctx, tc.obj)
 			if !reflect.DeepEqual(tc.obj, tc.expected) {
-				t.Fatalf("LegacyStrategy.PrepareForCreate failed:%s", diff.ObjectReflectDiff(tc.obj, tc.expected))
+				t.Fatalf("LegacyStrategy.PrepareForCreate failed:%s", diff.Diff(tc.obj, tc.expected))
 			}
 
 			errs := LegacyStrategy.Validate(ctx, tc.obj)
@@ -205,7 +205,7 @@ func TestGroupStrategy_PrepareForCreate(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			GroupStrategy.PrepareForCreate(ctx, tc.obj)
 			if !reflect.DeepEqual(tc.obj, tc.expected) {
-				t.Fatalf("GroupStrategy.PrepareForCreate failed:%s", diff.ObjectReflectDiff(tc.obj, tc.expected))
+				t.Fatalf("GroupStrategy.PrepareForCreate failed:%s", diff.Diff(tc.obj, tc.expected))
 			}
 
 			errs := GroupStrategy.Validate(ctx, tc.obj)

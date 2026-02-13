@@ -106,7 +106,7 @@ func testObjects(t *testing.T, list *corev1.List, fixtureFilename string) {
 				t.Logf("Could not update data in %s: %v", filename, err)
 			}
 		} else {
-			t.Logf("Diff between bootstrap data and fixture data in %s:\n-------------\n%s", filename, diff.StringDiff(string(yamlData), string(expectedYAML)))
+			t.Logf("Diff between bootstrap data and fixture data in %s:\n-------------\n%s", filename, diff.Diff(string(yamlData), string(expectedYAML)))
 			t.Logf("If the change is expected, re-run with %s=true to update the fixtures", updateEnvVar)
 		}
 	}

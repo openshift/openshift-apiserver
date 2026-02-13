@@ -225,7 +225,7 @@ func TestImageWithMetadata(t *testing.T) {
 				return
 			}
 			if e, a := test.expectedImage, imageWithMetadata; !kapihelper.Semantic.DeepEqual(e, a) {
-				t.Errorf("image: %s", diff.ObjectDiff(e, a))
+				t.Errorf("image: %s", diff.Diff(e, a))
 			}
 		})
 	}

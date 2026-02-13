@@ -102,7 +102,7 @@ func testVerifySignatures(t *testing.T, orig, new *imageapi.Image) {
 			switch typeOfT.Field(j).Name {
 			case "Content", "Type", "TypeMeta", "ObjectMeta":
 				if !reflect.DeepEqual(iField.Interface(), fField.Interface()) {
-					t.Errorf("%s field should not differ: %s", typeOfT.Field(j).Name, diff.ObjectGoPrintDiff(iField.Interface(), fField.Interface()))
+					t.Errorf("%s field should not differ: %s", typeOfT.Field(j).Name, diff.Diff(iField.Interface(), fField.Interface()))
 				}
 			}
 		}
@@ -165,7 +165,7 @@ func TestStrategyPrepareForCreateSignature(t *testing.T) {
 			testVerifySignatures(t, fuzzed, image)
 
 			if !reflect.DeepEqual(image.Signatures[0].Annotations, tc.expected) {
-				t.Errorf("unexpected signature annotations: %s", diff.ObjectGoPrintDiff(image.Annotations, tc.expected))
+				t.Errorf("unexpected signature annotations: %s", diff.Diff(image.Annotations, tc.expected))
 			}
 		})
 	}
