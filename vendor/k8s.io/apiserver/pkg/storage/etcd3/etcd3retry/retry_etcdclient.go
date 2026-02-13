@@ -25,6 +25,11 @@ var DefaultRetry = wait.Backoff{
 	Steps:    6, // .3 + .6 + 1.2 + 2.4 + 4.8 = 10ish  this lets us smooth out short bumps but not long ones and keeps retry behavior closer.
 }
 
+// Closable is an interface for storage implementations that support cleanup via Close.
+type Closable interface {
+	Close()
+}
+
 type retryClient struct {
 	// All methods of storage.Interface are implemented directly on *retryClient, even when they
 	// are purely passthroughs to the delegate. During a rebase, consider whether or not it is
@@ -33,12 +38,33 @@ type retryClient struct {
 	delegate storage.Interface
 }
 
-func (c *retryClient) Count(key string) (int64, error) {
-	return c.delegate.Count(key)
-}
-
 func (c *retryClient) ReadinessCheck() error {
 	return c.delegate.ReadinessCheck()
+}
+
+// SetKeysFunc is not expected to be retried as it setting
+// the keys function always succeeds.
+func (c *retryClient) SetKeysFunc(f storage.KeysFunc) {
+	c.delegate.SetKeysFunc(f)
+}
+
+// CompactRevision() is not expected to be retried as it only reads
+// the current revision from the compactor.
+func (c *retryClient) CompactRevision() int64 {
+	return c.delegate.CompactRevision()
+}
+
+// Each invocation of Stats may produce different results. Thus,
+// it's important to retry in case of an error to get the latest
+// results.
+func (c *retryClient) Stats(ctx context.Context) (storage.Stats, error) {
+	var stats storage.Stats
+	err := OnError(ctx, DefaultRetry, IsRetriableErrorOnRead, func() error {
+		var innerErr error
+		stats, innerErr = c.delegate.Stats(ctx)
+		return innerErr
+	})
+	return stats, err
 }
 
 func (c *retryClient) RequestWatchProgress(ctx context.Context) error {
@@ -49,8 +75,16 @@ func (c *retryClient) Versioner() storage.Versioner {
 	return c.delegate.Versioner()
 }
 
+// Close closes the underlying storage if it supports Close.
+// This method is not part of storage.Interface but is called by the factory destroy function.
+func (c *retryClient) Close() {
+	if closer, ok := c.delegate.(Closable); ok {
+		closer.Close()
+	}
+}
+
 // New returns an etcd3 implementation of storage.Interface.
-func NewRetryingEtcdStorage(delegate storage.Interface) storage.Interface {
+func NewRetryingEtcdStorage(delegate storage.Interface) *retryClient {
 	return &retryClient{delegate: delegate}
 }
 
