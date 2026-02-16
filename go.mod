@@ -194,7 +194,7 @@ replace (
 	k8s.io/api => k8s.io/api v0.34.1
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.34.1
 	k8s.io/apimachinery => k8s.io/apimachinery v0.34.1
-	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20260211130612-1431f3222f03 // points to openshift-apiserver-4.21-kubernetes-1.34.1
+	k8s.io/apiserver => github.com/atiratree/kubernetes-apiserver v0.0.0-20260216112724-0071d2af5078 // [WIP] test
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.34.1
 	k8s.io/client-go => k8s.io/client-go v0.34.1
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.34.1
@@ -220,3 +220,5 @@ replace (
 	k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.34.1
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.34.1
 )
+
+replace github.com/openshift/api => github.com/atiratree/api v0.0.0-20260209204953-22c911d1eab1
