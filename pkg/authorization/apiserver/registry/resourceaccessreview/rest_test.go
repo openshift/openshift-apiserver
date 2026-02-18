@@ -141,7 +141,7 @@ func (r *resourceAccessTest) runTest(t *testing.T) {
 	switch obj.(type) {
 	case *authorizationapi.ResourceAccessReviewResponse:
 		if !reflect.DeepEqual(expectedResponse, obj) {
-			t.Errorf("diff %v", diff.ObjectGoPrintDiff(expectedResponse, obj))
+			t.Errorf("diff %v", diff.Diff(expectedResponse, obj))
 		}
 	case nil:
 		if len(r.authorizer.err) == 0 {
@@ -152,6 +152,6 @@ func (r *resourceAccessTest) runTest(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(expectedAttributes, r.authorizer.actualAttributes) {
-		t.Errorf("diff %v", diff.ObjectGoPrintDiff(expectedAttributes, r.authorizer.actualAttributes))
+		t.Errorf("diff %v", diff.Diff(expectedAttributes, r.authorizer.actualAttributes))
 	}
 }

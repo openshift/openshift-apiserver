@@ -327,7 +327,7 @@ func TestWhitelistRegistry(t *testing.T) {
 	}
 	exp := fmt.Errorf(`registry "sub.foo.com" not allowed by whitelist: "foo.com:443", "foo.com:80"`)
 	if err := rw.AdmitHostname(ctx, "sub.foo.com", WhitelistTransportAny); err == nil || err.Error() != exp.Error() {
-		t.Fatalf("got unexpected error: %s", diff.ObjectGoPrintDiff(err, exp))
+		t.Fatalf("got unexpected error: %s", diff.Diff(err, exp))
 	}
 
 	rw = rwClean.Copy()
@@ -336,7 +336,7 @@ func TestWhitelistRegistry(t *testing.T) {
 	}
 	exp = fmt.Errorf(`registry "sub.foo.com" not allowed by whitelist: "foo.com:80"`)
 	if err := rw.AdmitHostname(ctx, "sub.foo.com", WhitelistTransportAny); err == nil || err.Error() != exp.Error() {
-		t.Fatalf("got unexpected error: %s", diff.ObjectGoPrintDiff(err, exp))
+		t.Fatalf("got unexpected error: %s", diff.Diff(err, exp))
 	}
 	// add duplicate
 	if err := rw.WhitelistRegistry("foo.com", WhitelistTransportInsecure); err != nil {
@@ -344,7 +344,7 @@ func TestWhitelistRegistry(t *testing.T) {
 	}
 	exp = fmt.Errorf(`registry "sub.foo.com" not allowed by whitelist: "foo.com:80"`)
 	if err := rw.AdmitHostname(ctx, "sub.foo.com", WhitelistTransportAny); err == nil || err.Error() != exp.Error() {
-		t.Fatalf("got unexpected error: %s", diff.ObjectGoPrintDiff(err, exp))
+		t.Fatalf("got unexpected error: %s", diff.Diff(err, exp))
 	}
 	// add duplicate with different port
 	if err := rw.WhitelistRegistry("foo.com", WhitelistTransportAny); err != nil {
@@ -352,7 +352,7 @@ func TestWhitelistRegistry(t *testing.T) {
 	}
 	exp = fmt.Errorf(`registry "sub.foo.com" not allowed by whitelist: "foo.com:443", "foo.com:80"`)
 	if err := rw.AdmitHostname(ctx, "sub.foo.com", WhitelistTransportAny); err == nil || err.Error() != exp.Error() {
-		t.Fatalf("got unexpected error: %s", diff.ObjectGoPrintDiff(err, exp))
+		t.Fatalf("got unexpected error: %s", diff.Diff(err, exp))
 	}
 }
 
@@ -388,7 +388,7 @@ func assertExpectedError(t *testing.T, a, e error) {
 	case a != nil && e == nil:
 		t.Errorf("got unexpected error: %q", a)
 	case a != nil && e != nil && a.Error() != e.Error():
-		t.Errorf("got unexpected error: %s", diff.ObjectGoPrintDiff(a, e))
+		t.Errorf("got unexpected error: %s", diff.Diff(a, e))
 	}
 }
 

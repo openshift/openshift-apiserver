@@ -404,7 +404,7 @@ func TestGetImageTag(t *testing.T) {
 			}
 
 			if !reflect.DeepEqual(testCase.tag, obj) {
-				t.Errorf("%s", diff.ObjectReflectDiff(testCase.tag, obj))
+				t.Errorf("%s", diff.Diff(testCase.tag, obj))
 			}
 		})
 	}
@@ -750,7 +750,7 @@ func TestListImageTag(t *testing.T) {
 
 			tags := obj.(*imageapi.ImageTagList).Items
 			if !reflect.DeepEqual(testCase.tags, tags) {
-				t.Errorf("%s", diff.ObjectReflectDiff(testCase.tags, tags))
+				t.Errorf("%s", diff.Diff(testCase.tags, tags))
 			}
 		})
 	}
@@ -1166,7 +1166,7 @@ func TestCreateImageTag(t *testing.T) {
 				tc.expectTag.ResourceVersion = tag.ResourceVersion
 			}
 			if !reflect.DeepEqual(tc.expectTag, tag) {
-				t.Fatalf("%s", diff.ObjectReflectDiff(tc.expectTag, tag))
+				t.Fatalf("%s", diff.Diff(tc.expectTag, tag))
 			}
 		})
 	}
@@ -1601,7 +1601,7 @@ func TestUpdateImageTag(t *testing.T) {
 				tc.expectTag.ResourceVersion = tag.ResourceVersion
 			}
 			if !reflect.DeepEqual(tc.expectTag, tag) {
-				t.Fatalf("%s", diff.ObjectReflectDiff(tc.expectTag, tag))
+				t.Fatalf("%s", diff.Diff(tc.expectTag, tag))
 			}
 		})
 	}

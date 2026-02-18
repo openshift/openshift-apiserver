@@ -417,7 +417,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 			obj, err = original, nil
 		} else {
 			if klog.V(4).Enabled() {
-				klog.V(4).Infof("updating stream %s", diff.ObjectDiff(original, stream))
+				klog.V(4).Infof("updating stream %s", diff.Diff(original, stream))
 			}
 			stream.Annotations[imagev1.DockerImageRepositoryCheckAnnotation] = now.UTC().Format(time.RFC3339)
 			obj, _, err = r.internalStreams.Update(ctx, stream.Name, rest.DefaultUpdatedObjectInfo(stream), rest.ValidateAllObjectFunc, rest.ValidateAllObjectUpdateFunc, false, &metav1.UpdateOptions{})

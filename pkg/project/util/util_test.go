@@ -42,7 +42,7 @@ func TestProjectFidelity(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(p, p2) {
-			t.Errorf("project data not preserved; the diff is %s", diff.ObjectReflectDiff(p, p2))
+			t.Errorf("project data not preserved; the diff is %s", diff.Diff(p, p2))
 		}
 	}
 }
@@ -72,7 +72,7 @@ func TestNamespaceFidelity(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(n, n2) {
-			t.Errorf("namespace data not preserved; the diff is %s", diff.ObjectReflectDiff(n, n2))
+			t.Errorf("namespace data not preserved; the diff is %s", diff.Diff(n, n2))
 		}
 	}
 }

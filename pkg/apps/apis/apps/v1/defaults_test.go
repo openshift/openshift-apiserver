@@ -553,7 +553,7 @@ func TestDefaults(t *testing.T) {
 			}
 			// TODO(rebase): check that there are no fields which have different semantics for nil and []
 			if !equality.Semantic.DeepEqual(got.Spec, expected.Spec) {
-				t.Errorf("got different than expected:\nA:\t%#v\nB:\t%#v\n\nDiff:\n%s\n\n%s", got, expected, diff.ObjectDiff(expected, got), diff.ObjectGoPrintSideBySide(expected, got))
+				t.Errorf("got different than expected:\nA:\t%#v\nB:\t%#v\n\nDiff:\n%s\n\n%s", got, expected, diff.Diff(expected, got), diff.ObjectGoPrintSideBySide(expected, got))
 			}
 		})
 	}

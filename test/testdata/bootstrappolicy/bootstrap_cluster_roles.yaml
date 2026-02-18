@@ -5,7 +5,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: sudoer
   rules:
   - apiGroups:
@@ -33,7 +32,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:scope-impersonation
   rules:
   - apiGroups:
@@ -53,7 +51,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: cluster-reader
   rules: null
 - apiVersion: rbac.authorization.k8s.io/v1
@@ -61,7 +58,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-cluster-reader: "true"
     name: system:openshift:aggregate-to-cluster-reader
@@ -407,7 +403,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: cluster-debugger
   rules:
   - nonResourceURLs:
@@ -421,7 +416,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:build-strategy-docker
   rules:
   - apiGroups:
@@ -437,7 +431,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:build-strategy-custom
   rules:
   - apiGroups:
@@ -452,7 +445,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:build-strategy-source
   rules:
   - apiGroups:
@@ -467,7 +459,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:build-strategy-jenkinspipeline
   rules:
   - apiGroups:
@@ -486,7 +477,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: storage-admin
   rules: null
 - apiVersion: rbac.authorization.k8s.io/v1
@@ -494,7 +484,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     labels:
       storage.openshift.io/aggregate-to-storage-admin: "true"
     name: system:openshift:aggregate-to-storage-admin
@@ -547,7 +536,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-admin: "true"
     name: system:openshift:aggregate-to-admin
@@ -841,7 +829,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-edit: "true"
     name: system:openshift:aggregate-to-edit
@@ -1074,7 +1061,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-view: "true"
     name: system:openshift:aggregate-to-view
@@ -1220,7 +1206,6 @@ items:
     annotations:
       openshift.io/description: A user that can get basic information about projects.
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: basic-user
   rules: null
 - apiVersion: rbac.authorization.k8s.io/v1
@@ -1228,7 +1213,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     labels:
       authorization.openshift.io/aggregate-to-basic-user: "true"
     name: system:openshift:aggregate-to-basic-user
@@ -1298,7 +1282,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: self-access-reviewer
   rules:
   - apiGroups:
@@ -1320,7 +1303,6 @@ items:
     annotations:
       openshift.io/description: A user that can request projects.
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: self-provisioner
   rules:
   - apiGroups:
@@ -1336,7 +1318,6 @@ items:
     annotations:
       openshift.io/description: A user that can get basic cluster status information.
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: cluster-status
   rules:
   - nonResourceURLs:
@@ -1370,7 +1351,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:image-auditor
   rules:
   - apiGroups:
@@ -1390,7 +1370,6 @@ items:
     annotations:
       openshift.io/description: Grants the right to pull images from within a project.
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:image-puller
   rules:
   - apiGroups:
@@ -1407,7 +1386,6 @@ items:
       openshift.io/description: Grants the right to push and pull images from within
         a project.
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:image-pusher
   rules:
   - apiGroups:
@@ -1425,7 +1403,6 @@ items:
       openshift.io/description: Grants the right to build, push and pull images from
         within a project.  Used primarily with service accounts for builds.
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-admin: "true"
       rbac.authorization.k8s.io/aggregate-to-edit: "true"
@@ -1465,7 +1442,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:image-signer
   rules:
   - apiGroups:
@@ -1489,7 +1465,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:master
   rules:
   - apiGroups:
@@ -1507,7 +1482,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:oauth-token-deleter
   rules:
   - apiGroups:
@@ -1523,7 +1497,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:router
   rules:
   - apiGroups:
@@ -1579,7 +1552,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:node-admin
   rules:
   - apiGroups:
@@ -1611,7 +1583,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:node-reader
   rules:
   - apiGroups:
@@ -1641,7 +1612,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:sdn-reader
   rules:
   - apiGroups:
@@ -1692,7 +1662,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:sdn-manager
   rules:
   - apiGroups:
@@ -1728,7 +1697,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:webhook
   rules:
   - apiGroups:
@@ -1744,7 +1712,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:discovery
   rules:
   - nonResourceURLs:
@@ -1773,7 +1740,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-admin: "true"
     name: registry-admin
@@ -1897,7 +1863,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-edit: "true"
     name: registry-editor
@@ -1968,7 +1933,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-view: "true"
     name: registry-viewer
@@ -2011,7 +1975,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:templateservicebroker-client
   rules:
   - nonResourceURLs:
@@ -2026,7 +1989,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:build-controller
   rules:
   - apiGroups:
@@ -2138,7 +2100,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:build-config-change-controller
   rules:
   - apiGroups:
@@ -2177,7 +2138,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:deployer-controller
   rules:
   - apiGroups:
@@ -2226,7 +2186,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:deploymentconfig-controller
   rules:
   - apiGroups:
@@ -2284,7 +2243,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:template-instance-controller
   rules:
   - apiGroups:
@@ -2304,7 +2262,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:template-instance-finalizer-controller
   rules:
   - apiGroups:
@@ -2318,7 +2275,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:origin-namespace-controller
   rules:
   - apiGroups:
@@ -2349,7 +2305,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:serviceaccount-controller
   rules:
   - apiGroups:
@@ -2377,7 +2332,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:serviceaccount-pull-secrets-controller
   rules:
   - apiGroups:
@@ -2430,7 +2384,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:image-trigger-controller
   rules:
   - apiGroups:
@@ -2509,7 +2462,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:image-import-controller
   rules:
   - apiGroups:
@@ -2556,7 +2508,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:cluster-quota-reconciliation-controller
   rules:
   - apiGroups:
@@ -2593,7 +2544,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:unidling-controller
   rules:
   - apiGroups:
@@ -2659,7 +2609,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:service-ingress-ip-controller
   rules:
   - apiGroups:
@@ -2689,7 +2638,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:pv-recycler-controller
   rules:
   - apiGroups:
@@ -2747,7 +2695,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:resourcequota-controller
   rules:
   - apiGroups:
@@ -2799,7 +2746,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:horizontal-pod-autoscaler
   rules:
   - apiGroups:
@@ -2815,7 +2761,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:template-service-broker
   rules:
   - apiGroups:
@@ -2902,7 +2847,6 @@ items:
   metadata:
     annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
-    creationTimestamp: null
     name: system:openshift:controller:default-rolebindings-controller
   rules:
   - apiGroups:

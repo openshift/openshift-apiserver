@@ -294,7 +294,7 @@ func (r *subjectAccessTest) runTest(t *testing.T) {
 	switch obj.(type) {
 	case *authorizationapi.SubjectAccessReviewResponse:
 		if !reflect.DeepEqual(expectedResponse, obj) {
-			t.Errorf("diff %v", diff.ObjectGoPrintDiff(expectedResponse, obj))
+			t.Errorf("diff %v", diff.Diff(expectedResponse, obj))
 		}
 
 	default:
@@ -303,6 +303,6 @@ func (r *subjectAccessTest) runTest(t *testing.T) {
 
 	expectedAttributes := util.ToDefaultAuthorizationAttributes(r.expectedUserInfo, r.reviewRequest.Action.Namespace, r.reviewRequest.Action)
 	if !reflect.DeepEqual(expectedAttributes, r.authorizer.actualAttributes) {
-		t.Errorf("diff %v", diff.ObjectGoPrintDiff(expectedAttributes, r.authorizer.actualAttributes))
+		t.Errorf("diff %v", diff.Diff(expectedAttributes, r.authorizer.actualAttributes))
 	}
 }

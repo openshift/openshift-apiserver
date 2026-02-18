@@ -353,7 +353,7 @@ func TestGet(t *testing.T) {
 			gotAnnotations := imageStreamImage.ObjectMeta.Annotations
 			if !equality.Semantic.DeepEqual(expectedAnnotations, gotAnnotations) {
 				t.Error("Expected image stream annotations to match image stream image's")
-				t.Log(diff.ObjectGoPrintDiff(expectedAnnotations, gotAnnotations))
+				t.Log(diff.Diff(expectedAnnotations, gotAnnotations))
 			}
 
 			expectedID := test.expectedImageMetadataID

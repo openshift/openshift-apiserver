@@ -52,7 +52,7 @@ func TestOpenAPIRoundtrip(t *testing.T) {
 			delete(value.Schema.Extensions, common.ExtensionV2Schema)
 
 			if !reflect.DeepEqual(value.Schema, roundTripped) {
-				t.Errorf("unexpected diff (a=expected,b=roundtripped):\n%s", diff.ObjectReflectDiff(value.Schema, roundTripped))
+				t.Errorf("unexpected diff (a=expected,b=roundtripped):\n%s", diff.Diff(value.Schema, roundTripped))
 				return
 			}
 		})

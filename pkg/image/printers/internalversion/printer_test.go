@@ -224,7 +224,7 @@ func TestImageTag(t *testing.T) {
 		{Cells: []interface{}{"foo:14", "Track", "image/sha256:0000000002", int(1), "2 days ago"}},
 	}
 	if !reflect.DeepEqual(expected, table.Rows) {
-		t.Fatalf("%s", diff.ObjectReflectDiff(expected, table.Rows))
+		t.Fatalf("%s", diff.Diff(expected, table.Rows))
 	}
 }
 
