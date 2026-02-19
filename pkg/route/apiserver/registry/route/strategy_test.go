@@ -17,6 +17,7 @@ import (
 	routev1 "github.com/openshift/api/route/v1"
 	"github.com/openshift/library-go/pkg/route"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
+	routev1conversion "github.com/openshift/openshift-apiserver/pkg/route/apis/route/v1"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
@@ -1110,5 +1111,156 @@ func TestExternalCertRemoval(t *testing.T) {
 		if freshRoute.Spec.TLS.ExternalCertificate == nil {
 			t.Errorf("should have external cert")
 		}
+	}
+}
+
+func TestValidateRoute(t *testing.T) {
+	ctx := apirequest.NewContext()
+	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, &testSecretGetter{}, true)
+
+	tests := []struct {
+		name           string
+		path           string
+		expectedErrors int
+	}{
+		{
+			name:           "spec.path should not contain hash symbol in the spec.path",
+			path:           "/new-path#",
+			expectedErrors: 1,
+		},
+		{
+			name:           "spec.path should not contain whitespace in the spec.path",
+			path:           "/new path",
+			expectedErrors: 1,
+		},
+		{
+			name:           "spec.path should not contain whitespace or # in the spec.path",
+			path:           "/invalid-path # ",
+			expectedErrors: 1,
+		},
+		{
+			name:           "spec.path is valid",
+			path:           "/valid-path",
+			expectedErrors: 0,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// Create a route with the specified path
+			route := &routev1.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test-route",
+					Namespace: "foo",
+				},
+				Spec: routev1.RouteSpec{
+					Path: tc.path,
+					To: routev1.RouteTargetReference{
+						Name: "serviceName",
+						Kind: "Service",
+					},
+				},
+			}
+
+			// Convert to internal API type
+			var routeInternal routeapi.Route
+			if err := routev1conversion.Convert_v1_Route_To_route_Route(route, &routeInternal, nil); err != nil {
+				t.Fatalf("failed to convert route: %v", err)
+			}
+
+			// Validate the route creation
+			errs := strategy.Validate(ctx, &routeInternal)
+
+			// Check if the number of errors matches expectations
+			if len(errs) != tc.expectedErrors {
+				t.Errorf("expected %d errors, but got %d: %v", tc.expectedErrors, len(errs), errs)
+			}
+		})
+	}
+}
+
+func TestValidateRouteUpdate(t *testing.T) {
+	ctx := apirequest.NewContext()
+	strategy := NewStrategy(testAllocator{}, &testSAR{allow: true}, &testSecretGetter{}, true)
+
+	tests := []struct {
+		name           string
+		route          *routev1.Route
+		change         func(*routev1.Route)
+		expectedErrors int
+	}{
+		{
+			name: "Reject update to spec.path containing #",
+			route: &routev1.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:            "valid-route",
+					Namespace:       "foo",
+					ResourceVersion: "1",
+				},
+				Spec: routev1.RouteSpec{
+					Path: "/valid-path", // Initial valid path
+					To: routev1.RouteTargetReference{
+						Name: "serviceName",
+						Kind: "Service",
+					},
+				},
+			},
+			change: func(route *routev1.Route) {
+				route.Spec.Path = "/path#invalid" // Introduce #
+			},
+			expectedErrors: 1,
+		},
+		{
+			name: "Reject update to spec.path containing whitespace",
+			route: &routev1.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:            "valid-route",
+					Namespace:       "foo",
+					ResourceVersion: "1",
+				},
+				Spec: routev1.RouteSpec{
+					Path: "/valid-path",
+					To: routev1.RouteTargetReference{
+						Name: "serviceName",
+						Kind: "Service",
+					},
+				},
+			},
+			change: func(route *routev1.Route) {
+				route.Spec.Path = "/invalid path" // Introduce whitespace
+			},
+			expectedErrors: 1,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// Create a copy of the original route to use as oldRoute
+			oldRoute := tc.route.DeepCopy()
+
+			// Convert to internal API type
+			var oldRouteInternal routeapi.Route
+			if err := routev1conversion.Convert_v1_Route_To_route_Route(oldRoute, &oldRouteInternal, nil); err != nil {
+				t.Fatalf("failed to convert old route: %v", err)
+			}
+
+			// Apply the change function to create the new route
+			newRoute := tc.route.DeepCopy()
+			tc.change(newRoute)
+
+			// Convert new route to internal API type
+			var newRouteInternal routeapi.Route
+			if err := routev1conversion.Convert_v1_Route_To_route_Route(newRoute, &newRouteInternal, nil); err != nil {
+				t.Fatalf("failed to convert new route: %v", err)
+			}
+
+			// Validate the update
+			errs := strategy.ValidateUpdate(ctx, &newRouteInternal, &oldRouteInternal)
+
+			// Check if the number of errors matches expectations
+			if len(errs) != tc.expectedErrors {
+				t.Errorf("expected %d errors, but got %d: %v", tc.expectedErrors, len(errs), errs)
+			}
+		})
 	}
 }
