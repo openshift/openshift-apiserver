@@ -19,7 +19,6 @@ package openapi
 import (
 	"bytes"
 	"fmt"
-	"reflect"
 	"sort"
 	"strings"
 	"unicode"
@@ -29,6 +28,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/klog/v2"
 	"k8s.io/kube-openapi/pkg/util"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
@@ -133,31 +133,28 @@ func gvkConvert(gvk schema.GroupVersionKind) v1.GroupVersionKind {
 	}
 }
 
-func typeName(t reflect.Type) string {
-	path := t.PkgPath()
-	if strings.Contains(path, "/vendor/") {
-		path = path[strings.Index(path, "/vendor/")+len("/vendor/"):]
-	}
-	return fmt.Sprintf("%s.%s", path, t.Name())
-}
-
 // NewDefinitionNamer constructs a new DefinitionNamer to be used to customize OpenAPI spec.
 func NewDefinitionNamer(schemes ...*runtime.Scheme) *DefinitionNamer {
 	ret := &DefinitionNamer{
 		typeGroupVersionKinds: map[string]groupVersionKinds{},
 	}
 	for _, s := range schemes {
-		for gvk, rtype := range s.AllKnownTypes() {
+		for gvk := range s.AllKnownTypes() {
 			newGVK := gvkConvert(gvk)
 			exists := false
-			for _, existingGVK := range ret.typeGroupVersionKinds[typeName(rtype)] {
+			name, err := s.ToOpenAPIDefinitionName(gvk)
+			if err != nil {
+				klog.Fatalf("failed to get OpenAPI definition name for %v: %v", gvk, err)
+				continue
+			}
+			for _, existingGVK := range ret.typeGroupVersionKinds[name] {
 				if newGVK == existingGVK {
 					exists = true
 					break
 				}
 			}
 			if !exists {
-				ret.typeGroupVersionKinds[typeName(rtype)] = append(ret.typeGroupVersionKinds[typeName(rtype)], newGVK)
+				ret.typeGroupVersionKinds[name] = append(ret.typeGroupVersionKinds[name], newGVK)
 			}
 		}
 	}
@@ -170,9 +167,20 @@ func NewDefinitionNamer(schemes ...*runtime.Scheme) *DefinitionNamer {
 // GetDefinitionName returns the name and tags for a given definition
 func (d *DefinitionNamer) GetDefinitionName(name string) (string, spec.Extensions) {
 	if groupVersionKinds, ok := d.typeGroupVersionKinds[name]; ok {
-		return util.ToRESTFriendlyName(name), spec.Extensions{
+		return name, spec.Extensions{
 			extensionGVK: groupVersionKinds.JSON(),
 		}
 	}
-	return util.ToRESTFriendlyName(name), nil
+	// In v1.35 d.typeGroupVersionKinds is constructured from REST-friendly types only.
+	// If not found, try converting to REST-friendly format to found a match.
+	// (e.g., "github.com/openshift/api/image/v1.ImageStreamImport" -> "com.github.openshift.api.image.v1.ImageStreamImport")
+	restFriendlyName := util.ToRESTFriendlyName(name)
+	if restFriendlyName != name {
+		if groupVersionKinds, ok := d.typeGroupVersionKinds[restFriendlyName]; ok {
+			return name, spec.Extensions{
+				extensionGVK: groupVersionKinds.JSON(),
+			}
+		}
+	}
+	return name, nil
 }
