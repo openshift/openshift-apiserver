@@ -40,6 +40,11 @@ type OpenShiftAPIServer struct {
 	Authorization  *genericapiserveroptions.DelegatingAuthorizationOptions
 }
 
+const (
+	// openShiftMajorVersion is the major version of OpenShift used for feature gate initialization
+	openShiftMajorVersion uint64 = 4
+)
+
 var longDescription = templates.LongDesc(`
 	Start an apiserver that contains the OpenShift resources`)
 
@@ -104,7 +109,7 @@ func (o *OpenShiftAPIServer) Validate() error {
 
 // RunAPIServer takes the options, starts the API server and waits until stopCh is closed or initial listening fails.
 func (o *OpenShiftAPIServer) RunAPIServer(stopCh <-chan struct{}) error {
-	if err := features.InitializeFeatureGates(feature.DefaultMutableFeatureGate, openshiftfeatures.SelfManaged); err != nil {
+	if err := features.InitializeFeatureGates(feature.DefaultMutableFeatureGate, openShiftMajorVersion, openshiftfeatures.SelfManaged); err != nil {
 		return err
 	}
 
