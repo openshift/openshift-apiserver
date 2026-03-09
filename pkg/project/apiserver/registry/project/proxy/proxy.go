@@ -113,7 +113,7 @@ func (s *REST) Watch(ctx context.Context, options *metainternal.ListOptions) (wa
 	// Reject WatchList requests: the custom userProjectWatcher doesn't support bookmark events.
 	// Client-go will automatically fall back to legacy LIST+WATCH behavior.
 	if options != nil && options.SendInitialEvents != nil && *options.SendInitialEvents {
-		return nil, fmt.Errorf("sendInitialEvents is not supported for project watches")
+		return nil, kerrors.NewBadRequest("the project resource does not support the sendInitialEvents parameter")
 	}
 
 	includeAllExistingProjects := (options != nil) && options.ResourceVersion == "0"
