@@ -176,7 +176,7 @@ require (
 	k8s.io/cli-runtime v0.35.1 // indirect
 	k8s.io/controller-manager v0.35.1 // indirect
 	k8s.io/cri-api v0.35.1 // indirect
-	k8s.io/cri-client v0.34.1 // indirect
+	k8s.io/cri-client v0.35.1 // indirect
 	k8s.io/dynamic-resource-allocation v0.35.1 // indirect
 	k8s.io/gengo/v2 v2.0.0-20250922181213-ec3ebc5fd46b // indirect
 	k8s.io/kms v0.35.2 // indirect

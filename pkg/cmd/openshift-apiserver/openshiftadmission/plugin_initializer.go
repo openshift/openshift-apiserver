@@ -14,6 +14,7 @@ import (
 	kexternalinformers "k8s.io/client-go/informers"
 	kubeclientgoclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/component-base/compatibility"
 	"k8s.io/component-base/featuregate"
 	aggregatorapiserver "k8s.io/kube-aggregator/pkg/apiserver"
 	controlplaneadmission "k8s.io/kubernetes/pkg/controlplane/apiserver/admission"
@@ -50,6 +51,7 @@ func NewPluginInitializer(
 	dynamicClient dynamic.Interface,
 	privilegedLoopbackConfig *rest.Config,
 	informers InformerAccess,
+	effectiveVersion compatibility.EffectiveVersion,
 	featureGates featuregate.FeatureGate,
 	restMapper meta.RESTMapper,
 	clusterQuotaMappingController *clusterquotamapping.ClusterQuotaMappingController,
@@ -64,7 +66,7 @@ func NewPluginInitializer(
 	}
 
 	// TODO make a union registry
-	quotaRegistry := generic.NewRegistry(install.NewQuotaConfigurationForAdmission().Evaluators())
+	quotaRegistry := generic.NewRegistry(install.NewQuotaConfigurationForAdmission(informers.GetKubernetesInformers()).Evaluators())
 	imageEvaluators := image.NewReplenishmentEvaluators(
 		nil, // for admission, we never have to list everything, so we can pass nil.
 		informers.GetOpenshiftImageInformers().Image().V1().ImageStreams(),
@@ -81,6 +83,7 @@ func NewPluginInitializer(
 		informers.GetKubernetesInformers(),
 		genericConfig.Authorization.Authorizer,
 		featureGates,
+		effectiveVersion,
 		genericConfig.DrainedNotify(),
 		restMapper,
 	)

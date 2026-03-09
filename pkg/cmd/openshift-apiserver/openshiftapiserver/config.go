@@ -190,7 +190,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	clusterQuotaMappingController := NewClusterQuotaMappingController(informers.kubernetesInformers.Core().V1().Namespaces(), informers.quotaInformers.Quota().V1().ClusterResourceQuotas())
 	discoveryClient := cacheddiscovery.NewMemCacheClient(kubeClient.Discovery())
 	restMapper := restmapper.NewDeferredDiscoveryRESTMapper(discoveryClient)
-	admissionInitializer, err := openshiftadmission.NewPluginInitializer(config, genericConfig, dynamicClient, kubeClientConfig, informers, feature.DefaultFeatureGate, restMapper, clusterQuotaMappingController)
+	admissionInitializer, err := openshiftadmission.NewPluginInitializer(config, genericConfig, dynamicClient, kubeClientConfig, informers, effectiveVersion, feature.DefaultFeatureGate, restMapper, clusterQuotaMappingController)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +214,7 @@ func NewOpenshiftAPIConfig(config *openshiftcontrolplanev1.OpenShiftAPIServerCon
 	}
 	admissionOptions.DisablePlugins = config.AdmissionConfig.DisabledAdmissionPlugins
 	admissionOptions.ConfigFile = admissionConfigFile
-	if err := admissionOptions.ApplyTo(&genericConfig.Config, kubeInformers, kubeClient, dynamicClient, feature.DefaultFeatureGate, admissionInitializer); err != nil {
+	if err := admissionOptions.ApplyTo(&genericConfig.Config, kubeInformers, kubeClient, dynamicClient, feature.DefaultFeatureGate, effectiveVersion, admissionInitializer); err != nil {
 		return nil, err
 	}
 

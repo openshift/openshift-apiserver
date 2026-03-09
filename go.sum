@@ -496,8 +496,8 @@ k8s.io/controller-manager v0.35.1 h1:AKMrGk8sCDa0WtLh+8yfcKck3r/AVw60FOmpak/4fB0
 k8s.io/controller-manager v0.35.1/go.mod h1:ifoFum/gxonT7duRuSrNQxU7bctlStGMXraZP5xbaso=
 k8s.io/cri-api v0.35.1 h1:3DuZiFFZ9hnNkSlnQHQktuUzjdT0b6BEcVs0wi1sAfY=
 k8s.io/cri-api v0.35.1/go.mod h1:Cnt29u/tYl1Se1cBRL30uSZ/oJ5TaIp4sZm1xDLvcMc=
-k8s.io/cri-client v0.34.1 h1:eq6FcEPDDL379w0WhPnItj2egsMZqOtU7nv1JaJmwP0=
-k8s.io/cri-client v0.34.1/go.mod h1:Dq6mKWV2ugO5tMv4xqVgcQ8vD7csP//e4KkzcFi2Pio=
+k8s.io/cri-client v0.35.1 h1:vGCely7r1ISWUDrbUUQD7As2QnRpYE3d7Uw625SCQ6Q=
+k8s.io/cri-client v0.35.1/go.mod h1:7t1v/JOCPLz1dpgW7KVujUvTUm4FoqnO03OkMx+NOBI=
 k8s.io/dynamic-resource-allocation v0.35.1 h1:mHQC28BFjGrCZMOnGLSv8BeXG4nBg0NQ8CpAYxbu9dk=
 k8s.io/dynamic-resource-allocation v0.35.1/go.mod h1:84qslMnScW6I3QYAHQQm2h3btRp7xsadlxNFY5OSztQ=
 k8s.io/gengo/v2 v2.0.0-20250922181213-ec3ebc5fd46b h1:gMplByicHV/TJBizHd9aVEsTYoJBnnUAT5MHlTkbjhQ=
