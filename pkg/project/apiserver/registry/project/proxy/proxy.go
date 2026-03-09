@@ -110,6 +110,12 @@ func (s *REST) Watch(ctx context.Context, options *metainternal.ListOptions) (wa
 		return nil, fmt.Errorf("no user")
 	}
 
+	// Reject WatchList requests: the custom userProjectWatcher doesn't support bookmark events.
+	// Client-go will automatically fall back to legacy LIST+WATCH behavior.
+	if options != nil && options.SendInitialEvents != nil && *options.SendInitialEvents {
+		return nil, fmt.Errorf("sendInitialEvents is not supported for project watches")
+	}
+
 	includeAllExistingProjects := (options != nil) && options.ResourceVersion == "0"
 
 	allowedNamespaces, err := scope.ScopesToVisibleNamespaces(userInfo.GetExtra()[authorizationapi.ScopesKey], s.authCache.GetClusterRoleLister(), true)
