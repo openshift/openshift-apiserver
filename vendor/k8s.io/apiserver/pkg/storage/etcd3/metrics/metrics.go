@@ -72,9 +72,10 @@ var (
 	)
 	objectCounts = compbasemetrics.NewGaugeVec(
 		&compbasemetrics.GaugeOpts{
-			Name:           "apiserver_storage_objects",
-			Help:           "[DEPRECATED, consider using apiserver_resource_objects instead] Number of stored objects at the time of last check split by kind. In case of a fetching error, the value will be -1.",
-			StabilityLevel: compbasemetrics.STABLE,
+			Name:              "apiserver_storage_objects",
+			Help:              "[DEPRECATED, consider using apiserver_resource_objects instead] Number of stored objects at the time of last check split by kind. In case of a fetching error, the value will be -1.",
+			StabilityLevel:    compbasemetrics.STABLE,
+			DeprecatedVersion: "1.34.0",
 		},
 		[]string{"resource"},
 	)
@@ -173,14 +174,6 @@ var (
 		},
 		[]string{"group", "resource"},
 	)
-	etcdRequestRetry = compbasemetrics.NewCounterVec(
-		&compbasemetrics.CounterOpts{
-			Name:           "etcd_request_retry_total",
-			Help:           "Etcd request retry total",
-			StabilityLevel: compbasemetrics.ALPHA,
-		},
-		[]string{"error"},
-	)
 )
 
 var registerMetrics sync.Once
@@ -205,7 +198,6 @@ func Register() {
 		legacyregistry.MustRegister(listStorageNumSelectorEvals)
 		legacyregistry.MustRegister(listStorageNumReturned)
 		legacyregistry.MustRegister(decodeErrorCounts)
-		legacyregistry.MustRegister(etcdRequestRetry)
 	})
 }
 
@@ -292,11 +284,6 @@ func UpdateLeaseObjectCount(count int64) {
 	// Currently we only store one previous lease, since all the events have the same ttl.
 	// See pkg/storage/etcd3/lease_manager.go
 	etcdLeaseObjectCounts.WithLabelValues().Observe(float64(count))
-}
-
-// UpdateEtcdRequestRetry sets the etcd_request_retry_total metric.
-func UpdateEtcdRequestRetry(errorCode string) {
-	etcdRequestRetry.WithLabelValues(errorCode).Inc()
 }
 
 // RecordListEtcd3Metrics notes various metrics of the cost to serve a LIST request

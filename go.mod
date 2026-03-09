@@ -1,6 +1,6 @@
 module github.com/openshift/openshift-apiserver
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
@@ -19,30 +19,30 @@ require (
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/openshift-eng/openshift-tests-extension v0.0.0-20251113163031-356b66aa5c24
-	github.com/openshift/api v0.0.0-20260105191300-d1c4dc4fd37b
-	github.com/openshift/apiserver-library-go v0.0.0-20251105084845-112ef95500de
+	github.com/openshift/api v0.0.0-20260306224518-0608f61fdd6b
+	github.com/openshift/apiserver-library-go v0.0.0-20260303173613-cd3676268d31
 	github.com/openshift/build-machinery-go v0.0.0-20251023084048-5d77c1a5e5af
-	github.com/openshift/client-go v0.0.0-20251205093018-96a6cbc1420c
-	github.com/openshift/library-go v0.0.0-20251205073205-ab8d51820e0b
+	github.com/openshift/client-go v0.0.0-20260306160707-3935d929fc7d
+	github.com/openshift/library-go v0.0.0-20260303171201-5d9eb6295ff6
 	github.com/openshift/runtime-utils v0.0.0-20230921210328-7bdb5b9c177b
-	github.com/spf13/cobra v1.9.1
-	github.com/spf13/pflag v1.0.6
-	go.etcd.io/etcd/client/v3 v3.6.4
-	k8s.io/api v0.34.1
-	k8s.io/apiextensions-apiserver v0.34.1
-	k8s.io/apimachinery v0.34.1
-	k8s.io/apiserver v0.34.1
-	k8s.io/client-go v0.34.1
-	k8s.io/cloud-provider v0.34.1
-	k8s.io/code-generator v0.34.1
-	k8s.io/component-base v0.34.1
-	k8s.io/component-helpers v0.34.1
+	github.com/spf13/cobra v1.10.0
+	github.com/spf13/pflag v1.0.9
+	go.etcd.io/etcd/client/v3 v3.6.5
+	k8s.io/api v0.35.2
+	k8s.io/apiextensions-apiserver v0.35.1
+	k8s.io/apimachinery v0.35.2
+	k8s.io/apiserver v0.35.1
+	k8s.io/client-go v0.35.2
+	k8s.io/cloud-provider v0.35.1
+	k8s.io/code-generator v0.35.1
+	k8s.io/component-base v0.35.2
+	k8s.io/component-helpers v0.35.1
 	k8s.io/klog/v2 v2.130.1
-	k8s.io/kube-aggregator v0.34.1
-	k8s.io/kube-openapi v0.0.0-20250710124328-f3f2b991d03b
-	k8s.io/kubectl v0.34.1
-	k8s.io/kubernetes v1.34.1
-	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397
+	k8s.io/kube-aggregator v0.35.1
+	k8s.io/kube-openapi v0.0.0-20250910181357-589584f1c912
+	k8s.io/kubectl v0.35.1
+	k8s.io/kubernetes v1.35.1
+	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
 	sigs.k8s.io/randfill v1.0.0
 )
 
@@ -74,7 +74,7 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
-	github.com/go-logr/logr v1.4.2 // indirect
+	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.21.1 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
@@ -113,75 +113,77 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
 	github.com/opencontainers/runc v1.2.1 // indirect
-	github.com/opencontainers/runtime-spec v1.2.0 // indirect
+	github.com/opencontainers/runtime-spec v1.2.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/profile v1.7.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/prometheus/client_golang v1.22.0 // indirect
-	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.62.0 // indirect
-	github.com/prometheus/procfs v0.15.1 // indirect
+	github.com/prometheus/client_golang v1.23.2 // indirect
+	github.com/prometheus/client_model v0.6.2 // indirect
+	github.com/prometheus/common v0.66.1 // indirect
+	github.com/prometheus/procfs v0.16.1 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/soheilhy/cmux v0.1.5 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
-	github.com/stretchr/testify v1.10.0 // indirect
+	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20220101234140-673ab2c3ae75 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xiang90/probing v0.0.0-20221125231312-a49e3df8f510 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
-	go.etcd.io/bbolt v1.4.2 // indirect
-	go.etcd.io/etcd/api/v3 v3.6.4 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.6.4 // indirect
-	go.etcd.io/etcd/pkg/v3 v3.6.4 // indirect
-	go.etcd.io/etcd/server/v3 v3.6.4 // indirect
+	go.etcd.io/bbolt v1.4.3 // indirect
+	go.etcd.io/etcd/api/v3 v3.6.5 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.6.5 // indirect
+	go.etcd.io/etcd/pkg/v3 v3.6.5 // indirect
+	go.etcd.io/etcd/server/v3 v3.6.5 // indirect
 	go.etcd.io/raft/v3 v3.6.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.60.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.58.0 // indirect
-	go.opentelemetry.io/otel v1.35.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.61.0 // indirect
+	go.opentelemetry.io/otel v1.36.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.34.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.34.0 // indirect
-	go.opentelemetry.io/otel/metric v1.35.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.34.0 // indirect
-	go.opentelemetry.io/otel/trace v1.35.0 // indirect
+	go.opentelemetry.io/otel/metric v1.36.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.36.0 // indirect
+	go.opentelemetry.io/otel/trace v1.36.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.5.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	go.yaml.in/yaml/v2 v2.4.2 // indirect
+	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.42.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
-	golang.org/x/mod v0.27.0 // indirect
-	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/oauth2 v0.28.0 // indirect
-	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/sys v0.36.0 // indirect
-	golang.org/x/term v0.35.0 // indirect
-	golang.org/x/text v0.29.0 // indirect
+	golang.org/x/mod v0.29.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/oauth2 v0.30.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/term v0.37.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
-	golang.org/x/tools v0.36.0 // indirect
-	golang.org/x/tools/go/expect v0.1.1-deprecated // indirect
+	golang.org/x/tools v0.38.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250519155744-55703ea1f237 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250519155744-55703ea1f237 // indirect
-	google.golang.org/grpc v1.72.1 // indirect
-	google.golang.org/protobuf v1.36.6 // indirect
-	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250528174236-200df99c418a // indirect
+	google.golang.org/grpc v1.72.2 // indirect
+	google.golang.org/protobuf v1.36.8 // indirect
+	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/cli-runtime v0.34.1 // indirect
-	k8s.io/controller-manager v0.34.1 // indirect
-	k8s.io/cri-api v0.34.1 // indirect
+	k8s.io/cli-runtime v0.35.1 // indirect
+	k8s.io/controller-manager v0.35.1 // indirect
+	k8s.io/cri-api v0.35.1 // indirect
 	k8s.io/cri-client v0.34.1 // indirect
-	k8s.io/gengo/v2 v2.0.0-20250604051438-85fd79dbfd9f // indirect
-	k8s.io/kms v0.34.1 // indirect
-	k8s.io/kubelet v0.34.1 // indirect
+	k8s.io/dynamic-resource-allocation v0.35.1 // indirect
+	k8s.io/gengo/v2 v2.0.0-20250922181213-ec3ebc5fd46b // indirect
+	k8s.io/kms v0.35.2 // indirect
+	k8s.io/kube-scheduler v0.0.0 // indirect
+	k8s.io/kubelet v0.35.1 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.2 // indirect
-	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
+	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 	sigs.k8s.io/kustomize/api v0.20.1 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.20.1 // indirect
 	sigs.k8s.io/structured-merge-diff/v6 v6.3.0 // indirect
@@ -191,32 +193,32 @@ require (
 replace (
 	github.com/distribution/distribution/v3 => github.com/openshift/docker-distribution/v3 v3.0.0-20240215131201-6b2f5d2f1f43
 	github.com/docker/docker => github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d
-	k8s.io/api => k8s.io/api v0.34.1
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.34.1
-	k8s.io/apimachinery => k8s.io/apimachinery v0.34.1
-	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20260211130612-1431f3222f03 // points to openshift-apiserver-4.21-kubernetes-1.34.1
-	k8s.io/cli-runtime => k8s.io/cli-runtime v0.34.1
-	k8s.io/client-go => k8s.io/client-go v0.34.1
-	k8s.io/cloud-provider => k8s.io/cloud-provider v0.34.1
-	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.34.1
-	k8s.io/code-generator => k8s.io/code-generator v0.34.1
-	k8s.io/component-base => k8s.io/component-base v0.34.1
-	k8s.io/component-helpers => k8s.io/component-helpers v0.34.1
-	k8s.io/controller-manager => k8s.io/controller-manager v0.34.1
-	k8s.io/cri-api => k8s.io/cri-api v0.34.1
-	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.34.1
-	k8s.io/dynamic-resource-allocation => k8s.io/dynamic-resource-allocation v0.34.1
-	k8s.io/endpointslice => k8s.io/endpointslice v0.34.1
-	k8s.io/kms => k8s.io/kms v0.34.1
-	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.34.1
-	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.34.1
-	k8s.io/kube-proxy => k8s.io/kube-proxy v0.34.1
-	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.34.1
-	k8s.io/kubectl => k8s.io/kubectl v0.34.1
-	k8s.io/kubelet => k8s.io/kubelet v0.34.1
-	k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.34.1
-	k8s.io/metrics => k8s.io/metrics v0.34.1
-	k8s.io/mount-utils => k8s.io/mount-utils v0.34.1
-	k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.34.1
-	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.34.1
+	k8s.io/api => k8s.io/api v0.35.1
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.35.1
+	k8s.io/apimachinery => k8s.io/apimachinery v0.35.1
+	k8s.io/apiserver => github.com/openshift/kubernetes-apiserver v0.0.0-20260227052614-9120debab75e // points to openshift-apiserver-4.22-kubernetes-1.35.2
+	k8s.io/cli-runtime => k8s.io/cli-runtime v0.35.1
+	k8s.io/client-go => k8s.io/client-go v0.35.1
+	k8s.io/cloud-provider => k8s.io/cloud-provider v0.35.1
+	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.35.1
+	k8s.io/code-generator => k8s.io/code-generator v0.35.1
+	k8s.io/component-base => k8s.io/component-base v0.35.1
+	k8s.io/component-helpers => k8s.io/component-helpers v0.35.1
+	k8s.io/controller-manager => k8s.io/controller-manager v0.35.1
+	k8s.io/cri-api => k8s.io/cri-api v0.35.1
+	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.35.1
+	k8s.io/dynamic-resource-allocation => k8s.io/dynamic-resource-allocation v0.35.1
+	k8s.io/endpointslice => k8s.io/endpointslice v0.35.1
+	k8s.io/kms => k8s.io/kms v0.35.1
+	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.35.1
+	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.35.1
+	k8s.io/kube-proxy => k8s.io/kube-proxy v0.35.1
+	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.35.1
+	k8s.io/kubectl => k8s.io/kubectl v0.35.1
+	k8s.io/kubelet => k8s.io/kubelet v0.35.1
+	k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.35.1
+	k8s.io/metrics => k8s.io/metrics v0.35.1
+	k8s.io/mount-utils => k8s.io/mount-utils v0.35.1
+	k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.35.1
+	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.35.1
 )
