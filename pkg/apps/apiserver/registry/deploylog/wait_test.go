@@ -2,6 +2,7 @@ package deploylog
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -21,10 +22,17 @@ func TestWaitForRunningDeploymentSuccess(t *testing.T) {
 	fakeController.Annotations = map[string]string{appsv1.DeploymentStatusAnnotation: string(appsv1.DeploymentStatusRunning)}
 
 	kubeclient := fake.NewSimpleClientset([]runtime.Object{fakeController}...)
-	fakeWatch := watch.NewFake()
-	kubeclient.PrependWatchReactor("replicationcontrollers", clientgotesting.DefaultWatchReactor(fakeWatch, nil))
-
-	go fakeWatch.Modify(fakeController)
+	// The fake client doesn't properly support bookmark events, so we reject SendInitialEvents to force fallback
+	kubeclient.PrependWatchReactor("replicationcontrollers", func(action clientgotesting.Action) (handled bool, ret watch.Interface, err error) {
+		watchAction := action.(clientgotesting.WatchActionImpl)
+		if watchAction.ListOptions.SendInitialEvents != nil && *watchAction.ListOptions.SendInitialEvents {
+			return true, nil, errors.New("sendInitialEvents is not supported in fake client")
+		}
+		// Fall back to default reactor for legacy watch
+		fakeWatch := watch.NewFake()
+		go fakeWatch.Modify(fakeController)
+		return clientgotesting.DefaultWatchReactor(fakeWatch, nil)(action)
+	})
 
 	rc, err := WaitForRunningDeployment(context.TODO(), kubeclient.CoreV1(), fakeController, 10*time.Second)
 	if err != nil {

@@ -2,11 +2,12 @@ package deploylog
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -119,6 +120,17 @@ func mockREST(version, desired int64, status appsv1.DeploymentStatus) *REST {
 	go fakeWatch.Add(obj)
 
 	fakePn := fakeexternal.NewSimpleClientset()
+	// The fake client doesn't properly support bookmark events, so we reject SendInitialEvents to force fallback
+	fakePn.PrependWatchReactor("pods", func(action clientgotesting.Action) (handled bool, ret watch.Interface, err error) {
+		watchAction := action.(clientgotesting.WatchActionImpl)
+		if watchAction.ListOptions.SendInitialEvents != nil && *watchAction.ListOptions.SendInitialEvents {
+			return true, nil, errors.New("sendInitialEvents is not supported in fake client")
+		}
+		// Fall back to default reactor for legacy watch
+		fakePodWatch := watch.NewFake()
+		return clientgotesting.DefaultWatchReactor(fakePodWatch, nil)(action)
+	})
+
 	if status == appsv1.DeploymentStatusComplete {
 		// If the deployment is complete, we will try to get the logs from the oldest
 		// application pod...
@@ -213,7 +225,7 @@ func TestRESTGet(t *testing.T) {
 			rest:        mockREST(1 /* won't be used */, 101, ""),
 			name:        "config",
 			opts:        &appsapi.DeploymentLogOptions{Follow: false, Previous: true},
-			expectedErr: errors.NewBadRequest("no previous deployment exists for deploymentConfig \"config\""),
+			expectedErr: apierrors.NewBadRequest("no previous deployment exists for deploymentConfig \"config\""),
 		},
 	}
 
