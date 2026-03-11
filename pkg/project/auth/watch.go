@@ -64,6 +64,10 @@ type userProjectWatcher struct {
 	initialProjects []corev1.Namespace
 	// knownProjects maps name to resourceVersion
 	knownProjects map[string]string
+	// sendInitialEventsBookmark indicates whether to send a bookmark after initial events
+	sendInitialEventsBookmark bool
+	// initialEventsResourceVersion is the cluster ResourceVersion at watch initialization
+	initialEventsResourceVersion string
 }
 
 var (
@@ -72,7 +76,7 @@ var (
 	watchChannelHWM kstorage.HighWaterMark
 )
 
-func NewUserProjectWatcher(user user.Info, visibleNamespaces sets.String, projectCache *projectcache.ProjectCache, authCache WatchableCache, includeAllExistingProjects bool, predicate kstorage.SelectionPredicate) *userProjectWatcher {
+func NewUserProjectWatcher(user user.Info, visibleNamespaces sets.String, projectCache *projectcache.ProjectCache, authCache WatchableCache, includeAllExistingProjects bool, sendInitialEventsBookmark bool, predicate kstorage.SelectionPredicate) *userProjectWatcher {
 	namespaces, _ := authCache.List(user, labels.Everything())
 	knownProjects := map[string]string{}
 	for _, namespace := range namespaces.Items {
@@ -94,17 +98,22 @@ func NewUserProjectWatcher(user user.Info, visibleNamespaces sets.String, projec
 		outgoing:      make(chan watch.Event),
 		userStop:      make(chan struct{}),
 
-		projectCache:    projectCache,
-		authCache:       authCache,
-		initialProjects: initialProjects,
-		knownProjects:   knownProjects,
+		projectCache:                 projectCache,
+		authCache:                    authCache,
+		initialProjects:              initialProjects,
+		knownProjects:                knownProjects,
+		sendInitialEventsBookmark:    sendInitialEventsBookmark,
+		initialEventsResourceVersion: namespaces.ResourceVersion,
 	}
 	w.emit = func(e watch.Event) {
-		// if dealing with project events, ensure that we only emit events for projects
-		// that match the field or label selector specified by a consumer
-		if project, ok := e.Object.(*projectapi.Project); ok {
-			if matches, err := predicate.Matches(project); err != nil || !matches {
-				return
+		// BOOKMARK events must pass through without predicate filtering
+		if e.Type != watch.Bookmark {
+			// if dealing with project events, ensure that we only emit events for projects
+			// that match the field or label selector specified by a consumer
+			if project, ok := e.Object.(*projectapi.Project); ok {
+				if matches, err := predicate.Matches(project); err != nil || !matches {
+					return
+				}
 			}
 		}
 
@@ -194,7 +203,6 @@ func (w *userProjectWatcher) Watch() {
 	}()
 	defer utilruntime.HandleCrash()
 
-	// start by emitting all the `initialProjects`
 	for i := range w.initialProjects {
 		// keep this check here to sure we don't keep this open in the case of failures
 		select {
@@ -211,6 +219,20 @@ func (w *userProjectWatcher) Watch() {
 		w.emit(watch.Event{
 			Type:   watch.Added,
 			Object: namespaceInternal,
+		})
+	}
+
+	// Send initial-events-end bookmark to support WatchList feature gate
+	if w.sendInitialEventsBookmark {
+		bookmarkProject := &projectapi.Project{}
+		bookmarkProject.ResourceVersion = w.initialEventsResourceVersion
+		if bookmarkProject.Annotations == nil {
+			bookmarkProject.Annotations = make(map[string]string)
+		}
+		bookmarkProject.Annotations[metav1.InitialEventsAnnotationKey] = "true"
+		w.emit(watch.Event{
+			Type:   watch.Bookmark,
+			Object: bookmarkProject,
 		})
 	}
 

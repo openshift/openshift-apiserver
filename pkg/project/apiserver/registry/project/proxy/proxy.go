@@ -112,13 +112,18 @@ func (s *REST) Watch(ctx context.Context, options *metainternal.ListOptions) (wa
 
 	includeAllExistingProjects := (options != nil) && options.ResourceVersion == "0"
 
+	sendInitialEventsBookmark := options != nil && options.SendInitialEvents != nil && *options.SendInitialEvents
+	if sendInitialEventsBookmark {
+		includeAllExistingProjects = true
+	}
+
 	allowedNamespaces, err := scope.ScopesToVisibleNamespaces(userInfo.GetExtra()[authorizationapi.ScopesKey], s.authCache.GetClusterRoleLister(), true)
 	if err != nil {
 		return nil, err
 	}
 
 	m := projectutil.MatchProject(apihelpers.InternalListOptionsToSelectors(options))
-	watcher := projectauth.NewUserProjectWatcher(userInfo, allowedNamespaces, s.projectCache, s.authCache, includeAllExistingProjects, m)
+	watcher := projectauth.NewUserProjectWatcher(userInfo, allowedNamespaces, s.projectCache, s.authCache, includeAllExistingProjects, sendInitialEventsBookmark, m)
 	s.authCache.AddWatcher(watcher)
 
 	go watcher.Watch()

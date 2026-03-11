@@ -41,7 +41,7 @@ func newTestWatcher(username string, groups []string, predicate storage.Selectio
 	stopCh := make(chan struct{})
 	go projectCache.Run(stopCh)
 
-	return NewUserProjectWatcher(&user.DefaultInfo{Name: username, Groups: groups}, sets.NewString("*"), projectCache, fakeAuthCache, false, predicate), fakeAuthCache, stopCh
+	return NewUserProjectWatcher(&user.DefaultInfo{Name: username, Groups: groups}, sets.NewString("*"), projectCache, fakeAuthCache, false, false, predicate), fakeAuthCache, stopCh
 }
 
 type fakeAuthCache struct {
