@@ -2,7 +2,7 @@
 
 This repository is compatible with the [OpenShift Tests Extension (OTE)](https://github.com/openshift-eng/openshift-tests-extension) framework.
 
-### Building the test binary
+### Building the test binary 
 
 ```bash
 make build
