@@ -87,9 +87,13 @@ func NewImageLayerIndex(lw ImageListWatch) ImageLayerIndex {
 	informer := cache.NewSharedIndexInformer(&cache.ListWatch{
 		ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 			list, err := lw.List(context.TODO(), metav1.ListOptions{
-				ResourceVersion: options.ResourceVersion,
-				Limit:           options.Limit,
-				Continue:        options.Continue,
+				ResourceVersion:      options.ResourceVersion,
+				Limit:                options.Limit,
+				Continue:             options.Continue,
+				AllowWatchBookmarks:  options.AllowWatchBookmarks,
+				SendInitialEvents:    options.SendInitialEvents,
+				ResourceVersionMatch: options.ResourceVersionMatch,
+				TimeoutSeconds:       options.TimeoutSeconds,
 			})
 			if err != nil {
 				return nil, err
@@ -109,7 +113,11 @@ func NewImageLayerIndex(lw ImageListWatch) ImageLayerIndex {
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 			w, err := lw.Watch(context.TODO(), metav1.ListOptions{
-				ResourceVersion: options.ResourceVersion,
+				ResourceVersion:      options.ResourceVersion,
+				AllowWatchBookmarks:  options.AllowWatchBookmarks,
+				SendInitialEvents:    options.SendInitialEvents,
+				ResourceVersionMatch: options.ResourceVersionMatch,
+				TimeoutSeconds:       options.TimeoutSeconds,
 			})
 			if err != nil {
 				return nil, err
