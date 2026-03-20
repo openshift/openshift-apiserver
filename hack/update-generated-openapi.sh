@@ -9,7 +9,7 @@ GOFLAGS="" go install -mod=vendor ./${CODEGEN_PKG}/cmd/openapi-gen
 
 function codegen::join() { local IFS="$1"; shift; echo "$*"; }
 
-ORIGIN_PREFIX="github.com/openshift/openshift-apiserver/"
+ORIGIN_PREFIX="github.com/openshift/openshift-apiserver"
 
 KUBE_INPUT_DIRS=(
   $(
@@ -42,7 +42,7 @@ echo "Generating origin openapi"
 ${GOPATH}/bin/openapi-gen \
   --output-file zz_generated.openapi.go \
   --go-header-file ${SCRIPT_ROOT}/hack/boilerplate.txt \
-  --output-dir="${GOPATH}/src" \
+  --output-dir="${GOPATH}/src/${ORIGIN_PREFIX}/pkg/openapi" \
   "${KUBE_INPUT_DIRS[@]}" "${ORIGIN_INPUT_DIRS[@]}" \
   --output-pkg "${ORIGIN_PREFIX}/pkg/openapi" \
   --report-filename "${SCRIPT_ROOT}/hack/openapi-violation.list" \
