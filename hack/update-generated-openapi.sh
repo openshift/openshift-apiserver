@@ -47,3 +47,19 @@ ${GOPATH}/bin/openapi-gen \
   --output-pkg "${ORIGIN_PREFIX}/pkg/openapi" \
   --report-filename "${SCRIPT_ROOT}/hack/openapi-violation.list" \
   "$@"
+
+echo "Ensuring OpenAPI schema mappings for the new REST friendly names"
+cd ${SCRIPT_ROOT}
+go run ./cmd/ensure-openapi-mappings --openapi-file pkg/openapi/zz_generated.openapi.go --update
+# go/printer does not format composite literal elements on separate lines when new entries
+# are added via AST manipulation, so we use sed to ensure each com.github.openshift entry
+# starts on its own line for better readability and consistency with the rest of the file
+sed -i 's/, "com\.github\.openshift/,\n\t\t"com.github.openshift/g' pkg/openapi/zz_generated.openapi.go
+# Ensure the entry after the last com.github.openshift also starts on a new line.
+# Find the line number of the last com.github.openshift entry and apply substitution only to that line
+LAST_LINE=$(grep -n '"com\.github\.openshift' pkg/openapi/zz_generated.openapi.go | tail -1 | cut -d: -f1)
+if [ -n "$LAST_LINE" ]; then
+  sed -i "${LAST_LINE}s/ref),\s\+/ref),\n\t\t/" pkg/openapi/zz_generated.openapi.go
+fi
+echo "Running make update-gofmt"
+make update-gofmt
