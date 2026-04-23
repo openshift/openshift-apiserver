@@ -23,7 +23,7 @@ import (
 	projectutil "github.com/openshift/openshift-apiserver/pkg/project/util"
 )
 
-func newTestWatcher(username string, groups []string, predicate storage.SelectionPredicate, namespaces ...*corev1.Namespace) (*userProjectWatcher, *fakeAuthCache, chan struct{}) {
+func newTestWatcher(username string, groups []string, predicate storage.SelectionPredicate, includeAllExistingProjects bool, namespaces ...*corev1.Namespace) (*userProjectWatcher, *fakeAuthCache, chan struct{}) {
 	objects := []runtime.Object{}
 	for i := range namespaces {
 		objects = append(objects, namespaces[i])
@@ -37,11 +37,14 @@ func newTestWatcher(username string, groups []string, predicate storage.Selectio
 		"",
 	)
 	fakeAuthCache := &fakeAuthCache{}
+	if includeAllExistingProjects {
+		fakeAuthCache.namespaces = namespaces
+	}
 
 	stopCh := make(chan struct{})
 	go projectCache.Run(stopCh)
 
-	return NewUserProjectWatcher(&user.DefaultInfo{Name: username, Groups: groups}, sets.NewString("*"), projectCache, fakeAuthCache, false, predicate), fakeAuthCache, stopCh
+	return NewUserProjectWatcher(&user.DefaultInfo{Name: username, Groups: groups}, sets.NewString("*"), projectCache, fakeAuthCache, includeAllExistingProjects, predicate, false), fakeAuthCache, stopCh
 }
 
 type fakeAuthCache struct {
@@ -66,7 +69,7 @@ func (w *fakeAuthCache) List(userInfo user.Info, selector labels.Selector) (*cor
 }
 
 func TestFullIncoming(t *testing.T) {
-	watcher, fakeAuthCache, stopCh := newTestWatcher("bob", nil, matchAllPredicate(), newNamespaces("ns-01")...)
+	watcher, fakeAuthCache, stopCh := newTestWatcher("bob", nil, matchAllPredicate(), false, newNamespaces("ns-01")...)
 	defer close(stopCh)
 	watcher.cacheIncoming = make(chan watch.Event)
 
@@ -115,7 +118,7 @@ func TestFullIncoming(t *testing.T) {
 }
 
 func TestAddModifyDeleteEventsByUser(t *testing.T) {
-	watcher, _, stopCh := newTestWatcher("bob", nil, matchAllPredicate(), newNamespaces("ns-01")...)
+	watcher, _, stopCh := newTestWatcher("bob", nil, matchAllPredicate(), false, newNamespaces("ns-01")...)
 	defer close(stopCh)
 	go watcher.Watch()
 
@@ -158,7 +161,7 @@ func TestProjectSelectionPredicate(t *testing.T) {
 	field := fields.ParseSelectorOrDie("metadata.name=ns-03")
 	m := projectutil.MatchProject(labels.Everything(), field)
 
-	watcher, _, stopCh := newTestWatcher("bob", nil, m, newNamespaces("ns-01", "ns-02", "ns-03")...)
+	watcher, _, stopCh := newTestWatcher("bob", nil, m, false, newNamespaces("ns-01", "ns-02", "ns-03")...)
 	defer close(stopCh)
 
 	if watcher.emit == nil {
@@ -220,7 +223,7 @@ func TestProjectSelectionPredicate(t *testing.T) {
 }
 
 func TestAddModifyDeleteEventsByGroup(t *testing.T) {
-	watcher, _, stopCh := newTestWatcher("bob", []string{"group-one"}, matchAllPredicate(), newNamespaces("ns-01")...)
+	watcher, _, stopCh := newTestWatcher("bob", []string{"group-one"}, matchAllPredicate(), false, newNamespaces("ns-01")...)
 	defer close(stopCh)
 	go watcher.Watch()
 
@@ -270,4 +273,76 @@ func newNamespaces(names ...string) []*corev1.Namespace {
 
 func matchAllPredicate() storage.SelectionPredicate {
 	return projectutil.MatchProject(labels.Everything(), fields.Everything())
+}
+
+func TestSendInitialEventsBookmark(t *testing.T) {
+	t.Run("with rv=0", func(t *testing.T) {
+		// rv="0" behavior: send initial events + bookmark
+		watcher, _, stopCh := newTestWatcher("bob", nil, matchAllPredicate(), true, newNamespaces("ns-01", "ns-02")...)
+		defer close(stopCh)
+
+		// Enable bookmark for watch-list
+		watcher.sendBookmark = true
+
+		go watcher.Watch()
+
+		// expect 2 initial Added events
+		for i := 0; i < 2; i++ {
+			select {
+			case event := <-watcher.ResultChan():
+				if event.Type != watch.Added {
+					t.Errorf("expected Added, got %v", event.Type)
+				}
+			case <-time.After(3 * time.Second):
+				t.Fatalf("timeout waiting for initial event %d", i)
+			}
+		}
+
+		// expect bookmark with annotation
+		select {
+		case event := <-watcher.ResultChan():
+			if event.Type != watch.Bookmark {
+				t.Errorf("expected Bookmark, got %v", event.Type)
+			}
+			project := event.Object.(*projectapi.Project)
+			if project.Annotations[metav1.InitialEventsAnnotationKey] != "true" {
+				t.Errorf("expected initial-events-end annotation")
+			}
+		case <-time.After(3 * time.Second):
+			t.Fatalf("timeout waiting for bookmark")
+		}
+	})
+
+	t.Run("without rv=0", func(t *testing.T) {
+		// rv!="0" behavior: send bookmark only, no initial events
+		watcher, _, stopCh := newTestWatcher("bob", nil, matchAllPredicate(), false, newNamespaces("ns-01", "ns-02")...)
+		defer close(stopCh)
+
+		// Enable bookmark for watch-list
+		watcher.sendBookmark = true
+
+		go watcher.Watch()
+
+		// expect bookmark with annotation immediately
+		select {
+		case event := <-watcher.ResultChan():
+			if event.Type != watch.Bookmark {
+				t.Errorf("expected Bookmark, got %v", event.Type)
+			}
+			project := event.Object.(*projectapi.Project)
+			if project.Annotations[metav1.InitialEventsAnnotationKey] != "true" {
+				t.Errorf("expected initial-events-end annotation")
+			}
+		case <-time.After(3 * time.Second):
+			t.Fatalf("timeout waiting for bookmark")
+		}
+
+		// verify no additional events
+		select {
+		case event := <-watcher.ResultChan():
+			t.Fatalf("unexpected event after bookmark: %v", event)
+		case <-time.After(500 * time.Millisecond):
+			// expected - no more events
+		}
+	})
 }

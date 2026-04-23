@@ -114,7 +114,18 @@ func (s *REST) Watch(ctx context.Context, options *metainternal.ListOptions) (wa
 		return nil, fmt.Errorf("no user")
 	}
 
-	includeAllExistingProjects := (options != nil) && options.ResourceVersion == "0"
+	// includeAllExistingProjects (RV="0") triggers sending initial state.
+	// sendBookmark (from SendInitialEvents) triggers sending a bookmark with
+	// k8s.io/initial-events-end annotation after initial events (if any).
+	includeAllExistingProjects, sendBookmark := false, false
+	if options != nil {
+		if options.ResourceVersion == "0" {
+			includeAllExistingProjects = true
+		}
+		if options.SendInitialEvents != nil && *options.SendInitialEvents {
+			sendBookmark = true
+		}
+	}
 
 	allowedNamespaces, err := scope.ScopesToVisibleNamespaces(userInfo.GetExtra()[authorizationapi.ScopesKey], s.authCache.GetClusterRoleLister(), true)
 	if err != nil {
@@ -122,7 +133,7 @@ func (s *REST) Watch(ctx context.Context, options *metainternal.ListOptions) (wa
 	}
 
 	m := projectutil.MatchProject(apihelpers.InternalListOptionsToSelectors(options))
-	watcher := projectauth.NewUserProjectWatcher(userInfo, allowedNamespaces, s.projectCache, s.authCache, includeAllExistingProjects, m)
+	watcher := projectauth.NewUserProjectWatcher(userInfo, allowedNamespaces, s.projectCache, s.authCache, includeAllExistingProjects, m, sendBookmark)
 	s.authCache.AddWatcher(watcher)
 
 	go watcher.Watch()
