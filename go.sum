@@ -73,6 +73,8 @@ github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkp
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/emicklei/go-restful/v3 v3.12.2 h1:DhwDP0vY3k8ZzE0RunuJy8GhNpPL6zqLkDf9B/a0/xU=
 github.com/emicklei/go-restful/v3 v3.12.2/go.mod h1:6n3XBCmQQb25CM2LCACGz8ukIrRry+4bhvbpWn3mrbc=
+github.com/everettraven/openshift-kubernetes-apiserver v0.0.0-20260505180148-e32ae1ce5757 h1:jqH06tVyyU03YYrC4oeCHSshktjiwLZ2pKaIzTONDMQ=
+github.com/everettraven/openshift-kubernetes-apiserver v0.0.0-20260505180148-e32ae1ce5757/go.mod h1:eOOc9nrVqlBI1AFCvVzsob0OxtPZUCPiUJL45JOTBG0=
 github.com/exponent-io/jsonpath v0.0.0-20210407135951-1de76d718b3f h1:Wl78ApPPB2Wvf/TIe2xdyJxTlb6obmF18d8QdkxNDu4=
 github.com/exponent-io/jsonpath v0.0.0-20210407135951-1de76d718b3f/go.mod h1:OSYXu++VVOHnXeitef/D8n/6y4QV8uLHSFXX4NeXMGc=
 github.com/felixge/fgprof v0.9.3/go.mod h1:RdbpDgzqYVh/T9fPELJyV7EYJuHB55UTEULNun8eiPw=
@@ -244,8 +246,6 @@ github.com/openshift/client-go v0.0.0-20251205093018-96a6cbc1420c h1:TBE0Gl+oCo/
 github.com/openshift/client-go v0.0.0-20251205093018-96a6cbc1420c/go.mod h1:IsynOWZAfdH+BgWimcFQRtI41Id9sgdhsCEjIk8ACLw=
 github.com/openshift/docker-distribution/v3 v3.0.0-20240215131201-6b2f5d2f1f43 h1:iFiveehT5yqHvAxdTwHGZLTxyxzMqP8bLcQKz6Y7NQQ=
 github.com/openshift/docker-distribution/v3 v3.0.0-20240215131201-6b2f5d2f1f43/go.mod h1:+fqBJ4vPYo4Uu1ZE4d+bUtTLRXfdSL3NvCZIZ9GHv58=
-github.com/openshift/kubernetes-apiserver v0.0.0-20260415154523-acdcc04896b5 h1:fsg0b+vZiuE5caq3QOM6bFBWfp3+1QvKixu/fzktnHI=
-github.com/openshift/kubernetes-apiserver v0.0.0-20260415154523-acdcc04896b5/go.mod h1:eOOc9nrVqlBI1AFCvVzsob0OxtPZUCPiUJL45JOTBG0=
 github.com/openshift/library-go v0.0.0-20260309173530-9ed71ac3148f h1:4nMvQlqotxtqJo4noee7Jr9AKpJZEG7fu26IJFKX5/c=
 github.com/openshift/library-go v0.0.0-20260309173530-9ed71ac3148f/go.mod h1:rYGQrSg+t1JEzeEwg6BJw3loPpXg/n3kgRygUpgxavY=
 github.com/openshift/moby-moby v0.0.0-20190308215630-da810a85109d h1:fLITXDjxMSvUDjnXs/zljIWktbST9+Om8XbrmmM7T4I=
