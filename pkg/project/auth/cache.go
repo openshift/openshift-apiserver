@@ -40,6 +40,7 @@ type Lister interface {
 
 // subjectRecord is a cache record for the set of namespaces a subject can access
 type subjectRecord struct {
+	mu         sync.RWMutex // protects namespaces from concurrent access
 	subject    string
 	namespaces sets.String
 }
@@ -514,14 +515,18 @@ func (ac *AuthorizationCache) List(userInfo user.Info, selector labels.Selector)
 	obj, exists, _ := ac.userSubjectRecordStore.GetByKey(user)
 	if exists {
 		subjectRecord := obj.(*subjectRecord)
+		subjectRecord.mu.RLock()
 		keys.Insert(subjectRecord.namespaces.List()...)
+		subjectRecord.mu.RUnlock()
 	}
 
 	for _, group := range groups {
 		obj, exists, _ := ac.groupSubjectRecordStore.GetByKey(group)
 		if exists {
 			subjectRecord := obj.(*subjectRecord)
+			subjectRecord.mu.RLock()
 			keys.Insert(subjectRecord.namespaces.List()...)
+			subjectRecord.mu.RUnlock()
 		}
 	}
 
@@ -601,8 +606,11 @@ func deleteNamespaceFromSubjects(subjectRecordStore cache.Store, subjects []stri
 		obj, exists, _ := subjectRecordStore.GetByKey(subject)
 		if exists {
 			subjectRecord := obj.(*subjectRecord)
+			subjectRecord.mu.Lock()
 			delete(subjectRecord.namespaces, namespace)
-			if len(subjectRecord.namespaces) == 0 {
+			isEmpty := len(subjectRecord.namespaces) == 0
+			subjectRecord.mu.Unlock()
+			if isEmpty {
 				subjectRecordStore.Delete(subjectRecord)
 			}
 		}
@@ -620,7 +628,9 @@ func addSubjectsToNamespace(subjectRecordStore cache.Store, subjects []string, n
 			item = &subjectRecord{subject: subject, namespaces: sets.NewString()}
 			subjectRecordStore.Add(item)
 		}
+		item.mu.Lock()
 		item.namespaces.Insert(namespace)
+		item.mu.Unlock()
 	}
 }
 
