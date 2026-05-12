@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"strconv"
+	"sync"
 	"testing"
 	"time"
 
@@ -432,6 +433,136 @@ func TestAuthorizationCache_invalidateCache(t *testing.T) {
 
 			if result := ac.invalidateCache(tt.expired); result != tt.expected {
 				t.Errorf("expected %t, got %t", tt.expected, result)
+			}
+		})
+	}
+}
+
+func TestAuthorizationCacheRace(t *testing.T) {
+	namespaceList := corev1.NamespaceList{
+		Items: []corev1.Namespace{
+			{ObjectMeta: metav1.ObjectMeta{Name: "foo", ResourceVersion: "1"}},
+			{ObjectMeta: metav1.ObjectMeta{Name: "bar", ResourceVersion: "2"}},
+			{ObjectMeta: metav1.ObjectMeta{Name: "baz", ResourceVersion: "3"}},
+		},
+	}
+	mockKubeClient := fake.NewSimpleClientset(&namespaceList)
+
+	reviewer := &mockReviewer{
+		expectedResults: map[string]*mockReview{
+			"foo": {
+				users:  []string{alice.GetName(), bob.GetName()},
+				groups: eve.GetGroups(),
+			},
+			"bar": {
+				users:  []string{frank.GetName(), eve.GetName()},
+				groups: []string{"random"},
+			},
+			"baz": {
+				users:  []string{alice.GetName()},
+				groups: []string{"employee"},
+			},
+		},
+	}
+
+	informers := informers.NewSharedInformerFactory(mockKubeClient, controller.NoResyncPeriodFunc())
+	nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+	nsLister := corev1listers.NewNamespaceLister(nsIndexer)
+
+	authorizationCache := NewAuthorizationCache(
+		nsLister,
+		informers.Core().V1().Namespaces().Informer(),
+		reviewer,
+		informers.Rbac().V1(),
+	)
+	for i := range namespaceList.Items {
+		nsIndexer.Add(&namespaceList.Items[i])
+	}
+
+	// seed the cache
+	authorizationCache.synchronize()
+
+	stop := make(chan struct{})
+	var wg sync.WaitGroup
+
+	// writer goroutine: continuously synchronize, toggling access
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		rv := 10
+		for {
+			select {
+			case <-stop:
+				return
+			default:
+			}
+			// toggle access patterns to force map mutations
+			if rv%2 == 0 {
+				reviewer.expectedResults["foo"] = &mockReview{
+					users:  []string{alice.GetName(), bob.GetName()},
+					groups: eve.GetGroups(),
+				}
+				reviewer.expectedResults["baz"] = &mockReview{
+					users:  []string{frank.GetName()},
+					groups: []string{},
+				}
+			} else {
+				reviewer.expectedResults["foo"] = &mockReview{
+					users:  []string{frank.GetName()},
+					groups: []string{"random"},
+				}
+				reviewer.expectedResults["baz"] = &mockReview{
+					users:  []string{alice.GetName(), eve.GetName()},
+					groups: []string{"employee"},
+				}
+			}
+			rv++
+			for i := range namespaceList.Items {
+				ns := namespaceList.Items[i]
+				ns.ResourceVersion = strconv.Itoa(rv)
+				nsIndexer.Update(&ns)
+			}
+			authorizationCache.synchronize()
+		}
+	}()
+
+	// reader goroutines: continuously call List
+	users := []user.Info{alice, bob, eve, frank}
+	for _, u := range users {
+		u := u
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for {
+				select {
+				case <-stop:
+					return
+				default:
+				}
+				_, err := authorizationCache.List(u, labels.Everything())
+				if err != nil {
+					t.Errorf("List(%s) returned error: %v", u.GetName(), err)
+					return
+				}
+			}
+		}()
+	}
+
+	time.Sleep(2 * time.Second)
+	close(stop)
+	wg.Wait()
+}
+
+func BenchmarkAddSubjectsToNamespace(b *testing.B) {
+	for _, namespaceCount := range []int{10, 100, 1000} {
+		b.Run(fmt.Sprintf("namespaces=%d", namespaceCount), func(b *testing.B) {
+			subjects := []string{"alice", "bob", "eve", "frank", "grace"}
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				store := cache.NewStore(subjectRecordKeyFn)
+				for ns := 0; ns < namespaceCount; ns++ {
+					addSubjectsToNamespace(store, subjects, fmt.Sprintf("namespace-%d", ns), true)
+				}
 			}
 		})
 	}
