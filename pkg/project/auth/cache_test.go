@@ -343,6 +343,92 @@ func TestAuthorizationCache_cacheHasExpired(t *testing.T) {
 	}
 }
 
+func BenchmarkFullCacheInvalidation(b *testing.B) {
+	for _, bc := range []struct {
+		namespaces int
+		users      int
+	}{
+		{namespaces: 10, users: 10},
+		{namespaces: 100, users: 10},
+		{namespaces: 100, users: 100},
+		{namespaces: 1000, users: 100},
+		{namespaces: 1000, users: 1000},
+	} {
+		b.Run(fmt.Sprintf("N=%d_U=%d", bc.namespaces, bc.users), func(b *testing.B) {
+			// Build user names.
+			userNames := make([]string, bc.users)
+			for i := range userNames {
+				userNames[i] = fmt.Sprintf("user-%d", i)
+			}
+
+			// Build namespaces and reviewer expectations: every user has access to every namespace.
+			nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+			expectedResults := make(map[string]*mockReview, bc.namespaces)
+			for i := 0; i < bc.namespaces; i++ {
+				name := fmt.Sprintf("ns-%d", i)
+				nsIndexer.Add(&corev1.Namespace{
+					ObjectMeta: metav1.ObjectMeta{Name: name, ResourceVersion: "1"},
+				})
+				expectedResults[name] = &mockReview{users: userNames}
+			}
+
+			reviewer := &mockReviewer{expectedResults: expectedResults}
+			nsLister := corev1listers.NewNamespaceLister(nsIndexer)
+
+			crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+			crbs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+
+			// Use a clock that always reports the cache as expired so every
+			// call to synchronize triggers a full invalidation.
+			clk := &mockedClock{since: 2 * defaultMaxCacheLifespan}
+
+			ac := &AuthorizationCache{
+				allKnownNamespaces:        sets.String{},
+				namespaceLister:           nsLister,
+				lastSyncResourceVersioner: &fakeVersioner{"v1"},
+				clusterRoleLister: syncedClusterRoleLister{
+					ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs),
+				},
+				clusterRoleBindingLister: syncedClusterRoleBindingLister{
+					ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs),
+				},
+				roleNamespacer: syncedRoleLister{
+					RoleLister: rbacv1listers.NewRoleLister(cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})),
+				},
+				roleBindingNamespacer: syncedRoleBindingLister{
+					RoleBindingLister: rbacv1listers.NewRoleBindingLister(cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})),
+				},
+				roleLastSyncResourceVersioner:  &fakeVersioner{"v1"},
+				clusterRoleResourceVersions:    sets.NewString(),
+				clusterBindingResourceVersions: sets.NewString(),
+				reviewer:                       reviewer,
+				skip:                           &neverSkipSynchronizer{},
+				clock:                          clk,
+				maxCacheLifespan:               defaultMaxCacheLifespan,
+			}
+			ac.stores.Store(&authorizationCacheStores{
+				reviewRecordStore:       cache.NewStore(reviewRecordKeyFn),
+				userSubjectRecordStore:  cache.NewStore(subjectRecordKeyFn),
+				groupSubjectRecordStore: cache.NewStore(subjectRecordKeyFn),
+			})
+			ac.syncHandler = ac.syncRequest
+
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				ac.synchronize()
+			}
+		})
+	}
+}
+
+type fakeVersioner struct {
+	version string
+}
+
+func (f *fakeVersioner) LastSyncResourceVersion() string {
+	return f.version
+}
+
 func TestAuthorizationCache_invalidateCache(t *testing.T) {
 	for _, tt := range []struct {
 		name                     string
