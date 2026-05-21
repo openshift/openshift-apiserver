@@ -1,0 +1,38 @@
+{
+  "apiVersion": "v1",
+  "groupVersion": "route.openshift.io/v1",
+  "kind": "APIResourceList",
+  "resources": [
+    {
+      "categories": [
+        "all"
+      ],
+      "kind": "Route",
+      "name": "routes",
+      "namespaced": true,
+      "singularName": "route",
+      "storageVersionHash": "jo1F7GfnXH4=",
+      "verbs": [
+        "create",
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "kind": "Route",
+      "name": "routes/status",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "get",
+        "patch",
+        "update"
+      ]
+    }
+  ]
+}

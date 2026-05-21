@@ -1,0 +1,974 @@
+{
+  "apiVersion": "apidiscovery.k8s.io/v2",
+  "items": [
+    {
+      "metadata": {
+        "name": "apps.openshift.io"
+      },
+      "versions": [
+        {
+          "freshness": "Current",
+          "resources": [
+            {
+              "categories": [
+                "all"
+              ],
+              "resource": "deploymentconfigs",
+              "responseKind": {
+                "group": "",
+                "kind": "DeploymentConfig",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "shortNames": [
+                "dc"
+              ],
+              "singularResource": "deploymentconfig",
+              "subresources": [
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "DeploymentRequest",
+                    "version": ""
+                  },
+                  "subresource": "instantiate",
+                  "verbs": [
+                    "create"
+                  ]
+                },
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "DeploymentLog",
+                    "version": ""
+                  },
+                  "subresource": "log",
+                  "verbs": [
+                    "get"
+                  ]
+                },
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "DeploymentConfigRollback",
+                    "version": ""
+                  },
+                  "subresource": "rollback",
+                  "verbs": [
+                    "create"
+                  ]
+                },
+                {
+                  "responseKind": {
+                    "group": "extensions",
+                    "kind": "Scale",
+                    "version": "v1beta1"
+                  },
+                  "subresource": "scale",
+                  "verbs": [
+                    "get",
+                    "patch",
+                    "update"
+                  ]
+                },
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "DeploymentConfig",
+                    "version": ""
+                  },
+                  "subresource": "status",
+                  "verbs": [
+                    "get",
+                    "patch",
+                    "update"
+                  ]
+                }
+              ],
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            }
+          ],
+          "version": "v1"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "authorization.openshift.io"
+      },
+      "versions": [
+        {
+          "freshness": "Current",
+          "resources": [
+            {
+              "resource": "clusterrolebindings",
+              "responseKind": {
+                "group": "",
+                "kind": "ClusterRoleBinding",
+                "version": ""
+              },
+              "scope": "Cluster",
+              "singularResource": "clusterrolebinding",
+              "verbs": [
+                "create",
+                "delete",
+                "get",
+                "list",
+                "patch",
+                "update"
+              ]
+            },
+            {
+              "resource": "clusterroles",
+              "responseKind": {
+                "group": "",
+                "kind": "ClusterRole",
+                "version": ""
+              },
+              "scope": "Cluster",
+              "singularResource": "clusterrole",
+              "verbs": [
+                "create",
+                "delete",
+                "get",
+                "list",
+                "patch",
+                "update"
+              ]
+            },
+            {
+              "resource": "localresourceaccessreviews",
+              "responseKind": {
+                "group": "",
+                "kind": "LocalResourceAccessReview",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "localresourceaccessreview",
+              "verbs": [
+                "create"
+              ]
+            },
+            {
+              "resource": "localsubjectaccessreviews",
+              "responseKind": {
+                "group": "",
+                "kind": "LocalSubjectAccessReview",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "localsubjectaccessreview",
+              "verbs": [
+                "create"
+              ]
+            },
+            {
+              "resource": "resourceaccessreviews",
+              "responseKind": {
+                "group": "",
+                "kind": "ResourceAccessReview",
+                "version": ""
+              },
+              "scope": "Cluster",
+              "singularResource": "localresourceaccessreview",
+              "verbs": [
+                "create"
+              ]
+            },
+            {
+              "resource": "rolebindingrestrictions",
+              "responseKind": {
+                "group": "",
+                "kind": "RoleBindingRestriction",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "rolebindingrestriction",
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            },
+            {
+              "resource": "rolebindings",
+              "responseKind": {
+                "group": "",
+                "kind": "RoleBinding",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "rolebinding",
+              "verbs": [
+                "create",
+                "delete",
+                "get",
+                "list",
+                "patch",
+                "update"
+              ]
+            },
+            {
+              "resource": "roles",
+              "responseKind": {
+                "group": "",
+                "kind": "Role",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "role",
+              "verbs": [
+                "create",
+                "delete",
+                "get",
+                "list",
+                "patch",
+                "update"
+              ]
+            },
+            {
+              "resource": "selfsubjectrulesreviews",
+              "responseKind": {
+                "group": "",
+                "kind": "SelfSubjectRulesReview",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "selfsubjectrulesreview",
+              "verbs": [
+                "create"
+              ]
+            },
+            {
+              "resource": "subjectaccessreviews",
+              "responseKind": {
+                "group": "",
+                "kind": "SubjectAccessReview",
+                "version": ""
+              },
+              "scope": "Cluster",
+              "singularResource": "subjectaccessreview",
+              "verbs": [
+                "create"
+              ]
+            },
+            {
+              "resource": "subjectrulesreviews",
+              "responseKind": {
+                "group": "",
+                "kind": "SubjectRulesReview",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "subjectrulesreview",
+              "verbs": [
+                "create"
+              ]
+            }
+          ],
+          "version": "v1"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "build.openshift.io"
+      },
+      "versions": [
+        {
+          "freshness": "Current",
+          "resources": [
+            {
+              "categories": [
+                "all"
+              ],
+              "resource": "buildconfigs",
+              "responseKind": {
+                "group": "",
+                "kind": "BuildConfig",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "shortNames": [
+                "bc"
+              ],
+              "singularResource": "buildconfig",
+              "subresources": [
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "BuildRequest",
+                    "version": ""
+                  },
+                  "subresource": "instantiate",
+                  "verbs": [
+                    "create"
+                  ]
+                },
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "BinaryBuildRequestOptions",
+                    "version": ""
+                  },
+                  "subresource": "instantiatebinary",
+                  "verbs": [
+                    "create"
+                  ]
+                },
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "Build",
+                    "version": ""
+                  },
+                  "subresource": "webhooks",
+                  "verbs": [
+                    "create"
+                  ]
+                }
+              ],
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            },
+            {
+              "categories": [
+                "all"
+              ],
+              "resource": "builds",
+              "responseKind": {
+                "group": "",
+                "kind": "Build",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "build",
+              "subresources": [
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "BuildRequest",
+                    "version": ""
+                  },
+                  "subresource": "clone",
+                  "verbs": [
+                    "create"
+                  ]
+                },
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "Build",
+                    "version": ""
+                  },
+                  "subresource": "details",
+                  "verbs": [
+                    "update"
+                  ]
+                },
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "BuildLog",
+                    "version": ""
+                  },
+                  "subresource": "log",
+                  "verbs": [
+                    "get"
+                  ]
+                }
+              ],
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            }
+          ],
+          "version": "v1"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "image.openshift.io"
+      },
+      "versions": [
+        {
+          "freshness": "Current",
+          "resources": [
+            {
+              "resource": "images",
+              "responseKind": {
+                "group": "",
+                "kind": "Image",
+                "version": ""
+              },
+              "scope": "Cluster",
+              "singularResource": "image",
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            },
+            {
+              "resource": "imagesignatures",
+              "responseKind": {
+                "group": "",
+                "kind": "ImageSignature",
+                "version": ""
+              },
+              "scope": "Cluster",
+              "singularResource": "imagesignature",
+              "verbs": [
+                "create",
+                "delete"
+              ]
+            },
+            {
+              "resource": "imagestreamimages",
+              "responseKind": {
+                "group": "",
+                "kind": "ImageStreamImage",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "shortNames": [
+                "isimage"
+              ],
+              "singularResource": "imagestreamimage",
+              "verbs": [
+                "get"
+              ]
+            },
+            {
+              "resource": "imagestreamimports",
+              "responseKind": {
+                "group": "",
+                "kind": "ImageStreamImport",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "imagestreamimport",
+              "verbs": [
+                "create"
+              ]
+            },
+            {
+              "resource": "imagestreammappings",
+              "responseKind": {
+                "group": "",
+                "kind": "ImageStreamMapping",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "imagestreammapping",
+              "verbs": [
+                "create"
+              ]
+            },
+            {
+              "categories": [
+                "all"
+              ],
+              "resource": "imagestreams",
+              "responseKind": {
+                "group": "",
+                "kind": "ImageStream",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "shortNames": [
+                "is"
+              ],
+              "singularResource": "imagestream",
+              "subresources": [
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "ImageStreamLayers",
+                    "version": ""
+                  },
+                  "subresource": "layers",
+                  "verbs": [
+                    "get"
+                  ]
+                },
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "SecretList",
+                    "version": ""
+                  },
+                  "subresource": "secrets",
+                  "verbs": [
+                    "get"
+                  ]
+                },
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "ImageStream",
+                    "version": ""
+                  },
+                  "subresource": "status",
+                  "verbs": [
+                    "get",
+                    "patch",
+                    "update"
+                  ]
+                }
+              ],
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            },
+            {
+              "resource": "imagestreamtags",
+              "responseKind": {
+                "group": "",
+                "kind": "ImageStreamTag",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "shortNames": [
+                "istag"
+              ],
+              "singularResource": "imagestreamtag",
+              "verbs": [
+                "create",
+                "delete",
+                "get",
+                "list",
+                "patch",
+                "update"
+              ]
+            },
+            {
+              "resource": "imagetags",
+              "responseKind": {
+                "group": "",
+                "kind": "ImageTag",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "shortNames": [
+                "itag"
+              ],
+              "singularResource": "imagetag",
+              "verbs": [
+                "create",
+                "delete",
+                "get",
+                "list",
+                "patch",
+                "update"
+              ]
+            }
+          ],
+          "version": "v1"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "project.openshift.io"
+      },
+      "versions": [
+        {
+          "freshness": "Current",
+          "resources": [
+            {
+              "resource": "projectrequests",
+              "responseKind": {
+                "group": "",
+                "kind": "ProjectRequest",
+                "version": ""
+              },
+              "scope": "Cluster",
+              "singularResource": "projectrequest",
+              "verbs": [
+                "create",
+                "list"
+              ]
+            },
+            {
+              "resource": "projects",
+              "responseKind": {
+                "group": "",
+                "kind": "Project",
+                "version": ""
+              },
+              "scope": "Cluster",
+              "singularResource": "project",
+              "verbs": [
+                "create",
+                "delete",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            }
+          ],
+          "version": "v1"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "quota.openshift.io"
+      },
+      "versions": [
+        {
+          "freshness": "Current",
+          "resources": [
+            {
+              "resource": "appliedclusterresourcequotas",
+              "responseKind": {
+                "group": "",
+                "kind": "AppliedClusterResourceQuota",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "appliedclusterresourcequota",
+              "verbs": [
+                "get",
+                "list"
+              ]
+            },
+            {
+              "resource": "clusterresourcequotas",
+              "responseKind": {
+                "group": "",
+                "kind": "ClusterResourceQuota",
+                "version": ""
+              },
+              "scope": "Cluster",
+              "shortNames": [
+                "clusterquota"
+              ],
+              "singularResource": "clusterresourcequota",
+              "subresources": [
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "ClusterResourceQuota",
+                    "version": ""
+                  },
+                  "subresource": "status",
+                  "verbs": [
+                    "get",
+                    "patch",
+                    "update"
+                  ]
+                }
+              ],
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            }
+          ],
+          "version": "v1"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "route.openshift.io"
+      },
+      "versions": [
+        {
+          "freshness": "Current",
+          "resources": [
+            {
+              "categories": [
+                "all"
+              ],
+              "resource": "routes",
+              "responseKind": {
+                "group": "",
+                "kind": "Route",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "route",
+              "subresources": [
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "Route",
+                    "version": ""
+                  },
+                  "subresource": "status",
+                  "verbs": [
+                    "get",
+                    "patch",
+                    "update"
+                  ]
+                }
+              ],
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            }
+          ],
+          "version": "v1"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "security.openshift.io"
+      },
+      "versions": [
+        {
+          "freshness": "Current",
+          "resources": [
+            {
+              "resource": "podsecuritypolicyreviews",
+              "responseKind": {
+                "group": "",
+                "kind": "PodSecurityPolicyReview",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "podsecuritypolicyreview",
+              "verbs": [
+                "create"
+              ]
+            },
+            {
+              "resource": "podsecuritypolicyselfsubjectreviews",
+              "responseKind": {
+                "group": "",
+                "kind": "PodSecurityPolicySelfSubjectReview",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "podsecuritypolicyselfsubjectreview",
+              "verbs": [
+                "create"
+              ]
+            },
+            {
+              "resource": "podsecuritypolicysubjectreviews",
+              "responseKind": {
+                "group": "",
+                "kind": "PodSecurityPolicySubjectReview",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "podsecuritypolicysubjectreview",
+              "verbs": [
+                "create"
+              ]
+            },
+            {
+              "resource": "rangeallocations",
+              "responseKind": {
+                "group": "",
+                "kind": "RangeAllocation",
+                "version": ""
+              },
+              "scope": "Cluster",
+              "singularResource": "rangeallocation",
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            },
+            {
+              "resource": "securitycontextconstraints",
+              "responseKind": {
+                "group": "",
+                "kind": "SecurityContextConstraints",
+                "version": ""
+              },
+              "scope": "Cluster",
+              "shortNames": [
+                "scc"
+              ],
+              "singularResource": "securitycontextconstraint",
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            }
+          ],
+          "version": "v1"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "template.openshift.io"
+      },
+      "versions": [
+        {
+          "freshness": "Current",
+          "resources": [
+            {
+              "resource": "brokertemplateinstances",
+              "responseKind": {
+                "group": "",
+                "kind": "BrokerTemplateInstance",
+                "version": ""
+              },
+              "scope": "Cluster",
+              "singularResource": "brokertemplateinstance",
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            },
+            {
+              "resource": "processedtemplates",
+              "responseKind": {
+                "group": "",
+                "kind": "Template",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "processedtemplate",
+              "verbs": [
+                "create"
+              ]
+            },
+            {
+              "resource": "templateinstances",
+              "responseKind": {
+                "group": "",
+                "kind": "TemplateInstance",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "templateinstance",
+              "subresources": [
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "TemplateInstance",
+                    "version": ""
+                  },
+                  "subresource": "status",
+                  "verbs": [
+                    "get",
+                    "patch",
+                    "update"
+                  ]
+                }
+              ],
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            },
+            {
+              "resource": "templates",
+              "responseKind": {
+                "group": "",
+                "kind": "Template",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "template",
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            }
+          ],
+          "version": "v1"
+        }
+      ]
+    }
+  ],
+  "kind": "APIGroupDiscoveryList",
+  "metadata": {}
+}

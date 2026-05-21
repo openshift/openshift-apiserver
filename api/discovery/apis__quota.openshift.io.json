@@ -1,0 +1,15 @@
+{
+  "apiVersion": "v1",
+  "kind": "APIGroup",
+  "name": "quota.openshift.io",
+  "preferredVersion": {
+    "groupVersion": "quota.openshift.io/v1",
+    "version": "v1"
+  },
+  "versions": [
+    {
+      "groupVersion": "quota.openshift.io/v1",
+      "version": "v1"
+    }
+  ]
+}

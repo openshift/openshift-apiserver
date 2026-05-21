@@ -1,0 +1,165 @@
+{
+  "components": {
+    "schemas": {
+      "io.k8s.apimachinery.pkg.apis.meta.v1.APIGroup": {
+        "description": "APIGroup contains the name, the supported versions, and the preferred version of a group.",
+        "properties": {
+          "apiVersion": {
+            "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+            "type": "string"
+          },
+          "kind": {
+            "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+            "type": "string"
+          },
+          "name": {
+            "default": "",
+            "description": "name is the name of the group.",
+            "type": "string"
+          },
+          "preferredVersion": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.GroupVersionForDiscovery"
+              }
+            ],
+            "default": {},
+            "description": "preferredVersion is the version preferred by the API server, which probably is the storage version."
+          },
+          "serverAddressByClientCIDRs": {
+            "description": "a map of client CIDR to server address that is serving this group. This is to help clients reach servers in the most network-efficient way possible. Clients can use the appropriate server address as per the CIDR that they match. In case of multiple matches, clients should use the longest matching CIDR. The server returns only those CIDRs that it thinks that the client can match. For example: the master will return an internal IP CIDR only, if the client reaches the server using an internal IP. Server looks at X-Forwarded-For header or X-Real-Ip header or request.RemoteAddr (in that order) to get the client IP.",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR"
+                }
+              ],
+              "default": {}
+            },
+            "type": "array",
+            "x-kubernetes-list-type": "atomic"
+          },
+          "versions": {
+            "description": "versions are the versions supported in this group.",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.GroupVersionForDiscovery"
+                }
+              ],
+              "default": {}
+            },
+            "type": "array",
+            "x-kubernetes-list-type": "atomic"
+          }
+        },
+        "required": [
+          "name",
+          "versions"
+        ],
+        "type": "object",
+        "x-kubernetes-group-version-kind": [
+          {
+            "group": "",
+            "kind": "APIGroup",
+            "version": "v1"
+          }
+        ]
+      },
+      "io.k8s.apimachinery.pkg.apis.meta.v1.GroupVersionForDiscovery": {
+        "description": "GroupVersion contains the \"group/version\" and \"version\" string of a version. It is made a struct to keep extensibility.",
+        "properties": {
+          "groupVersion": {
+            "default": "",
+            "description": "groupVersion specifies the API group and version in the form \"group/version\"",
+            "type": "string"
+          },
+          "version": {
+            "default": "",
+            "description": "version specifies the version in the form of \"version\". This is to save the clients the trouble of splitting the GroupVersion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "groupVersion",
+          "version"
+        ],
+        "type": "object"
+      },
+      "io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR": {
+        "description": "ServerAddressByClientCIDR helps the client to determine the server address that they should use, depending on the clientCIDR that they match.",
+        "properties": {
+          "clientCIDR": {
+            "default": "",
+            "description": "The CIDR with which clients can match their IP to figure out the server address that they should use.",
+            "type": "string"
+          },
+          "serverAddress": {
+            "default": "",
+            "description": "Address of this server, suitable for a client that matches the above CIDR. This can be a hostname, hostname:port, IP or IP:port.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "clientCIDR",
+          "serverAddress"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerToken": {
+        "description": "Bearer Token authentication",
+        "in": "header",
+        "name": "authorization",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "description": "OpenShift provides builds, application lifecycle, image content management,\nand administrative policy on top of Kubernetes. The API allows consistent\nmanagement of those objects.\n\nAll API operations are authenticated via an Authorization\tbearer token that\nis provided for service accounts as a generated secret (in JWT form) or via\nthe native OAuth endpoint located at /oauth/authorize. Core infrastructure\ncomponents may use client certificates that require no authentication.\n\nAll API operations return a 'resourceVersion' string that represents the\nversion of the object in the underlying storage. The standard LIST operation\nperforms a snapshot read of the underlying objects, returning a resourceVersion\nrepresenting a consistent version of the listed objects. The WATCH operation\nallows all updates to a set of objects after the provided resourceVersion to\nbe observed by a client. By listing and beginning a watch from the returned\nresourceVersion, clients may observe a consistent view of the state of one\nor more objects. Note that WATCH always returns the update after the provided\nresourceVersion. Watch may be extended a limited time in the past - using\netcd 2 the watch window is 1000 events (which on a large cluster may only\nbe a few tens of seconds) so clients must explicitly handle the \"watch\nto old error\" by re-listing.\n\nObjects are divided into two rough categories - those that have a lifecycle\nand must reflect the state of the cluster, and those that have no state.\nObjects with lifecycle typically have three main sections:\n\n* 'metadata' common to all objects\n* a 'spec' that represents the desired state\n* a 'status' that represents how much of the desired state is reflected on\n  the cluster at the current time\n\nObjects that have no state have 'metadata' but may lack a 'spec' or 'status'\nsection.\n\nObjects are divided into those that are namespace scoped (only exist inside\nof a namespace) and those that are cluster scoped (exist outside of\na namespace). A namespace scoped resource will be deleted when the namespace\nis deleted and cannot be created if the namespace has not yet been created\nor is in the process of deletion. Cluster scoped resources are typically\nonly accessible to admins - resources like nodes, persistent volumes, and\ncluster policy.\n\nAll objects have a schema that is a combination of the 'kind' and\n'apiVersion' fields. This schema is additive only for any given version -\nno backwards incompatible changes are allowed without incrementing the\napiVersion. The server will return and accept a number of standard\nresponses that share a common schema - for instance, the common\nerror type is 'metav1.Status' (described below) and will be returned\non any error from the API server.\n\nThe API is available in multiple serialization formats - the default is\nJSON (Accept: application/json and Content-Type: application/json) but\nclients may also use YAML (application/yaml) or the native Protobuf\nschema (application/vnd.kubernetes.protobuf). Note that the format\nof the WATCH API call is slightly different - for JSON it returns newline\ndelimited objects while for Protobuf it returns length-delimited frames\n(4 bytes in network-order) that contain a 'versioned.Watch' Protobuf\nobject.\n\nSee the OpenShift documentation at https://docs.openshift.org for more\ninformation.\n",
+    "license": {
+      "name": "Apache 2.0 (ASL2.0)",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "title": "OpenShift API (with Kubernetes)",
+    "version": "unversioned"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/apis/route.openshift.io/": {
+      "get": {
+        "description": "get information of a group",
+        "operationId": "getRouteOpenshiftIoAPIGroup",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIGroup"
+                }
+              },
+              "application/vnd.kubernetes.protobuf": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIGroup"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIGroup"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "routeOpenshiftIo"
+        ]
+      }
+    }
+  }
+}
