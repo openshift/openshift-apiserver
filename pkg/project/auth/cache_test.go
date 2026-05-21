@@ -421,6 +421,102 @@ func BenchmarkFullCacheInvalidation(b *testing.B) {
 	}
 }
 
+func BenchmarkIncrementalSyncDuplicateSubjects(b *testing.B) {
+	for _, bc := range []struct {
+		namespaces  int
+		users       int
+		dupsPerUser int
+	}{
+		{namespaces: 100, users: 10, dupsPerUser: 1},
+		{namespaces: 100, users: 10, dupsPerUser: 10},
+		{namespaces: 1000, users: 100, dupsPerUser: 1},
+		{namespaces: 1000, users: 100, dupsPerUser: 10},
+	} {
+		b.Run(fmt.Sprintf("N=%d_U=%d_D=%d", bc.namespaces, bc.users, bc.dupsPerUser), func(b *testing.B) {
+			// Build user names with duplicates to simulate the broken kube dedup.
+			uniqueUsers := make([]string, bc.users)
+			for i := range uniqueUsers {
+				uniqueUsers[i] = fmt.Sprintf("user-%d", i)
+			}
+			dupUsers := make([]string, 0, bc.users*bc.dupsPerUser)
+			for _, u := range uniqueUsers {
+				for d := 0; d < bc.dupsPerUser; d++ {
+					dupUsers = append(dupUsers, u)
+				}
+			}
+
+			nsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+			expectedResults := make(map[string]*mockReview, bc.namespaces)
+			for i := 0; i < bc.namespaces; i++ {
+				name := fmt.Sprintf("ns-%d", i)
+				nsIndexer.Add(&corev1.Namespace{
+					ObjectMeta: metav1.ObjectMeta{Name: name, ResourceVersion: "1"},
+				})
+				expectedResults[name] = &mockReview{users: dupUsers}
+			}
+
+			reviewer := &mockReviewer{expectedResults: expectedResults}
+			nsLister := corev1listers.NewNamespaceLister(nsIndexer)
+
+			crs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+			crbs := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+
+			// Use a clock that reports zero elapsed time so the cache never
+			// expires — every synchronize after the first hits the incremental
+			// COW path.
+			clk := &mockedClock{since: 0}
+
+			ac := &AuthorizationCache{
+				allKnownNamespaces:        sets.String{},
+				namespaceLister:           nsLister,
+				lastSyncResourceVersioner: &fakeVersioner{"v1"},
+				clusterRoleLister: syncedClusterRoleLister{
+					ClusterRoleLister: rbacv1listers.NewClusterRoleLister(crs),
+				},
+				clusterRoleBindingLister: syncedClusterRoleBindingLister{
+					ClusterRoleBindingLister: rbacv1listers.NewClusterRoleBindingLister(crbs),
+				},
+				roleNamespacer: syncedRoleLister{
+					RoleLister: rbacv1listers.NewRoleLister(cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})),
+				},
+				roleBindingNamespacer: syncedRoleBindingLister{
+					RoleBindingLister: rbacv1listers.NewRoleBindingLister(cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})),
+				},
+				roleLastSyncResourceVersioner:  &fakeVersioner{"v1"},
+				clusterRoleResourceVersions:    sets.NewString(),
+				clusterBindingResourceVersions: sets.NewString(),
+				reviewer:                       reviewer,
+				skip:                           &neverSkipSynchronizer{},
+				clock:                          clk,
+				maxCacheLifespan:               defaultMaxCacheLifespan,
+			}
+			ac.stores.Store(&authorizationCacheStores{
+				reviewRecordStore:       cache.NewStore(reviewRecordKeyFn),
+				userSubjectRecordStore:  cache.NewStore(subjectRecordKeyFn),
+				groupSubjectRecordStore: cache.NewStore(subjectRecordKeyFn),
+			})
+			ac.syncHandler = ac.syncRequest
+
+			// Seed the cache with a full rebuild (first call always invalidates).
+			ac.synchronize()
+
+			// Bump resource versions so subsequent syncs process every namespace
+			// through the incremental COW path.
+			for i := 0; i < bc.namespaces; i++ {
+				name := fmt.Sprintf("ns-%d", i)
+				nsIndexer.Update(&corev1.Namespace{
+					ObjectMeta: metav1.ObjectMeta{Name: name, ResourceVersion: "2"},
+				})
+			}
+
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				ac.synchronize()
+			}
+		})
+	}
+}
+
 type fakeVersioner struct {
 	version string
 }
