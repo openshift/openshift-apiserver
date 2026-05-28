@@ -15,12 +15,7 @@
           "dockerImageLayers": {
             "description": "dockerImageLayers represents the layers in the image. May not be set if the image does not define that data or if the image represents a manifest list.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageLayer"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageLayer"
             },
             "type": "array"
           },
@@ -35,12 +30,7 @@
           "dockerImageManifests": {
             "description": "dockerImageManifests holds information about sub-manifests when the image represents a manifest list. When this field is present, no DockerImageLayers should be specified.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageManifest"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageManifest"
             },
             "type": "array"
           },
@@ -85,12 +75,7 @@
           "signatures": {
             "description": "signatures holds all signatures of the image.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageSignature"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageSignature"
             },
             "type": "array",
             "x-kubernetes-patch-merge-key": "name",
@@ -126,7 +111,6 @@
           "layers": {
             "description": "layers is the list of blobs that compose this image, from base layer to top layer. All layers referenced by this array will be defined in the blobs map. Some images may have zero layers.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -134,7 +118,6 @@
           "manifests": {
             "description": "manifests is the list of other image names that this image points to. For a single architecture image, it is empty. For a multi-arch image, it consists of the digests of single architecture images, such images shouldn't have layers nor config.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -204,12 +187,7 @@
           "manifests": {
             "description": "manifests holds sub-manifests metadata when importing a manifest list",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.Image"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.Image"
             },
             "type": "array"
           },
@@ -289,12 +267,7 @@
           "items": {
             "description": "items is a list of images",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.Image"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.Image"
             },
             "type": "array"
           },
@@ -396,12 +369,7 @@
           "conditions": {
             "description": "conditions represent the latest available observations of a signature's current state.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.SignatureCondition"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.SignatureCondition"
             },
             "type": "array",
             "x-kubernetes-patch-merge-key": "type",
@@ -455,7 +423,6 @@
           },
           "signedClaims": {
             "additionalProperties": {
-              "default": "",
               "type": "string"
             },
             "description": "Contains claims from the signature.",
@@ -648,12 +615,7 @@
           "images": {
             "description": "images are a list of individual images to import.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageImportSpec"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageImportSpec"
             },
             "type": "array"
           },
@@ -682,12 +644,7 @@
           "images": {
             "description": "images is set with the result of importing spec.images",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageImportStatus"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageImportStatus"
             },
             "type": "array"
           },
@@ -719,24 +676,14 @@
           },
           "blobs": {
             "additionalProperties": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageLayerData"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageLayerData"
             },
             "description": "blobs is a map of blob name to metadata about the blob.",
             "type": "object"
           },
           "images": {
             "additionalProperties": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageBlobReferences"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageBlobReferences"
             },
             "description": "images is a map between an image name and the names of the blobs and config that comprise the image.",
             "type": "object"
@@ -778,12 +725,7 @@
           "items": {
             "description": "items is a list of imageStreams",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageStream"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageStream"
             },
             "type": "array"
           },
@@ -890,12 +832,7 @@
           "tags": {
             "description": "tags map arbitrary string values to specific image locators",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.TagReference"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.TagReference"
             },
             "type": "array",
             "x-kubernetes-patch-merge-key": "name",
@@ -919,12 +856,7 @@
           "tags": {
             "description": "tags are a historical record of images associated with each tag. The first entry in the TagEvent array is the currently tagged image.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.NamedTagEventList"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.NamedTagEventList"
             },
             "type": "array",
             "x-kubernetes-patch-merge-key": "tag",
@@ -943,12 +875,7 @@
           "conditions": {
             "description": "conditions is an array of conditions that apply to the image stream tag.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.TagEventCondition"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.TagEventCondition"
             },
             "type": "array"
           },
@@ -1028,12 +955,7 @@
           "items": {
             "description": "items is the list of image stream tags",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageStreamTag"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageStreamTag"
             },
             "type": "array"
           },
@@ -1137,12 +1059,7 @@
           "items": {
             "description": "items is the list of image stream tags",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageTag"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageTag"
             },
             "type": "array"
           },
@@ -1178,24 +1095,14 @@
           "conditions": {
             "description": "conditions is an array of conditions that apply to the tag event list.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.TagEventCondition"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.TagEventCondition"
             },
             "type": "array"
           },
           "items": {
             "description": "Standard object's metadata.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.TagEvent"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.TagEvent"
             },
             "type": "array"
           },
@@ -1257,7 +1164,6 @@
           "additionalTags": {
             "description": "additionalTags are tags that exist in the repository but were not imported because a maximum limit of automatic imports was applied.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -1265,12 +1171,7 @@
           "images": {
             "description": "images is a list of images successfully retrieved by the import of the repository.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageImportStatus"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.image.v1.ImageImportStatus"
             },
             "type": "array"
           },
@@ -1296,12 +1197,7 @@
           "items": {
             "description": "Items is a list of secret objects. More info: https://kubernetes.io/docs/concepts/configuration/secret",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.api.core.v1.Secret"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.api.core.v1.Secret"
             },
             "type": "array"
           },
@@ -1513,7 +1409,6 @@
         "properties": {
           "annotations": {
             "additionalProperties": {
-              "default": "",
               "type": "string"
             },
             "description": "Optional; if specified, annotations that are applied to images retrieved via ImageStreamTags.",
@@ -1660,7 +1555,6 @@
           },
           "stringData": {
             "additionalProperties": {
-              "default": "",
               "type": "string"
             },
             "description": "stringData allows specifying non-binary secret data in string form. It is provided as a write-only input field for convenience. All keys and values are merged into the data field on write, overwriting any existing values. The stringData field is never output when reading from the API.",
@@ -1686,7 +1580,6 @@
           "categories": {
             "description": "categories is a list of the grouped resources this resource belongs to (e.g. 'all')",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array",
@@ -1714,7 +1607,6 @@
           "shortNames": {
             "description": "shortNames is a list of suggested short names of the resource.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array",
@@ -1732,7 +1624,6 @@
           "verbs": {
             "description": "verbs is a list of supported kube verbs (this includes get, list, watch, create, update, patch, delete, deletecollection, and proxy)",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -1770,12 +1661,7 @@
           "resources": {
             "description": "resources contains the name of the resources and if they are namespaced.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIResource"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIResource"
             },
             "type": "array",
             "x-kubernetes-list-type": "atomic"
@@ -1804,7 +1690,6 @@
           "dryRun": {
             "description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array",
@@ -2228,7 +2113,6 @@
         "properties": {
           "annotations": {
             "additionalProperties": {
-              "default": "",
               "type": "string"
             },
             "description": "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations",
@@ -2258,7 +2142,6 @@
           "finalizers": {
             "description": "Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array",
@@ -2276,7 +2159,6 @@
           },
           "labels": {
             "additionalProperties": {
-              "default": "",
               "type": "string"
             },
             "description": "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels",
@@ -2285,12 +2167,7 @@
           "managedFields": {
             "description": "ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like \"ci-cd\". The set of fields is always in the version that the workflow used when modifying the object.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry"
             },
             "type": "array",
             "x-kubernetes-list-type": "atomic"
@@ -2306,12 +2183,7 @@
           "ownerReferences": {
             "description": "List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.OwnerReference"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.OwnerReference"
             },
             "type": "array",
             "x-kubernetes-list-map-keys": [
@@ -2413,8 +2285,7 @@
                 "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails"
               }
             ],
-            "description": "Extended data associated with the reason.  Each reason may define its own extended details. This field is optional and the data returned is not guaranteed to conform to any schema except that defined by the reason type.",
-            "x-kubernetes-list-type": "atomic"
+            "description": "Extended data associated with the reason.  Each reason may define its own extended details. This field is optional and the data returned is not guaranteed to conform to any schema except that defined by the reason type."
           },
           "kind": {
             "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
@@ -2475,12 +2346,7 @@
           "causes": {
             "description": "The Causes array includes more details associated with the StatusReason failure. Not all StatusReasons may provide detailed causes.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusCause"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusCause"
             },
             "type": "array",
             "x-kubernetes-list-type": "atomic"
