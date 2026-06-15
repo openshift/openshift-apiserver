@@ -43,6 +43,10 @@ func (s Strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 		_, tag, _ := imageutil.SplitImageStreamTag(newIST.Name)
 		newIST.Tag.Name = tag
 	}
+	// Copy annotations from ImageStreamTag metadata to Tag if Tag.Annotations is empty
+	if newIST.Tag != nil && len(newIST.Tag.Annotations) == 0 && len(newIST.Annotations) > 0 {
+		newIST.Tag.Annotations = newIST.Annotations
+	}
 	newIST.Conditions = nil
 	newIST.Image = imageapi.Image{}
 }
