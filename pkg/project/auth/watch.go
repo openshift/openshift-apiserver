@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"strconv"
 	"sync"
 
 	"k8s.io/klog/v2"
@@ -65,7 +66,8 @@ type userProjectWatcher struct {
 	// knownProjects maps name to resourceVersion
 	knownProjects map[string]string
 
-	sendBookmark bool
+	sendBookmark            bool
+	bookmarkResourceVersion string
 }
 
 var (
@@ -77,8 +79,12 @@ var (
 func NewUserProjectWatcher(user user.Info, visibleNamespaces sets.String, projectCache *projectcache.ProjectCache, authCache WatchableCache, includeAllExistingProjects bool, predicate kstorage.SelectionPredicate, sendBookmark bool) *userProjectWatcher {
 	namespaces, _ := authCache.List(user, labels.Everything())
 	knownProjects := map[string]string{}
+	var maxRV int
 	for _, namespace := range namespaces.Items {
 		knownProjects[namespace.Name] = namespace.ResourceVersion
+		if n, err := strconv.Atoi(namespace.ResourceVersion); err == nil && n > maxRV {
+			maxRV = n
+		}
 	}
 
 	// this is optional.  If they don't request it, don't include it.
@@ -101,7 +107,8 @@ func NewUserProjectWatcher(user user.Info, visibleNamespaces sets.String, projec
 		initialProjects: initialProjects,
 		knownProjects:   knownProjects,
 
-		sendBookmark: sendBookmark,
+		sendBookmark:            sendBookmark,
+		bookmarkResourceVersion: strconv.Itoa(maxRV),
 	}
 	w.emit = func(e watch.Event) {
 		// if dealing with project events, ensure that we only emit events for projects
@@ -230,7 +237,8 @@ func (w *userProjectWatcher) Watch() {
 			Type: watch.Bookmark,
 			Object: &projectapi.Project{
 				ObjectMeta: metav1.ObjectMeta{
-					Annotations: map[string]string{metav1.InitialEventsAnnotationKey: "true"},
+					ResourceVersion: w.bookmarkResourceVersion,
+					Annotations:     map[string]string{metav1.InitialEventsAnnotationKey: "true"},
 				},
 			},
 		})

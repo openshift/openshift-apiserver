@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -275,14 +276,50 @@ func matchAllPredicate() storage.SelectionPredicate {
 	return projectutil.MatchProject(labels.Everything(), fields.Everything())
 }
 
+func newNamespacesWithRV(names ...string) []*corev1.Namespace {
+	ret := []*corev1.Namespace{}
+	for i, name := range names {
+		ret = append(ret, &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:            name,
+				ResourceVersion: fmt.Sprintf("%d", i+10),
+			},
+		})
+	}
+	return ret
+}
+
+func newBookmarkTestWatcher(username string, includeAllExistingProjects bool, namespaces ...*corev1.Namespace) (*userProjectWatcher, chan struct{}) {
+	objects := []runtime.Object{}
+	for i := range namespaces {
+		objects = append(objects, namespaces[i])
+	}
+	mockClient := fakev1.NewSimpleClientset(objects...)
+	informers := informersv1.NewSharedInformerFactory(mockClient, controller.NoResyncPeriodFunc())
+	projectCache := projectcache.NewProjectCache(
+		informers.Core().V1().Namespaces().Informer(),
+		mockClient.CoreV1().Namespaces(),
+		"",
+	)
+	fakeAuthCache := &fakeAuthCache{namespaces: namespaces}
+	stopCh := make(chan struct{})
+	go projectCache.Run(stopCh)
+	w := NewUserProjectWatcher(
+		&user.DefaultInfo{Name: username},
+		sets.NewString("*"),
+		projectCache,
+		fakeAuthCache,
+		includeAllExistingProjects,
+		matchAllPredicate(),
+		true,
+	)
+	return w, stopCh
+}
+
 func TestSendInitialEventsBookmark(t *testing.T) {
 	t.Run("with rv=0", func(t *testing.T) {
-		// rv="0" behavior: send initial events + bookmark
-		watcher, _, stopCh := newTestWatcher("bob", nil, matchAllPredicate(), true, newNamespaces("ns-01", "ns-02")...)
+		watcher, stopCh := newBookmarkTestWatcher("bob", true, newNamespacesWithRV("ns-01", "ns-02")...)
 		defer close(stopCh)
-
-		// Enable bookmark for watch-list
-		watcher.sendBookmark = true
 
 		go watcher.Watch()
 
@@ -298,7 +335,7 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 			}
 		}
 
-		// expect bookmark with annotation
+		// expect bookmark with annotation and ResourceVersion
 		select {
 		case event := <-watcher.ResultChan():
 			if event.Type != watch.Bookmark {
@@ -307,6 +344,9 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 			project := event.Object.(*projectapi.Project)
 			if project.Annotations[metav1.InitialEventsAnnotationKey] != "true" {
 				t.Errorf("expected initial-events-end annotation")
+			}
+			if project.ResourceVersion != "11" {
+				t.Errorf("expected bookmark ResourceVersion %q, got %q", "11", project.ResourceVersion)
 			}
 		case <-time.After(3 * time.Second):
 			t.Fatalf("timeout waiting for bookmark")
@@ -314,16 +354,12 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 	})
 
 	t.Run("without rv=0", func(t *testing.T) {
-		// rv!="0" behavior: send bookmark only, no initial events
-		watcher, _, stopCh := newTestWatcher("bob", nil, matchAllPredicate(), false, newNamespaces("ns-01", "ns-02")...)
+		watcher, stopCh := newBookmarkTestWatcher("bob", false, newNamespacesWithRV("ns-01", "ns-02")...)
 		defer close(stopCh)
-
-		// Enable bookmark for watch-list
-		watcher.sendBookmark = true
 
 		go watcher.Watch()
 
-		// expect bookmark with annotation immediately
+		// expect bookmark with annotation and ResourceVersion immediately
 		select {
 		case event := <-watcher.ResultChan():
 			if event.Type != watch.Bookmark {
@@ -332,6 +368,9 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 			project := event.Object.(*projectapi.Project)
 			if project.Annotations[metav1.InitialEventsAnnotationKey] != "true" {
 				t.Errorf("expected initial-events-end annotation")
+			}
+			if project.ResourceVersion != "11" {
+				t.Errorf("expected bookmark ResourceVersion %q, got %q", "11", project.ResourceVersion)
 			}
 		case <-time.After(3 * time.Second):
 			t.Fatalf("timeout waiting for bookmark")
