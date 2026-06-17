@@ -111,11 +111,13 @@ func NewUserProjectWatcher(user user.Info, visibleNamespaces sets.String, projec
 		bookmarkResourceVersion: strconv.Itoa(maxRV),
 	}
 	w.emit = func(e watch.Event) {
-		// if dealing with project events, ensure that we only emit events for projects
-		// that match the field or label selector specified by a consumer
-		if project, ok := e.Object.(*projectapi.Project); ok {
-			if matches, err := predicate.Matches(project); err != nil || !matches {
-				return
+		if e.Type != watch.Bookmark {
+			// if dealing with project events, ensure that we only emit events for projects
+			// that match the field or label selector specified by a consumer
+			if project, ok := e.Object.(*projectapi.Project); ok {
+				if matches, err := predicate.Matches(project); err != nil || !matches {
+					return
+				}
 			}
 		}
 

@@ -353,6 +353,56 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 		}
 	})
 
+	t.Run("bookmark bypasses field selector predicate", func(t *testing.T) {
+		// Verify that bookmark events are delivered even when a field selector
+		// (e.g. metadata.name=<project>) would reject the bookmark's empty Name.
+		// This is critical for oc delete --wait which watches a specific project
+		// and needs the bookmark to complete the initial events stream.
+		field := fields.ParseSelectorOrDie("metadata.name=ns-01")
+		m := projectutil.MatchProject(labels.Everything(), field)
+
+		objects := []runtime.Object{}
+		namespaces := newNamespacesWithRV("ns-01", "ns-02")
+		for i := range namespaces {
+			objects = append(objects, namespaces[i])
+		}
+		mockClient := fakev1.NewSimpleClientset(objects...)
+		informers := informersv1.NewSharedInformerFactory(mockClient, controller.NoResyncPeriodFunc())
+		projectCache := projectcache.NewProjectCache(
+			informers.Core().V1().Namespaces().Informer(),
+			mockClient.CoreV1().Namespaces(),
+			"",
+		)
+		fakeAuthCache := &fakeAuthCache{namespaces: namespaces}
+		stopCh := make(chan struct{})
+		defer close(stopCh)
+		go projectCache.Run(stopCh)
+
+		w := NewUserProjectWatcher(
+			&user.DefaultInfo{Name: "bob"},
+			sets.NewString("*"),
+			projectCache,
+			fakeAuthCache,
+			false,
+			m,
+			true,
+		)
+		go w.Watch()
+
+		select {
+		case event := <-w.ResultChan():
+			if event.Type != watch.Bookmark {
+				t.Errorf("expected Bookmark, got %v", event.Type)
+			}
+			project := event.Object.(*projectapi.Project)
+			if project.Annotations[metav1.InitialEventsAnnotationKey] != "true" {
+				t.Errorf("expected initial-events-end annotation")
+			}
+		case <-time.After(3 * time.Second):
+			t.Fatalf("timeout waiting for bookmark — predicate likely filtered it out")
+		}
+	})
+
 	t.Run("without rv=0", func(t *testing.T) {
 		watcher, stopCh := newBookmarkTestWatcher("bob", false, newNamespacesWithRV("ns-01", "ns-02")...)
 		defer close(stopCh)
