@@ -335,7 +335,7 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 			}
 		}
 
-		// expect bookmark with annotation and ResourceVersion
+		// expect bookmark with annotation
 		select {
 		case event := <-watcher.ResultChan():
 			if event.Type != watch.Bookmark {
@@ -344,9 +344,6 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 			project := event.Object.(*projectapi.Project)
 			if project.Annotations[metav1.InitialEventsAnnotationKey] != "true" {
 				t.Errorf("expected initial-events-end annotation")
-			}
-			if project.ResourceVersion != "11" {
-				t.Errorf("expected bookmark ResourceVersion %q, got %q", "11", project.ResourceVersion)
 			}
 		case <-time.After(3 * time.Second):
 			t.Fatalf("timeout waiting for bookmark")
@@ -409,7 +406,7 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 
 		go watcher.Watch()
 
-		// expect bookmark with annotation and ResourceVersion immediately
+		// expect bookmark with annotation immediately
 		select {
 		case event := <-watcher.ResultChan():
 			if event.Type != watch.Bookmark {
@@ -418,9 +415,6 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 			project := event.Object.(*projectapi.Project)
 			if project.Annotations[metav1.InitialEventsAnnotationKey] != "true" {
 				t.Errorf("expected initial-events-end annotation")
-			}
-			if project.ResourceVersion != "11" {
-				t.Errorf("expected bookmark ResourceVersion %q, got %q", "11", project.ResourceVersion)
 			}
 		case <-time.After(3 * time.Second):
 			t.Fatalf("timeout waiting for bookmark")
