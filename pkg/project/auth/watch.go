@@ -64,6 +64,8 @@ type userProjectWatcher struct {
 	initialProjects []corev1.Namespace
 	// knownProjects maps name to resourceVersion
 	knownProjects map[string]string
+
+	sendBookmark bool
 }
 
 var (
@@ -72,7 +74,7 @@ var (
 	watchChannelHWM kstorage.HighWaterMark
 )
 
-func NewUserProjectWatcher(user user.Info, visibleNamespaces sets.String, projectCache *projectcache.ProjectCache, authCache WatchableCache, includeAllExistingProjects bool, predicate kstorage.SelectionPredicate) *userProjectWatcher {
+func NewUserProjectWatcher(user user.Info, visibleNamespaces sets.String, projectCache *projectcache.ProjectCache, authCache WatchableCache, includeAllExistingProjects bool, predicate kstorage.SelectionPredicate, sendBookmark bool) *userProjectWatcher {
 	namespaces, _ := authCache.List(user, labels.Everything())
 	knownProjects := map[string]string{}
 	for _, namespace := range namespaces.Items {
@@ -98,13 +100,17 @@ func NewUserProjectWatcher(user user.Info, visibleNamespaces sets.String, projec
 		authCache:       authCache,
 		initialProjects: initialProjects,
 		knownProjects:   knownProjects,
+
+		sendBookmark: sendBookmark,
 	}
 	w.emit = func(e watch.Event) {
-		// if dealing with project events, ensure that we only emit events for projects
-		// that match the field or label selector specified by a consumer
-		if project, ok := e.Object.(*projectapi.Project); ok {
-			if matches, err := predicate.Matches(project); err != nil || !matches {
-				return
+		if e.Type != watch.Bookmark {
+			// if dealing with project events, ensure that we only emit events for projects
+			// that match the field or label selector specified by a consumer
+			if project, ok := e.Object.(*projectapi.Project); ok {
+				if matches, err := predicate.Matches(project); err != nil || !matches {
+					return
+				}
 			}
 		}
 
@@ -186,6 +192,13 @@ func (w *userProjectWatcher) GroupMembershipChanged(namespaceName string, users,
 
 // Watch pulls stuff from etcd, converts, and pushes out the outgoing channel. Meant to be
 // called as a goroutine.
+//
+// Design decision: This implementation balances KEP-3157 watch-list support with backward
+// compatibility. Initial events are sent only when rv="0" (includeAllExistingProjects=true).
+// For other rv values with SendInitialEvents=true, only the bookmark is sent. This approach
+// acknowledges that project visibility depends on both namespace objects and RBAC state. Since
+// RBAC changes don't update namespace ResourceVersions, permission-filtered views cannot provide
+// the same consistency guarantees (resourceVersionMatch=NotOlderThan) as direct object watches.
 func (w *userProjectWatcher) Watch() {
 	defer close(w.outgoing)
 	defer func() {
@@ -211,6 +224,17 @@ func (w *userProjectWatcher) Watch() {
 		w.emit(watch.Event{
 			Type:   watch.Added,
 			Object: namespaceInternal,
+		})
+	}
+
+	if w.sendBookmark {
+		w.emit(watch.Event{
+			Type: watch.Bookmark,
+			Object: &projectapi.Project{
+				ObjectMeta: metav1.ObjectMeta{
+					Annotations: map[string]string{metav1.InitialEventsAnnotationKey: "true"},
+				},
+			},
 		})
 	}
 
