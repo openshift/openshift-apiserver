@@ -122,7 +122,7 @@ func (s *REST) Watch(ctx context.Context, options *metainternal.ListOptions) (wa
 		if options.ResourceVersion == "0" {
 			includeAllExistingProjects = true
 		}
-		if options.SendInitialEvents != nil && *options.SendInitialEvents {
+		if options.SendInitialEvents != nil && *options.SendInitialEvents && options.AllowWatchBookmarks {
 			sendBookmark = true
 		}
 	}
