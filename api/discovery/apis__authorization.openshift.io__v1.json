@@ -1,0 +1,133 @@
+{
+  "apiVersion": "v1",
+  "groupVersion": "authorization.openshift.io/v1",
+  "kind": "APIResourceList",
+  "resources": [
+    {
+      "kind": "ClusterRoleBinding",
+      "name": "clusterrolebindings",
+      "namespaced": false,
+      "singularName": "clusterrolebinding",
+      "verbs": [
+        "create",
+        "delete",
+        "get",
+        "list",
+        "patch",
+        "update"
+      ]
+    },
+    {
+      "kind": "ClusterRole",
+      "name": "clusterroles",
+      "namespaced": false,
+      "singularName": "clusterrole",
+      "verbs": [
+        "create",
+        "delete",
+        "get",
+        "list",
+        "patch",
+        "update"
+      ]
+    },
+    {
+      "kind": "LocalResourceAccessReview",
+      "name": "localresourceaccessreviews",
+      "namespaced": true,
+      "singularName": "localresourceaccessreview",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "kind": "LocalSubjectAccessReview",
+      "name": "localsubjectaccessreviews",
+      "namespaced": true,
+      "singularName": "localsubjectaccessreview",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "kind": "ResourceAccessReview",
+      "name": "resourceaccessreviews",
+      "namespaced": false,
+      "singularName": "localresourceaccessreview",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "kind": "RoleBindingRestriction",
+      "name": "rolebindingrestrictions",
+      "namespaced": true,
+      "singularName": "rolebindingrestriction",
+      "verbs": [
+        "create",
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "kind": "RoleBinding",
+      "name": "rolebindings",
+      "namespaced": true,
+      "singularName": "rolebinding",
+      "verbs": [
+        "create",
+        "delete",
+        "get",
+        "list",
+        "patch",
+        "update"
+      ]
+    },
+    {
+      "kind": "Role",
+      "name": "roles",
+      "namespaced": true,
+      "singularName": "role",
+      "verbs": [
+        "create",
+        "delete",
+        "get",
+        "list",
+        "patch",
+        "update"
+      ]
+    },
+    {
+      "kind": "SelfSubjectRulesReview",
+      "name": "selfsubjectrulesreviews",
+      "namespaced": true,
+      "singularName": "selfsubjectrulesreview",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "kind": "SubjectAccessReview",
+      "name": "subjectaccessreviews",
+      "namespaced": false,
+      "singularName": "subjectaccessreview",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "kind": "SubjectRulesReview",
+      "name": "subjectrulesreviews",
+      "namespaced": true,
+      "singularName": "subjectrulesreview",
+      "verbs": [
+        "create"
+      ]
+    }
+  ]
+}

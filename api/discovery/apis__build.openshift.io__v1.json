@@ -1,0 +1,104 @@
+{
+  "apiVersion": "v1",
+  "groupVersion": "build.openshift.io/v1",
+  "kind": "APIResourceList",
+  "resources": [
+    {
+      "categories": [
+        "all"
+      ],
+      "kind": "BuildConfig",
+      "name": "buildconfigs",
+      "namespaced": true,
+      "shortNames": [
+        "bc"
+      ],
+      "singularName": "buildconfig",
+      "storageVersionHash": "2ooe95Eo6Y4=",
+      "verbs": [
+        "create",
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "kind": "BuildRequest",
+      "name": "buildconfigs/instantiate",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "kind": "BinaryBuildRequestOptions",
+      "name": "buildconfigs/instantiatebinary",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "kind": "Build",
+      "name": "buildconfigs/webhooks",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "categories": [
+        "all"
+      ],
+      "kind": "Build",
+      "name": "builds",
+      "namespaced": true,
+      "singularName": "build",
+      "storageVersionHash": "Iv+mFnvyzFc=",
+      "verbs": [
+        "create",
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "kind": "BuildRequest",
+      "name": "builds/clone",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "kind": "Build",
+      "name": "builds/details",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "update"
+      ]
+    },
+    {
+      "kind": "BuildLog",
+      "name": "builds/log",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "get"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "paths": {
+    "apis": {
+      "serverRelativeURL": "/openapi/v3/apis"
+    },
+    "apis/apps.openshift.io": {
+      "serverRelativeURL": "/openapi/v3/apis/apps.openshift.io"
+    },
+    "apis/apps.openshift.io/v1": {
+      "serverRelativeURL": "/openapi/v3/apis/apps.openshift.io/v1"
+    },
+    "apis/authorization.openshift.io": {
+      "serverRelativeURL": "/openapi/v3/apis/authorization.openshift.io"
+    },
+    "apis/authorization.openshift.io/v1": {
+      "serverRelativeURL": "/openapi/v3/apis/authorization.openshift.io/v1"
+    },
+    "apis/build.openshift.io": {
+      "serverRelativeURL": "/openapi/v3/apis/build.openshift.io"
+    },
+    "apis/build.openshift.io/v1": {
+      "serverRelativeURL": "/openapi/v3/apis/build.openshift.io/v1"
+    },
+    "apis/image.openshift.io": {
+      "serverRelativeURL": "/openapi/v3/apis/image.openshift.io"
+    },
+    "apis/image.openshift.io/v1": {
+      "serverRelativeURL": "/openapi/v3/apis/image.openshift.io/v1"
+    },
+    "apis/project.openshift.io": {
+      "serverRelativeURL": "/openapi/v3/apis/project.openshift.io"
+    },
+    "apis/project.openshift.io/v1": {
+      "serverRelativeURL": "/openapi/v3/apis/project.openshift.io/v1"
+    },
+    "apis/quota.openshift.io": {
+      "serverRelativeURL": "/openapi/v3/apis/quota.openshift.io"
+    },
+    "apis/quota.openshift.io/v1": {
+      "serverRelativeURL": "/openapi/v3/apis/quota.openshift.io/v1"
+    },
+    "apis/route.openshift.io": {
+      "serverRelativeURL": "/openapi/v3/apis/route.openshift.io"
+    },
+    "apis/route.openshift.io/v1": {
+      "serverRelativeURL": "/openapi/v3/apis/route.openshift.io/v1"
+    },
+    "apis/security.openshift.io": {
+      "serverRelativeURL": "/openapi/v3/apis/security.openshift.io"
+    },
+    "apis/security.openshift.io/v1": {
+      "serverRelativeURL": "/openapi/v3/apis/security.openshift.io/v1"
+    },
+    "apis/template.openshift.io": {
+      "serverRelativeURL": "/openapi/v3/apis/template.openshift.io"
+    },
+    "apis/template.openshift.io/v1": {
+      "serverRelativeURL": "/openapi/v3/apis/template.openshift.io/v1"
+    },
+    "version": {
+      "serverRelativeURL": "/openapi/v3/version"
+    },
+    "version/openshift": {
+      "serverRelativeURL": "/openapi/v3/version/openshift"
+    }
+  }
+}

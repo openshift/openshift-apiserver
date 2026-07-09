@@ -1,0 +1,150 @@
+{
+  "apiVersion": "v1",
+  "groupVersion": "image.openshift.io/v1",
+  "kind": "APIResourceList",
+  "resources": [
+    {
+      "kind": "Image",
+      "name": "images",
+      "namespaced": false,
+      "singularName": "image",
+      "storageVersionHash": "FX/i8Tt+3Fc=",
+      "verbs": [
+        "create",
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "kind": "ImageSignature",
+      "name": "imagesignatures",
+      "namespaced": false,
+      "singularName": "imagesignature",
+      "verbs": [
+        "create",
+        "delete"
+      ]
+    },
+    {
+      "kind": "ImageStreamImage",
+      "name": "imagestreamimages",
+      "namespaced": true,
+      "shortNames": [
+        "isimage"
+      ],
+      "singularName": "imagestreamimage",
+      "verbs": [
+        "get"
+      ]
+    },
+    {
+      "kind": "ImageStreamImport",
+      "name": "imagestreamimports",
+      "namespaced": true,
+      "singularName": "imagestreamimport",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "kind": "ImageStreamMapping",
+      "name": "imagestreammappings",
+      "namespaced": true,
+      "singularName": "imagestreammapping",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "categories": [
+        "all"
+      ],
+      "kind": "ImageStream",
+      "name": "imagestreams",
+      "namespaced": true,
+      "shortNames": [
+        "is"
+      ],
+      "singularName": "imagestream",
+      "storageVersionHash": "mwmf9lCqOiA=",
+      "verbs": [
+        "create",
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "kind": "ImageStreamLayers",
+      "name": "imagestreams/layers",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "get"
+      ]
+    },
+    {
+      "kind": "SecretList",
+      "name": "imagestreams/secrets",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "get"
+      ]
+    },
+    {
+      "kind": "ImageStream",
+      "name": "imagestreams/status",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "get",
+        "patch",
+        "update"
+      ]
+    },
+    {
+      "kind": "ImageStreamTag",
+      "name": "imagestreamtags",
+      "namespaced": true,
+      "shortNames": [
+        "istag"
+      ],
+      "singularName": "imagestreamtag",
+      "verbs": [
+        "create",
+        "delete",
+        "get",
+        "list",
+        "patch",
+        "update"
+      ]
+    },
+    {
+      "kind": "ImageTag",
+      "name": "imagetags",
+      "namespaced": true,
+      "shortNames": [
+        "itag"
+      ],
+      "singularName": "imagetag",
+      "verbs": [
+        "create",
+        "delete",
+        "get",
+        "list",
+        "patch",
+        "update"
+      ]
+    }
+  ]
+}

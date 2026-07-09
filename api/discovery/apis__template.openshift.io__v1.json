@@ -1,0 +1,78 @@
+{
+  "apiVersion": "v1",
+  "groupVersion": "template.openshift.io/v1",
+  "kind": "APIResourceList",
+  "resources": [
+    {
+      "kind": "BrokerTemplateInstance",
+      "name": "brokertemplateinstances",
+      "namespaced": false,
+      "singularName": "brokertemplateinstance",
+      "storageVersionHash": "Jxj8HlN0pXU=",
+      "verbs": [
+        "create",
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "kind": "Template",
+      "name": "processedtemplates",
+      "namespaced": true,
+      "singularName": "processedtemplate",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "kind": "TemplateInstance",
+      "name": "templateinstances",
+      "namespaced": true,
+      "singularName": "templateinstance",
+      "storageVersionHash": "Q8UwfyPqly4=",
+      "verbs": [
+        "create",
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "kind": "TemplateInstance",
+      "name": "templateinstances/status",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "get",
+        "patch",
+        "update"
+      ]
+    },
+    {
+      "kind": "Template",
+      "name": "templates",
+      "namespaced": true,
+      "singularName": "template",
+      "storageVersionHash": "utuWisMumJk=",
+      "verbs": [
+        "create",
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    }
+  ]
+}

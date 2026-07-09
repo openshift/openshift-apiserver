@@ -1,0 +1,81 @@
+{
+  "apiVersion": "v1",
+  "groupVersion": "apps.openshift.io/v1",
+  "kind": "APIResourceList",
+  "resources": [
+    {
+      "categories": [
+        "all"
+      ],
+      "kind": "DeploymentConfig",
+      "name": "deploymentconfigs",
+      "namespaced": true,
+      "shortNames": [
+        "dc"
+      ],
+      "singularName": "deploymentconfig",
+      "storageVersionHash": "6xyoXGsxfiA=",
+      "verbs": [
+        "create",
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "kind": "DeploymentRequest",
+      "name": "deploymentconfigs/instantiate",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "kind": "DeploymentLog",
+      "name": "deploymentconfigs/log",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "get"
+      ]
+    },
+    {
+      "kind": "DeploymentConfigRollback",
+      "name": "deploymentconfigs/rollback",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "create"
+      ]
+    },
+    {
+      "group": "extensions",
+      "kind": "Scale",
+      "name": "deploymentconfigs/scale",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "get",
+        "patch",
+        "update"
+      ],
+      "version": "v1beta1"
+    },
+    {
+      "kind": "DeploymentConfig",
+      "name": "deploymentconfigs/status",
+      "namespaced": true,
+      "singularName": "",
+      "verbs": [
+        "get",
+        "patch",
+        "update"
+      ]
+    }
+  ]
+}
