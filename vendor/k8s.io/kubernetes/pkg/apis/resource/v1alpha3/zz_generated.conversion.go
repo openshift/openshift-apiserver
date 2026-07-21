@@ -98,6 +98,16 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*resourcev1alpha3.DeviceTaintRuleStatus)(nil), (*resource.DeviceTaintRuleStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha3_DeviceTaintRuleStatus_To_resource_DeviceTaintRuleStatus(a.(*resourcev1alpha3.DeviceTaintRuleStatus), b.(*resource.DeviceTaintRuleStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*resource.DeviceTaintRuleStatus)(nil), (*resourcev1alpha3.DeviceTaintRuleStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_resource_DeviceTaintRuleStatus_To_v1alpha3_DeviceTaintRuleStatus(a.(*resource.DeviceTaintRuleStatus), b.(*resourcev1alpha3.DeviceTaintRuleStatus), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*resourcev1alpha3.DeviceTaintSelector)(nil), (*resource.DeviceTaintSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha3_DeviceTaintSelector_To_resource_DeviceTaintSelector(a.(*resourcev1alpha3.DeviceTaintSelector), b.(*resource.DeviceTaintSelector), scope)
 	}); err != nil {
@@ -105,6 +115,56 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*resource.DeviceTaintSelector)(nil), (*resourcev1alpha3.DeviceTaintSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_resource_DeviceTaintSelector_To_v1alpha3_DeviceTaintSelector(a.(*resource.DeviceTaintSelector), b.(*resourcev1alpha3.DeviceTaintSelector), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*resourcev1alpha3.PoolStatus)(nil), (*resource.PoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha3_PoolStatus_To_resource_PoolStatus(a.(*resourcev1alpha3.PoolStatus), b.(*resource.PoolStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*resource.PoolStatus)(nil), (*resourcev1alpha3.PoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_resource_PoolStatus_To_v1alpha3_PoolStatus(a.(*resource.PoolStatus), b.(*resourcev1alpha3.PoolStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*resourcev1alpha3.ResourcePoolStatusRequest)(nil), (*resource.ResourcePoolStatusRequest)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha3_ResourcePoolStatusRequest_To_resource_ResourcePoolStatusRequest(a.(*resourcev1alpha3.ResourcePoolStatusRequest), b.(*resource.ResourcePoolStatusRequest), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*resource.ResourcePoolStatusRequest)(nil), (*resourcev1alpha3.ResourcePoolStatusRequest)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_resource_ResourcePoolStatusRequest_To_v1alpha3_ResourcePoolStatusRequest(a.(*resource.ResourcePoolStatusRequest), b.(*resourcev1alpha3.ResourcePoolStatusRequest), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*resourcev1alpha3.ResourcePoolStatusRequestList)(nil), (*resource.ResourcePoolStatusRequestList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha3_ResourcePoolStatusRequestList_To_resource_ResourcePoolStatusRequestList(a.(*resourcev1alpha3.ResourcePoolStatusRequestList), b.(*resource.ResourcePoolStatusRequestList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*resource.ResourcePoolStatusRequestList)(nil), (*resourcev1alpha3.ResourcePoolStatusRequestList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_resource_ResourcePoolStatusRequestList_To_v1alpha3_ResourcePoolStatusRequestList(a.(*resource.ResourcePoolStatusRequestList), b.(*resourcev1alpha3.ResourcePoolStatusRequestList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*resourcev1alpha3.ResourcePoolStatusRequestSpec)(nil), (*resource.ResourcePoolStatusRequestSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha3_ResourcePoolStatusRequestSpec_To_resource_ResourcePoolStatusRequestSpec(a.(*resourcev1alpha3.ResourcePoolStatusRequestSpec), b.(*resource.ResourcePoolStatusRequestSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*resource.ResourcePoolStatusRequestSpec)(nil), (*resourcev1alpha3.ResourcePoolStatusRequestSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_resource_ResourcePoolStatusRequestSpec_To_v1alpha3_ResourcePoolStatusRequestSpec(a.(*resource.ResourcePoolStatusRequestSpec), b.(*resourcev1alpha3.ResourcePoolStatusRequestSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*resourcev1alpha3.ResourcePoolStatusRequestStatus)(nil), (*resource.ResourcePoolStatusRequestStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha3_ResourcePoolStatusRequestStatus_To_resource_ResourcePoolStatusRequestStatus(a.(*resourcev1alpha3.ResourcePoolStatusRequestStatus), b.(*resource.ResourcePoolStatusRequestStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*resource.ResourcePoolStatusRequestStatus)(nil), (*resourcev1alpha3.ResourcePoolStatusRequestStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_resource_ResourcePoolStatusRequestStatus_To_v1alpha3_ResourcePoolStatusRequestStatus(a.(*resource.ResourcePoolStatusRequestStatus), b.(*resourcev1alpha3.ResourcePoolStatusRequestStatus), scope)
 	}); err != nil {
 		return err
 	}
@@ -182,6 +242,9 @@ func autoConvert_v1alpha3_DeviceTaintRule_To_resource_DeviceTaintRule(in *resour
 	if err := Convert_v1alpha3_DeviceTaintRuleSpec_To_resource_DeviceTaintRuleSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
+	if err := Convert_v1alpha3_DeviceTaintRuleStatus_To_resource_DeviceTaintRuleStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -193,6 +256,9 @@ func Convert_v1alpha3_DeviceTaintRule_To_resource_DeviceTaintRule(in *resourcev1
 func autoConvert_resource_DeviceTaintRule_To_v1alpha3_DeviceTaintRule(in *resource.DeviceTaintRule, out *resourcev1alpha3.DeviceTaintRule, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_resource_DeviceTaintRuleSpec_To_v1alpha3_DeviceTaintRuleSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_resource_DeviceTaintRuleStatus_To_v1alpha3_DeviceTaintRuleStatus(&in.Status, &out.Status, s); err != nil {
 		return err
 	}
 	return nil
@@ -251,12 +317,30 @@ func Convert_resource_DeviceTaintRuleSpec_To_v1alpha3_DeviceTaintRuleSpec(in *re
 	return autoConvert_resource_DeviceTaintRuleSpec_To_v1alpha3_DeviceTaintRuleSpec(in, out, s)
 }
 
+func autoConvert_v1alpha3_DeviceTaintRuleStatus_To_resource_DeviceTaintRuleStatus(in *resourcev1alpha3.DeviceTaintRuleStatus, out *resource.DeviceTaintRuleStatus, s conversion.Scope) error {
+	out.Conditions = *(*[]v1.Condition)(unsafe.Pointer(&in.Conditions))
+	return nil
+}
+
+// Convert_v1alpha3_DeviceTaintRuleStatus_To_resource_DeviceTaintRuleStatus is an autogenerated conversion function.
+func Convert_v1alpha3_DeviceTaintRuleStatus_To_resource_DeviceTaintRuleStatus(in *resourcev1alpha3.DeviceTaintRuleStatus, out *resource.DeviceTaintRuleStatus, s conversion.Scope) error {
+	return autoConvert_v1alpha3_DeviceTaintRuleStatus_To_resource_DeviceTaintRuleStatus(in, out, s)
+}
+
+func autoConvert_resource_DeviceTaintRuleStatus_To_v1alpha3_DeviceTaintRuleStatus(in *resource.DeviceTaintRuleStatus, out *resourcev1alpha3.DeviceTaintRuleStatus, s conversion.Scope) error {
+	out.Conditions = *(*[]v1.Condition)(unsafe.Pointer(&in.Conditions))
+	return nil
+}
+
+// Convert_resource_DeviceTaintRuleStatus_To_v1alpha3_DeviceTaintRuleStatus is an autogenerated conversion function.
+func Convert_resource_DeviceTaintRuleStatus_To_v1alpha3_DeviceTaintRuleStatus(in *resource.DeviceTaintRuleStatus, out *resourcev1alpha3.DeviceTaintRuleStatus, s conversion.Scope) error {
+	return autoConvert_resource_DeviceTaintRuleStatus_To_v1alpha3_DeviceTaintRuleStatus(in, out, s)
+}
+
 func autoConvert_v1alpha3_DeviceTaintSelector_To_resource_DeviceTaintSelector(in *resourcev1alpha3.DeviceTaintSelector, out *resource.DeviceTaintSelector, s conversion.Scope) error {
-	out.DeviceClassName = (*string)(unsafe.Pointer(in.DeviceClassName))
 	out.Driver = (*string)(unsafe.Pointer(in.Driver))
 	out.Pool = (*string)(unsafe.Pointer(in.Pool))
 	out.Device = (*string)(unsafe.Pointer(in.Device))
-	out.Selectors = *(*[]resource.DeviceSelector)(unsafe.Pointer(&in.Selectors))
 	return nil
 }
 
@@ -266,15 +350,149 @@ func Convert_v1alpha3_DeviceTaintSelector_To_resource_DeviceTaintSelector(in *re
 }
 
 func autoConvert_resource_DeviceTaintSelector_To_v1alpha3_DeviceTaintSelector(in *resource.DeviceTaintSelector, out *resourcev1alpha3.DeviceTaintSelector, s conversion.Scope) error {
-	out.DeviceClassName = (*string)(unsafe.Pointer(in.DeviceClassName))
 	out.Driver = (*string)(unsafe.Pointer(in.Driver))
 	out.Pool = (*string)(unsafe.Pointer(in.Pool))
 	out.Device = (*string)(unsafe.Pointer(in.Device))
-	out.Selectors = *(*[]resourcev1alpha3.DeviceSelector)(unsafe.Pointer(&in.Selectors))
 	return nil
 }
 
 // Convert_resource_DeviceTaintSelector_To_v1alpha3_DeviceTaintSelector is an autogenerated conversion function.
 func Convert_resource_DeviceTaintSelector_To_v1alpha3_DeviceTaintSelector(in *resource.DeviceTaintSelector, out *resourcev1alpha3.DeviceTaintSelector, s conversion.Scope) error {
 	return autoConvert_resource_DeviceTaintSelector_To_v1alpha3_DeviceTaintSelector(in, out, s)
+}
+
+func autoConvert_v1alpha3_PoolStatus_To_resource_PoolStatus(in *resourcev1alpha3.PoolStatus, out *resource.PoolStatus, s conversion.Scope) error {
+	out.Driver = in.Driver
+	out.PoolName = in.PoolName
+	out.Generation = in.Generation
+	out.ResourceSliceCount = (*int32)(unsafe.Pointer(in.ResourceSliceCount))
+	out.TotalDevices = (*int32)(unsafe.Pointer(in.TotalDevices))
+	out.AllocatedDevices = (*int32)(unsafe.Pointer(in.AllocatedDevices))
+	out.AvailableDevices = (*int32)(unsafe.Pointer(in.AvailableDevices))
+	out.UnavailableDevices = (*int32)(unsafe.Pointer(in.UnavailableDevices))
+	out.NodeName = (*string)(unsafe.Pointer(in.NodeName))
+	out.ValidationError = (*string)(unsafe.Pointer(in.ValidationError))
+	return nil
+}
+
+// Convert_v1alpha3_PoolStatus_To_resource_PoolStatus is an autogenerated conversion function.
+func Convert_v1alpha3_PoolStatus_To_resource_PoolStatus(in *resourcev1alpha3.PoolStatus, out *resource.PoolStatus, s conversion.Scope) error {
+	return autoConvert_v1alpha3_PoolStatus_To_resource_PoolStatus(in, out, s)
+}
+
+func autoConvert_resource_PoolStatus_To_v1alpha3_PoolStatus(in *resource.PoolStatus, out *resourcev1alpha3.PoolStatus, s conversion.Scope) error {
+	out.Driver = in.Driver
+	out.PoolName = in.PoolName
+	out.Generation = in.Generation
+	out.ResourceSliceCount = (*int32)(unsafe.Pointer(in.ResourceSliceCount))
+	out.TotalDevices = (*int32)(unsafe.Pointer(in.TotalDevices))
+	out.AllocatedDevices = (*int32)(unsafe.Pointer(in.AllocatedDevices))
+	out.AvailableDevices = (*int32)(unsafe.Pointer(in.AvailableDevices))
+	out.UnavailableDevices = (*int32)(unsafe.Pointer(in.UnavailableDevices))
+	out.NodeName = (*string)(unsafe.Pointer(in.NodeName))
+	out.ValidationError = (*string)(unsafe.Pointer(in.ValidationError))
+	return nil
+}
+
+// Convert_resource_PoolStatus_To_v1alpha3_PoolStatus is an autogenerated conversion function.
+func Convert_resource_PoolStatus_To_v1alpha3_PoolStatus(in *resource.PoolStatus, out *resourcev1alpha3.PoolStatus, s conversion.Scope) error {
+	return autoConvert_resource_PoolStatus_To_v1alpha3_PoolStatus(in, out, s)
+}
+
+func autoConvert_v1alpha3_ResourcePoolStatusRequest_To_resource_ResourcePoolStatusRequest(in *resourcev1alpha3.ResourcePoolStatusRequest, out *resource.ResourcePoolStatusRequest, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_v1alpha3_ResourcePoolStatusRequestSpec_To_resource_ResourcePoolStatusRequestSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	out.Status = (*resource.ResourcePoolStatusRequestStatus)(unsafe.Pointer(in.Status))
+	return nil
+}
+
+// Convert_v1alpha3_ResourcePoolStatusRequest_To_resource_ResourcePoolStatusRequest is an autogenerated conversion function.
+func Convert_v1alpha3_ResourcePoolStatusRequest_To_resource_ResourcePoolStatusRequest(in *resourcev1alpha3.ResourcePoolStatusRequest, out *resource.ResourcePoolStatusRequest, s conversion.Scope) error {
+	return autoConvert_v1alpha3_ResourcePoolStatusRequest_To_resource_ResourcePoolStatusRequest(in, out, s)
+}
+
+func autoConvert_resource_ResourcePoolStatusRequest_To_v1alpha3_ResourcePoolStatusRequest(in *resource.ResourcePoolStatusRequest, out *resourcev1alpha3.ResourcePoolStatusRequest, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_resource_ResourcePoolStatusRequestSpec_To_v1alpha3_ResourcePoolStatusRequestSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	out.Status = (*resourcev1alpha3.ResourcePoolStatusRequestStatus)(unsafe.Pointer(in.Status))
+	return nil
+}
+
+// Convert_resource_ResourcePoolStatusRequest_To_v1alpha3_ResourcePoolStatusRequest is an autogenerated conversion function.
+func Convert_resource_ResourcePoolStatusRequest_To_v1alpha3_ResourcePoolStatusRequest(in *resource.ResourcePoolStatusRequest, out *resourcev1alpha3.ResourcePoolStatusRequest, s conversion.Scope) error {
+	return autoConvert_resource_ResourcePoolStatusRequest_To_v1alpha3_ResourcePoolStatusRequest(in, out, s)
+}
+
+func autoConvert_v1alpha3_ResourcePoolStatusRequestList_To_resource_ResourcePoolStatusRequestList(in *resourcev1alpha3.ResourcePoolStatusRequestList, out *resource.ResourcePoolStatusRequestList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]resource.ResourcePoolStatusRequest)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_v1alpha3_ResourcePoolStatusRequestList_To_resource_ResourcePoolStatusRequestList is an autogenerated conversion function.
+func Convert_v1alpha3_ResourcePoolStatusRequestList_To_resource_ResourcePoolStatusRequestList(in *resourcev1alpha3.ResourcePoolStatusRequestList, out *resource.ResourcePoolStatusRequestList, s conversion.Scope) error {
+	return autoConvert_v1alpha3_ResourcePoolStatusRequestList_To_resource_ResourcePoolStatusRequestList(in, out, s)
+}
+
+func autoConvert_resource_ResourcePoolStatusRequestList_To_v1alpha3_ResourcePoolStatusRequestList(in *resource.ResourcePoolStatusRequestList, out *resourcev1alpha3.ResourcePoolStatusRequestList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]resourcev1alpha3.ResourcePoolStatusRequest)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_resource_ResourcePoolStatusRequestList_To_v1alpha3_ResourcePoolStatusRequestList is an autogenerated conversion function.
+func Convert_resource_ResourcePoolStatusRequestList_To_v1alpha3_ResourcePoolStatusRequestList(in *resource.ResourcePoolStatusRequestList, out *resourcev1alpha3.ResourcePoolStatusRequestList, s conversion.Scope) error {
+	return autoConvert_resource_ResourcePoolStatusRequestList_To_v1alpha3_ResourcePoolStatusRequestList(in, out, s)
+}
+
+func autoConvert_v1alpha3_ResourcePoolStatusRequestSpec_To_resource_ResourcePoolStatusRequestSpec(in *resourcev1alpha3.ResourcePoolStatusRequestSpec, out *resource.ResourcePoolStatusRequestSpec, s conversion.Scope) error {
+	out.Driver = in.Driver
+	out.PoolName = (*string)(unsafe.Pointer(in.PoolName))
+	out.Limit = (*int32)(unsafe.Pointer(in.Limit))
+	return nil
+}
+
+// Convert_v1alpha3_ResourcePoolStatusRequestSpec_To_resource_ResourcePoolStatusRequestSpec is an autogenerated conversion function.
+func Convert_v1alpha3_ResourcePoolStatusRequestSpec_To_resource_ResourcePoolStatusRequestSpec(in *resourcev1alpha3.ResourcePoolStatusRequestSpec, out *resource.ResourcePoolStatusRequestSpec, s conversion.Scope) error {
+	return autoConvert_v1alpha3_ResourcePoolStatusRequestSpec_To_resource_ResourcePoolStatusRequestSpec(in, out, s)
+}
+
+func autoConvert_resource_ResourcePoolStatusRequestSpec_To_v1alpha3_ResourcePoolStatusRequestSpec(in *resource.ResourcePoolStatusRequestSpec, out *resourcev1alpha3.ResourcePoolStatusRequestSpec, s conversion.Scope) error {
+	out.Driver = in.Driver
+	out.PoolName = (*string)(unsafe.Pointer(in.PoolName))
+	out.Limit = (*int32)(unsafe.Pointer(in.Limit))
+	return nil
+}
+
+// Convert_resource_ResourcePoolStatusRequestSpec_To_v1alpha3_ResourcePoolStatusRequestSpec is an autogenerated conversion function.
+func Convert_resource_ResourcePoolStatusRequestSpec_To_v1alpha3_ResourcePoolStatusRequestSpec(in *resource.ResourcePoolStatusRequestSpec, out *resourcev1alpha3.ResourcePoolStatusRequestSpec, s conversion.Scope) error {
+	return autoConvert_resource_ResourcePoolStatusRequestSpec_To_v1alpha3_ResourcePoolStatusRequestSpec(in, out, s)
+}
+
+func autoConvert_v1alpha3_ResourcePoolStatusRequestStatus_To_resource_ResourcePoolStatusRequestStatus(in *resourcev1alpha3.ResourcePoolStatusRequestStatus, out *resource.ResourcePoolStatusRequestStatus, s conversion.Scope) error {
+	out.PoolCount = (*int32)(unsafe.Pointer(in.PoolCount))
+	out.Pools = *(*[]resource.PoolStatus)(unsafe.Pointer(&in.Pools))
+	out.Conditions = *(*[]v1.Condition)(unsafe.Pointer(&in.Conditions))
+	return nil
+}
+
+// Convert_v1alpha3_ResourcePoolStatusRequestStatus_To_resource_ResourcePoolStatusRequestStatus is an autogenerated conversion function.
+func Convert_v1alpha3_ResourcePoolStatusRequestStatus_To_resource_ResourcePoolStatusRequestStatus(in *resourcev1alpha3.ResourcePoolStatusRequestStatus, out *resource.ResourcePoolStatusRequestStatus, s conversion.Scope) error {
+	return autoConvert_v1alpha3_ResourcePoolStatusRequestStatus_To_resource_ResourcePoolStatusRequestStatus(in, out, s)
+}
+
+func autoConvert_resource_ResourcePoolStatusRequestStatus_To_v1alpha3_ResourcePoolStatusRequestStatus(in *resource.ResourcePoolStatusRequestStatus, out *resourcev1alpha3.ResourcePoolStatusRequestStatus, s conversion.Scope) error {
+	out.PoolCount = (*int32)(unsafe.Pointer(in.PoolCount))
+	out.Pools = *(*[]resourcev1alpha3.PoolStatus)(unsafe.Pointer(&in.Pools))
+	out.Conditions = *(*[]v1.Condition)(unsafe.Pointer(&in.Conditions))
+	return nil
+}
+
+// Convert_resource_ResourcePoolStatusRequestStatus_To_v1alpha3_ResourcePoolStatusRequestStatus is an autogenerated conversion function.
+func Convert_resource_ResourcePoolStatusRequestStatus_To_v1alpha3_ResourcePoolStatusRequestStatus(in *resource.ResourcePoolStatusRequestStatus, out *resourcev1alpha3.ResourcePoolStatusRequestStatus, s conversion.Scope) error {
+	return autoConvert_resource_ResourcePoolStatusRequestStatus_To_v1alpha3_ResourcePoolStatusRequestStatus(in, out, s)
 }

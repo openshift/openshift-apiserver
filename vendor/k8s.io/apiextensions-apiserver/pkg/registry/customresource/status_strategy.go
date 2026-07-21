@@ -56,6 +56,7 @@ func (a statusStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set
 			// we might need a mechanism that is the inverse of resetFields where
 			// you specify only the fields to be kept rather than the fields to be wiped
 			// that way you could wipe everything but the status in this case.
+			fieldpath.MakePathOrDie("metadata"),
 			fieldpath.MakePathOrDie("spec"),
 		),
 	}
@@ -105,7 +106,9 @@ func (a statusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Obj
 	var correlatedObject *common.CorrelatedObject
 	if utilfeature.DefaultFeatureGate.Enabled(apiextensionsfeatures.CRDValidationRatcheting) {
 		correlatedObject = common.NewCorrelatedObject(uNew.Object, uOld.Object, &model.Structural{Structural: a.structuralSchema})
-		options = append(options, validation.WithRatcheting(correlatedObject.Key("status")))
+		if a.structuralSchema != nil {
+			options = append(options, validation.WithRatcheting(correlatedObject.Key("status")))
+		}
 		celOptions = append(celOptions, cel.WithRatcheting(correlatedObject))
 	}
 

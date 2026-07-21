@@ -1510,6 +1510,11 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: signerName
       type:
         scalar: string
+    - name: userAnnotations
+      type:
+        map:
+          elementType:
+            scalar: string
 - name: io.k8s.api.core.v1.PodDNSConfig
   map:
     fields:
@@ -1574,6 +1579,16 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: io.k8s.api.core.v1.PodSchedulingGroup
+  map:
+    fields:
+    - name: podGroupName
+      type:
+        scalar: string
+    unions:
+    - fields:
+      - fieldName: podGroupName
+        discriminatorValue: PodGroupName
 - name: io.k8s.api.core.v1.PodSecurityContext
   map:
     fields:
@@ -1761,6 +1776,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - name
+    - name: schedulingGroup
+      type:
+        namedType: io.k8s.api.core.v1.PodSchedulingGroup
     - name: securityContext
       type:
         namedType: io.k8s.api.core.v1.PodSecurityContext

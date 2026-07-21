@@ -72,10 +72,11 @@ type ExtensionTestSpec struct {
 }
 
 type Resources struct {
-	Isolation Isolation `json:"isolation"`
-	Memory    string    `json:"memory,omitempty"`
-	Duration  string    `json:"duration,omitempty"`
-	Timeout   string    `json:"timeout,omitempty"`
+	Isolation Isolation      `json:"isolation"`
+	ResourcePools map[string]int `json:"resourcePools,omitempty"`
+	Memory    string         `json:"memory,omitempty"`
+	Duration  string         `json:"duration,omitempty"`
+	Timeout   string         `json:"timeout,omitempty"`
 }
 
 type Isolation struct {

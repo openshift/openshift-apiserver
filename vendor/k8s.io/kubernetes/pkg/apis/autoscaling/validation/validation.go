@@ -19,8 +19,8 @@ package validation
 import (
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
-	pathvalidation "k8s.io/apimachinery/pkg/api/validation/path"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -50,17 +50,19 @@ func ValidateScale(scale *autoscaling.Scale) field.ErrorList {
 
 // ValidateHorizontalPodAutoscalerName can be used to check whether the given autoscaler name is valid.
 // Prefix indicates this name will be used as part of generation, in which case trailing dashes are allowed.
-var ValidateHorizontalPodAutoscalerName = apivalidation.ValidateReplicationControllerName
+var ValidateHorizontalPodAutoscalerName = apimachineryvalidation.NameIsDNSSubdomain
 
 func validateHorizontalPodAutoscalerSpec(autoscaler autoscaling.HorizontalPodAutoscalerSpec, fldPath *field.Path, opts HorizontalPodAutoscalerSpecValidationOptions) field.ErrorList {
 	allErrs := field.ErrorList{}
 
 	if autoscaler.MinReplicas != nil && *autoscaler.MinReplicas < opts.MinReplicasLowerBound {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("minReplicas"), *autoscaler.MinReplicas,
-			fmt.Sprintf("must be greater than or equal to %d", opts.MinReplicasLowerBound)))
+			fmt.Sprintf("must be greater than or equal to %d", opts.MinReplicasLowerBound)).WithOrigin("minimum").MarkCoveredByDeclarative())
 	}
-	if autoscaler.MaxReplicas < 1 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxReplicas"), autoscaler.MaxReplicas, "must be greater than 0"))
+	if autoscaler.MaxReplicas == 0 {
+		allErrs = append(allErrs, field.Required(fldPath.Child("maxReplicas"), "must be set and greater than 0").MarkCoveredByDeclarative())
+	} else if autoscaler.MaxReplicas < 0 {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxReplicas"), autoscaler.MaxReplicas, "must be greater than or equal to 1").WithOrigin("minimum").MarkCoveredByDeclarative())
 	}
 	if autoscaler.MinReplicas != nil && autoscaler.MaxReplicas < *autoscaler.MinReplicas {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxReplicas"), autoscaler.MaxReplicas, "must be greater than or equal to `minReplicas`"))
@@ -84,7 +86,7 @@ func ValidateCrossVersionObjectReference(ref autoscaling.CrossVersionObjectRefer
 	if len(ref.Kind) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("kind"), ""))
 	} else {
-		for _, msg := range pathvalidation.IsValidPathSegmentName(ref.Kind) {
+		for _, msg := range content.IsPathSegmentName(ref.Kind) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("kind"), ref.Kind, msg))
 		}
 	}
@@ -92,7 +94,7 @@ func ValidateCrossVersionObjectReference(ref autoscaling.CrossVersionObjectRefer
 	if len(ref.Name) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("name"), ""))
 	} else {
-		for _, msg := range pathvalidation.IsValidPathSegmentName(ref.Name) {
+		for _, msg := range content.IsPathSegmentName(ref.Name) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), ref.Name, msg))
 		}
 	}
@@ -472,7 +474,7 @@ func validateMetricIdentifier(id autoscaling.MetricIdentifier, fldPath *field.Pa
 	if len(id.Name) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("name"), "must specify a metric name"))
 	} else {
-		for _, msg := range pathvalidation.IsValidPathSegmentName(id.Name) {
+		for _, msg := range content.IsPathSegmentName(id.Name) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), id.Name, msg))
 		}
 	}

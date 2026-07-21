@@ -89,12 +89,9 @@ const (
 	// PodNodeNameKeyIndex is the name of the index used by PodInformer to index pods by their node name.
 	PodNodeNameKeyIndex = "spec.nodeName"
 
-	// OrphanPodIndexKey is used to index all Orphan pods to this key
-	OrphanPodIndexKey = "_ORPHAN_POD"
-
-	// podControllerUIDIndex is the name for the Pod store's index function,
-	// which is to index by pods's controllerUID.
-	PodControllerUIDIndex = "podControllerUID"
+	// PodControllerIndex is the name for the Pod store's index function,
+	// which indexes by the key returned from PodControllerIndexKey.
+	PodControllerIndex = "podController"
 )
 
 var UpdateTaintBackoff = wait.Backoff{
@@ -485,6 +482,7 @@ type PodControlInterface interface {
 type RealPodControl struct {
 	KubeClient clientset.Interface
 	Recorder   record.EventRecorder
+	OnWrite    func(*v1.Pod, *metav1.OwnerReference)
 }
 
 var _ PodControlInterface = &RealPodControl{}
@@ -554,11 +552,15 @@ func (r RealPodControl) CreatePodsWithGenerateName(ctx context.Context, namespac
 	if len(generateName) > 0 {
 		pod.ObjectMeta.GenerateName = generateName
 	}
-	return r.createPods(ctx, namespace, pod, controllerObject)
+	return r.createPods(ctx, namespace, pod, controllerObject, controllerRef)
 }
 
 func (r RealPodControl) PatchPod(ctx context.Context, namespace, name string, data []byte) error {
-	_, err := r.KubeClient.CoreV1().Pods(namespace).Patch(ctx, name, types.StrategicMergePatchType, data, metav1.PatchOptions{})
+	pod, err := r.KubeClient.CoreV1().Pods(namespace).Patch(ctx, name, types.StrategicMergePatchType, data, metav1.PatchOptions{})
+	if err == nil && r.OnWrite != nil {
+		ownerRef := metav1.GetControllerOfNoCopy(pod)
+		r.OnWrite(pod, ownerRef)
+	}
 	return err
 }
 
@@ -587,7 +589,7 @@ func GetPodFromTemplate(template *v1.PodTemplateSpec, parentObject runtime.Objec
 	return pod, nil
 }
 
-func (r RealPodControl) createPods(ctx context.Context, namespace string, pod *v1.Pod, object runtime.Object) error {
+func (r RealPodControl) createPods(ctx context.Context, namespace string, pod *v1.Pod, object runtime.Object, controllerRef *metav1.OwnerReference) error {
 	if len(labels.Set(pod.Labels)) == 0 {
 		return fmt.Errorf("unable to create pods, no labels")
 	}
@@ -600,6 +602,9 @@ func (r RealPodControl) createPods(ctx context.Context, namespace string, pod *v
 		return err
 	}
 	logger := klog.FromContext(ctx)
+	if r.OnWrite != nil {
+		r.OnWrite(newPod, controllerRef)
+	}
 	accessor, err := meta.Accessor(object)
 	if err != nil {
 		logger.Error(err, "parentObject does not have ObjectMeta")
@@ -1139,43 +1144,59 @@ func AddPodNodeNameIndexer(podInformer cache.SharedIndexInformer) error {
 	})
 }
 
-// OrphanPodIndexKeyForNamespace returns the orphan pod index key for a specific namespace.
-func OrphanPodIndexKeyForNamespace(namespace string) string {
-	return OrphanPodIndexKey + "/" + namespace
+// PodControllerIndexKey returns the index key to locate pods with the specified controller ownerReference.
+// If ownerReference is nil, the returned key locates pods in the namespace without a controller ownerReference.
+func PodControllerIndexKey(namespace string, ownerReference *metav1.OwnerReference) string {
+	if ownerReference == nil {
+		return namespace
+	}
+	return namespace + "/" + ownerReference.Kind + "/" + ownerReference.Name + "/" + string(ownerReference.UID)
 }
 
-// AddPodControllerUIDIndexer adds an indexer for Pod's controllerRef.UID to the given PodInformer.
+// AddPodControllerIndexer adds an indexer for Pod's controllerRef.UID to the given PodInformer.
 // This indexer is used to efficiently look up pods by their ControllerRef.UID
-func AddPodControllerUIDIndexer(podInformer cache.SharedIndexInformer) error {
-	if _, exists := podInformer.GetIndexer().GetIndexers()[PodControllerUIDIndex]; exists {
+func AddPodControllerIndexer(podInformer cache.SharedIndexInformer) error {
+	if _, exists := podInformer.GetIndexer().GetIndexers()[PodControllerIndex]; exists {
 		// indexer already exists, do nothing
 		return nil
 	}
 	return podInformer.AddIndexers(cache.Indexers{
-		PodControllerUIDIndex: func(obj interface{}) ([]string, error) {
+		PodControllerIndex: func(obj interface{}) ([]string, error) {
 			pod, ok := obj.(*v1.Pod)
 			if !ok {
 				return nil, nil
 			}
-			// Get the ControllerRef of the Pod to check if it's managed by a controller
-			if ref := metav1.GetControllerOf(pod); ref != nil {
-				return []string{string(ref.UID)}, nil
-			}
-			// If the Pod has no controller (i.e., it's orphaned), index it with the OrphanPodIndexKeyForNamespace
-			// This helps identify orphan pods for reconciliation and adoption by controllers
-			return []string{OrphanPodIndexKeyForNamespace(pod.Namespace)}, nil
+			// Get the ControllerRef of the Pod to check if it's managed by a controller.
+			// Index with a non-nil controller (indicating an owned pod) or a nil controller (indicating an orphan pod).
+			return []string{PodControllerIndexKey(pod.Namespace, metav1.GetControllerOf(pod))}, nil
 		},
 	})
 }
 
 // FilterPodsByOwner gets the Pods managed by an owner or orphan Pods in the owner's namespace
-func FilterPodsByOwner(podIndexer cache.Indexer, owner *metav1.ObjectMeta) ([]*v1.Pod, error) {
+func FilterPodsByOwner(podIndexer cache.Indexer, owner *metav1.ObjectMeta, ownerKind string, includeOrphanedPods bool) ([]*v1.Pod, error) {
 	result := []*v1.Pod{}
-	// Iterate over two keys:
-	// - the UID of the owner, which identifies Pods that are controlled by the owner
-	// - the OrphanPodIndexKey, which identifies orphaned Pods in the owner's namespace and might be adopted by the owner later
-	for _, key := range []string{string(owner.UID), OrphanPodIndexKeyForNamespace(owner.Namespace)} {
-		pods, err := podIndexer.ByIndex(PodControllerUIDIndex, key)
+
+	if len(owner.Namespace) == 0 {
+		return nil, fmt.Errorf("no owner namespace provided")
+	}
+	if len(owner.Name) == 0 {
+		return nil, fmt.Errorf("no owner name provided")
+	}
+	if len(owner.UID) == 0 {
+		return nil, fmt.Errorf("no owner uid provided")
+	}
+	if len(ownerKind) == 0 {
+		return nil, fmt.Errorf("no owner kind provided")
+	}
+	// Always include the owner key, which identifies Pods that are controlled by the owner
+	keys := []string{PodControllerIndexKey(owner.Namespace, &metav1.OwnerReference{Name: owner.Name, Kind: ownerKind, UID: owner.UID})}
+	if includeOrphanedPods {
+		// Optionally include the unowned key, which identifies orphaned Pods in the owner's namespace and might be adopted by the owner later
+		keys = append(keys, PodControllerIndexKey(owner.Namespace, nil))
+	}
+	for _, key := range keys {
+		pods, err := podIndexer.ByIndex(PodControllerIndex, key)
 		if err != nil {
 			return nil, err
 		}
