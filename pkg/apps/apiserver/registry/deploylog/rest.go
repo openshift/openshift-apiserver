@@ -20,7 +20,6 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/client-go/kubernetes"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
-	"k8s.io/client-go/tools/cache"
 	watchtools "k8s.io/client-go/tools/watch"
 	kapi "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/controller"
@@ -239,75 +238,64 @@ func (r *REST) returnApplicationPodName(ctx context.Context, target *corev1.Repl
 	return firstPod.Name, nil
 }
 
-// GetFirstPod returns a pod matching the namespace and label selector
-// and the number of all pods that match the label selector.
+// GetPodList returns a PodList matching the namespace and label selector.
 // DO NOT EDIT: this is a copy of the same function from kubectl to avoid carrying the dependency
-func GetFirstPod(ctx context.Context, client corev1client.PodsGetter, namespace string, selector string, timeout time.Duration, sortBy func([]*corev1.Pod) sort.Interface) (*corev1.Pod, int, error) {
-	lw := &cache.ListWatch{
-		ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-			options.LabelSelector = selector
-			return client.Pods(namespace).List(ctx, options)
-		},
-		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			options.LabelSelector = selector
-			return client.Pods(namespace).Watch(ctx, options)
-		},
-	}
+func GetPodList(ctx context.Context, client corev1client.PodsGetter, namespace string, selector string, timeout time.Duration, sortBy func([]*corev1.Pod) sort.Interface) (*corev1.PodList, error) {
+	options := metav1.ListOptions{LabelSelector: selector}
 
-	var initialPods []*corev1.Pod
-	preconditionFunc := func(store cache.Store) (bool, error) {
-		items := store.List()
-		if len(items) > 0 {
-			for _, item := range items {
-				pod, ok := item.(*corev1.Pod)
-				if !ok {
-					return true, fmt.Errorf("unexpected store item type: %#v", item)
-				}
-
-				initialPods = append(initialPods, pod)
-			}
-
-			sort.Sort(sortBy(initialPods))
-
-			return true, nil
-		}
-
-		// Continue by watching for a new pod to appear
-		return false, nil
-	}
-
-	ctx, cancel := watchtools.ContextWithOptionalTimeout(context.Background(), timeout)
-	defer cancel()
-	event, err := watchtools.UntilWithSync(ctx, lw, &corev1.Pod{}, preconditionFunc, func(event watch.Event) (bool, error) {
-		switch event.Type {
-		case watch.Added, watch.Modified:
-			// Any pod is good enough
-			return true, nil
-
-		case watch.Deleted:
-			return true, fmt.Errorf("pod got deleted %#v", event.Object)
-
-		case watch.Error:
-			return true, fmt.Errorf("unexpected error %#v", event.Object)
-
-		default:
-			return true, fmt.Errorf("unexpected event type: %T", event.Type)
-		}
-	})
+	podList, err := client.Pods(namespace).List(ctx, options)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
-	if len(initialPods) > 0 {
-		return initialPods[0], len(initialPods), nil
+	pods := []*corev1.Pod{}
+	for i := range podList.Items {
+		pod := podList.Items[i]
+		pods = append(pods, &pod)
+	}
+	if len(pods) > 0 {
+		sort.Sort(sortBy(pods))
+		for i, pod := range pods {
+			podList.Items[i] = *pod
+		}
+		return podList, nil
+	}
+
+	options.ResourceVersion = podList.ResourceVersion
+	w, err := client.Pods(namespace).Watch(ctx, options)
+	if err != nil {
+		return nil, err
+	}
+	defer w.Stop()
+
+	condition := func(event watch.Event) (bool, error) {
+		return event.Type == watch.Added || event.Type == watch.Modified, nil
+	}
+
+	ctx, cancel := watchtools.ContextWithOptionalTimeout(ctx, timeout)
+	defer cancel()
+	event, err := watchtools.UntilWithoutRetry(ctx, w, condition)
+	if err != nil {
+		return nil, err
 	}
 
 	pod, ok := event.Object.(*corev1.Pod)
 	if !ok {
-		return nil, 0, fmt.Errorf("%#v is not a pod event", event)
+		return nil, fmt.Errorf("%#v is not a pod event", event)
 	}
+	podList.Items = append(podList.Items, *pod)
+	return podList, nil
+}
 
-	return pod, 1, nil
+// GetFirstPod returns a pod matching the namespace and label selector
+// and the number of all pods that match the label selector.
+// DO NOT EDIT: this is a copy of the same function from kubectl to avoid carrying the dependency
+func GetFirstPod(ctx context.Context, client corev1client.PodsGetter, namespace string, selector string, timeout time.Duration, sortBy func([]*corev1.Pod) sort.Interface) (*corev1.Pod, int, error) {
+	podList, err := GetPodList(ctx, client, namespace, selector, timeout, sortBy)
+	if err != nil {
+		return nil, 0, err
+	}
+	return &podList.Items[0], len(podList.Items), nil
 }
 
 func DeploymentToPodLogOptions(opts *appsapi.DeploymentLogOptions) *corev1.PodLogOptions {
