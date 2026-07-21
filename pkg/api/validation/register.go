@@ -3,7 +3,6 @@ package validation
 import (
 	"context"
 
-	routecommon "github.com/openshift/library-go/pkg/route"
 	appsvalidation "github.com/openshift/openshift-apiserver/pkg/apps/apis/apps/validation"
 	authorizationvalidation "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization/validation"
 	buildvalidation "github.com/openshift/openshift-apiserver/pkg/build/apis/build/validation"
@@ -82,10 +81,10 @@ func registerAll() {
 
 func routeOptionsAdapter(route *routeapi.Route) field.ErrorList {
 	a := &authorizationclient.AuthorizationV1Client{}
-	return routevalidation.ValidateRoute(context.Background(), route, a.SubjectAccessReviews(), &v1.CoreV1Client{}, routecommon.RouteValidationOptions{})
+	return routevalidation.ValidateRoute(context.Background(), route, a.SubjectAccessReviews(), &v1.CoreV1Client{})
 }
 
 func routeUpdateOptionsAdapter(route *routeapi.Route, oldRoute *routeapi.Route) field.ErrorList {
 	a := &authorizationclient.AuthorizationV1Client{}
-	return routevalidation.ValidateRouteUpdate(context.Background(), route, oldRoute, a.SubjectAccessReviews(), &v1.CoreV1Client{}, routecommon.RouteValidationOptions{})
+	return routevalidation.ValidateRouteUpdate(context.Background(), route, oldRoute, a.SubjectAccessReviews(), &v1.CoreV1Client{})
 }

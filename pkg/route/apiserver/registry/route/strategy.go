@@ -15,7 +15,6 @@ import (
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	routev1 "github.com/openshift/api/route/v1"
-	routecommon "github.com/openshift/library-go/pkg/route"
 	routeapi "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
 	"github.com/openshift/openshift-apiserver/pkg/route/apis/route/validation"
 	"github.com/openshift/openshift-apiserver/pkg/route/apiserver/admission/routehostassignment"
@@ -56,12 +55,6 @@ func (routeStrategy) NamespaceScoped() bool {
 	return true
 }
 
-func (s routeStrategy) routeValidationOptions() routecommon.RouteValidationOptions {
-	return routecommon.RouteValidationOptions{
-		AllowExternalCertificates: true,
-	}
-}
-
 func (s routeStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 	route := obj.(*routeapi.Route)
 	route.Status = routeapi.RouteStatus{}
@@ -93,8 +86,8 @@ func (s routeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 
 func (s routeStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	route := obj.(*routeapi.Route)
-	errs := routehostassignment.AllocateHost(ctx, route, s.sarClient, s.hostnameGenerator, s.routeValidationOptions())
-	errs = append(errs, validation.ValidateRoute(ctx, route, s.sarClient, s.secretsGetter, s.routeValidationOptions())...)
+	errs := routehostassignment.AllocateHost(ctx, route, s.sarClient, s.hostnameGenerator)
+	errs = append(errs, validation.ValidateRoute(ctx, route, s.sarClient, s.secretsGetter)...)
 	return errs
 }
 
@@ -114,8 +107,8 @@ func (routeStrategy) Canonicalize(obj runtime.Object) {
 func (s routeStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	oldRoute := old.(*routeapi.Route)
 	objRoute := obj.(*routeapi.Route)
-	errs := routehostassignment.ValidateHostUpdate(ctx, objRoute, oldRoute, s.sarClient, s.routeValidationOptions())
-	errs = append(errs, validation.ValidateRouteUpdate(ctx, objRoute, oldRoute, s.sarClient, s.secretsGetter, s.routeValidationOptions())...)
+	errs := routehostassignment.ValidateHostUpdate(ctx, objRoute, oldRoute, s.sarClient)
+	errs = append(errs, validation.ValidateRouteUpdate(ctx, objRoute, oldRoute, s.sarClient, s.secretsGetter)...)
 	return errs
 }
 
