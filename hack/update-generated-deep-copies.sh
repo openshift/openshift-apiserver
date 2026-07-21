@@ -25,4 +25,4 @@ ALL_FQ_APIS=(
 )
 
 echo "Generating deepcopy funcs"
-${GOPATH}/bin/deepcopy-gen "${ALL_FQ_APIS[@]}" --output-file zz_generated.deepcopy.go --bounding-dirs $(codegen::join , "${ALL_FQ_APIS[@]}") --go-header-file ${SCRIPT_ROOT}/hack/boilerplate.txt "$@"
+"${GOPATH}/bin/deepcopy-gen" "${ALL_FQ_APIS[@]}" --output-file zz_generated.deepcopy.go --go-header-file "${SCRIPT_ROOT}/hack/boilerplate.txt" "$@"
