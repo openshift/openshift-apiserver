@@ -22,16 +22,16 @@ func toRouteV1(internal *routeapi.Route) (*routev1.Route, field.ErrorList) {
 }
 
 // ValidateRoute tests if required fields in the route are set.
-func ValidateRoute(ctx context.Context, route *routeapi.Route, sarClient routecommon.SubjectAccessReviewCreator, secretsGetter corev1client.SecretsGetter, opts routecommon.RouteValidationOptions) field.ErrorList {
+func ValidateRoute(ctx context.Context, route *routeapi.Route, sarClient routecommon.SubjectAccessReviewCreator, secretsGetter corev1client.SecretsGetter) field.ErrorList {
 	external, errs := toRouteV1(route)
 	if len(errs) > 0 {
 		return errs
 	}
 
-	return routevalidation.ValidateRoute(ctx, external, sarClient, secretsGetter, opts)
+	return routevalidation.ValidateRoute(ctx, external, sarClient, secretsGetter)
 }
 
-func ValidateRouteUpdate(ctx context.Context, route *routeapi.Route, oldRoute *routeapi.Route, sarClient routecommon.SubjectAccessReviewCreator, secretsGetter corev1client.SecretsGetter, opts routecommon.RouteValidationOptions) field.ErrorList {
+func ValidateRouteUpdate(ctx context.Context, route *routeapi.Route, oldRoute *routeapi.Route, sarClient routecommon.SubjectAccessReviewCreator, secretsGetter corev1client.SecretsGetter) field.ErrorList {
 	external, errs := toRouteV1(route)
 	if len(errs) > 0 {
 		return errs
@@ -42,7 +42,7 @@ func ValidateRouteUpdate(ctx context.Context, route *routeapi.Route, oldRoute *r
 		return errs
 	}
 
-	return routevalidation.ValidateRouteUpdate(ctx, external, oldExternal, sarClient, secretsGetter, opts)
+	return routevalidation.ValidateRouteUpdate(ctx, external, oldExternal, sarClient, secretsGetter)
 }
 
 // ValidateRouteStatusUpdate validates status updates for routes.

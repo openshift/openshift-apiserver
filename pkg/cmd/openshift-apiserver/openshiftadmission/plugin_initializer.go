@@ -64,7 +64,11 @@ func NewPluginInitializer(
 	}
 
 	// TODO make a union registry
-	quotaRegistry := generic.NewRegistry(install.NewQuotaConfigurationForAdmission(informers.GetKubernetesInformers()).Evaluators())
+	quotaConfig, err := install.NewQuotaConfigurationForAdmission(informers.GetKubernetesInformers(), nil)
+	if err != nil {
+		return nil, err
+	}
+	quotaRegistry := generic.NewRegistry(quotaConfig.Evaluators())
 	imageEvaluators := image.NewReplenishmentEvaluators(
 		nil, // for admission, we never have to list everything, so we can pass nil.
 		informers.GetOpenshiftImageInformers().Image().V1().ImageStreams(),

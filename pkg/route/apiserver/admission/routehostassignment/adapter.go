@@ -12,13 +12,13 @@ import (
 	routev1conversion "github.com/openshift/openshift-apiserver/pkg/route/apis/route/v1"
 )
 
-func AllocateHost(ctx context.Context, route *routeinternal.Route, sarClient routecommon.SubjectAccessReviewCreator, hg hostassignment.HostnameGenerator, opts routecommon.RouteValidationOptions) field.ErrorList {
+func AllocateHost(ctx context.Context, route *routeinternal.Route, sarClient routecommon.SubjectAccessReviewCreator, hg hostassignment.HostnameGenerator) field.ErrorList {
 	var external routev1.Route
 	if err := routev1conversion.Convert_route_Route_To_v1_Route(route, &external, nil); err != nil {
 		return field.ErrorList{field.InternalError(field.NewPath(""), err)}
 	}
 
-	errs := hostassignment.AllocateHost(ctx, &external, sarClient, hg, opts)
+	errs := hostassignment.AllocateHost(ctx, &external, sarClient, hg)
 	if len(errs) > 0 {
 		return errs
 	}
@@ -30,7 +30,7 @@ func AllocateHost(ctx context.Context, route *routeinternal.Route, sarClient rou
 	return nil
 }
 
-func ValidateHostUpdate(ctx context.Context, route, oldRoute *routeinternal.Route, sarClient routecommon.SubjectAccessReviewCreator, opts routecommon.RouteValidationOptions) field.ErrorList {
+func ValidateHostUpdate(ctx context.Context, route, oldRoute *routeinternal.Route, sarClient routecommon.SubjectAccessReviewCreator) field.ErrorList {
 	var external, oldExternal routev1.Route
 	var errs field.ErrorList
 	err := routev1conversion.Convert_route_Route_To_v1_Route(route, &external, nil)
@@ -45,5 +45,5 @@ func ValidateHostUpdate(ctx context.Context, route, oldRoute *routeinternal.Rout
 		return errs
 	}
 
-	return hostassignment.ValidateHostUpdate(ctx, &external, &oldExternal, sarClient, opts)
+	return hostassignment.ValidateHostUpdate(ctx, &external, &oldExternal, sarClient)
 }
