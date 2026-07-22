@@ -135,20 +135,25 @@ if ! command -v oc &>/dev/null; then
   exit 1
 fi
 
-# Detect OpenShift version from .ci-operator.yaml
-OPENSHIFT_VERSION=""
-if [[ -f "${SCRIPT_ROOT}/.ci-operator.yaml" ]]; then
-  OPENSHIFT_VERSION=$(grep -oP 'openshift-\K[0-9]+\.[0-9]+' "${SCRIPT_ROOT}/.ci-operator.yaml" | head -1)
+# Determine which release image to use.
+# Priority: OPENSHIFT_RELEASE env var > RELEASE_IMAGE_LATEST (set by ci-operator) > auto-detect from .ci-operator.yaml
+if [[ -z "${OPENSHIFT_RELEASE:-}" ]]; then
+  if [[ -n "${RELEASE_IMAGE_LATEST:-}" ]]; then
+    OPENSHIFT_RELEASE="${RELEASE_IMAGE_LATEST}"
+  else
+    OPENSHIFT_VERSION=""
+    if [[ -f "${SCRIPT_ROOT}/.ci-operator.yaml" ]]; then
+      OPENSHIFT_VERSION=$(grep -oP 'openshift-\K[0-9]+\.[0-9]+' "${SCRIPT_ROOT}/.ci-operator.yaml" | head -1)
+    fi
+    if [[ -z "${OPENSHIFT_VERSION}" ]]; then
+      echo "ERROR: Could not detect OpenShift version from .ci-operator.yaml"
+      echo "Please set OPENSHIFT_RELEASE environment variable manually, e.g.:"
+      echo "  OPENSHIFT_RELEASE=registry.ci.openshift.org/ocp/release:4.22 $0"
+      exit 1
+    fi
+    OPENSHIFT_RELEASE="registry.ci.openshift.org/ocp/release:${OPENSHIFT_VERSION}"
+  fi
 fi
-
-if [[ -z "${OPENSHIFT_VERSION}" ]]; then
-  echo "ERROR: Could not detect OpenShift version from .ci-operator.yaml"
-  echo "Please set OPENSHIFT_RELEASE environment variable manually, e.g.:"
-  echo "  OPENSHIFT_RELEASE=quay.io/openshift-release-dev/ocp-release:4.22.0-x86_64 $0"
-  exit 1
-fi
-
-OPENSHIFT_RELEASE="${OPENSHIFT_RELEASE:-quay.io/openshift-release-dev/ocp-release:${OPENSHIFT_VERSION}.0-x86_64}"
 echo "Using OpenShift release: ${OPENSHIFT_RELEASE}"
 
 # Set up registry authentication if available
