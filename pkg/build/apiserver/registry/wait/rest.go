@@ -72,6 +72,11 @@ func WaitForRunningBuild(buildClient buildtypedclient.BuildsGetter, buildNamespa
 				if event.Type == watch.Error {
 					return false, ErrWatchError{fmt.Errorf("watch event type error: %v", event)}
 				}
+				// Bookmark events are sent by the WatchList protocol to signal sync completion.
+				// They don't represent actual Build changes and should be ignored.
+				if event.Type == watch.Bookmark {
+					return false, nil
+				}
 				obj, ok := event.Object.(*buildv1.Build)
 				if !ok {
 					return false, fmt.Errorf("received unknown object while watching for builds: %T", event.Object)

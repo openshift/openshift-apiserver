@@ -32,12 +32,7 @@
           "rules": {
             "description": "rules holds all the PolicyRules for this ClusterRole",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.PolicyRule"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.PolicyRule"
             },
             "type": "array"
           }
@@ -69,7 +64,6 @@
           "groupNames": {
             "description": "groupNames holds all the groups directly bound to the role. This field should only be specified when supporting legacy clients and servers. See Subjects for further details.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -99,19 +93,13 @@
           "subjects": {
             "description": "subjects hold object references to authorize with this rule. This field is ignored if UserNames or GroupNames are specified to support legacy clients and servers. Thus newer clients that do not need to support backwards compatibility should send only fully qualified Subjects and should omit the UserNames and GroupNames fields. Clients that need to support backwards compatibility can use this field to build the UserNames and GroupNames.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.api.core.v1.ObjectReference"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.api.core.v1.ObjectReference"
             },
             "type": "array"
           },
           "userNames": {
             "description": "userNames holds all the usernames directly bound to the role. This field should only be specified when supporting legacy clients and servers. See Subjects for further details.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -145,12 +133,7 @@
           "items": {
             "description": "items is a list of ClusterRoleBindings",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.ClusterRoleBinding"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.ClusterRoleBinding"
             },
             "type": "array"
           },
@@ -195,12 +178,7 @@
           "items": {
             "description": "items is a list of ClusterRoles",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.ClusterRole"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.ClusterRole"
             },
             "type": "array"
           },
@@ -241,7 +219,6 @@
           "groups": {
             "description": "groups is a list of groups used to match against an individual user's groups. If the user is a member of one of the whitelisted groups, the user is allowed to be bound to a role.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -249,12 +226,7 @@
           "labels": {
             "description": "Selectors specifies a list of label selectors over group labels.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
             },
             "type": "array"
           }
@@ -376,7 +348,6 @@
           "groups": {
             "description": "groups is optional.  Groups is the list of groups to which the User belongs.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -432,7 +403,6 @@
           "scopes": {
             "description": "scopes to use for the evaluation.  Empty means \"use the unscoped (full) permissions of the user/groups\". Nil for a self-SAR, means \"use the scopes on this request\". Nil for a regular SAR, means the same as empty.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -481,7 +451,6 @@
           "apiGroups": {
             "description": "apiGroups is the name of the APIGroup that contains the resources.  If this field is empty, then both kubernetes and origin API groups are assumed. That means that if an action is requested against one of the enumerated resources in either the kubernetes or the origin API group, the request will be allowed",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -497,7 +466,6 @@
           "nonResourceURLs": {
             "description": "NonResourceURLsSlice is a set of partial urls that a user should have access to.  *s are allowed, but only as the full, final step in the path This name is intentionally different than the internal type so that the DefaultConvert works nicely and because the ordering may be different.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -505,7 +473,6 @@
           "resourceNames": {
             "description": "resourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -513,7 +480,6 @@
           "resources": {
             "description": "resources is a list of resources this rule applies to.  ResourceAll represents all resources.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -521,7 +487,6 @@
           "verbs": {
             "description": "verbs is a list of Verbs that apply to ALL the ResourceKinds and AttributeRestrictions contained in this rule.  VerbAll represents all kinds.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -649,12 +614,7 @@
           "rules": {
             "description": "rules holds all the PolicyRules for this Role",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.PolicyRule"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.PolicyRule"
             },
             "type": "array"
           }
@@ -686,7 +646,6 @@
           "groupNames": {
             "description": "groupNames holds all the groups directly bound to the role. This field should only be specified when supporting legacy clients and servers. See Subjects for further details.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -716,19 +675,13 @@
           "subjects": {
             "description": "subjects hold object references to authorize with this rule. This field is ignored if UserNames or GroupNames are specified to support legacy clients and servers. Thus newer clients that do not need to support backwards compatibility should send only fully qualified Subjects and should omit the UserNames and GroupNames fields. Clients that need to support backwards compatibility can use this field to build the UserNames and GroupNames.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.api.core.v1.ObjectReference"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.api.core.v1.ObjectReference"
             },
             "type": "array"
           },
           "userNames": {
             "description": "userNames holds all the usernames directly bound to the role. This field should only be specified when supporting legacy clients and servers. See Subjects for further details.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -762,12 +715,7 @@
           "items": {
             "description": "items is a list of RoleBindings",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.RoleBinding"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.RoleBinding"
             },
             "type": "array"
           },
@@ -860,12 +808,7 @@
           "items": {
             "description": "items is a list of RoleBindingRestriction objects.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.RoleBindingRestriction"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.RoleBindingRestriction"
             },
             "type": "array"
           },
@@ -945,12 +888,7 @@
           "items": {
             "description": "items is a list of Roles",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.Role"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.Role"
             },
             "type": "array"
           },
@@ -1047,7 +985,6 @@
           "scopes": {
             "description": "scopes to use for the evaluation.  Empty means \"use the unscoped (full) permissions of the user/groups\". Nil means \"use the scopes on this request\".",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -1084,7 +1021,6 @@
           "namespaces": {
             "description": "namespaces specifies a list of literal namespace names.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -1092,12 +1028,7 @@
           "serviceaccounts": {
             "description": "serviceaccounts specifies a list of literal service-account names.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.ServiceAccountReference"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.ServiceAccountReference"
             },
             "type": "array"
           }
@@ -1126,7 +1057,6 @@
           "groups": {
             "description": "GroupsSlice is optional. Groups is the list of groups to which the User belongs.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -1182,7 +1112,6 @@
           "scopes": {
             "description": "scopes to use for the evaluation.  Empty means \"use the unscoped (full) permissions of the user/groups\". Nil for a self-SAR, means \"use the scopes on this request\". Nil for a regular SAR, means the same as empty.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -1287,7 +1216,6 @@
           "groups": {
             "description": "groups is optional.  Groups is the list of groups to which the User belongs.  At least one of User and Groups must be specified.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -1295,7 +1223,6 @@
           "scopes": {
             "description": "scopes to use for the evaluation.  Empty means \"use the unscoped (full) permissions of the user/groups\".",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -1323,12 +1250,7 @@
           "rules": {
             "description": "rules is the list of rules (no particular sort) that are allowed for the subject",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.PolicyRule"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/com.github.openshift.api.authorization.v1.PolicyRule"
             },
             "type": "array"
           }
@@ -1341,7 +1263,6 @@
           "groups": {
             "description": "groups specifies a list of literal group names.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -1349,19 +1270,13 @@
           "labels": {
             "description": "Selectors specifies a list of label selectors over user labels.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
             },
             "type": "array"
           },
           "users": {
             "description": "users specifies a list of literal user names.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -1415,12 +1330,7 @@
           "clusterRoleSelectors": {
             "description": "ClusterRoleSelectors holds a list of selectors which will be used to find ClusterRoles and create the rules. If any of the selectors match, then the ClusterRole's permissions will be added",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
             },
             "type": "array",
             "x-kubernetes-list-type": "atomic"
@@ -1434,7 +1344,6 @@
           "categories": {
             "description": "categories is a list of the grouped resources this resource belongs to (e.g. 'all')",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array",
@@ -1462,7 +1371,6 @@
           "shortNames": {
             "description": "shortNames is a list of suggested short names of the resource.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array",
@@ -1480,7 +1388,6 @@
           "verbs": {
             "description": "verbs is a list of supported kube verbs (this includes get, list, watch, create, update, patch, delete, deletecollection, and proxy)",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array"
@@ -1518,12 +1425,7 @@
           "resources": {
             "description": "resources contains the name of the resources and if they are namespaced.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIResource"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIResource"
             },
             "type": "array",
             "x-kubernetes-list-type": "atomic"
@@ -1552,7 +1454,6 @@
           "dryRun": {
             "description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array",
@@ -1912,19 +1813,13 @@
           "matchExpressions": {
             "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement"
             },
             "type": "array",
             "x-kubernetes-list-type": "atomic"
           },
           "matchLabels": {
             "additionalProperties": {
-              "default": "",
               "type": "string"
             },
             "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -1950,7 +1845,6 @@
           "values": {
             "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array",
@@ -2033,7 +1927,6 @@
         "properties": {
           "annotations": {
             "additionalProperties": {
-              "default": "",
               "type": "string"
             },
             "description": "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations",
@@ -2063,7 +1956,6 @@
           "finalizers": {
             "description": "Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.",
             "items": {
-              "default": "",
               "type": "string"
             },
             "type": "array",
@@ -2081,7 +1973,6 @@
           },
           "labels": {
             "additionalProperties": {
-              "default": "",
               "type": "string"
             },
             "description": "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels",
@@ -2090,12 +1981,7 @@
           "managedFields": {
             "description": "ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like \"ci-cd\". The set of fields is always in the version that the workflow used when modifying the object.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry"
             },
             "type": "array",
             "x-kubernetes-list-type": "atomic"
@@ -2111,12 +1997,7 @@
           "ownerReferences": {
             "description": "List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.OwnerReference"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.OwnerReference"
             },
             "type": "array",
             "x-kubernetes-list-map-keys": [
@@ -2218,8 +2099,7 @@
                 "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails"
               }
             ],
-            "description": "Extended data associated with the reason.  Each reason may define its own extended details. This field is optional and the data returned is not guaranteed to conform to any schema except that defined by the reason type.",
-            "x-kubernetes-list-type": "atomic"
+            "description": "Extended data associated with the reason.  Each reason may define its own extended details. This field is optional and the data returned is not guaranteed to conform to any schema except that defined by the reason type."
           },
           "kind": {
             "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
@@ -2280,12 +2160,7 @@
           "causes": {
             "description": "The Causes array includes more details associated with the StatusReason failure. Not all StatusReasons may provide detailed causes.",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusCause"
-                }
-              ],
-              "default": {}
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusCause"
             },
             "type": "array",
             "x-kubernetes-list-type": "atomic"

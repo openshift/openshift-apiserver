@@ -116,7 +116,18 @@ func mockREST(version, desired int64, status appsv1.DeploymentStatus) *REST {
 	fakeRn.PrependWatchReactor("replicationcontrollers", clientgotesting.DefaultWatchReactor(fakeWatch, nil))
 	obj := &fakeDeployments.Items[desired-1]
 	obj.Annotations[appsv1.DeploymentStatusAnnotation] = string(status)
-	go fakeWatch.Add(obj)
+	go func() {
+		// Send bookmark event to signal end of initial events
+		fakeWatch.Action(watch.Bookmark, &corev1.ReplicationController{
+			ObjectMeta: metav1.ObjectMeta{
+				ResourceVersion: "1",
+				Annotations: map[string]string{
+					metav1.InitialEventsAnnotationKey: "true",
+				},
+			},
+		})
+		fakeWatch.Add(obj)
+	}()
 
 	fakePn := fakeexternal.NewSimpleClientset()
 	if status == appsv1.DeploymentStatusComplete {
@@ -128,6 +139,22 @@ func mockREST(version, desired int64, status appsv1.DeploymentStatus) *REST {
 		fakePn.PrependReactor("get", "pods", func(action clientgotesting.Action) (handled bool, ret runtime.Object, err error) {
 			return true, &fakePodList.Items[0], nil
 		})
+		// Set up watch reactor for pods (needed by GetFirstPod)
+		fakePodWatch := watch.NewFake()
+		fakePn.PrependWatchReactor("pods", clientgotesting.DefaultWatchReactor(fakePodWatch, nil))
+		go func() {
+			// Send bookmark event to signal end of initial events
+			fakePodWatch.Action(watch.Bookmark, &corev1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					ResourceVersion: "1",
+					Annotations: map[string]string{
+						metav1.InitialEventsAnnotationKey: "true",
+					},
+				},
+			})
+			// Send a pod event so GetFirstPod can find it
+			fakePodWatch.Add(&fakePodList.Items[0])
+		}()
 	} else {
 		// ...otherwise try to get the logs from the deployer pod.
 		fakeDeployer := &kapi.Pod{

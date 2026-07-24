@@ -42,10 +42,10 @@ func (c *retryClient) ReadinessCheck() error {
 	return c.delegate.ReadinessCheck()
 }
 
-// SetKeysFunc is not expected to be retried as it setting
+// EnableResourceSizeEstimation is not expected to be retried as it setting
 // the keys function always succeeds.
-func (c *retryClient) SetKeysFunc(f storage.KeysFunc) {
-	c.delegate.SetKeysFunc(f)
+func (c *retryClient) EnableResourceSizeEstimation(f storage.KeysFunc) error {
+	return c.delegate.EnableResourceSizeEstimation(f)
 }
 
 // CompactRevision() is not expected to be retried as it only reads

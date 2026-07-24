@@ -98,7 +98,6 @@ API rule violation: list_type_missing,github.com/openshift/api/config/v1,Require
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ServingInfo,CipherSuites
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,ServingInfo,NamedCertificates
 API rule violation: list_type_missing,github.com/openshift/api/config/v1,TestReportingSpec,TestsForFeatureGates
-API rule violation: list_type_missing,github.com/openshift/api/config/v1alpha1,GatherConfig,DisabledGatherers
 API rule violation: list_type_missing,github.com/openshift/api/console/v1,ConsoleCLIDownloadSpec,Links
 API rule violation: list_type_missing,github.com/openshift/api/console/v1,ConsoleQuickStartSpec,AccessReviewResources
 API rule violation: list_type_missing,github.com/openshift/api/console/v1,ConsoleQuickStartSpec,NextQuickStart
@@ -325,7 +324,6 @@ API rule violation: list_type_missing,github.com/openshift/api/template/v1,Templ
 API rule violation: list_type_missing,github.com/openshift/api/template/v1,TemplateInstanceStatus,Objects
 API rule violation: list_type_missing,github.com/openshift/api/user/v1,User,Groups
 API rule violation: list_type_missing,github.com/openshift/api/user/v1,User,Identities
-API rule violation: list_type_missing,k8s.io/api/storagemigration/v1alpha1,StorageVersionMigrationList,Items
 API rule violation: list_type_missing,k8s.io/cloud-provider/config/v1alpha1,WebhookConfiguration,Webhooks
 API rule violation: list_type_missing,k8s.io/controller-manager/config/v1alpha1,GenericControllerManagerConfiguration,Controllers
 API rule violation: list_type_missing,k8s.io/controller-manager/config/v1alpha1,LeaderMigrationConfiguration,ControllerLeaders
@@ -367,9 +365,9 @@ API rule violation: names_match,github.com/openshift/api/config/v1,GenericAPISer
 API rule violation: names_match,github.com/openshift/api/config/v1,IdentityProviderConfig,GitHub
 API rule violation: names_match,github.com/openshift/api/config/v1,IdentityProviderConfig,GitLab
 API rule violation: names_match,github.com/openshift/api/config/v1,IdentityProviderConfig,HTPasswd
+API rule violation: names_match,github.com/openshift/api/config/v1,ImagePolicyPKIRootOfTrust,CertificateAuthorityIntermediatesData
+API rule violation: names_match,github.com/openshift/api/config/v1,ImagePolicyPKIRootOfTrust,CertificateAuthorityRootsData
 API rule violation: names_match,github.com/openshift/api/config/v1,InfrastructureStatus,APIServerInternalURL
-API rule violation: names_match,github.com/openshift/api/config/v1,PKI,CertificateAuthorityIntermediatesData
-API rule violation: names_match,github.com/openshift/api/config/v1,PKI,CertificateAuthorityRootsData
 API rule violation: names_match,github.com/openshift/api/config/v1,PlatformSpec,BareMetal
 API rule violation: names_match,github.com/openshift/api/config/v1,PlatformSpec,IBMCloud
 API rule violation: names_match,github.com/openshift/api/config/v1,PlatformSpec,OpenStack
@@ -391,10 +389,11 @@ API rule violation: names_match,github.com/openshift/api/config/v1,VSpherePlatfo
 API rule violation: names_match,github.com/openshift/api/config/v1,VSpherePlatformSpec,VCenters
 API rule violation: names_match,github.com/openshift/api/config/v1alpha1,BackupSpec,EtcdBackupSpec
 API rule violation: names_match,github.com/openshift/api/config/v1alpha1,GatherConfig,StorageSpec
-API rule violation: names_match,github.com/openshift/api/config/v1alpha1,PKI,CertificateAuthorityIntermediatesData
-API rule violation: names_match,github.com/openshift/api/config/v1alpha1,PKI,CertificateAuthorityRootsData
-API rule violation: names_match,github.com/openshift/api/config/v1alpha1,PolicyIdentity,PolicyMatchExactRepository
-API rule violation: names_match,github.com/openshift/api/config/v1alpha1,PolicyIdentity,PolicyMatchRemapIdentity
+API rule violation: names_match,github.com/openshift/api/config/v1alpha1,OAuth2,ClientID
+API rule violation: names_match,github.com/openshift/api/config/v1alpha1,OAuth2,TokenURL
+API rule violation: names_match,github.com/openshift/api/config/v1alpha1,RemoteWriteAuthorization,OAuth2
+API rule violation: names_match,github.com/openshift/api/config/v1alpha1,RemoteWriteSpec,AuthorizationConfig
+API rule violation: names_match,github.com/openshift/api/config/v1alpha1,RemoteWriteSpec,ProxyURL
 API rule violation: names_match,github.com/openshift/api/helm/v1beta1,HelmChartRepositorySpec,DisplayName
 API rule violation: names_match,github.com/openshift/api/helm/v1beta1,ProjectHelmChartRepositorySpec,DisplayName
 API rule violation: names_match,github.com/openshift/api/helm/v1beta1,ProjectHelmChartRepositorySpec,ProjectConnectionConfig
@@ -515,6 +514,7 @@ API rule violation: names_match,github.com/openshift/api/operator/v1,EtcdSpec,Ha
 API rule violation: names_match,github.com/openshift/api/operator/v1,EtcdStatus,HardwareSpeed
 API rule violation: names_match,github.com/openshift/api/operator/v1,GatewayConfig,IPv4
 API rule violation: names_match,github.com/openshift/api/operator/v1,GatewayConfig,IPv6
+API rule violation: names_match,github.com/openshift/api/operator/v1,IngressControllerSpec,HAProxyVersion
 API rule violation: names_match,github.com/openshift/api/operator/v1,NodeDisruptionPolicyClusterStatus,SSHKey
 API rule violation: names_match,github.com/openshift/api/operator/v1,NodeDisruptionPolicyConfig,SSHKey
 API rule violation: names_match,github.com/openshift/api/operator/v1,OVNKubernetesConfig,IPsecConfig
@@ -655,6 +655,8 @@ API rule violation: names_match,k8s.io/cloud-provider/config/v1alpha1,KubeCloudS
 API rule violation: names_match,k8s.io/cloud-provider/config/v1alpha1,KubeCloudSharedConfiguration,RouteReconciliationPeriod
 API rule violation: names_match,k8s.io/cloud-provider/config/v1alpha1,KubeCloudSharedConfiguration,UseServiceAccountCredentials
 API rule violation: names_match,k8s.io/cloud-provider/config/v1alpha1,WebhookConfiguration,Webhooks
+API rule violation: names_match,k8s.io/cloud-provider/controllers/node/config/v1alpha1,NodeControllerConfiguration,ConcurrentNodeSyncs
+API rule violation: names_match,k8s.io/cloud-provider/controllers/service/config/v1alpha1,ServiceControllerConfiguration,ConcurrentServiceSyncs
 API rule violation: names_match,k8s.io/controller-manager/config/v1alpha1,GenericControllerManagerConfiguration,Address
 API rule violation: names_match,k8s.io/controller-manager/config/v1alpha1,GenericControllerManagerConfiguration,ClientConnection
 API rule violation: names_match,k8s.io/controller-manager/config/v1alpha1,GenericControllerManagerConfiguration,ControllerStartInterval
@@ -665,10 +667,13 @@ API rule violation: names_match,k8s.io/controller-manager/config/v1alpha1,Generi
 API rule violation: names_match,k8s.io/controller-manager/config/v1alpha1,GenericControllerManagerConfiguration,LeaderMigrationEnabled
 API rule violation: names_match,k8s.io/controller-manager/config/v1alpha1,GenericControllerManagerConfiguration,MinResyncPeriod
 API rule violation: names_match,k8s.io/controller-manager/config/v1alpha1,GenericControllerManagerConfiguration,Port
+API rule violation: streaming_list_type_json_tags,github.com/openshift/api/apiextensions/v1alpha1,CompatibilityRequirementList,Items
+API rule violation: streaming_list_type_json_tags,github.com/openshift/api/apiextensions/v1alpha1,CompatibilityRequirementList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/apiserver/v1,APIRequestCountList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,APIServerList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,AuthenticationList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,BuildList,ListMeta
+API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,CRIOCredentialProviderConfigList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,ClusterImagePolicyList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,ClusterOperatorList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,ClusterVersionList,ListMeta
@@ -682,6 +687,7 @@ API rule violation: streaming_list_type_json_tags,github.com/openshift/api/confi
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,ImageTagMirrorSetList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,InfrastructureList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,IngressList,ListMeta
+API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,InsightsDataGatherList,Items
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,NetworkList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,NodeList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,OAuthList,ListMeta
@@ -690,8 +696,7 @@ API rule violation: streaming_list_type_json_tags,github.com/openshift/api/confi
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,ProxyList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1,SchedulerList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1alpha1,BackupList,ListMeta
-API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1alpha1,ClusterImagePolicyList,ListMeta
-API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1alpha1,ImagePolicyList,ListMeta
+API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1alpha1,CRIOCredentialProviderConfigList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1alpha1,InsightsDataGatherList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/config/v1alpha2,InsightsDataGatherList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/console/v1,ConsoleCLIDownloadList,ListMeta
@@ -723,6 +728,7 @@ API rule violation: streaming_list_type_json_tags,github.com/openshift/api/opera
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/operator/v1,ServiceCAList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/operator/v1,ServiceCatalogAPIServerList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/operator/v1,ServiceCatalogControllerManagerList,ListMeta
+API rule violation: streaming_list_type_json_tags,github.com/openshift/api/operator/v1alpha1,ClusterAPIList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/operator/v1alpha1,ClusterVersionOperatorList,Items
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/operator/v1alpha1,ClusterVersionOperatorList,ListMeta
 API rule violation: streaming_list_type_json_tags,github.com/openshift/api/operator/v1alpha1,EtcdBackupList,ListMeta
