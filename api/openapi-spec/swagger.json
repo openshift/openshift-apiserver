@@ -7608,7 +7608,7 @@
       "type": "object"
     },
     "io.k8s.api.core.v1.PodResourceClaim": {
-      "description": "PodResourceClaim references exactly one ResourceClaim, either directly or by naming a ResourceClaimTemplate which is then turned into a ResourceClaim for the pod.\n\nIt adds a name to it that uniquely identifies the ResourceClaim inside the Pod. Containers that need access to the ResourceClaim reference it with this name.",
+      "description": "PodResourceClaim references exactly one ResourceClaim, either directly or by naming a ResourceClaimTemplate which is then turned into a ResourceClaim for the pod.\n\nIt adds a name to it that uniquely identifies the ResourceClaim inside the Pod. Containers that need access to the ResourceClaim reference it with this name.\n\nWhen the DRAWorkloadResourceClaims feature gate is enabled and this Pod belongs to a PodGroup, a PodResourceClaim is matched to a PodGroupResourceClaim if all of their fields are equal (Name, ResourceClaimName, and ResourceClaimTemplateName). A matched claim references a single ResourceClaim shared across all Pods in the PodGroup, reserved for the PodGroup in ResourceClaimStatus.ReservedFor rather than for individual Pods.",
       "properties": {
         "name": {
           "description": "Name uniquely identifies this resource claim inside the pod. This must be a DNS_LABEL.",
@@ -7619,7 +7619,7 @@
           "type": "string"
         },
         "resourceClaimTemplateName": {
-          "description": "ResourceClaimTemplateName is the name of a ResourceClaimTemplate object in the same namespace as this pod.\n\nThe template will be used to create a new ResourceClaim, which will be bound to this pod. When this pod is deleted, the ResourceClaim will also be deleted. The pod name and resource name, along with a generated component, will be used to form a unique name for the ResourceClaim, which will be recorded in pod.status.resourceClaimStatuses.\n\nThis field is immutable and no changes will be made to the corresponding ResourceClaim by the control plane after creating the ResourceClaim.\n\nExactly one of ResourceClaimName and ResourceClaimTemplateName must be set.",
+          "description": "ResourceClaimTemplateName is the name of a ResourceClaimTemplate object in the same namespace as this pod.\n\nThe template will be used to create a new ResourceClaim, which will be bound to this pod. When this pod is deleted, the ResourceClaim will also be deleted. The pod name and resource name, along with a generated component, will be used to form a unique name for the ResourceClaim, which will be recorded in pod.status.resourceClaimStatuses.\n\nWhen the DRAWorkloadResourceClaims feature gate is enabled and the pod belongs to a PodGroup that defines a PodGroupResourceClaim with the same Name and ResourceClaimTemplateName, this PodResourceClaim resolves to the ResourceClaim generated for the PodGroup. All pods in the group that define an equivalent PodResourceClaim matching the PodGroupResourceClaim's Name and ResourceClaimTemplateName share the same generated ResourceClaim. ResourceClaims generated for a PodGroup are owned by the PodGroup and their lifecycles are tied to the PodGroup instead of any individual pod.\n\nThis field is immutable and no changes will be made to the corresponding ResourceClaim by the control plane after creating the ResourceClaim.\n\nExactly one of ResourceClaimName and ResourceClaimTemplateName must be set.",
           "type": "string"
         }
       },
@@ -7640,6 +7640,23 @@
         "name"
       ],
       "type": "object"
+    },
+    "io.k8s.api.core.v1.PodSchedulingGroup": {
+      "description": "PodSchedulingGroup identifies the runtime scheduling group instance that a Pod belongs to. The scheduler uses this information to apply workload-aware scheduling semantics. Exactly one field must be specified.",
+      "properties": {
+        "podGroupName": {
+          "description": "PodGroupName specifies the name of the standalone PodGroup object that represents the runtime instance of this group. Must be a DNS subdomain.",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "x-kubernetes-unions": [
+        {
+          "fields-to-discriminateBy": {
+            "podGroupName": "PodGroupName"
+          }
+        }
+      ]
     },
     "io.k8s.api.core.v1.PodSecurityContext": {
       "description": "PodSecurityContext holds pod-level security attributes and common container settings. Some fields are also present in container.securityContext.  Field values of container.securityContext take precedence over field values of PodSecurityContext.",
@@ -7805,7 +7822,7 @@
           "type": "boolean"
         },
         "hostUsers": {
-          "description": "Use the host's user namespace. Optional: Default to true. If set to true or not present, the pod will be run in the host user namespace, useful for when the pod needs a feature only available to the host user namespace, such as loading a kernel module with CAP_SYS_MODULE. When set to false, a new userns is created for the pod. Setting false is useful for mitigating container breakout vulnerabilities even allowing users to run their containers as root without actually having root privileges on the host. This field is alpha-level and is only honored by servers that enable the UserNamespacesSupport feature.",
+          "description": "Use the host's user namespace. Optional: Default to true. If set to true or not present, the pod will be run in the host user namespace, useful for when the pod needs a feature only available to the host user namespace, such as loading a kernel module with CAP_SYS_MODULE. When set to false, a new userns is created for the pod. Setting false is useful for mitigating container breakout vulnerabilities even allowing users to run their containers as root without actually having root privileges on the host.",
           "type": "boolean"
         },
         "hostname": {
@@ -7937,6 +7954,10 @@
           "x-kubernetes-patch-merge-key": "name",
           "x-kubernetes-patch-strategy": "merge"
         },
+        "schedulingGroup": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.PodSchedulingGroup",
+          "description": "SchedulingGroup provides a reference to the immediate scheduling runtime grouping object that this Pod belongs to. This field is used by the scheduler to identify the group and apply the correct group scheduling policies. The association with a group also impacts other lifecycle aspects of a Pod that are relevant in a wider context of scheduling like preemption, resource attachment, etc. If not specified, the Pod is treated as a single unit in all of these aspects. The group object referenced by this field may not exist at the time the Pod is created. This field is immutable, but a group object with the same name may be recreated with different policies. Doing this during pod scheduling may result in the placement not conforming to the expected policies."
+        },
         "securityContext": {
           "$ref": "#/definitions/io.k8s.api.core.v1.PodSecurityContext",
           "description": "SecurityContext holds pod-level security attributes and common container settings. Optional: Defaults to empty.  See type description for default values of each field."
@@ -8000,10 +8021,6 @@
           "x-kubernetes-list-type": "map",
           "x-kubernetes-patch-merge-key": "name",
           "x-kubernetes-patch-strategy": "merge,retainKeys"
-        },
-        "workloadRef": {
-          "$ref": "#/definitions/io.k8s.api.core.v1.WorkloadReference",
-          "description": "WorkloadRef provides a reference to the Workload object that this Pod belongs to. This field is used by the scheduler to identify the PodGroup and apply the correct group scheduling policies. The Workload object referenced by this field may not exist at the time the Pod is created. This field is immutable, but a Workload object with the same name may be recreated with different policies. Doing this during pod scheduling may result in the placement not conforming to the expected policies."
         }
       },
       "required": [
@@ -8652,7 +8669,7 @@
           "type": "boolean"
         },
         "procMount": {
-          "description": "procMount denotes the type of proc mount to use for the containers. The default value is Default which uses the container runtime defaults for readonly paths and masked paths. This requires the ProcMountType feature flag to be enabled. Note that this field cannot be set when spec.os.name is windows.\n\nPossible enum values:\n - `\"Default\"` uses the container runtime defaults for readonly and masked paths for /proc. Most container runtimes mask certain paths in /proc to avoid accidental security exposure of special devices or information.\n - `\"Unmasked\"` bypasses the default masking behavior of the container runtime and ensures the newly created /proc the container stays in tact with no modifications.",
+          "description": "procMount denotes the type of proc mount to use for the containers. The default value is Default which uses the container runtime defaults for readonly paths and masked paths. Note that this field cannot be set when spec.os.name is windows.\n\nPossible enum values:\n - `\"Default\"` uses the container runtime defaults for readonly and masked paths for /proc. Most container runtimes mask certain paths in /proc to avoid accidental security exposure of special devices or information.\n - `\"Unmasked\"` bypasses the default masking behavior of the container runtime and ensures the newly created /proc the container stays in tact with no modifications.",
           "enum": [
             "Default",
             "Unmasked"
@@ -9010,7 +9027,7 @@
         },
         "image": {
           "$ref": "#/definitions/io.k8s.api.core.v1.ImageVolumeSource",
-          "description": "image represents an OCI object (a container image or artifact) pulled and mounted on the kubelet's host machine. The volume is resolved at pod startup depending on which PullPolicy value is provided:\n\n- Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails. - Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present. - IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.\n\nThe volume gets re-resolved if the pod gets deleted and recreated, which means that new remote content will become available on pod recreation. A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message. The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field. The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images. The volume will be mounted read-only (ro) and non-executable files (noexec). Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33. The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type."
+          "description": "image represents an OCI object (a container image or artifact) pulled and mounted on the kubelet's host machine. The volume is resolved at pod startup depending on which PullPolicy value is provided:\n\n- Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails. - Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present. - IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.\n\nThe volume gets re-resolved if the pod gets deleted and recreated, which means that new remote content will become available on pod recreation. A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message. The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field. The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images. The volume will be mounted read-only (ro). Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33. The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type."
         },
         "iscsi": {
           "$ref": "#/definitions/io.k8s.api.core.v1.ISCSIVolumeSource",
@@ -9034,7 +9051,7 @@
         },
         "portworxVolume": {
           "$ref": "#/definitions/io.k8s.api.core.v1.PortworxVolumeSource",
-          "description": "portworxVolume represents a portworx volume attached and mounted on kubelets host machine. Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate is on."
+          "description": "portworxVolume represents a portworx volume attached and mounted on kubelets host machine. Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type are redirected to the pxd.portworx.com CSI driver."
         },
         "projected": {
           "$ref": "#/definitions/io.k8s.api.core.v1.ProjectedVolumeSource",
@@ -9245,28 +9262,6 @@
           "type": "string"
         }
       },
-      "type": "object"
-    },
-    "io.k8s.api.core.v1.WorkloadReference": {
-      "description": "WorkloadReference identifies the Workload object and PodGroup membership that a Pod belongs to. The scheduler uses this information to apply workload-aware scheduling semantics.",
-      "properties": {
-        "name": {
-          "description": "Name defines the name of the Workload object this Pod belongs to. Workload must be in the same namespace as the Pod. If it doesn't match any existing Workload, the Pod will remain unschedulable until a Workload object is created and observed by the kube-scheduler. It must be a DNS subdomain.",
-          "type": "string"
-        },
-        "podGroup": {
-          "description": "PodGroup is the name of the PodGroup within the Workload that this Pod belongs to. If it doesn't match any existing PodGroup within the Workload, the Pod will remain unschedulable until the Workload object is recreated and observed by the kube-scheduler. It must be a DNS label.",
-          "type": "string"
-        },
-        "podGroupReplicaKey": {
-          "description": "PodGroupReplicaKey specifies the replica key of the PodGroup to which this Pod belongs. It is used to distinguish pods belonging to different replicas of the same pod group. The pod group policy is applied separately to each replica. When set, it must be a DNS label.",
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "podGroup"
-      ],
       "type": "object"
     },
     "io.k8s.api.extensions.v1beta1.Scale": {
@@ -9698,16 +9693,6 @@
           "version": "v2"
         },
         {
-          "group": "autoscaling",
-          "kind": "DeleteOptions",
-          "version": "v2beta1"
-        },
-        {
-          "group": "autoscaling",
-          "kind": "DeleteOptions",
-          "version": "v2beta2"
-        },
-        {
           "group": "batch",
           "kind": "DeleteOptions",
           "version": "v1"
@@ -9865,7 +9850,7 @@
         {
           "group": "scheduling.k8s.io",
           "kind": "DeleteOptions",
-          "version": "v1alpha1"
+          "version": "v1alpha2"
         },
         {
           "group": "scheduling.k8s.io",
@@ -9988,6 +9973,10 @@
         "selfLink": {
           "description": "Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.",
           "type": "string"
+        },
+        "shardInfo": {
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ShardInfo",
+          "description": "shardInfo is set when the list is a filtered subset of the full collection, as selected by a shard selector on the request. It echoes back the selector so clients can verify which shard they received and merge sharded responses. Clients should not cache sharded list responses as a full representation of the collection.\n\nThis is an alpha field and requires enabling the ShardedListAndWatch feature gate."
         }
       },
       "type": "object"
@@ -10188,6 +10177,19 @@
       "required": [
         "clientCIDR",
         "serverAddress"
+      ],
+      "type": "object"
+    },
+    "io.k8s.apimachinery.pkg.apis.meta.v1.ShardInfo": {
+      "description": "ShardInfo describes the shard selector that was applied to produce a list response. Its presence on a list response indicates the list is a filtered subset.",
+      "properties": {
+        "selector": {
+          "description": "selector is the shard selector string from the request, echoed back so clients can verify which shard they received and merge responses from multiple shards.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "selector"
       ],
       "type": "object"
     },
@@ -10423,16 +10425,6 @@
           "version": "v2"
         },
         {
-          "group": "autoscaling",
-          "kind": "WatchEvent",
-          "version": "v2beta1"
-        },
-        {
-          "group": "autoscaling",
-          "kind": "WatchEvent",
-          "version": "v2beta2"
-        },
-        {
           "group": "batch",
           "kind": "WatchEvent",
           "version": "v1"
@@ -10590,7 +10582,7 @@
         {
           "group": "scheduling.k8s.io",
           "kind": "WatchEvent",
-          "version": "v1alpha1"
+          "version": "v1alpha2"
         },
         {
           "group": "scheduling.k8s.io",
@@ -10975,6 +10967,13 @@
       "type": "boolean",
       "uniqueItems": true
     },
+    "shardSelector-Kgyki_3_": {
+      "description": "shardSelector restricts the list of returned objects using a CEL-based shard selector expression. The format uses the shardRange() function combined with || (logical OR) to specify one or more hash ranges:\n\n  shardRange(object.metadata.uid, '0x0', '0x8000000000000000')\n  shardRange(object.metadata.uid, '0x0', '0x8000000000000000') || shardRange(object.metadata.uid, '0x8000000000000000', '0x10000000000000000')\n\nField paths use CEL-style object-rooted syntax (e.g. \"object.metadata.uid\"), NOT the fieldSelector format (\"metadata.uid\"). Currently supported paths:\n  - object.metadata.uid\n  - object.metadata.namespace\n\nhexStart and hexEnd are single-quoted CEL string literals with a '0x' prefix, defining the inclusive lower and exclusive upper bounds over the 64-bit FNV-1a hash space. The full range is [0x0, 0x10000000000000000), where the exclusive upper bound equals 2^64.\n\nExamples:\n  2-shard split:\n    shard 0: shardRange(object.metadata.uid, '0x0000000000000000', '0x8000000000000000')\n    shard 1: shardRange(object.metadata.uid, '0x8000000000000000', '0x10000000000000000')\n  4-shard split:\n    shard 0: shardRange(object.metadata.uid, '0x0000000000000000', '0x4000000000000000')\n    shard 1: shardRange(object.metadata.uid, '0x4000000000000000', '0x8000000000000000')\n    shard 2: shardRange(object.metadata.uid, '0x8000000000000000', '0xc000000000000000')\n    shard 3: shardRange(object.metadata.uid, '0xc000000000000000', '0x10000000000000000')\n\nThis is an alpha field and requires enabling the ShardedListAndWatch feature gate.",
+      "in": "query",
+      "name": "shardSelector",
+      "type": "string",
+      "uniqueItems": true
+    },
     "sinceSeconds-Sf7lFlCh": {
       "description": "sinceSeconds is a relative time in seconds before the current time from which to show logs. If this value precedes the time a pod was started, only logs since the pod start will be returned. If this value is in the future, no logs will be returned. Only one of sinceSeconds or sinceTime may be specified.",
       "in": "query",
@@ -11210,6 +11209,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -11267,6 +11269,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -11331,6 +11336,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -12419,6 +12427,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -12494,6 +12505,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -12579,6 +12593,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -12685,6 +12702,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -13087,6 +13107,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -13659,6 +13682,9 @@
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
           },
           {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
+          },
+          {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
           },
           {
@@ -14065,6 +14091,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -14758,6 +14787,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -14830,6 +14862,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -15053,6 +15088,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -15127,6 +15165,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -15184,6 +15225,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -15248,6 +15292,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -15943,6 +15990,9 @@
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
           },
           {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
+          },
+          {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
           }
         ],
@@ -16005,6 +16055,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -16710,6 +16763,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -16782,6 +16838,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -16859,6 +16918,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -16946,6 +17008,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -17021,6 +17086,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -17106,6 +17174,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -17233,6 +17304,9 @@
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
           },
           {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
+          },
+          {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
           }
         ],
@@ -17295,6 +17369,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -17894,6 +17971,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -17968,6 +18048,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -18040,6 +18123,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -18322,6 +18408,9 @@
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
           },
           {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
+          },
+          {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
           }
         ],
@@ -18384,6 +18473,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -18890,6 +18982,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -19118,6 +19213,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -19526,6 +19624,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -19970,6 +20071,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -20052,6 +20156,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -20124,6 +20231,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -20201,6 +20311,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -20286,6 +20399,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -20392,6 +20508,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -20542,6 +20661,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -20980,6 +21102,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -21060,6 +21185,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -21202,6 +21330,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -21277,6 +21408,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -21406,6 +21540,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -21486,6 +21623,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -21613,6 +21753,9 @@
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
           },
           {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
+          },
+          {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
           }
         ],
@@ -21675,6 +21818,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -22309,6 +22455,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -22384,6 +22533,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -22471,6 +22623,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -22543,6 +22698,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -22922,6 +23080,9 @@
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
           },
           {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
+          },
+          {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
           }
         ],
@@ -22984,6 +23145,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -23422,6 +23586,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -23504,6 +23671,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -23576,6 +23746,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -23658,6 +23831,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -23785,6 +23961,9 @@
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
           },
           {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
+          },
+          {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
           }
         ],
@@ -23847,6 +24026,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -24351,6 +24533,9 @@
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
           },
           {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
+          },
+          {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
           }
         ],
@@ -24413,6 +24598,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -25032,6 +25220,9 @@
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
           },
           {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
+          },
+          {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
           }
         ],
@@ -25094,6 +25285,9 @@
           },
           {
             "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+          },
+          {
+            "$ref": "#/parameters/shardSelector-Kgyki_3_"
           },
           {
             "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -25538,6 +25732,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -25612,6 +25809,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -25684,6 +25884,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -25768,6 +25971,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -25843,6 +26049,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -25930,6 +26139,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -26005,6 +26217,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
@@ -26092,6 +26307,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -26166,6 +26384,9 @@
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
         },
         {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
+        },
+        {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
         },
         {
@@ -26238,6 +26459,9 @@
         },
         {
           "$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+        },
+        {
+          "$ref": "#/parameters/shardSelector-Kgyki_3_"
         },
         {
           "$ref": "#/parameters/timeoutSeconds-yvYezaOC"
