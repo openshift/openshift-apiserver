@@ -159,10 +159,10 @@ func TestAddModifyDeleteEventsByUser(t *testing.T) {
 }
 
 func TestProjectSelectionPredicate(t *testing.T) {
-	field := fields.ParseSelectorOrDie("metadata.name=ns-03")
-	m := projectutil.MatchProject(labels.Everything(), field)
+	fieldSelector := fields.ParseSelectorOrDie("metadata.name=ns-03")
+	predicate := projectutil.MatchProject(labels.Everything(), fieldSelector)
 
-	watcher, _, stopCh := newTestWatcher("bob", nil, m, false, newNamespaces("ns-01", "ns-02", "ns-03")...)
+	watcher, _, stopCh := newTestWatcher("bob", nil, predicate, false, newNamespaces("ns-01", "ns-02", "ns-03")...)
 	defer close(stopCh)
 
 	if watcher.emit == nil {
@@ -304,7 +304,7 @@ func newBookmarkTestWatcher(username string, includeAllExistingProjects bool, na
 	fakeAuthCache := &fakeAuthCache{namespaces: namespaces}
 	stopCh := make(chan struct{})
 	go projectCache.Run(stopCh)
-	w := NewUserProjectWatcher(
+	watcher := NewUserProjectWatcher(
 		&user.DefaultInfo{Name: username},
 		sets.NewString("*"),
 		projectCache,
@@ -313,7 +313,7 @@ func newBookmarkTestWatcher(username string, includeAllExistingProjects bool, na
 		matchAllPredicate(),
 		true,
 	)
-	return w, stopCh
+	return watcher, stopCh
 }
 
 func TestSendInitialEventsBookmark(t *testing.T) {
@@ -335,7 +335,7 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 			}
 		}
 
-		// expect bookmark with annotation
+		// expect bookmark with annotation and ResourceVersion
 		select {
 		case event := <-watcher.ResultChan():
 			if event.Type != watch.Bookmark {
@@ -344,6 +344,9 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 			project := event.Object.(*projectapi.Project)
 			if project.Annotations[metav1.InitialEventsAnnotationKey] != "true" {
 				t.Errorf("expected initial-events-end annotation")
+			}
+			if project.ResourceVersion != "11" {
+				t.Errorf("expected ResourceVersion 11 (max across namespaces), got %v", project.ResourceVersion)
 			}
 		case <-time.After(3 * time.Second):
 			t.Fatalf("timeout waiting for bookmark")
@@ -355,8 +358,8 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 		// (e.g. metadata.name=<project>) would reject the bookmark's empty Name.
 		// This is critical for oc delete --wait which watches a specific project
 		// and needs the bookmark to complete the initial events stream.
-		field := fields.ParseSelectorOrDie("metadata.name=ns-01")
-		m := projectutil.MatchProject(labels.Everything(), field)
+		fieldSelector := fields.ParseSelectorOrDie("metadata.name=ns-01")
+		predicate := projectutil.MatchProject(labels.Everything(), fieldSelector)
 
 		objects := []runtime.Object{}
 		namespaces := newNamespacesWithRV("ns-01", "ns-02")
@@ -375,25 +378,28 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 		defer close(stopCh)
 		go projectCache.Run(stopCh)
 
-		w := NewUserProjectWatcher(
+		watcher := NewUserProjectWatcher(
 			&user.DefaultInfo{Name: "bob"},
 			sets.NewString("*"),
 			projectCache,
 			fakeAuthCache,
 			false,
-			m,
+			predicate,
 			true,
 		)
-		go w.Watch()
+		go watcher.Watch()
 
 		select {
-		case event := <-w.ResultChan():
+		case event := <-watcher.ResultChan():
 			if event.Type != watch.Bookmark {
 				t.Errorf("expected Bookmark, got %v", event.Type)
 			}
 			project := event.Object.(*projectapi.Project)
 			if project.Annotations[metav1.InitialEventsAnnotationKey] != "true" {
 				t.Errorf("expected initial-events-end annotation")
+			}
+			if project.ResourceVersion == "0" {
+				t.Errorf("expected non-zero ResourceVersion on bookmark, got %v", project.ResourceVersion)
 			}
 		case <-time.After(3 * time.Second):
 			t.Fatalf("timeout waiting for bookmark — predicate likely filtered it out")
@@ -415,6 +421,9 @@ func TestSendInitialEventsBookmark(t *testing.T) {
 			project := event.Object.(*projectapi.Project)
 			if project.Annotations[metav1.InitialEventsAnnotationKey] != "true" {
 				t.Errorf("expected initial-events-end annotation")
+			}
+			if project.ResourceVersion == "0" {
+				t.Errorf("expected non-zero ResourceVersion on bookmark, got %v", project.ResourceVersion)
 			}
 		case <-time.After(3 * time.Second):
 			t.Fatalf("timeout waiting for bookmark")

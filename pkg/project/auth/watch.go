@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"strconv"
 	"sync"
 
 	"k8s.io/klog/v2"
@@ -65,7 +66,8 @@ type userProjectWatcher struct {
 	// knownProjects maps name to resourceVersion
 	knownProjects map[string]string
 
-	sendBookmark bool
+	sendBookmark            bool
+	bookmarkResourceVersion string
 }
 
 var (
@@ -75,10 +77,16 @@ var (
 )
 
 func NewUserProjectWatcher(user user.Info, visibleNamespaces sets.String, projectCache *projectcache.ProjectCache, authCache WatchableCache, includeAllExistingProjects bool, predicate kstorage.SelectionPredicate, sendBookmark bool) *userProjectWatcher {
+	// TODO: authCache.List materializes all visible namespaces per watcher, increasing memory
+	// proportional to concurrent watchers. Consider streaming events from WatchableCache instead.
 	namespaces, _ := authCache.List(user, labels.Everything())
 	knownProjects := map[string]string{}
+	var maxRV int
 	for _, namespace := range namespaces.Items {
 		knownProjects[namespace.Name] = namespace.ResourceVersion
+		if n, err := strconv.Atoi(namespace.ResourceVersion); err == nil && n > maxRV {
+			maxRV = n
+		}
 	}
 
 	// this is optional.  If they don't request it, don't include it.
@@ -101,7 +109,8 @@ func NewUserProjectWatcher(user user.Info, visibleNamespaces sets.String, projec
 		initialProjects: initialProjects,
 		knownProjects:   knownProjects,
 
-		sendBookmark: sendBookmark,
+		sendBookmark:            sendBookmark,
+		bookmarkResourceVersion: strconv.Itoa(maxRV),
 	}
 	w.emit = func(e watch.Event) {
 		if e.Type != watch.Bookmark {
@@ -199,6 +208,10 @@ func (w *userProjectWatcher) GroupMembershipChanged(namespaceName string, users,
 // acknowledges that project visibility depends on both namespace objects and RBAC state. Since
 // RBAC changes don't update namespace ResourceVersions, permission-filtered views cannot provide
 // the same consistency guarantees (resourceVersionMatch=NotOlderThan) as direct object watches.
+//
+// Limitation: Unlike upstream's cacher which streams initial events from a shared watch cache,
+// this implementation materializes all visible namespaces per watcher via authCache.List,
+// so we do not fully realize the memory savings that KEP-3157 WatchList is designed to provide.
 func (w *userProjectWatcher) Watch() {
 	defer close(w.outgoing)
 	defer func() {
@@ -227,12 +240,15 @@ func (w *userProjectWatcher) Watch() {
 		})
 	}
 
+	// When sendBookmark is true but initialProjects is empty (RV != "0"), only
+	// the bookmark is emitted with no preceding Added events. See design comment above.
 	if w.sendBookmark {
 		w.emit(watch.Event{
 			Type: watch.Bookmark,
 			Object: &projectapi.Project{
 				ObjectMeta: metav1.ObjectMeta{
-					Annotations: map[string]string{metav1.InitialEventsAnnotationKey: "true"},
+					ResourceVersion: w.bookmarkResourceVersion,
+					Annotations:     map[string]string{metav1.InitialEventsAnnotationKey: "true"},
 				},
 			},
 		})
