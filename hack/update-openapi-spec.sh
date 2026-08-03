@@ -153,12 +153,12 @@ echo "Using OpenShift release: ${OPENSHIFT_RELEASE}"
 
 # Set up registry authentication if available
 REGISTRY_AUTH_OPTS=""
-if [[ -n "${CLUSTER_PROFILE_DIR:-}" && -f "${CLUSTER_PROFILE_DIR}/pull-secret" ]]; then
-  echo "Using pull secret from ${CLUSTER_PROFILE_DIR}/pull-secret"
-  REGISTRY_AUTH_OPTS="--registry-config=${CLUSTER_PROFILE_DIR}/pull-secret"
-elif [[ -n "${REGISTRY_AUTH_FILE:-}" && -f "${REGISTRY_AUTH_FILE}" ]]; then
+if [[ -n "${REGISTRY_AUTH_FILE:-}" && -f "${REGISTRY_AUTH_FILE}" ]]; then
   echo "Using pull secret from ${REGISTRY_AUTH_FILE}"
   REGISTRY_AUTH_OPTS="--registry-config=${REGISTRY_AUTH_FILE}"
+elif [[ -n "${CLUSTER_PROFILE_DIR:-}" && -f "${CLUSTER_PROFILE_DIR}/pull-secret" ]]; then
+  echo "Using pull secret from ${CLUSTER_PROFILE_DIR}/pull-secret"
+  REGISTRY_AUTH_OPTS="--registry-config=${CLUSTER_PROFILE_DIR}/pull-secret"
 else
   echo "WARNING: No pull secret found. Proceeding without authentication."
   echo "This may fail if accessing private registries."
