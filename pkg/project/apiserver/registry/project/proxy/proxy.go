@@ -268,6 +268,9 @@ func (s *REST) Delete(ctx context.Context, name string, objectFunc rest.Validate
 	err := wait.ExponentialBackoffWithContext(ctx, backoff, func(ctx context.Context) (bool, error) {
 		project, err := s.getProjectForDeletion(ctx, name)
 		if err != nil {
+			if kerrors.IsNotFound(err) {
+				return false, err
+			}
 			lastErr = fmt.Errorf("getting project for deletion: %w", err)
 			return false, nil
 		}
@@ -322,6 +325,9 @@ func (s *REST) getProjectForDeletion(ctx context.Context, name string) (*project
 
 	obj, err := s.Get(ctx, name, &getOpts)
 	if err != nil {
+		if kerrors.IsNotFound(err) {
+			return nil, err
+		}
 		return nil, fmt.Errorf("unable to get project: %w", err)
 	}
 

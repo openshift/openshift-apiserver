@@ -215,6 +215,7 @@ func TestDeleteProject(t *testing.T) {
 		options         *metav1.DeleteOptions
 		expectedStatus  *metav1.Status
 		expectedErr     error
+		expectedErrFunc func(error) bool
 		// Use -1 to ignore
 		expectedValidationCalls int
 	}
@@ -244,6 +245,27 @@ func TestDeleteProject(t *testing.T) {
 			expectedStatus:          &metav1.Status{Status: metav1.StatusFailure},
 			expectedValidationCalls: 10,
 			expectedErr:             errors.New("validating project: boom"),
+		},
+		{
+			name: "has validation, getting project returns not found, no retry, returns not found error",
+			reactors: []*reactor{
+				newReactor(
+					"get",
+					"namespaces",
+					func(called int) (runtime.Object, error) {
+						return nil, kerrors.NewNotFound(corev1.Resource("namespaces"), "foo")
+					},
+					1,
+				),
+			},
+			objectValidator: &objectValidator{
+				objectFunc: func(ctx context.Context, obj runtime.Object) error {
+					return nil
+				},
+			},
+			expectedStatus:          &metav1.Status{Status: metav1.StatusFailure},
+			expectedErrFunc:         kerrors.IsNotFound,
+			expectedValidationCalls: 0,
 		},
 		{
 			name: "has validation, getting project perma-fails with non-terminal error, no options, validation never called, request fails",
@@ -548,13 +570,22 @@ func TestDeleteProject(t *testing.T) {
 			}
 
 			obj, _, err := storage.Delete(ctx, "foo", validationFunc, tc.options)
-			switch {
-			case err != nil && tc.expectedErr == nil:
-				t.Fatalf("received an unexpected error: %v", err)
-			case err == nil && tc.expectedErr != nil:
-				t.Fatalf("expected an error but did not receive one. expected error: %v", tc.expectedErr)
-			case err != nil && tc.expectedErr != nil && err.Error() != tc.expectedErr.Error():
-				t.Fatalf("received error does not match expected error. expected error: %v , received error: %v", tc.expectedErr, err)
+			if tc.expectedErrFunc != nil {
+				if err == nil {
+					t.Fatalf("expected an error but did not receive one")
+				}
+				if !tc.expectedErrFunc(err) {
+					t.Fatalf("error did not pass expected classification check: %v", err)
+				}
+			} else {
+				switch {
+				case err != nil && tc.expectedErr == nil:
+					t.Fatalf("received an unexpected error: %v", err)
+				case err == nil && tc.expectedErr != nil:
+					t.Fatalf("expected an error but did not receive one. expected error: %v", tc.expectedErr)
+				case err != nil && tc.expectedErr != nil && err.Error() != tc.expectedErr.Error():
+					t.Fatalf("received error does not match expected error. expected error: %v , received error: %v", tc.expectedErr, err)
+				}
 			}
 
 			if tc.expectedStatus.Status != obj.(*metav1.Status).Status {
