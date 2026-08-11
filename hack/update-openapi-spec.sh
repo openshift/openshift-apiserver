@@ -135,58 +135,78 @@ if ! command -v oc &>/dev/null; then
   exit 1
 fi
 
-# Detect OpenShift version from .ci-operator.yaml
-OPENSHIFT_VERSION=""
-if [[ -f "${SCRIPT_ROOT}/.ci-operator.yaml" ]]; then
-  OPENSHIFT_VERSION=$(grep -oP 'openshift-\K[0-9]+\.[0-9]+' "${SCRIPT_ROOT}/.ci-operator.yaml" | head -1)
+# Resolve component images and registry auth.
+#
+# Image resolution (first match wins):
+#   1. HYPERKUBE_IMAGE / ETCD_IMAGE env vars — set by ci-operator dependencies in CI,
+#      or manually by the user. If both are set, skips release resolution entirely.
+#   2. OPENSHIFT_RELEASE env var if set.
+#   3. Auto-detect version from .ci-operator.yaml and construct release pullspec
+#      (ocp/release:<version> for 4.x, ocp/release-<major>:<version> for 5+).
+#
+# Registry auth:
+#   oc resolves credentials via REGISTRY_AUTH_FILE, ~/.config/containers/auth.json,
+#   or ~/.docker/config.json (see oc's auth_resolver.go). For backward compatibility
+#   with CI configs that set cluster_profile, the script also checks
+#   CLUSTER_PROFILE_DIR/pull-secret and exports it as REGISTRY_AUTH_FILE so oc
+#   picks it up automatically.
+
+if [[ -z "${HYPERKUBE_IMAGE:-}" || -z "${ETCD_IMAGE:-}" ]]; then
+  OPENSHIFT_RELEASE="${OPENSHIFT_RELEASE:-}"
+
+  if [[ -z "${OPENSHIFT_RELEASE}" ]]; then
+    OPENSHIFT_VERSION=""
+    if [[ -f "${SCRIPT_ROOT}/.ci-operator.yaml" ]]; then
+      OPENSHIFT_VERSION=$(grep -oE 'openshift-[0-9]+\.[0-9]+' "${SCRIPT_ROOT}/.ci-operator.yaml" | head -1 | sed 's/openshift-//')
+    fi
+    if [[ -z "${OPENSHIFT_VERSION}" ]]; then
+      echo "ERROR: Could not detect OpenShift version from .ci-operator.yaml"
+      echo "Set OPENSHIFT_RELEASE or HYPERKUBE_IMAGE/ETCD_IMAGE directly."
+      exit 1
+    fi
+    MAJOR_VERSION="${OPENSHIFT_VERSION%%.*}"
+    if [[ "${MAJOR_VERSION}" -ge 5 ]]; then
+      OPENSHIFT_RELEASE="registry.ci.openshift.org/ocp/release-${MAJOR_VERSION}:${OPENSHIFT_VERSION}"
+    else
+      OPENSHIFT_RELEASE="registry.ci.openshift.org/ocp/release:${OPENSHIFT_VERSION}"
+    fi
+  fi
+  echo "Using release: ${OPENSHIFT_RELEASE}"
+
 fi
 
-if [[ -z "${OPENSHIFT_VERSION}" ]]; then
-  echo "ERROR: Could not detect OpenShift version from .ci-operator.yaml"
-  echo "Please set OPENSHIFT_RELEASE environment variable manually, e.g.:"
-  echo "  OPENSHIFT_RELEASE=quay.io/openshift-release-dev/ocp-release:4.22.0-x86_64 $0"
-  exit 1
-fi
-
-OPENSHIFT_RELEASE="${OPENSHIFT_RELEASE:-quay.io/openshift-release-dev/ocp-release:${OPENSHIFT_VERSION}.0-x86_64}"
-echo "Using OpenShift release: ${OPENSHIFT_RELEASE}"
-
-# Set up registry authentication if available
-REGISTRY_AUTH_OPTS=""
-if [[ -n "${REGISTRY_AUTH_FILE:-}" && -f "${REGISTRY_AUTH_FILE}" ]]; then
-  echo "Using pull secret from ${REGISTRY_AUTH_FILE}"
-  REGISTRY_AUTH_OPTS="--registry-config=${REGISTRY_AUTH_FILE}"
-elif [[ -n "${CLUSTER_PROFILE_DIR:-}" && -f "${CLUSTER_PROFILE_DIR}/pull-secret" ]]; then
+# Registry auth is needed even when HYPERKUBE_IMAGE/ETCD_IMAGE are pre-set,
+# because oc image extract still needs credentials to pull the images.
+if [[ -n "${CLUSTER_PROFILE_DIR:-}" && -f "${CLUSTER_PROFILE_DIR}/pull-secret" ]]; then
   echo "Using pull secret from ${CLUSTER_PROFILE_DIR}/pull-secret"
-  REGISTRY_AUTH_OPTS="--registry-config=${CLUSTER_PROFILE_DIR}/pull-secret"
+  export REGISTRY_AUTH_FILE="${CLUSTER_PROFILE_DIR}/pull-secret"
 else
-  echo "WARNING: No pull secret found. Proceeding without authentication."
+  echo "WARNING: No explicit registry credentials found."
+  echo "Falling back to oc's default credential discovery (REGISTRY_AUTH_FILE, ~/.docker/config.json, ~/.config/containers/auth.json)."
   echo "This may fail if accessing private registries."
 fi
 
-echo "Extracting kube-apiserver from OpenShift release ${OPENSHIFT_RELEASE}..."
+echo "Extracting kube-apiserver..."
 KUBE_APISERVER="${BIN_DIR}/kube-apiserver"
 KUBE_EXTRACT_DIR="${TMP_DIR}/kube-extract"
 rm -rf "${KUBE_EXTRACT_DIR}"
 mkdir -p "${KUBE_EXTRACT_DIR}"
-HYPERKUBE_IMAGE=$(oc adm release info "${OPENSHIFT_RELEASE}" ${REGISTRY_AUTH_OPTS} --image-for=hyperkube)
-oc image extract "${HYPERKUBE_IMAGE}" ${REGISTRY_AUTH_OPTS} --path usr/bin/kube-apiserver:"${KUBE_EXTRACT_DIR}"
+HYPERKUBE_IMAGE="${HYPERKUBE_IMAGE:-$(oc adm release info "${OPENSHIFT_RELEASE}" --image-for=hyperkube)}"
+oc image extract "${HYPERKUBE_IMAGE}" --path usr/bin/kube-apiserver:"${KUBE_EXTRACT_DIR}"
 mv "${KUBE_EXTRACT_DIR}/kube-apiserver" "${KUBE_APISERVER}"
 chmod +x "${KUBE_APISERVER}"
-echo "Extracted kube-apiserver to ${KUBE_APISERVER}"
 echo "kube-apiserver version:"
 "${KUBE_APISERVER}" --version
 
-echo "Extracting etcd from OpenShift release ${OPENSHIFT_RELEASE}..."
+echo "Extracting etcd..."
 ETCD="${BIN_DIR}/etcd"
 ETCD_EXTRACT_DIR="${TMP_DIR}/etcd-extract"
 rm -rf "${ETCD_EXTRACT_DIR}"
 mkdir -p "${ETCD_EXTRACT_DIR}"
-ETCD_IMAGE=$(oc adm release info "${OPENSHIFT_RELEASE}" ${REGISTRY_AUTH_OPTS} --image-for=etcd)
-oc image extract "${ETCD_IMAGE}" ${REGISTRY_AUTH_OPTS} --path usr/bin/etcd:"${ETCD_EXTRACT_DIR}"
+ETCD_IMAGE="${ETCD_IMAGE:-$(oc adm release info "${OPENSHIFT_RELEASE}" --image-for=etcd)}"
+oc image extract "${ETCD_IMAGE}" --path usr/bin/etcd:"${ETCD_EXTRACT_DIR}"
 mv "${ETCD_EXTRACT_DIR}/etcd" "${ETCD}"
 chmod +x "${ETCD}"
-echo "Extracted etcd to ${ETCD}"
 echo "etcd version:"
 "${ETCD}" --version
 
