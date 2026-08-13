@@ -146,10 +146,7 @@ fi
 #
 # Registry auth:
 #   oc resolves credentials via REGISTRY_AUTH_FILE, ~/.config/containers/auth.json,
-#   or ~/.docker/config.json (see oc's auth_resolver.go). For backward compatibility
-#   with CI configs that set cluster_profile, the script also checks
-#   CLUSTER_PROFILE_DIR/pull-secret and exports it as REGISTRY_AUTH_FILE so oc
-#   picks it up automatically.
+#   or ~/.docker/config.json (see oc's auth_resolver.go).
 
 if [[ -z "${HYPERKUBE_IMAGE:-}" || -z "${ETCD_IMAGE:-}" ]]; then
   OPENSHIFT_RELEASE="${OPENSHIFT_RELEASE:-}"
@@ -173,17 +170,6 @@ if [[ -z "${HYPERKUBE_IMAGE:-}" || -z "${ETCD_IMAGE:-}" ]]; then
   fi
   echo "Using release: ${OPENSHIFT_RELEASE}"
 
-fi
-
-# Registry auth is needed even when HYPERKUBE_IMAGE/ETCD_IMAGE are pre-set,
-# because oc image extract still needs credentials to pull the images.
-if [[ -n "${CLUSTER_PROFILE_DIR:-}" && -f "${CLUSTER_PROFILE_DIR}/pull-secret" ]]; then
-  echo "Using pull secret from ${CLUSTER_PROFILE_DIR}/pull-secret"
-  export REGISTRY_AUTH_FILE="${CLUSTER_PROFILE_DIR}/pull-secret"
-else
-  echo "WARNING: No explicit registry credentials found."
-  echo "Falling back to oc's default credential discovery (REGISTRY_AUTH_FILE, ~/.docker/config.json, ~/.config/containers/auth.json)."
-  echo "This may fail if accessing private registries."
 fi
 
 echo "Extracting kube-apiserver..."
