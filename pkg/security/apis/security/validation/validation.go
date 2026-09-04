@@ -72,6 +72,48 @@ func ValidateSecurityContextConstraints(scc *securityapi.SecurityContextConstrai
 	}
 	allErrs = append(allErrs, validateIDRanges(scc.SupplementalGroups.Ranges, field.NewPath("supplementalGroups"))...)
 
+	// validate runAsGroup if present
+	if scc.RunAsGroup.Type != "" {
+		runAsGroupPath := field.NewPath("runAsGroup")
+		switch scc.RunAsGroup.Type {
+		case securityapi.RunAsGroupStrategyMustRunAs, securityapi.RunAsGroupStrategyMustRunAsRange, securityapi.RunAsGroupStrategyRunAsAny:
+			// good types
+		default:
+			msg := fmt.Sprintf("invalid strategy type. Valid values are %s, %s, %s",
+				securityapi.RunAsGroupStrategyMustRunAs,
+				securityapi.RunAsGroupStrategyMustRunAsRange,
+				securityapi.RunAsGroupStrategyRunAsAny)
+			allErrs = append(allErrs, field.Invalid(runAsGroupPath.Child("type"), scc.RunAsGroup.Type, msg))
+		}
+
+		// if specified, gid cannot be negative
+		if scc.RunAsGroup.GID != nil {
+			if *scc.RunAsGroup.GID < 0 {
+				allErrs = append(allErrs, field.Invalid(runAsGroupPath.Child("gid"), *scc.RunAsGroup.GID, "gid cannot be negative"))
+			}
+		}
+
+		// validate GID range if specified
+		if scc.RunAsGroup.GIDRangeMin != nil {
+			if *scc.RunAsGroup.GIDRangeMin < 0 {
+				allErrs = append(allErrs, field.Invalid(runAsGroupPath.Child("gidRangeMin"), *scc.RunAsGroup.GIDRangeMin, "gidRangeMin cannot be negative"))
+			}
+		}
+		if scc.RunAsGroup.GIDRangeMax != nil {
+			if *scc.RunAsGroup.GIDRangeMax < 0 {
+				allErrs = append(allErrs, field.Invalid(runAsGroupPath.Child("gidRangeMax"), *scc.RunAsGroup.GIDRangeMax, "gidRangeMax cannot be negative"))
+			}
+		}
+		if scc.RunAsGroup.GIDRangeMin != nil && scc.RunAsGroup.GIDRangeMax != nil {
+			if *scc.RunAsGroup.GIDRangeMin > *scc.RunAsGroup.GIDRangeMax {
+				allErrs = append(allErrs, field.Invalid(runAsGroupPath.Child("gidRangeMin"), scc.RunAsGroup, "gidRangeMin cannot be greater than gidRangeMax"))
+			}
+		}
+
+		// validate ranges if specified
+		allErrs = append(allErrs, validateRunAsGroupIDRanges(scc.RunAsGroup.Ranges, runAsGroupPath)...)
+	}
+
 	// validate capabilities
 	allErrs = append(allErrs, validateSCCCapsAgainstDrops(scc.RequiredDropCapabilities, scc.DefaultAddCapabilities, field.NewPath("defaultAddCapabilities"))...)
 	allErrs = append(allErrs, validateSCCCapsAgainstDrops(scc.RequiredDropCapabilities, scc.AllowedCapabilities, field.NewPath("allowedCapabilities"))...)
@@ -264,6 +306,36 @@ func validateIDRanges(rng []securityapi.IDRange, fldPath *field.Path) field.Erro
 		}
 		if r.Min > r.Max {
 			allErrs = append(allErrs, field.Invalid(minPath, r, "min cannot be greater than max"))
+		}
+	}
+
+	return allErrs
+}
+
+// validateRunAsGroupIDRanges ensures the RunAsGroupIDRange is valid.
+func validateRunAsGroupIDRanges(rng []securityapi.RunAsGroupIDRange, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	for i, r := range rng {
+		// if 0 <= Min <= Max then we do not need to validate max.  It is always greater than or
+		// equal to 0 and Min.
+		minPath := fldPath.Child("ranges").Index(i).Child("min")
+		maxPath := fldPath.Child("ranges").Index(i).Child("max")
+
+		if r.Min != nil {
+			if *r.Min < 0 {
+				allErrs = append(allErrs, field.Invalid(minPath, *r.Min, "min cannot be negative"))
+			}
+		}
+		if r.Max != nil {
+			if *r.Max < 0 {
+				allErrs = append(allErrs, field.Invalid(maxPath, *r.Max, "max cannot be negative"))
+			}
+		}
+		if r.Min != nil && r.Max != nil {
+			if *r.Min > *r.Max {
+				allErrs = append(allErrs, field.Invalid(minPath, r, "min cannot be greater than max"))
+			}
 		}
 	}
 

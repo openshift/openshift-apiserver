@@ -124,6 +124,56 @@ func TestValidateSecurityContextConstraints(t *testing.T) {
 	invalidDuplicatedSysctls.ForbiddenSysctls = []string{"net.ipv4.ip_local_port_range"}
 	invalidDuplicatedSysctls.AllowedUnsafeSysctls = []string{"net.ipv4.ip_local_port_range"}
 
+	// RunAsGroup test cases
+	invalidRunAsGroupStratType := validSCC()
+	invalidRunAsGroupStratType.RunAsGroup.Type = "invalid"
+
+	var invalidGID int64 = -1
+	invalidGIDSCC := validSCC()
+	invalidGIDSCC.RunAsGroup.Type = securityapi.RunAsGroupStrategyMustRunAs
+	invalidGIDSCC.RunAsGroup.GID = &invalidGID
+
+	var negativeGIDMin int64 = -1
+	invalidGIDRangeMin := validSCC()
+	invalidGIDRangeMin.RunAsGroup.Type = securityapi.RunAsGroupStrategyMustRunAsRange
+	invalidGIDRangeMin.RunAsGroup.GIDRangeMin = &negativeGIDMin
+
+	var negativeGIDMax int64 = -10
+	invalidGIDRangeMax := validSCC()
+	invalidGIDRangeMax.RunAsGroup.Type = securityapi.RunAsGroupStrategyMustRunAsRange
+	invalidGIDRangeMax.RunAsGroup.GIDRangeMax = &negativeGIDMax
+
+	var gidMin int64 = 2000
+	var gidMax int64 = 1000
+	invalidGIDRangeMinGreaterThanMax := validSCC()
+	invalidGIDRangeMinGreaterThanMax.RunAsGroup.Type = securityapi.RunAsGroupStrategyMustRunAsRange
+	invalidGIDRangeMinGreaterThanMax.RunAsGroup.GIDRangeMin = &gidMin
+	invalidGIDRangeMinGreaterThanMax.RunAsGroup.GIDRangeMax = &gidMax
+
+	var rangeMin2 int64 = 2
+	var rangeMax1 int64 = 1
+	invalidRunAsGroupRangeMinGreaterThanMax := validSCC()
+	invalidRunAsGroupRangeMinGreaterThanMax.RunAsGroup.Type = securityapi.RunAsGroupStrategyMustRunAsRange
+	invalidRunAsGroupRangeMinGreaterThanMax.RunAsGroup.Ranges = []securityapi.RunAsGroupIDRange{
+		{Min: &rangeMin2, Max: &rangeMax1},
+	}
+
+	var rangeMinNeg int64 = -1
+	var rangeMax10 int64 = 10
+	invalidRunAsGroupRangeNegativeMin := validSCC()
+	invalidRunAsGroupRangeNegativeMin.RunAsGroup.Type = securityapi.RunAsGroupStrategyMustRunAsRange
+	invalidRunAsGroupRangeNegativeMin.RunAsGroup.Ranges = []securityapi.RunAsGroupIDRange{
+		{Min: &rangeMinNeg, Max: &rangeMax10},
+	}
+
+	var rangeMin1 int64 = 1
+	var rangeMaxNeg int64 = -10
+	invalidRunAsGroupRangeNegativeMax := validSCC()
+	invalidRunAsGroupRangeNegativeMax.RunAsGroup.Type = securityapi.RunAsGroupStrategyMustRunAsRange
+	invalidRunAsGroupRangeNegativeMax.RunAsGroup.Ranges = []securityapi.RunAsGroupIDRange{
+		{Min: &rangeMin1, Max: &rangeMaxNeg},
+	}
+
 	errorCases := map[string]struct {
 		scc         *securityapi.SecurityContextConstraints
 		errorType   field.ErrorType
@@ -248,6 +298,46 @@ func TestValidateSecurityContextConstraints(t *testing.T) {
 			scc:         invalidDuplicatedSysctls,
 			errorType:   field.ErrorTypeInvalid,
 			errorDetail: fmt.Sprintf("sysctl overlaps with %s", invalidDuplicatedSysctls.AllowedUnsafeSysctls[0]),
+		},
+		"invalid runAsGroup strategy type": {
+			scc:         invalidRunAsGroupStratType,
+			errorType:   field.ErrorTypeInvalid,
+			errorDetail: "invalid strategy type. Valid values are MustRunAs, MustRunAsRange, RunAsAny",
+		},
+		"invalid gid": {
+			scc:         invalidGIDSCC,
+			errorType:   field.ErrorTypeInvalid,
+			errorDetail: "gid cannot be negative",
+		},
+		"invalid gid range min": {
+			scc:         invalidGIDRangeMin,
+			errorType:   field.ErrorTypeInvalid,
+			errorDetail: "gidRangeMin cannot be negative",
+		},
+		"invalid gid range max": {
+			scc:         invalidGIDRangeMax,
+			errorType:   field.ErrorTypeInvalid,
+			errorDetail: "gidRangeMax cannot be negative",
+		},
+		"invalid gid range min greater than max": {
+			scc:         invalidGIDRangeMinGreaterThanMax,
+			errorType:   field.ErrorTypeInvalid,
+			errorDetail: "gidRangeMin cannot be greater than gidRangeMax",
+		},
+		"invalid runAsGroup ranges min greater than max": {
+			scc:         invalidRunAsGroupRangeMinGreaterThanMax,
+			errorType:   field.ErrorTypeInvalid,
+			errorDetail: "min cannot be greater than max",
+		},
+		"invalid runAsGroup ranges negative min": {
+			scc:         invalidRunAsGroupRangeNegativeMin,
+			errorType:   field.ErrorTypeInvalid,
+			errorDetail: "min cannot be negative",
+		},
+		"invalid runAsGroup ranges negative max": {
+			scc:         invalidRunAsGroupRangeNegativeMax,
+			errorType:   field.ErrorTypeInvalid,
+			errorDetail: "max cannot be negative",
 		},
 	}
 

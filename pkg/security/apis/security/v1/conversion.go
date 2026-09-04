@@ -11,6 +11,14 @@ func Convert_v1_SecurityContextConstraints_To_security_SecurityContextConstraint
 	return autoConvert_v1_SecurityContextConstraints_To_security_SecurityContextConstraints(in, out, s)
 }
 
+func Convert_v1_RunAsGroupStrategyOptions_To_security_RunAsGroupStrategyOptions(in *v1.RunAsGroupStrategyOptions, out *securityapi.RunAsGroupStrategyOptions, s conversion.Scope) error {
+	return autoConvert_v1_RunAsGroupStrategyOptions_To_security_RunAsGroupStrategyOptions(in, out, s)
+}
+
+func Convert_security_RunAsGroupStrategyOptions_To_v1_RunAsGroupStrategyOptions(in *securityapi.RunAsGroupStrategyOptions, out *v1.RunAsGroupStrategyOptions, s conversion.Scope) error {
+	return autoConvert_security_RunAsGroupStrategyOptions_To_v1_RunAsGroupStrategyOptions(in, out, s)
+}
+
 func Convert_security_SecurityContextConstraints_To_v1_SecurityContextConstraints(in *securityapi.SecurityContextConstraints, out *v1.SecurityContextConstraints, s conversion.Scope) error {
 	if err := autoConvert_security_SecurityContextConstraints_To_v1_SecurityContextConstraints(in, out, s); err != nil {
 		return err
@@ -24,6 +32,24 @@ func Convert_security_SecurityContextConstraints_To_v1_SecurityContextConstraint
 				out.AllowHostDirVolumePlugin = true
 			}
 		}
+	}
+	return nil
+}
+
+// Convert_v1_IDRange_To_security_RunAsGroupIDRange converts v1.IDRange to internal RunAsGroupIDRange
+func Convert_v1_IDRange_To_security_RunAsGroupIDRange(in *v1.IDRange, out *securityapi.RunAsGroupIDRange, s conversion.Scope) error {
+	out.Min = &in.Min
+	out.Max = &in.Max
+	return nil
+}
+
+// Convert_security_RunAsGroupIDRange_To_v1_IDRange converts internal RunAsGroupIDRange to v1.IDRange
+func Convert_security_RunAsGroupIDRange_To_v1_IDRange(in *securityapi.RunAsGroupIDRange, out *v1.IDRange, s conversion.Scope) error {
+	if in.Min != nil {
+		out.Min = *in.Min
+	}
+	if in.Max != nil {
+		out.Max = *in.Max
 	}
 	return nil
 }
