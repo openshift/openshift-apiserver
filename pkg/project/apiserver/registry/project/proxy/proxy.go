@@ -109,6 +109,15 @@ func (s *REST) Watch(ctx context.Context, options *metainternal.ListOptions) (wa
 	if ctx == nil {
 		return nil, fmt.Errorf("Context is nil")
 	}
+
+	// Reject WatchList (sendInitialEvents) requests. The Project resource is a
+	// virtual/proxy type backed by filtered Namespaces and cannot properly serve
+	// the WatchList protocol. Returning an error here causes client-go's
+	// reflector to fall back to the standard LIST+WATCH semantics.
+	if options != nil && options.SendInitialEvents != nil && *options.SendInitialEvents {
+		return nil, kerrors.NewMethodNotSupported(project.Resource("project"), "watch-list")
+	}
+
 	userInfo, exists := apirequest.UserFrom(ctx)
 	if !exists {
 		return nil, fmt.Errorf("no user")
