@@ -14,3 +14,23 @@ aliases:
     - ricardomaraschini
     - tjungblu
     - xueqzhan
+  network-ingress-dns-approvers:
+    - aswinsuryan
+    - bentito
+    - davidesalerno
+    - grzpiotrowski
+    - jcmoraisjr
+    - melvinjoseph86
+    - Miciah
+    - pedjak
+    - rfredette
+  network-ingress-dns-reviewers:
+    - aswinsuryan
+    - bentito
+    - davidesalerno
+    - grzpiotrowski
+    - jcmoraisjr
+    - melvinjoseph86
+    - Miciah
+    - pedjak
+    - rfredette

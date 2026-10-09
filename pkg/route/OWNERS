@@ -1,16 +1,4 @@
 reviewers:
-  - smarterclayton
-  - pweil-
-  - imcsk8
-  - knobunc
-  - ironcladlou
-  - pecameron
-  - pravisankar
-  - rajatchopra
-  - jacobtanenbaum
+  - network-ingress-dns-reviewers
 approvers:
-  - smarterclayton
-  - pweil-
-  - knobunc
-  - ironcladlou
-  - rajatchopra
+  - network-ingress-dns-approvers
