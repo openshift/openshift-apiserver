@@ -1,0 +1,29 @@
+# goodmod.yaml
+# This file is tracking branches and tags used in go.mod file replaces
+# Please follow https://github.com/mfojtik/goodmod#installation to get the tool.
+# Run `$ goodmod replace --apply` to apply these rules on `go.mod`
+#
+rules:
+  - paths:
+    - k8s.io/apiserver
+    branch: openshift-apiserver-4.3-kubernetes-1.17.0
+
+  # github.com/openshift/* paths that are tracking "master" branch
+  - paths:
+    - github.com/openshift/api
+    - github.com/openshift/client-go
+    - github.com/openshift/library-go
+    - github.com/openshift/apiserver-library-go
+    branch: master
+
+  # devexp team:
+  - paths:
+    - github.com/docker/distribution
+    commit: d4c35485a70df4dce2179bc227b1393a69edb809
+  - paths:
+    - github.com/moby/buildkit
+    commit: da2b9dc7dab99e824b2b1067ad7d0523e32dd2d9
+  - paths:
+    - github.com/docker/docker
+    branch: openshift-3.10-docker-b68221c
+

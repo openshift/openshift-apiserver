@@ -1,0 +1,11 @@
+reviewers:
+  - p0lyn0mial
+  - benluddy
+  - sanchezl
+  - dgrisonnet
+approvers:
+  - p0lyn0mial
+  - benluddy
+  - sanchezl
+  - dgrisonnet
+component: openshift-apiserver

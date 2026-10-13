@@ -1,0 +1,5 @@
+/openshift-apiserver
+/openshift-apiserver-tests-ext
+/openshift-apiserver-tests-ext.gz
+/_output
+.idea

@@ -1,0 +1,724 @@
+package auth
+
+import (
+	"fmt"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"time"
+
+	"k8s.io/klog/v2"
+
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/types"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
+	utilwait "k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/apiserver/pkg/authentication/user"
+	rbacv1informers "k8s.io/client-go/informers/rbac/v1"
+	corev1listers "k8s.io/client-go/listers/core/v1"
+	rbacv1listers "k8s.io/client-go/listers/rbac/v1"
+	"k8s.io/client-go/tools/cache"
+	"k8s.io/utils/clock"
+
+	"github.com/openshift/apiserver-library-go/pkg/authorization/scope"
+	authorizationapi "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
+)
+
+// defaultMaxCacheLifespan is used to control how long the cache can live
+// without being invalidated. This is a workaround for a bug, see
+// https://issues.redhat.com/browse/OCPBUGS-57474 for further details.
+const defaultMaxCacheLifespan = 15 * time.Second
+
+// Lister enforces ability to enumerate a resource based on role
+type Lister interface {
+	// List returns the list of Namespace items that the user can access
+	List(user user.Info, selector labels.Selector) (*corev1.NamespaceList, error)
+}
+
+// subjectRecord is a cache record for the set of namespaces a subject can access
+type subjectRecord struct {
+	subject    string
+	namespaces sets.String
+}
+
+// reviewRequest is the resource we want to review
+type reviewRequest struct {
+	namespace string
+	// the resource version of the namespace that was observed to make this request
+	namespaceResourceVersion string
+	// the map of role uid to resource version that was observed to make this request
+	roleUIDToResourceVersion map[types.UID]string
+	// the map of role binding uid to resource version that was observed to make this request
+	roleBindingUIDToResourceVersion map[types.UID]string
+}
+
+// reviewRecord is a cache record for the result of a resource access review
+type reviewRecord struct {
+	*reviewRequest
+	users  []string
+	groups []string
+}
+
+// reviewRecordKeyFn is a key func for reviewRecord objects
+func reviewRecordKeyFn(obj interface{}) (string, error) {
+	reviewRecord, ok := obj.(*reviewRecord)
+	if !ok {
+		return "", fmt.Errorf("expected reviewRecord")
+	}
+	return reviewRecord.namespace, nil
+}
+
+// subjectRecordKeyFn is a key func for subjectRecord objects
+func subjectRecordKeyFn(obj interface{}) (string, error) {
+	subjectRecord, ok := obj.(*subjectRecord)
+	if !ok {
+		return "", fmt.Errorf("expected subjectRecord")
+	}
+	return subjectRecord.subject, nil
+}
+
+type skipSynchronizer interface {
+	// SkipSynchronize returns true if if its safe to skip synchronization of the cache based on provided token from previous observation
+	SkipSynchronize(prevState string, versionedObjects ...LastSyncResourceVersioner) (skip bool, currentState string)
+}
+
+// LastSyncResourceVersioner is any object that can divulge a LastSyncResourceVersion
+type LastSyncResourceVersioner interface {
+	LastSyncResourceVersion() string
+}
+
+type unionLastSyncResourceVersioner []LastSyncResourceVersioner
+
+func (u unionLastSyncResourceVersioner) LastSyncResourceVersion() string {
+	resourceVersions := []string{}
+	for _, versioner := range u {
+		resourceVersions = append(resourceVersions, versioner.LastSyncResourceVersion())
+	}
+	return strings.Join(resourceVersions, "")
+}
+
+type statelessSkipSynchronizer struct{}
+
+func (rs *statelessSkipSynchronizer) SkipSynchronize(prevState string, versionedObjects ...LastSyncResourceVersioner) (skip bool, currentState string) {
+	resourceVersions := []string{}
+	for i := range versionedObjects {
+		resourceVersions = append(resourceVersions, versionedObjects[i].LastSyncResourceVersion())
+	}
+	currentState = strings.Join(resourceVersions, ",")
+	skip = currentState == prevState
+
+	return skip, currentState
+}
+
+type neverSkipSynchronizer struct{}
+
+func (s *neverSkipSynchronizer) SkipSynchronize(prevState string, versionedObjects ...LastSyncResourceVersioner) (bool, string) {
+	return false, ""
+}
+
+type SyncedClusterRoleLister interface {
+	rbacv1listers.ClusterRoleLister
+	LastSyncResourceVersioner
+}
+
+type SyncedClusterRoleBindingLister interface {
+	rbacv1listers.ClusterRoleBindingLister
+	LastSyncResourceVersioner
+}
+type SyncedRoleLister interface {
+	rbacv1listers.RoleLister
+	LastSyncResourceVersioner
+}
+type SyncedRoleBindingLister interface {
+	rbacv1listers.RoleBindingLister
+	LastSyncResourceVersioner
+}
+
+type syncedRoleLister struct {
+	rbacv1listers.RoleLister
+	versioner LastSyncResourceVersioner
+}
+
+func (l syncedRoleLister) LastSyncResourceVersion() string {
+	return l.versioner.LastSyncResourceVersion()
+}
+
+type syncedClusterRoleLister struct {
+	rbacv1listers.ClusterRoleLister
+	versioner LastSyncResourceVersioner
+}
+
+func (l syncedClusterRoleLister) LastSyncResourceVersion() string {
+	return l.versioner.LastSyncResourceVersion()
+}
+
+type syncedRoleBindingLister struct {
+	rbacv1listers.RoleBindingLister
+	versioner LastSyncResourceVersioner
+}
+
+func (l syncedRoleBindingLister) LastSyncResourceVersion() string {
+	return l.versioner.LastSyncResourceVersion()
+}
+
+type syncedClusterRoleBindingLister struct {
+	rbacv1listers.ClusterRoleBindingLister
+	versioner LastSyncResourceVersioner
+}
+
+func (l syncedClusterRoleBindingLister) LastSyncResourceVersion() string {
+	return l.versioner.LastSyncResourceVersion()
+}
+
+// authorizationCacheStores groups the three cache stores so they can be
+// swapped atomically during full cache invalidation.
+type authorizationCacheStores struct {
+	reviewRecordStore       cache.Store
+	userSubjectRecordStore  cache.Store
+	groupSubjectRecordStore cache.Store
+}
+
+// AuthorizationCache maintains a cache on the set of namespaces a user or group can access.
+type AuthorizationCache struct {
+	// allKnownNamespaces we track all the known namespaces, so we can detect deletes.
+	// TODO remove this in favor of a list/watch mechanism for projects
+	allKnownNamespaces        sets.String
+	namespaceLister           corev1listers.NamespaceLister
+	lastSyncResourceVersioner LastSyncResourceVersioner
+
+	clusterRoleLister             SyncedClusterRoleLister
+	clusterRoleBindingLister      SyncedClusterRoleBindingLister
+	roleNamespacer                SyncedRoleLister
+	roleBindingNamespacer         SyncedRoleBindingLister
+	roleLastSyncResourceVersioner LastSyncResourceVersioner
+
+	stores atomic.Pointer[authorizationCacheStores]
+
+	clusterBindingResourceVersions sets.String
+	clusterRoleResourceVersions    sets.String
+
+	skip      skipSynchronizer
+	lastState string
+
+	reviewer Reviewer
+
+	syncHandler func(request *reviewRequest, userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store, copyOnWrite bool) error
+
+	watchers    []CacheWatcher
+	watcherLock sync.Mutex
+
+	// lastCacheInvalidation, maxCacheLifespan and clock exist so we can
+	// control the maximum time between cache invalidations. This is a
+	// temporary workaround due to release timing risk. Cache expires when
+	// clock.Since(lastCacheInvalidation) > maxCacheLifespan, according to
+	// the internal clock implementation.
+	// See https://issues.redhat.com/browse/OCPBUGS-57474 for details.
+	lastCacheInvalidation time.Time
+	maxCacheLifespan      time.Duration
+	clock                 clock.PassiveClock
+}
+
+// NewAuthorizationCache creates a new AuthorizationCache
+func NewAuthorizationCache(
+	namespaceLister corev1listers.NamespaceLister,
+	namespaceLastSyncResourceVersioner LastSyncResourceVersioner,
+	reviewer Reviewer,
+	informers rbacv1informers.Interface,
+) *AuthorizationCache {
+	scrLister := syncedClusterRoleLister{
+		informers.ClusterRoles().Lister(),
+		informers.ClusterRoles().Informer(),
+	}
+	scrbLister := syncedClusterRoleBindingLister{
+		informers.ClusterRoleBindings().Lister(),
+		informers.ClusterRoleBindings().Informer(),
+	}
+	srLister := syncedRoleLister{
+		informers.Roles().Lister(),
+		informers.Roles().Informer(),
+	}
+	srbLister := syncedRoleBindingLister{
+		informers.RoleBindings().Lister(),
+		informers.RoleBindings().Informer(),
+	}
+
+	// create a real clock so we can compute cache expiration times.
+	realClock := clock.RealClock{}
+
+	ac := &AuthorizationCache{
+		allKnownNamespaces: sets.String{},
+		namespaceLister:    namespaceLister,
+
+		clusterRoleResourceVersions:    sets.NewString(),
+		clusterBindingResourceVersions: sets.NewString(),
+
+		clusterRoleLister:             scrLister,
+		clusterRoleBindingLister:      scrbLister,
+		roleNamespacer:                srLister,
+		roleBindingNamespacer:         srbLister,
+		roleLastSyncResourceVersioner: unionLastSyncResourceVersioner{scrLister, scrbLister, srLister, srbLister},
+
+		reviewer: reviewer,
+		skip:     &neverSkipSynchronizer{},
+
+		watchers: []CacheWatcher{},
+
+		clock:                 realClock,
+		lastCacheInvalidation: realClock.Now(),
+		maxCacheLifespan:      defaultMaxCacheLifespan,
+	}
+	ac.stores.Store(&authorizationCacheStores{
+		reviewRecordStore:       cache.NewStore(reviewRecordKeyFn),
+		userSubjectRecordStore:  cache.NewStore(subjectRecordKeyFn),
+		groupSubjectRecordStore: cache.NewStore(subjectRecordKeyFn),
+	})
+	ac.lastSyncResourceVersioner = namespaceLastSyncResourceVersioner
+	ac.syncHandler = ac.syncRequest
+	return ac
+}
+
+// cacheHasExpired is used to evaluate when it is time to do a full cache
+// invalidation due to age.
+func (ac *AuthorizationCache) cacheHasExpired() bool {
+	return ac.clock.Since(ac.lastCacheInvalidation) > ac.maxCacheLifespan
+}
+
+// Run begins watching and synchronizing the cache
+func (ac *AuthorizationCache) Run(period time.Duration) {
+	ac.skip = &statelessSkipSynchronizer{}
+
+	go utilwait.Forever(func() { ac.synchronize() }, period)
+}
+
+func (ac *AuthorizationCache) AddWatcher(watcher CacheWatcher) {
+	ac.watcherLock.Lock()
+	defer ac.watcherLock.Unlock()
+
+	ac.watchers = append(ac.watchers, watcher)
+}
+
+func (ac *AuthorizationCache) RemoveWatcher(watcher CacheWatcher) {
+	ac.watcherLock.Lock()
+	defer ac.watcherLock.Unlock()
+
+	lastIndex := len(ac.watchers) - 1
+	for i := 0; i < len(ac.watchers); i++ {
+		if ac.watchers[i] == watcher {
+			if i < lastIndex {
+				// if we're not the last element, shift
+				copy(ac.watchers[i:], ac.watchers[i+1:])
+			}
+			ac.watchers = ac.watchers[:lastIndex]
+			break
+		}
+	}
+}
+
+func (ac *AuthorizationCache) GetClusterRoleLister() SyncedClusterRoleLister {
+	return ac.clusterRoleLister
+}
+
+// synchronizeNamespaces synchronizes access over each namespace and returns a set of namespace names that were looked at in last sync
+func (ac *AuthorizationCache) synchronizeNamespaces(userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store, copyOnWrite bool) sets.String {
+	namespaceSet := sets.NewString()
+	namespaces, err := ac.namespaceLister.List(labels.Everything())
+	if err != nil {
+		// should never happen
+		panic(err)
+	}
+	for i := range namespaces {
+		namespace := namespaces[i]
+		namespaceSet.Insert(namespace.Name)
+		reviewRequest := &reviewRequest{
+			namespace:                namespace.Name,
+			namespaceResourceVersion: namespace.ResourceVersion,
+		}
+		if err := ac.syncHandler(reviewRequest, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite); err != nil {
+			utilruntime.HandleError(fmt.Errorf("error synchronizing: %v", err))
+		}
+	}
+	return namespaceSet
+}
+
+// synchronizePolicies synchronizes access over each role
+func (ac *AuthorizationCache) synchronizePolicies(userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store, copyOnWrite bool) {
+	roleList, err := ac.roleNamespacer.Roles(metav1.NamespaceAll).List(labels.Everything())
+	if err != nil {
+		utilruntime.HandleError(err)
+		return
+	}
+	for _, role := range roleList {
+		reviewRequest := &reviewRequest{
+			namespace:                role.Namespace,
+			roleUIDToResourceVersion: map[types.UID]string{role.UID: role.ResourceVersion},
+		}
+		if err := ac.syncHandler(reviewRequest, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite); err != nil {
+			utilruntime.HandleError(fmt.Errorf("error synchronizing: %v", err))
+		}
+	}
+}
+
+// synchronizeRoleBindings synchronizes access over each role binding
+func (ac *AuthorizationCache) synchronizeRoleBindings(userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store, copyOnWrite bool) {
+	roleBindingList, err := ac.roleBindingNamespacer.RoleBindings(metav1.NamespaceAll).List(labels.Everything())
+	if err != nil {
+		utilruntime.HandleError(err)
+		return
+	}
+	for _, roleBinding := range roleBindingList {
+		reviewRequest := &reviewRequest{
+			namespace:                       roleBinding.Namespace,
+			roleBindingUIDToResourceVersion: map[types.UID]string{roleBinding.UID: roleBinding.ResourceVersion},
+		}
+		if err := ac.syncHandler(reviewRequest, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite); err != nil {
+			utilruntime.HandleError(fmt.Errorf("error synchronizing: %v", err))
+		}
+	}
+}
+
+// purgeDeletedNamespaces will remove all namespaces enumerated in a reviewRecordStore that are not in the namespace set
+func (ac *AuthorizationCache) purgeDeletedNamespaces(oldNamespaces, newNamespaces sets.String, userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store, copyOnWrite bool) {
+	reviewRecordItems := reviewRecordStore.List()
+	for i := range reviewRecordItems {
+		reviewRecord := reviewRecordItems[i].(*reviewRecord)
+		if !newNamespaces.Has(reviewRecord.namespace) {
+			deleteNamespaceFromSubjects(userSubjectRecordStore, reviewRecord.users, reviewRecord.namespace, copyOnWrite)
+			deleteNamespaceFromSubjects(groupSubjectRecordStore, reviewRecord.groups, reviewRecord.namespace, copyOnWrite)
+			reviewRecordStore.Delete(reviewRecord)
+		}
+	}
+
+	for namespace := range oldNamespaces.Difference(newNamespaces) {
+		ac.notifyWatchers(namespace, nil, sets.String{}, sets.String{})
+	}
+}
+
+// invalidateCache returns true if there was a change in the cluster namespace that holds cluster role and role bindings
+func (ac *AuthorizationCache) invalidateCache(expired bool) bool {
+	invalidateCache := expired
+	clusterRoleList, err := ac.clusterRoleLister.List(labels.Everything())
+	if err != nil {
+		utilruntime.HandleError(err)
+		return invalidateCache
+	}
+
+	temporaryVersions := sets.NewString()
+	for _, clusterRole := range clusterRoleList {
+		temporaryVersions.Insert(clusterRole.ResourceVersion)
+	}
+	if !temporaryVersions.Equal(ac.clusterRoleResourceVersions) {
+		invalidateCache = true
+		ac.clusterRoleResourceVersions = temporaryVersions
+	}
+
+	clusterRoleBindingList, err := ac.clusterRoleBindingLister.List(labels.Everything())
+	if err != nil {
+		utilruntime.HandleError(err)
+		return invalidateCache
+	}
+
+	temporaryVersions = sets.NewString()
+	for _, clusterRoleBinding := range clusterRoleBindingList {
+		temporaryVersions.Insert(clusterRoleBinding.ResourceVersion)
+	}
+	if !temporaryVersions.Equal(ac.clusterBindingResourceVersions) {
+		invalidateCache = true
+		ac.clusterBindingResourceVersions = temporaryVersions
+	}
+	return invalidateCache
+}
+
+// synchronize runs a full synchronization over the cache data. Only one
+// goroutine may call synchronize at a time, but List() may be called
+// concurrently from any number of goroutines.
+func (ac *AuthorizationCache) synchronize() {
+	expired := ac.cacheHasExpired()
+	// if none of our internal reflectors changed, then we can skip reviewing the cache
+	skip, currentState := ac.skip.SkipSynchronize(ac.lastState, ac.lastSyncResourceVersioner, ac.roleLastSyncResourceVersioner)
+	if skip && !expired {
+		return
+	}
+
+	// by default, we update our current caches and do an incremental change
+	currentStores := ac.stores.Load()
+	userSubjectRecordStore := currentStores.userSubjectRecordStore
+	groupSubjectRecordStore := currentStores.groupSubjectRecordStore
+	reviewRecordStore := currentStores.reviewRecordStore
+
+	// if there was a global change that forced complete invalidation, we rebuild our cache and do a fast swap at end
+	invalidateCache := ac.invalidateCache(expired)
+	if invalidateCache {
+		ac.lastCacheInvalidation = ac.clock.Now()
+		userSubjectRecordStore = cache.NewStore(subjectRecordKeyFn)
+		groupSubjectRecordStore = cache.NewStore(subjectRecordKeyFn)
+		reviewRecordStore = cache.NewStore(reviewRecordKeyFn)
+	}
+
+	// During full cache invalidation the stores are private to this
+	// goroutine, so in-place mutation is safe and avoids the O(n²)
+	// copy overhead of COW. During incremental updates the stores
+	// are shared with concurrent List() callers, so COW is required.
+	copyOnWrite := !invalidateCache
+
+	// iterate over caches and synchronize our three caches
+	newKnownNamespaces := ac.synchronizeNamespaces(userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite)
+	ac.synchronizePolicies(userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite)
+	ac.synchronizeRoleBindings(userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite)
+	ac.purgeDeletedNamespaces(ac.allKnownNamespaces, newKnownNamespaces, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite)
+
+	// if we did a full rebuild, now we swap the fully rebuilt cache atomically
+	if invalidateCache {
+		ac.stores.Store(&authorizationCacheStores{
+			userSubjectRecordStore:  userSubjectRecordStore,
+			groupSubjectRecordStore: groupSubjectRecordStore,
+			reviewRecordStore:       reviewRecordStore,
+		})
+	}
+	ac.allKnownNamespaces = newKnownNamespaces
+
+	// we were able to update our cache since this last observation period
+	ac.lastState = currentState
+}
+
+// syncRequest takes a reviewRequest and determines if it should update the
+// caches supplied. It is only called from synchronize and shares its
+// concurrency contract: single writer, concurrent readers via List().
+func (ac *AuthorizationCache) syncRequest(request *reviewRequest, userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store, copyOnWrite bool) error {
+
+	lastKnownValue, err := lastKnown(reviewRecordStore, request.namespace)
+	if err != nil {
+		return err
+	}
+
+	if skipReview(request, lastKnownValue) {
+		return nil
+	}
+
+	namespace := request.namespace
+	review, err := ac.reviewer.Review(namespace)
+	if err != nil {
+		return fmt.Errorf("review for namespace %s failed: %v", namespace, err)
+	}
+
+	usersToRemove := sets.NewString()
+	groupsToRemove := sets.NewString()
+	if lastKnownValue != nil {
+		usersToRemove.Insert(lastKnownValue.users...)
+		usersToRemove.Delete(review.Users()...)
+		groupsToRemove.Insert(lastKnownValue.groups...)
+		groupsToRemove.Delete(review.Groups()...)
+	}
+
+	deleteNamespaceFromSubjects(userSubjectRecordStore, usersToRemove.List(), namespace, copyOnWrite)
+	deleteNamespaceFromSubjects(groupSubjectRecordStore, groupsToRemove.List(), namespace, copyOnWrite)
+	addSubjectsToNamespace(userSubjectRecordStore, review.Users(), namespace, copyOnWrite)
+	addSubjectsToNamespace(groupSubjectRecordStore, review.Groups(), namespace, copyOnWrite)
+	cacheReviewRecord(request, lastKnownValue, review, reviewRecordStore)
+	ac.notifyWatchers(namespace, lastKnownValue, sets.NewString(review.Users()...), sets.NewString(review.Groups()...))
+
+	if errMsg := review.EvaluationError(); len(errMsg) > 0 {
+		klog.V(5).Info(errMsg)
+	}
+	return nil
+}
+
+// List returns the set of namespace names the user has access to view
+func (ac *AuthorizationCache) List(userInfo user.Info, selector labels.Selector) (*corev1.NamespaceList, error) {
+	keys := sets.String{}
+	user := userInfo.GetName()
+	groups := userInfo.GetGroups()
+
+	// snapshot the stores pointer once so we read from a consistent pair
+	stores := ac.stores.Load()
+
+	obj, exists, _ := stores.userSubjectRecordStore.GetByKey(user)
+	if exists {
+		subjectRecord := obj.(*subjectRecord)
+		keys.Insert(subjectRecord.namespaces.List()...)
+	}
+
+	for _, group := range groups {
+		obj, exists, _ := stores.groupSubjectRecordStore.GetByKey(group)
+		if exists {
+			subjectRecord := obj.(*subjectRecord)
+			keys.Insert(subjectRecord.namespaces.List()...)
+		}
+	}
+
+	allowedNamespaces, err := scope.ScopesToVisibleNamespaces(userInfo.GetExtra()[authorizationapi.ScopesKey], ac.clusterRoleLister, true)
+	if err != nil {
+		return nil, fmt.Errorf("failed to compute visible namespaces for user %q: %v", userInfo.GetName(), err)
+	}
+
+	namespaceList := &corev1.NamespaceList{}
+	for _, key := range keys.List() {
+		namespace, err := ac.namespaceLister.Get(key)
+		if apierrors.IsNotFound(err) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		// only match selected labels
+		if !selector.Matches(labels.Set(namespace.Labels)) {
+			continue
+		}
+		if allowedNamespaces.Has("*") || allowedNamespaces.Has(namespace.Name) {
+			namespaceList.Items = append(namespaceList.Items, *namespace)
+		}
+	}
+	return namespaceList, nil
+}
+
+func (ac *AuthorizationCache) ReadyForAccess() bool {
+	return len(ac.lastState) > 0
+}
+
+// skipReview returns true if the request was satisfied by the lastKnown
+func skipReview(request *reviewRequest, lastKnownValue *reviewRecord) bool {
+
+	// if your request is nil, you have no reason to make a review
+	if request == nil {
+		return true
+	}
+
+	// if you know nothing from a prior review, you better make a request
+	if lastKnownValue == nil {
+		return false
+	}
+	// if you are asking about a specific namespace, and you think you knew about a different one, you better check again
+	if request.namespace != lastKnownValue.namespace {
+		return false
+	}
+
+	// if you are making your request relative to a specific resource version, only make it if its different
+	if len(request.namespaceResourceVersion) > 0 && request.namespaceResourceVersion != lastKnownValue.namespaceResourceVersion {
+		return false
+	}
+
+	// if you see a new role binding, or a newer version, we need to do a review
+	for k, v := range request.roleBindingUIDToResourceVersion {
+		oldValue, exists := lastKnownValue.roleBindingUIDToResourceVersion[k]
+		if !exists || v != oldValue {
+			return false
+		}
+	}
+
+	// if you see a new role, or a newer version, we need to do a review
+	for k, v := range request.roleUIDToResourceVersion {
+		oldValue, exists := lastKnownValue.roleUIDToResourceVersion[k]
+		if !exists || v != oldValue {
+			return false
+		}
+	}
+	return true
+}
+
+// deleteNamespaceFromSubjects removes the namespace from each subject.
+// When copyOnWrite is true, a new subjectRecord is created so concurrent
+// readers iterating the old record's map are not disturbed. When false,
+// the map is mutated in place (safe only when the store is not visible
+// to readers, e.g. during a full cache rebuild).
+func deleteNamespaceFromSubjects(subjectRecordStore cache.Store, subjects []string, namespace string, copyOnWrite bool) {
+	for _, subject := range subjects {
+		obj, exists, _ := subjectRecordStore.GetByKey(subject)
+		if exists {
+			sr := obj.(*subjectRecord)
+			if copyOnWrite {
+				if !sr.namespaces.Has(namespace) {
+					continue
+				}
+				newNamespaces := sets.NewString(sr.namespaces.UnsortedList()...)
+				newNamespaces.Delete(namespace)
+				if len(newNamespaces) == 0 {
+					subjectRecordStore.Delete(sr)
+				} else {
+					subjectRecordStore.Update(&subjectRecord{subject: subject, namespaces: newNamespaces})
+				}
+			} else {
+				delete(sr.namespaces, namespace)
+				if len(sr.namespaces) == 0 {
+					subjectRecordStore.Delete(sr)
+				}
+			}
+		}
+	}
+}
+
+// addSubjectsToNamespace adds the specified namespace to each subject.
+// See deleteNamespaceFromSubjects for the copyOnWrite semantics.
+func addSubjectsToNamespace(subjectRecordStore cache.Store, subjects []string, namespace string, copyOnWrite bool) {
+	for _, subject := range subjects {
+		obj, exists, _ := subjectRecordStore.GetByKey(subject)
+		if exists {
+			sr := obj.(*subjectRecord)
+			if copyOnWrite {
+				if sr.namespaces.Has(namespace) {
+					continue
+				}
+				newNamespaces := sets.NewString(sr.namespaces.UnsortedList()...)
+				newNamespaces.Insert(namespace)
+				subjectRecordStore.Update(&subjectRecord{subject: subject, namespaces: newNamespaces})
+			} else {
+				sr.namespaces.Insert(namespace)
+			}
+		} else {
+			subjectRecordStore.Add(&subjectRecord{subject: subject, namespaces: sets.NewString(namespace)})
+		}
+	}
+}
+
+func (ac *AuthorizationCache) notifyWatchers(namespace string, exists *reviewRecord, users, groups sets.String) {
+	ac.watcherLock.Lock()
+	defer ac.watcherLock.Unlock()
+	for _, watcher := range ac.watchers {
+		watcher.GroupMembershipChanged(namespace, users, groups)
+	}
+}
+
+// cacheReviewRecord updates the cache based on the request processed
+func cacheReviewRecord(request *reviewRequest, lastKnownValue *reviewRecord, review Review, reviewRecordStore cache.Store) {
+	reviewRecord := &reviewRecord{
+		reviewRequest: &reviewRequest{namespace: request.namespace, roleUIDToResourceVersion: map[types.UID]string{}, roleBindingUIDToResourceVersion: map[types.UID]string{}},
+		groups:        review.Groups(),
+		users:         review.Users(),
+	}
+	// keep what we last believe we knew by default
+	if lastKnownValue != nil {
+		reviewRecord.namespaceResourceVersion = lastKnownValue.namespaceResourceVersion
+		for k, v := range lastKnownValue.roleUIDToResourceVersion {
+			reviewRecord.roleUIDToResourceVersion[k] = v
+		}
+		for k, v := range lastKnownValue.roleBindingUIDToResourceVersion {
+			reviewRecord.roleBindingUIDToResourceVersion[k] = v
+		}
+	}
+
+	// update the review record relative to what drove this request
+	if len(request.namespaceResourceVersion) > 0 {
+		reviewRecord.namespaceResourceVersion = request.namespaceResourceVersion
+	}
+	for k, v := range request.roleUIDToResourceVersion {
+		reviewRecord.roleUIDToResourceVersion[k] = v
+	}
+	for k, v := range request.roleBindingUIDToResourceVersion {
+		reviewRecord.roleBindingUIDToResourceVersion[k] = v
+	}
+	// update the cache record
+	reviewRecordStore.Add(reviewRecord)
+}
+
+func lastKnown(reviewRecordStore cache.Store, namespace string) (*reviewRecord, error) {
+	obj, exists, err := reviewRecordStore.GetByKey(namespace)
+	if err != nil {
+		return nil, err
+	}
+	if exists {
+		return obj.(*reviewRecord), nil
+	}
+	return nil, nil
+}
