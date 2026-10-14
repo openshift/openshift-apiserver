@@ -10,11 +10,8 @@ import (
 
 	routev1 "github.com/openshift/api/route/v1"
 	route "github.com/openshift/openshift-apiserver/pkg/route/apis/route"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
-	core "k8s.io/kubernetes/pkg/apis/core"
 )
 
 func init() {
@@ -188,7 +185,7 @@ func RegisterConversions(s *runtime.Scheme) error {
 }
 
 func autoConvert_v1_LocalObjectReference_To_route_LocalObjectReference(in *routev1.LocalObjectReference, out *route.LocalObjectReference, s conversion.Scope) error {
-	out.Name = in.Name
+	*out = *(*route.LocalObjectReference)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -198,7 +195,7 @@ func Convert_v1_LocalObjectReference_To_route_LocalObjectReference(in *routev1.L
 }
 
 func autoConvert_route_LocalObjectReference_To_v1_LocalObjectReference(in *route.LocalObjectReference, out *routev1.LocalObjectReference, s conversion.Scope) error {
-	out.Name = in.Name
+	*out = *(*routev1.LocalObjectReference)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -240,10 +237,7 @@ func Convert_route_Route_To_v1_Route(in *route.Route, out *routev1.Route, s conv
 }
 
 func autoConvert_v1_RouteHTTPHeader_To_route_RouteHTTPHeader(in *routev1.RouteHTTPHeader, out *route.RouteHTTPHeader, s conversion.Scope) error {
-	out.Name = in.Name
-	if err := Convert_v1_RouteHTTPHeaderActionUnion_To_route_RouteHTTPHeaderActionUnion(&in.Action, &out.Action, s); err != nil {
-		return err
-	}
+	*out = *(*route.RouteHTTPHeader)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -253,10 +247,7 @@ func Convert_v1_RouteHTTPHeader_To_route_RouteHTTPHeader(in *routev1.RouteHTTPHe
 }
 
 func autoConvert_route_RouteHTTPHeader_To_v1_RouteHTTPHeader(in *route.RouteHTTPHeader, out *routev1.RouteHTTPHeader, s conversion.Scope) error {
-	out.Name = in.Name
-	if err := Convert_route_RouteHTTPHeaderActionUnion_To_v1_RouteHTTPHeaderActionUnion(&in.Action, &out.Action, s); err != nil {
-		return err
-	}
+	*out = *(*routev1.RouteHTTPHeader)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -266,8 +257,7 @@ func Convert_route_RouteHTTPHeader_To_v1_RouteHTTPHeader(in *route.RouteHTTPHead
 }
 
 func autoConvert_v1_RouteHTTPHeaderActionUnion_To_route_RouteHTTPHeaderActionUnion(in *routev1.RouteHTTPHeaderActionUnion, out *route.RouteHTTPHeaderActionUnion, s conversion.Scope) error {
-	out.Type = route.RouteHTTPHeaderActionType(in.Type)
-	out.Set = (*route.RouteSetHTTPHeader)(unsafe.Pointer(in.Set))
+	*out = *(*route.RouteHTTPHeaderActionUnion)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -277,8 +267,7 @@ func Convert_v1_RouteHTTPHeaderActionUnion_To_route_RouteHTTPHeaderActionUnion(i
 }
 
 func autoConvert_route_RouteHTTPHeaderActionUnion_To_v1_RouteHTTPHeaderActionUnion(in *route.RouteHTTPHeaderActionUnion, out *routev1.RouteHTTPHeaderActionUnion, s conversion.Scope) error {
-	out.Type = routev1.RouteHTTPHeaderActionType(in.Type)
-	out.Set = (*routev1.RouteSetHTTPHeader)(unsafe.Pointer(in.Set))
+	*out = *(*routev1.RouteHTTPHeaderActionUnion)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -288,8 +277,7 @@ func Convert_route_RouteHTTPHeaderActionUnion_To_v1_RouteHTTPHeaderActionUnion(i
 }
 
 func autoConvert_v1_RouteHTTPHeaderActions_To_route_RouteHTTPHeaderActions(in *routev1.RouteHTTPHeaderActions, out *route.RouteHTTPHeaderActions, s conversion.Scope) error {
-	out.Response = *(*[]route.RouteHTTPHeader)(unsafe.Pointer(&in.Response))
-	out.Request = *(*[]route.RouteHTTPHeader)(unsafe.Pointer(&in.Request))
+	*out = *(*route.RouteHTTPHeaderActions)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -299,8 +287,7 @@ func Convert_v1_RouteHTTPHeaderActions_To_route_RouteHTTPHeaderActions(in *route
 }
 
 func autoConvert_route_RouteHTTPHeaderActions_To_v1_RouteHTTPHeaderActions(in *route.RouteHTTPHeaderActions, out *routev1.RouteHTTPHeaderActions, s conversion.Scope) error {
-	out.Response = *(*[]routev1.RouteHTTPHeader)(unsafe.Pointer(&in.Response))
-	out.Request = *(*[]routev1.RouteHTTPHeader)(unsafe.Pointer(&in.Request))
+	*out = *(*routev1.RouteHTTPHeaderActions)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -310,9 +297,7 @@ func Convert_route_RouteHTTPHeaderActions_To_v1_RouteHTTPHeaderActions(in *route
 }
 
 func autoConvert_v1_RouteHTTPHeaders_To_route_RouteHTTPHeaders(in *routev1.RouteHTTPHeaders, out *route.RouteHTTPHeaders, s conversion.Scope) error {
-	if err := Convert_v1_RouteHTTPHeaderActions_To_route_RouteHTTPHeaderActions(&in.Actions, &out.Actions, s); err != nil {
-		return err
-	}
+	*out = *(*route.RouteHTTPHeaders)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -322,9 +307,7 @@ func Convert_v1_RouteHTTPHeaders_To_route_RouteHTTPHeaders(in *routev1.RouteHTTP
 }
 
 func autoConvert_route_RouteHTTPHeaders_To_v1_RouteHTTPHeaders(in *route.RouteHTTPHeaders, out *routev1.RouteHTTPHeaders, s conversion.Scope) error {
-	if err := Convert_route_RouteHTTPHeaderActions_To_v1_RouteHTTPHeaderActions(&in.Actions, &out.Actions, s); err != nil {
-		return err
-	}
+	*out = *(*routev1.RouteHTTPHeaders)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -334,11 +317,7 @@ func Convert_route_RouteHTTPHeaders_To_v1_RouteHTTPHeaders(in *route.RouteHTTPHe
 }
 
 func autoConvert_v1_RouteIngress_To_route_RouteIngress(in *routev1.RouteIngress, out *route.RouteIngress, s conversion.Scope) error {
-	out.Host = in.Host
-	out.RouterName = in.RouterName
-	out.Conditions = *(*[]route.RouteIngressCondition)(unsafe.Pointer(&in.Conditions))
-	out.WildcardPolicy = route.WildcardPolicyType(in.WildcardPolicy)
-	out.RouterCanonicalHostname = in.RouterCanonicalHostname
+	*out = *(*route.RouteIngress)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -348,11 +327,7 @@ func Convert_v1_RouteIngress_To_route_RouteIngress(in *routev1.RouteIngress, out
 }
 
 func autoConvert_route_RouteIngress_To_v1_RouteIngress(in *route.RouteIngress, out *routev1.RouteIngress, s conversion.Scope) error {
-	out.Host = in.Host
-	out.RouterName = in.RouterName
-	out.Conditions = *(*[]routev1.RouteIngressCondition)(unsafe.Pointer(&in.Conditions))
-	out.WildcardPolicy = routev1.WildcardPolicyType(in.WildcardPolicy)
-	out.RouterCanonicalHostname = in.RouterCanonicalHostname
+	*out = *(*routev1.RouteIngress)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -362,11 +337,7 @@ func Convert_route_RouteIngress_To_v1_RouteIngress(in *route.RouteIngress, out *
 }
 
 func autoConvert_v1_RouteIngressCondition_To_route_RouteIngressCondition(in *routev1.RouteIngressCondition, out *route.RouteIngressCondition, s conversion.Scope) error {
-	out.Type = route.RouteIngressConditionType(in.Type)
-	out.Status = core.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.LastTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastTransitionTime))
+	*out = *(*route.RouteIngressCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -376,11 +347,7 @@ func Convert_v1_RouteIngressCondition_To_route_RouteIngressCondition(in *routev1
 }
 
 func autoConvert_route_RouteIngressCondition_To_v1_RouteIngressCondition(in *route.RouteIngressCondition, out *routev1.RouteIngressCondition, s conversion.Scope) error {
-	out.Type = routev1.RouteIngressConditionType(in.Type)
-	out.Status = corev1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.LastTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastTransitionTime))
+	*out = *(*routev1.RouteIngressCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -412,7 +379,7 @@ func Convert_route_RouteList_To_v1_RouteList(in *route.RouteList, out *routev1.R
 }
 
 func autoConvert_v1_RoutePort_To_route_RoutePort(in *routev1.RoutePort, out *route.RoutePort, s conversion.Scope) error {
-	out.TargetPort = in.TargetPort
+	*out = *(*route.RoutePort)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -422,7 +389,7 @@ func Convert_v1_RoutePort_To_route_RoutePort(in *routev1.RoutePort, out *route.R
 }
 
 func autoConvert_route_RoutePort_To_v1_RoutePort(in *route.RoutePort, out *routev1.RoutePort, s conversion.Scope) error {
-	out.TargetPort = in.TargetPort
+	*out = *(*routev1.RoutePort)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -432,7 +399,7 @@ func Convert_route_RoutePort_To_v1_RoutePort(in *route.RoutePort, out *routev1.R
 }
 
 func autoConvert_v1_RouteSetHTTPHeader_To_route_RouteSetHTTPHeader(in *routev1.RouteSetHTTPHeader, out *route.RouteSetHTTPHeader, s conversion.Scope) error {
-	out.Value = in.Value
+	*out = *(*route.RouteSetHTTPHeader)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -442,7 +409,7 @@ func Convert_v1_RouteSetHTTPHeader_To_route_RouteSetHTTPHeader(in *routev1.Route
 }
 
 func autoConvert_route_RouteSetHTTPHeader_To_v1_RouteSetHTTPHeader(in *route.RouteSetHTTPHeader, out *routev1.RouteSetHTTPHeader, s conversion.Scope) error {
-	out.Value = in.Value
+	*out = *(*routev1.RouteSetHTTPHeader)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -452,17 +419,7 @@ func Convert_route_RouteSetHTTPHeader_To_v1_RouteSetHTTPHeader(in *route.RouteSe
 }
 
 func autoConvert_v1_RouteSpec_To_route_RouteSpec(in *routev1.RouteSpec, out *route.RouteSpec, s conversion.Scope) error {
-	out.Host = in.Host
-	out.Subdomain = in.Subdomain
-	out.Path = in.Path
-	if err := Convert_v1_RouteTargetReference_To_route_RouteTargetReference(&in.To, &out.To, s); err != nil {
-		return err
-	}
-	out.AlternateBackends = *(*[]route.RouteTargetReference)(unsafe.Pointer(&in.AlternateBackends))
-	out.Port = (*route.RoutePort)(unsafe.Pointer(in.Port))
-	out.TLS = (*route.TLSConfig)(unsafe.Pointer(in.TLS))
-	out.WildcardPolicy = route.WildcardPolicyType(in.WildcardPolicy)
-	out.HTTPHeaders = (*route.RouteHTTPHeaders)(unsafe.Pointer(in.HTTPHeaders))
+	*out = *(*route.RouteSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -472,17 +429,7 @@ func Convert_v1_RouteSpec_To_route_RouteSpec(in *routev1.RouteSpec, out *route.R
 }
 
 func autoConvert_route_RouteSpec_To_v1_RouteSpec(in *route.RouteSpec, out *routev1.RouteSpec, s conversion.Scope) error {
-	out.Host = in.Host
-	out.Subdomain = in.Subdomain
-	out.Path = in.Path
-	if err := Convert_route_RouteTargetReference_To_v1_RouteTargetReference(&in.To, &out.To, s); err != nil {
-		return err
-	}
-	out.AlternateBackends = *(*[]routev1.RouteTargetReference)(unsafe.Pointer(&in.AlternateBackends))
-	out.Port = (*routev1.RoutePort)(unsafe.Pointer(in.Port))
-	out.TLS = (*routev1.TLSConfig)(unsafe.Pointer(in.TLS))
-	out.WildcardPolicy = routev1.WildcardPolicyType(in.WildcardPolicy)
-	out.HTTPHeaders = (*routev1.RouteHTTPHeaders)(unsafe.Pointer(in.HTTPHeaders))
+	*out = *(*routev1.RouteSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -492,7 +439,7 @@ func Convert_route_RouteSpec_To_v1_RouteSpec(in *route.RouteSpec, out *routev1.R
 }
 
 func autoConvert_v1_RouteStatus_To_route_RouteStatus(in *routev1.RouteStatus, out *route.RouteStatus, s conversion.Scope) error {
-	out.Ingress = *(*[]route.RouteIngress)(unsafe.Pointer(&in.Ingress))
+	*out = *(*route.RouteStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -502,7 +449,7 @@ func Convert_v1_RouteStatus_To_route_RouteStatus(in *routev1.RouteStatus, out *r
 }
 
 func autoConvert_route_RouteStatus_To_v1_RouteStatus(in *route.RouteStatus, out *routev1.RouteStatus, s conversion.Scope) error {
-	out.Ingress = *(*[]routev1.RouteIngress)(unsafe.Pointer(&in.Ingress))
+	*out = *(*routev1.RouteStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -512,9 +459,7 @@ func Convert_route_RouteStatus_To_v1_RouteStatus(in *route.RouteStatus, out *rou
 }
 
 func autoConvert_v1_RouteTargetReference_To_route_RouteTargetReference(in *routev1.RouteTargetReference, out *route.RouteTargetReference, s conversion.Scope) error {
-	out.Kind = in.Kind
-	out.Name = in.Name
-	out.Weight = (*int32)(unsafe.Pointer(in.Weight))
+	*out = *(*route.RouteTargetReference)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -524,9 +469,7 @@ func Convert_v1_RouteTargetReference_To_route_RouteTargetReference(in *routev1.R
 }
 
 func autoConvert_route_RouteTargetReference_To_v1_RouteTargetReference(in *route.RouteTargetReference, out *routev1.RouteTargetReference, s conversion.Scope) error {
-	out.Kind = in.Kind
-	out.Name = in.Name
-	out.Weight = (*int32)(unsafe.Pointer(in.Weight))
+	*out = *(*routev1.RouteTargetReference)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -536,8 +479,7 @@ func Convert_route_RouteTargetReference_To_v1_RouteTargetReference(in *route.Rou
 }
 
 func autoConvert_v1_RouterShard_To_route_RouterShard(in *routev1.RouterShard, out *route.RouterShard, s conversion.Scope) error {
-	out.ShardName = in.ShardName
-	out.DNSSuffix = in.DNSSuffix
+	*out = *(*route.RouterShard)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -547,8 +489,7 @@ func Convert_v1_RouterShard_To_route_RouterShard(in *routev1.RouterShard, out *r
 }
 
 func autoConvert_route_RouterShard_To_v1_RouterShard(in *route.RouterShard, out *routev1.RouterShard, s conversion.Scope) error {
-	out.ShardName = in.ShardName
-	out.DNSSuffix = in.DNSSuffix
+	*out = *(*routev1.RouterShard)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -558,13 +499,7 @@ func Convert_route_RouterShard_To_v1_RouterShard(in *route.RouterShard, out *rou
 }
 
 func autoConvert_v1_TLSConfig_To_route_TLSConfig(in *routev1.TLSConfig, out *route.TLSConfig, s conversion.Scope) error {
-	out.Termination = route.TLSTerminationType(in.Termination)
-	out.Certificate = in.Certificate
-	out.Key = in.Key
-	out.CACertificate = in.CACertificate
-	out.DestinationCACertificate = in.DestinationCACertificate
-	out.InsecureEdgeTerminationPolicy = route.InsecureEdgeTerminationPolicyType(in.InsecureEdgeTerminationPolicy)
-	out.ExternalCertificate = (*route.LocalObjectReference)(unsafe.Pointer(in.ExternalCertificate))
+	*out = *(*route.TLSConfig)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -574,13 +509,7 @@ func Convert_v1_TLSConfig_To_route_TLSConfig(in *routev1.TLSConfig, out *route.T
 }
 
 func autoConvert_route_TLSConfig_To_v1_TLSConfig(in *route.TLSConfig, out *routev1.TLSConfig, s conversion.Scope) error {
-	out.Termination = routev1.TLSTerminationType(in.Termination)
-	out.Certificate = in.Certificate
-	out.Key = in.Key
-	out.CACertificate = in.CACertificate
-	out.DestinationCACertificate = in.DestinationCACertificate
-	out.InsecureEdgeTerminationPolicy = routev1.InsecureEdgeTerminationPolicyType(in.InsecureEdgeTerminationPolicy)
-	out.ExternalCertificate = (*routev1.LocalObjectReference)(unsafe.Pointer(in.ExternalCertificate))
+	*out = *(*routev1.TLSConfig)(unsafe.Pointer(in))
 	return nil
 }
 

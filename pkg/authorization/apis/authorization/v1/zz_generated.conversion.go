@@ -12,7 +12,6 @@ import (
 	authorization "github.com/openshift/openshift-apiserver/pkg/authorization/apis/authorization"
 	apicorev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	core "k8s.io/kubernetes/pkg/apis/core"
@@ -529,8 +528,7 @@ func Convert_authorization_ClusterRoleList_To_v1_ClusterRoleList(in *authorizati
 }
 
 func autoConvert_v1_GroupRestriction_To_authorization_GroupRestriction(in *authorizationv1.GroupRestriction, out *authorization.GroupRestriction, s conversion.Scope) error {
-	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
-	out.Selectors = *(*[]metav1.LabelSelector)(unsafe.Pointer(&in.Selectors))
+	*out = *(*authorization.GroupRestriction)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -540,8 +538,7 @@ func Convert_v1_GroupRestriction_To_authorization_GroupRestriction(in *authoriza
 }
 
 func autoConvert_authorization_GroupRestriction_To_v1_GroupRestriction(in *authorization.GroupRestriction, out *authorizationv1.GroupRestriction, s conversion.Scope) error {
-	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
-	out.Selectors = *(*[]metav1.LabelSelector)(unsafe.Pointer(&in.Selectors))
+	*out = *(*authorizationv1.GroupRestriction)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -855,9 +852,7 @@ func Convert_authorization_RoleBindingRestrictionList_To_v1_RoleBindingRestricti
 }
 
 func autoConvert_v1_RoleBindingRestrictionSpec_To_authorization_RoleBindingRestrictionSpec(in *authorizationv1.RoleBindingRestrictionSpec, out *authorization.RoleBindingRestrictionSpec, s conversion.Scope) error {
-	out.UserRestriction = (*authorization.UserRestriction)(unsafe.Pointer(in.UserRestriction))
-	out.GroupRestriction = (*authorization.GroupRestriction)(unsafe.Pointer(in.GroupRestriction))
-	out.ServiceAccountRestriction = (*authorization.ServiceAccountRestriction)(unsafe.Pointer(in.ServiceAccountRestriction))
+	*out = *(*authorization.RoleBindingRestrictionSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -867,9 +862,7 @@ func Convert_v1_RoleBindingRestrictionSpec_To_authorization_RoleBindingRestricti
 }
 
 func autoConvert_authorization_RoleBindingRestrictionSpec_To_v1_RoleBindingRestrictionSpec(in *authorization.RoleBindingRestrictionSpec, out *authorizationv1.RoleBindingRestrictionSpec, s conversion.Scope) error {
-	out.UserRestriction = (*authorizationv1.UserRestriction)(unsafe.Pointer(in.UserRestriction))
-	out.GroupRestriction = (*authorizationv1.GroupRestriction)(unsafe.Pointer(in.GroupRestriction))
-	out.ServiceAccountRestriction = (*authorizationv1.ServiceAccountRestriction)(unsafe.Pointer(in.ServiceAccountRestriction))
+	*out = *(*authorizationv1.RoleBindingRestrictionSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -963,8 +956,7 @@ func autoConvert_authorization_SelfSubjectRulesReviewSpec_To_v1_SelfSubjectRules
 }
 
 func autoConvert_v1_ServiceAccountReference_To_authorization_ServiceAccountReference(in *authorizationv1.ServiceAccountReference, out *authorization.ServiceAccountReference, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Namespace = in.Namespace
+	*out = *(*authorization.ServiceAccountReference)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -974,8 +966,7 @@ func Convert_v1_ServiceAccountReference_To_authorization_ServiceAccountReference
 }
 
 func autoConvert_authorization_ServiceAccountReference_To_v1_ServiceAccountReference(in *authorization.ServiceAccountReference, out *authorizationv1.ServiceAccountReference, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Namespace = in.Namespace
+	*out = *(*authorizationv1.ServiceAccountReference)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -985,8 +976,7 @@ func Convert_authorization_ServiceAccountReference_To_v1_ServiceAccountReference
 }
 
 func autoConvert_v1_ServiceAccountRestriction_To_authorization_ServiceAccountRestriction(in *authorizationv1.ServiceAccountRestriction, out *authorization.ServiceAccountRestriction, s conversion.Scope) error {
-	out.ServiceAccounts = *(*[]authorization.ServiceAccountReference)(unsafe.Pointer(&in.ServiceAccounts))
-	out.Namespaces = *(*[]string)(unsafe.Pointer(&in.Namespaces))
+	*out = *(*authorization.ServiceAccountRestriction)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -996,8 +986,7 @@ func Convert_v1_ServiceAccountRestriction_To_authorization_ServiceAccountRestric
 }
 
 func autoConvert_authorization_ServiceAccountRestriction_To_v1_ServiceAccountRestriction(in *authorization.ServiceAccountRestriction, out *authorizationv1.ServiceAccountRestriction, s conversion.Scope) error {
-	out.ServiceAccounts = *(*[]authorizationv1.ServiceAccountReference)(unsafe.Pointer(&in.ServiceAccounts))
-	out.Namespaces = *(*[]string)(unsafe.Pointer(&in.Namespaces))
+	*out = *(*authorizationv1.ServiceAccountRestriction)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1087,9 +1076,7 @@ func Convert_authorization_SubjectRulesReview_To_v1_SubjectRulesReview(in *autho
 }
 
 func autoConvert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSpec(in *authorizationv1.SubjectRulesReviewSpec, out *authorization.SubjectRulesReviewSpec, s conversion.Scope) error {
-	out.User = in.User
-	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
-	out.Scopes = *(*[]string)(unsafe.Pointer(&in.Scopes))
+	*out = *(*authorization.SubjectRulesReviewSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1099,9 +1086,7 @@ func Convert_v1_SubjectRulesReviewSpec_To_authorization_SubjectRulesReviewSpec(i
 }
 
 func autoConvert_authorization_SubjectRulesReviewSpec_To_v1_SubjectRulesReviewSpec(in *authorization.SubjectRulesReviewSpec, out *authorizationv1.SubjectRulesReviewSpec, s conversion.Scope) error {
-	out.User = in.User
-	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
-	out.Scopes = *(*authorizationv1.OptionalScopes)(unsafe.Pointer(&in.Scopes))
+	*out = *(*authorizationv1.SubjectRulesReviewSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1153,9 +1138,7 @@ func Convert_authorization_SubjectRulesReviewStatus_To_v1_SubjectRulesReviewStat
 }
 
 func autoConvert_v1_UserRestriction_To_authorization_UserRestriction(in *authorizationv1.UserRestriction, out *authorization.UserRestriction, s conversion.Scope) error {
-	out.Users = *(*[]string)(unsafe.Pointer(&in.Users))
-	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
-	out.Selectors = *(*[]metav1.LabelSelector)(unsafe.Pointer(&in.Selectors))
+	*out = *(*authorization.UserRestriction)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1165,9 +1148,7 @@ func Convert_v1_UserRestriction_To_authorization_UserRestriction(in *authorizati
 }
 
 func autoConvert_authorization_UserRestriction_To_v1_UserRestriction(in *authorization.UserRestriction, out *authorizationv1.UserRestriction, s conversion.Scope) error {
-	out.Users = *(*[]string)(unsafe.Pointer(&in.Users))
-	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
-	out.Selectors = *(*[]metav1.LabelSelector)(unsafe.Pointer(&in.Selectors))
+	*out = *(*authorizationv1.UserRestriction)(unsafe.Pointer(in))
 	return nil
 }
 

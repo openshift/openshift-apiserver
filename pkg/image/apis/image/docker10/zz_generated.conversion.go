@@ -45,33 +45,7 @@ func RegisterConversions(s *runtime.Scheme) error {
 }
 
 func autoConvert_docker10_DockerConfig_To_image_DockerConfig(in *imagedocker10.DockerConfig, out *image.DockerConfig, s conversion.Scope) error {
-	out.Hostname = in.Hostname
-	out.Domainname = in.Domainname
-	out.User = in.User
-	out.Memory = in.Memory
-	out.MemorySwap = in.MemorySwap
-	out.CPUShares = in.CPUShares
-	out.CPUSet = in.CPUSet
-	out.AttachStdin = in.AttachStdin
-	out.AttachStdout = in.AttachStdout
-	out.AttachStderr = in.AttachStderr
-	out.PortSpecs = *(*[]string)(unsafe.Pointer(&in.PortSpecs))
-	out.ExposedPorts = *(*map[string]struct{})(unsafe.Pointer(&in.ExposedPorts))
-	out.Tty = in.Tty
-	out.OpenStdin = in.OpenStdin
-	out.StdinOnce = in.StdinOnce
-	out.Env = *(*[]string)(unsafe.Pointer(&in.Env))
-	out.Cmd = *(*[]string)(unsafe.Pointer(&in.Cmd))
-	out.DNS = *(*[]string)(unsafe.Pointer(&in.DNS))
-	out.Image = in.Image
-	out.Volumes = *(*map[string]struct{})(unsafe.Pointer(&in.Volumes))
-	out.VolumesFrom = in.VolumesFrom
-	out.WorkingDir = in.WorkingDir
-	out.Entrypoint = *(*[]string)(unsafe.Pointer(&in.Entrypoint))
-	out.NetworkDisabled = in.NetworkDisabled
-	out.SecurityOpts = *(*[]string)(unsafe.Pointer(&in.SecurityOpts))
-	out.OnBuild = *(*[]string)(unsafe.Pointer(&in.OnBuild))
-	out.Labels = *(*map[string]string)(unsafe.Pointer(&in.Labels))
+	*out = *(*image.DockerConfig)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -81,33 +55,7 @@ func Convert_docker10_DockerConfig_To_image_DockerConfig(in *imagedocker10.Docke
 }
 
 func autoConvert_image_DockerConfig_To_docker10_DockerConfig(in *image.DockerConfig, out *imagedocker10.DockerConfig, s conversion.Scope) error {
-	out.Hostname = in.Hostname
-	out.Domainname = in.Domainname
-	out.User = in.User
-	out.Memory = in.Memory
-	out.MemorySwap = in.MemorySwap
-	out.CPUShares = in.CPUShares
-	out.CPUSet = in.CPUSet
-	out.AttachStdin = in.AttachStdin
-	out.AttachStdout = in.AttachStdout
-	out.AttachStderr = in.AttachStderr
-	out.PortSpecs = *(*[]string)(unsafe.Pointer(&in.PortSpecs))
-	out.ExposedPorts = *(*map[string]struct{})(unsafe.Pointer(&in.ExposedPorts))
-	out.Tty = in.Tty
-	out.OpenStdin = in.OpenStdin
-	out.StdinOnce = in.StdinOnce
-	out.Env = *(*[]string)(unsafe.Pointer(&in.Env))
-	out.Cmd = *(*[]string)(unsafe.Pointer(&in.Cmd))
-	out.DNS = *(*[]string)(unsafe.Pointer(&in.DNS))
-	out.Image = in.Image
-	out.Volumes = *(*map[string]struct{})(unsafe.Pointer(&in.Volumes))
-	out.VolumesFrom = in.VolumesFrom
-	out.WorkingDir = in.WorkingDir
-	out.Entrypoint = *(*[]string)(unsafe.Pointer(&in.Entrypoint))
-	out.NetworkDisabled = in.NetworkDisabled
-	out.SecurityOpts = *(*[]string)(unsafe.Pointer(&in.SecurityOpts))
-	out.OnBuild = *(*[]string)(unsafe.Pointer(&in.OnBuild))
-	out.Labels = *(*map[string]string)(unsafe.Pointer(&in.Labels))
+	*out = *(*imagedocker10.DockerConfig)(unsafe.Pointer(in))
 	return nil
 }
 

@@ -443,10 +443,7 @@ func autoConvert_image_Image_To_v1_Image(in *image.Image, out *imagev1.Image, s 
 }
 
 func autoConvert_v1_ImageBlobReferences_To_image_ImageBlobReferences(in *imagev1.ImageBlobReferences, out *image.ImageBlobReferences, s conversion.Scope) error {
-	out.ImageMissing = in.ImageMissing
-	out.Layers = *(*[]string)(unsafe.Pointer(&in.Layers))
-	out.Config = (*string)(unsafe.Pointer(in.Config))
-	out.Manifests = *(*[]string)(unsafe.Pointer(&in.Manifests))
+	*out = *(*image.ImageBlobReferences)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -456,10 +453,7 @@ func Convert_v1_ImageBlobReferences_To_image_ImageBlobReferences(in *imagev1.Ima
 }
 
 func autoConvert_image_ImageBlobReferences_To_v1_ImageBlobReferences(in *image.ImageBlobReferences, out *imagev1.ImageBlobReferences, s conversion.Scope) error {
-	out.ImageMissing = in.ImageMissing
-	out.Layers = *(*[]string)(unsafe.Pointer(&in.Layers))
-	out.Config = (*string)(unsafe.Pointer(in.Config))
-	out.Manifests = *(*[]string)(unsafe.Pointer(&in.Manifests))
+	*out = *(*imagev1.ImageBlobReferences)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -582,9 +576,7 @@ func Convert_image_ImageImportStatus_To_v1_ImageImportStatus(in *image.ImageImpo
 }
 
 func autoConvert_v1_ImageLayer_To_image_ImageLayer(in *imagev1.ImageLayer, out *image.ImageLayer, s conversion.Scope) error {
-	out.Name = in.Name
-	out.LayerSize = in.LayerSize
-	out.MediaType = in.MediaType
+	*out = *(*image.ImageLayer)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -594,9 +586,7 @@ func Convert_v1_ImageLayer_To_image_ImageLayer(in *imagev1.ImageLayer, out *imag
 }
 
 func autoConvert_image_ImageLayer_To_v1_ImageLayer(in *image.ImageLayer, out *imagev1.ImageLayer, s conversion.Scope) error {
-	out.Name = in.Name
-	out.LayerSize = in.LayerSize
-	out.MediaType = in.MediaType
+	*out = *(*imagev1.ImageLayer)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -606,8 +596,7 @@ func Convert_image_ImageLayer_To_v1_ImageLayer(in *image.ImageLayer, out *imagev
 }
 
 func autoConvert_v1_ImageLayerData_To_image_ImageLayerData(in *imagev1.ImageLayerData, out *image.ImageLayerData, s conversion.Scope) error {
-	out.LayerSize = (*int64)(unsafe.Pointer(in.LayerSize))
-	out.MediaType = in.MediaType
+	*out = *(*image.ImageLayerData)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -617,8 +606,7 @@ func Convert_v1_ImageLayerData_To_image_ImageLayerData(in *imagev1.ImageLayerDat
 }
 
 func autoConvert_image_ImageLayerData_To_v1_ImageLayerData(in *image.ImageLayerData, out *imagev1.ImageLayerData, s conversion.Scope) error {
-	out.LayerSize = (*int64)(unsafe.Pointer(in.LayerSize))
-	out.MediaType = in.MediaType
+	*out = *(*imagev1.ImageLayerData)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -670,7 +658,7 @@ func Convert_image_ImageList_To_v1_ImageList(in *image.ImageList, out *imagev1.I
 }
 
 func autoConvert_v1_ImageLookupPolicy_To_image_ImageLookupPolicy(in *imagev1.ImageLookupPolicy, out *image.ImageLookupPolicy, s conversion.Scope) error {
-	out.Local = in.Local
+	*out = *(*image.ImageLookupPolicy)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -680,7 +668,7 @@ func Convert_v1_ImageLookupPolicy_To_image_ImageLookupPolicy(in *imagev1.ImageLo
 }
 
 func autoConvert_image_ImageLookupPolicy_To_v1_ImageLookupPolicy(in *image.ImageLookupPolicy, out *imagev1.ImageLookupPolicy, s conversion.Scope) error {
-	out.Local = in.Local
+	*out = *(*imagev1.ImageLookupPolicy)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -690,12 +678,7 @@ func Convert_image_ImageLookupPolicy_To_v1_ImageLookupPolicy(in *image.ImageLook
 }
 
 func autoConvert_v1_ImageManifest_To_image_ImageManifest(in *imagev1.ImageManifest, out *image.ImageManifest, s conversion.Scope) error {
-	out.Digest = in.Digest
-	out.MediaType = in.MediaType
-	out.ManifestSize = in.ManifestSize
-	out.Architecture = in.Architecture
-	out.OS = in.OS
-	out.Variant = in.Variant
+	*out = *(*image.ImageManifest)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -705,12 +688,7 @@ func Convert_v1_ImageManifest_To_image_ImageManifest(in *imagev1.ImageManifest, 
 }
 
 func autoConvert_image_ImageManifest_To_v1_ImageManifest(in *image.ImageManifest, out *imagev1.ImageManifest, s conversion.Scope) error {
-	out.Digest = in.Digest
-	out.MediaType = in.MediaType
-	out.ManifestSize = in.ManifestSize
-	out.Architecture = in.Architecture
-	out.OS = in.OS
-	out.Variant = in.Variant
+	*out = *(*imagev1.ImageManifest)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1305,9 +1283,7 @@ func Convert_image_ImageTagList_To_v1_ImageTagList(in *image.ImageTagList, out *
 }
 
 func autoConvert_v1_NamedTagEventList_To_image_NamedTagEventList(in *imagev1.NamedTagEventList, out *image.NamedTagEventList, s conversion.Scope) error {
-	out.Tag = in.Tag
-	out.Items = *(*[]image.TagEvent)(unsafe.Pointer(&in.Items))
-	out.Conditions = *(*[]image.TagEventCondition)(unsafe.Pointer(&in.Conditions))
+	*out = *(*image.NamedTagEventList)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1317,9 +1293,7 @@ func Convert_v1_NamedTagEventList_To_image_NamedTagEventList(in *imagev1.NamedTa
 }
 
 func autoConvert_image_NamedTagEventList_To_v1_NamedTagEventList(in *image.NamedTagEventList, out *imagev1.NamedTagEventList, s conversion.Scope) error {
-	out.Tag = in.Tag
-	out.Items = *(*[]imagev1.TagEvent)(unsafe.Pointer(&in.Items))
-	out.Conditions = *(*[]imagev1.TagEventCondition)(unsafe.Pointer(&in.Conditions))
+	*out = *(*imagev1.NamedTagEventList)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1453,12 +1427,7 @@ func Convert_core_SecretList_To_v1_SecretList(in *core.SecretList, out *imagev1.
 }
 
 func autoConvert_v1_SignatureCondition_To_image_SignatureCondition(in *imagev1.SignatureCondition, out *image.SignatureCondition, s conversion.Scope) error {
-	out.Type = image.SignatureConditionType(in.Type)
-	out.Status = core.ConditionStatus(in.Status)
-	out.LastProbeTime = in.LastProbeTime
-	out.LastTransitionTime = in.LastTransitionTime
-	out.Reason = in.Reason
-	out.Message = in.Message
+	*out = *(*image.SignatureCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1468,12 +1437,7 @@ func Convert_v1_SignatureCondition_To_image_SignatureCondition(in *imagev1.Signa
 }
 
 func autoConvert_image_SignatureCondition_To_v1_SignatureCondition(in *image.SignatureCondition, out *imagev1.SignatureCondition, s conversion.Scope) error {
-	out.Type = imagev1.SignatureConditionType(in.Type)
-	out.Status = apicorev1.ConditionStatus(in.Status)
-	out.LastProbeTime = in.LastProbeTime
-	out.LastTransitionTime = in.LastTransitionTime
-	out.Reason = in.Reason
-	out.Message = in.Message
+	*out = *(*imagev1.SignatureCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1483,8 +1447,7 @@ func Convert_image_SignatureCondition_To_v1_SignatureCondition(in *image.Signatu
 }
 
 func autoConvert_v1_SignatureGenericEntity_To_image_SignatureGenericEntity(in *imagev1.SignatureGenericEntity, out *image.SignatureGenericEntity, s conversion.Scope) error {
-	out.Organization = in.Organization
-	out.CommonName = in.CommonName
+	*out = *(*image.SignatureGenericEntity)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1494,8 +1457,7 @@ func Convert_v1_SignatureGenericEntity_To_image_SignatureGenericEntity(in *image
 }
 
 func autoConvert_image_SignatureGenericEntity_To_v1_SignatureGenericEntity(in *image.SignatureGenericEntity, out *imagev1.SignatureGenericEntity, s conversion.Scope) error {
-	out.Organization = in.Organization
-	out.CommonName = in.CommonName
+	*out = *(*imagev1.SignatureGenericEntity)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1505,9 +1467,7 @@ func Convert_image_SignatureGenericEntity_To_v1_SignatureGenericEntity(in *image
 }
 
 func autoConvert_v1_SignatureIssuer_To_image_SignatureIssuer(in *imagev1.SignatureIssuer, out *image.SignatureIssuer, s conversion.Scope) error {
-	if err := Convert_v1_SignatureGenericEntity_To_image_SignatureGenericEntity(&in.SignatureGenericEntity, &out.SignatureGenericEntity, s); err != nil {
-		return err
-	}
+	*out = *(*image.SignatureIssuer)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1517,9 +1477,7 @@ func Convert_v1_SignatureIssuer_To_image_SignatureIssuer(in *imagev1.SignatureIs
 }
 
 func autoConvert_image_SignatureIssuer_To_v1_SignatureIssuer(in *image.SignatureIssuer, out *imagev1.SignatureIssuer, s conversion.Scope) error {
-	if err := Convert_image_SignatureGenericEntity_To_v1_SignatureGenericEntity(&in.SignatureGenericEntity, &out.SignatureGenericEntity, s); err != nil {
-		return err
-	}
+	*out = *(*imagev1.SignatureIssuer)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1529,10 +1487,7 @@ func Convert_image_SignatureIssuer_To_v1_SignatureIssuer(in *image.SignatureIssu
 }
 
 func autoConvert_v1_SignatureSubject_To_image_SignatureSubject(in *imagev1.SignatureSubject, out *image.SignatureSubject, s conversion.Scope) error {
-	if err := Convert_v1_SignatureGenericEntity_To_image_SignatureGenericEntity(&in.SignatureGenericEntity, &out.SignatureGenericEntity, s); err != nil {
-		return err
-	}
-	out.PublicKeyID = in.PublicKeyID
+	*out = *(*image.SignatureSubject)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1542,10 +1497,7 @@ func Convert_v1_SignatureSubject_To_image_SignatureSubject(in *imagev1.Signature
 }
 
 func autoConvert_image_SignatureSubject_To_v1_SignatureSubject(in *image.SignatureSubject, out *imagev1.SignatureSubject, s conversion.Scope) error {
-	if err := Convert_image_SignatureGenericEntity_To_v1_SignatureGenericEntity(&in.SignatureGenericEntity, &out.SignatureGenericEntity, s); err != nil {
-		return err
-	}
-	out.PublicKeyID = in.PublicKeyID
+	*out = *(*imagev1.SignatureSubject)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1555,10 +1507,7 @@ func Convert_image_SignatureSubject_To_v1_SignatureSubject(in *image.SignatureSu
 }
 
 func autoConvert_v1_TagEvent_To_image_TagEvent(in *imagev1.TagEvent, out *image.TagEvent, s conversion.Scope) error {
-	out.Created = in.Created
-	out.DockerImageReference = in.DockerImageReference
-	out.Image = in.Image
-	out.Generation = in.Generation
+	*out = *(*image.TagEvent)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1568,10 +1517,7 @@ func Convert_v1_TagEvent_To_image_TagEvent(in *imagev1.TagEvent, out *image.TagE
 }
 
 func autoConvert_image_TagEvent_To_v1_TagEvent(in *image.TagEvent, out *imagev1.TagEvent, s conversion.Scope) error {
-	out.Created = in.Created
-	out.DockerImageReference = in.DockerImageReference
-	out.Image = in.Image
-	out.Generation = in.Generation
+	*out = *(*imagev1.TagEvent)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1581,12 +1527,7 @@ func Convert_image_TagEvent_To_v1_TagEvent(in *image.TagEvent, out *imagev1.TagE
 }
 
 func autoConvert_v1_TagEventCondition_To_image_TagEventCondition(in *imagev1.TagEventCondition, out *image.TagEventCondition, s conversion.Scope) error {
-	out.Type = image.TagEventConditionType(in.Type)
-	out.Status = core.ConditionStatus(in.Status)
-	out.LastTransitionTime = in.LastTransitionTime
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.Generation = in.Generation
+	*out = *(*image.TagEventCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1596,12 +1537,7 @@ func Convert_v1_TagEventCondition_To_image_TagEventCondition(in *imagev1.TagEven
 }
 
 func autoConvert_image_TagEventCondition_To_v1_TagEventCondition(in *image.TagEventCondition, out *imagev1.TagEventCondition, s conversion.Scope) error {
-	out.Type = imagev1.TagEventConditionType(in.Type)
-	out.Status = apicorev1.ConditionStatus(in.Status)
-	out.LastTransitionTime = in.LastTransitionTime
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.Generation = in.Generation
+	*out = *(*imagev1.TagEventCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1686,7 +1622,7 @@ func Convert_image_TagReference_To_v1_TagReference(in *image.TagReference, out *
 }
 
 func autoConvert_v1_TagReferencePolicy_To_image_TagReferencePolicy(in *imagev1.TagReferencePolicy, out *image.TagReferencePolicy, s conversion.Scope) error {
-	out.Type = image.TagReferencePolicyType(in.Type)
+	*out = *(*image.TagReferencePolicy)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1696,7 +1632,7 @@ func Convert_v1_TagReferencePolicy_To_image_TagReferencePolicy(in *imagev1.TagRe
 }
 
 func autoConvert_image_TagReferencePolicy_To_v1_TagReferencePolicy(in *image.TagReferencePolicy, out *imagev1.TagReferencePolicy, s conversion.Scope) error {
-	out.Type = imagev1.TagReferencePolicyType(in.Type)
+	*out = *(*imagev1.TagReferencePolicy)(unsafe.Pointer(in))
 	return nil
 }
 
