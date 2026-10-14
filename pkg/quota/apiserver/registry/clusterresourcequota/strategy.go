@@ -21,11 +21,11 @@ func (strategy) NamespaceScoped() bool {
 	return false
 }
 
-func (strategy) AllowCreateOnUpdate() bool {
+func (strategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (strategy) AllowUnconditionalUpdate() bool {
+func (strategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 
@@ -68,11 +68,11 @@ func (statusStrategy) NamespaceScoped() bool {
 	return false
 }
 
-func (statusStrategy) AllowCreateOnUpdate() bool {
+func (statusStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (statusStrategy) AllowUnconditionalUpdate() bool {
+func (statusStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

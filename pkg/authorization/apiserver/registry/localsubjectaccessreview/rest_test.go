@@ -52,6 +52,15 @@ func (a *testAuthorizer) Authorize(ctx context.Context, passedAttributes kauthor
 	}
 	return a.allowed, a.reason, errors.New(a.err)
 }
+
+func (a *testAuthorizer) ConditionsAwareAuthorize(ctx context.Context, attributes kauthorizer.Attributes) kauthorizer.ConditionsAwareDecision {
+	return kauthorizer.ConditionsAwareDecisionFromParts(a.Authorize(ctx, attributes))
+}
+
+func (a *testAuthorizer) EvaluateConditions(_ context.Context, _ kauthorizer.ConditionsAwareDecision, _ kauthorizer.ConditionsData) (kauthorizer.Decision, string, error) {
+	return kauthorizer.DecisionDeny, "", kauthorizer.ErrorConditionEvaluationNotSupported
+}
+
 func (a *testAuthorizer) GetAllowedSubjects(passedAttributes kauthorizer.Attributes) (sets.String, sets.String, error) {
 	return sets.String{}, sets.String{}, nil
 }

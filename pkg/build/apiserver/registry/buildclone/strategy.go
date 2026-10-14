@@ -21,7 +21,7 @@ func (s strategy) NamespaceScoped() bool {
 	return true
 }
 
-func (s strategy) AllowCreateOnUpdate() bool {
+func (s strategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 

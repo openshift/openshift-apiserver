@@ -366,6 +366,7 @@ func validPodSpec() kapi.PodSpec {
 		DNSPolicy:                     kapi.DNSClusterFirst,
 		ActiveDeadlineSeconds:         &activeDeadlineSeconds,
 		ServiceAccountName:            "acct",
+		DeprecatedServiceAccount:      "acct",
 		SchedulerName:                 corev1.DefaultSchedulerName,
 		TerminationGracePeriodSeconds: &defaultGracePeriod,
 	}

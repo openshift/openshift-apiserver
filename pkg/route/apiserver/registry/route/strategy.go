@@ -96,7 +96,7 @@ func (routeStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) [
 	return validation.Warnings(obj.(*routeapi.Route))
 }
 
-func (routeStrategy) AllowCreateOnUpdate() bool {
+func (routeStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
@@ -117,7 +117,7 @@ func (routeStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Obje
 	return validation.Warnings(obj.(*routeapi.Route))
 }
 
-func (routeStrategy) AllowUnconditionalUpdate() bool {
+func (routeStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 
