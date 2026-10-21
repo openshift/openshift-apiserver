@@ -69,11 +69,11 @@ func (projectStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object)
 }
 
 // AllowCreateOnUpdate is false for project.
-func (projectStrategy) AllowCreateOnUpdate() bool {
+func (projectStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (projectStrategy) AllowUnconditionalUpdate() bool {
+func (projectStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

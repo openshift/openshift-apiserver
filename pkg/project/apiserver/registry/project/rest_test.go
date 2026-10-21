@@ -14,7 +14,7 @@ func TestProjectStrategy(t *testing.T) {
 	if Strategy.NamespaceScoped() {
 		t.Errorf("Projects should not be namespace scoped")
 	}
-	if Strategy.AllowCreateOnUpdate() {
+	if Strategy.AllowCreateOnUpdate(ctx) {
 		t.Errorf("Projects should not allow create on update")
 	}
 	project := &projectapi.Project{

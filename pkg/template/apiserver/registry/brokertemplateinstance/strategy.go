@@ -50,11 +50,11 @@ func (brokerTemplateInstanceStrategy) WarningsOnCreate(ctx context.Context, obj 
 }
 
 // AllowCreateOnUpdate is false for brokertemplateinstances.
-func (brokerTemplateInstanceStrategy) AllowCreateOnUpdate() bool {
+func (brokerTemplateInstanceStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (brokerTemplateInstanceStrategy) AllowUnconditionalUpdate() bool {
+func (brokerTemplateInstanceStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

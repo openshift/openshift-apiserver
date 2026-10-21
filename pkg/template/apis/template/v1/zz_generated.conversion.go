@@ -258,13 +258,7 @@ func Convert_template_BrokerTemplateInstanceSpec_To_v1_BrokerTemplateInstanceSpe
 }
 
 func autoConvert_v1_Parameter_To_template_Parameter(in *templatev1.Parameter, out *template.Parameter, s conversion.Scope) error {
-	out.Name = in.Name
-	out.DisplayName = in.DisplayName
-	out.Description = in.Description
-	out.Value = in.Value
-	out.Generate = in.Generate
-	out.From = in.From
-	out.Required = in.Required
+	*out = *(*template.Parameter)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -274,13 +268,7 @@ func Convert_v1_Parameter_To_template_Parameter(in *templatev1.Parameter, out *t
 }
 
 func autoConvert_template_Parameter_To_v1_Parameter(in *template.Parameter, out *templatev1.Parameter, s conversion.Scope) error {
-	out.Name = in.Name
-	out.DisplayName = in.DisplayName
-	out.Description = in.Description
-	out.Value = in.Value
-	out.Generate = in.Generate
-	out.From = in.From
-	out.Required = in.Required
+	*out = *(*templatev1.Parameter)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -370,11 +358,7 @@ func Convert_template_TemplateInstance_To_v1_TemplateInstance(in *template.Templ
 }
 
 func autoConvert_v1_TemplateInstanceCondition_To_template_TemplateInstanceCondition(in *templatev1.TemplateInstanceCondition, out *template.TemplateInstanceCondition, s conversion.Scope) error {
-	out.Type = template.TemplateInstanceConditionType(in.Type)
-	out.Status = core.ConditionStatus(in.Status)
-	out.LastTransitionTime = in.LastTransitionTime
-	out.Reason = in.Reason
-	out.Message = in.Message
+	*out = *(*template.TemplateInstanceCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -384,11 +368,7 @@ func Convert_v1_TemplateInstanceCondition_To_template_TemplateInstanceCondition(
 }
 
 func autoConvert_template_TemplateInstanceCondition_To_v1_TemplateInstanceCondition(in *template.TemplateInstanceCondition, out *templatev1.TemplateInstanceCondition, s conversion.Scope) error {
-	out.Type = templatev1.TemplateInstanceConditionType(in.Type)
-	out.Status = apicorev1.ConditionStatus(in.Status)
-	out.LastTransitionTime = in.LastTransitionTime
-	out.Reason = in.Reason
-	out.Message = in.Message
+	*out = *(*templatev1.TemplateInstanceCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -464,10 +444,7 @@ func Convert_template_TemplateInstanceObject_To_v1_TemplateInstanceObject(in *te
 }
 
 func autoConvert_v1_TemplateInstanceRequester_To_template_TemplateInstanceRequester(in *templatev1.TemplateInstanceRequester, out *template.TemplateInstanceRequester, s conversion.Scope) error {
-	out.Username = in.Username
-	out.UID = in.UID
-	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
-	out.Extra = *(*map[string]template.ExtraValue)(unsafe.Pointer(&in.Extra))
+	*out = *(*template.TemplateInstanceRequester)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -477,10 +454,7 @@ func Convert_v1_TemplateInstanceRequester_To_template_TemplateInstanceRequester(
 }
 
 func autoConvert_template_TemplateInstanceRequester_To_v1_TemplateInstanceRequester(in *template.TemplateInstanceRequester, out *templatev1.TemplateInstanceRequester, s conversion.Scope) error {
-	out.Username = in.Username
-	out.UID = in.UID
-	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
-	out.Extra = *(*map[string]templatev1.ExtraValue)(unsafe.Pointer(&in.Extra))
+	*out = *(*templatev1.TemplateInstanceRequester)(unsafe.Pointer(in))
 	return nil
 }
 

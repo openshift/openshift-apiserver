@@ -67,7 +67,8 @@ func TestAllowed(t *testing.T) {
 				admissionttesting.UserScc("foo"),
 			},
 			patch: func(p *securityapi.PodSecurityPolicySubjectReview) {
-				p.Spec.Template.Spec.ServiceAccountName = "" // empty SA in podSpec
+				p.Spec.Template.Spec.ServiceAccountName = ""       // empty SA in podSpec
+				p.Spec.Template.Spec.DeprecatedServiceAccount = "" // must match ServiceAccountName
 			},
 
 			check: func(p *securityapi.PodSecurityPolicySubjectReview) (bool, string) {
@@ -117,6 +118,7 @@ func TestAllowed(t *testing.T) {
 						SecurityContext:               &coreapi.PodSecurityContext{},
 						DNSPolicy:                     coreapi.DNSClusterFirst,
 						ServiceAccountName:            "default",
+						DeprecatedServiceAccount:      "default",
 						SchedulerName:                 corev1.DefaultSchedulerName,
 						TerminationGracePeriodSeconds: &defaultGracePeriod,
 					},
@@ -190,6 +192,7 @@ func TestRequests(t *testing.T) {
 							SecurityContext:               &coreapi.PodSecurityContext{},
 							DNSPolicy:                     coreapi.DNSClusterFirst,
 							ServiceAccountName:            "A.B.C.D",
+							DeprecatedServiceAccount:      "A.B.C.D",
 							SchedulerName:                 corev1.DefaultSchedulerName,
 							TerminationGracePeriodSeconds: &defaultGracePeriod,
 						},
@@ -217,6 +220,7 @@ func TestRequests(t *testing.T) {
 							SecurityContext:               &coreapi.PodSecurityContext{},
 							DNSPolicy:                     coreapi.DNSClusterFirst,
 							ServiceAccountName:            "default",
+							DeprecatedServiceAccount:      "default",
 							SchedulerName:                 corev1.DefaultSchedulerName,
 							TerminationGracePeriodSeconds: &defaultGracePeriod,
 						},
@@ -247,6 +251,7 @@ func TestRequests(t *testing.T) {
 							SecurityContext:               &coreapi.PodSecurityContext{},
 							DNSPolicy:                     coreapi.DNSClusterFirst,
 							ServiceAccountName:            "default",
+							DeprecatedServiceAccount:      "default",
 							SchedulerName:                 corev1.DefaultSchedulerName,
 							TerminationGracePeriodSeconds: &defaultGracePeriod,
 						},

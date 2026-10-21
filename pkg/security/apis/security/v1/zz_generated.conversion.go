@@ -218,7 +218,7 @@ func RegisterConversions(s *runtime.Scheme) error {
 }
 
 func autoConvert_v1_AllowedFlexVolume_To_security_AllowedFlexVolume(in *securityv1.AllowedFlexVolume, out *security.AllowedFlexVolume, s conversion.Scope) error {
-	out.Driver = in.Driver
+	*out = *(*security.AllowedFlexVolume)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -228,7 +228,7 @@ func Convert_v1_AllowedFlexVolume_To_security_AllowedFlexVolume(in *securityv1.A
 }
 
 func autoConvert_security_AllowedFlexVolume_To_v1_AllowedFlexVolume(in *security.AllowedFlexVolume, out *securityv1.AllowedFlexVolume, s conversion.Scope) error {
-	out.Driver = in.Driver
+	*out = *(*securityv1.AllowedFlexVolume)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -238,8 +238,7 @@ func Convert_security_AllowedFlexVolume_To_v1_AllowedFlexVolume(in *security.All
 }
 
 func autoConvert_v1_FSGroupStrategyOptions_To_security_FSGroupStrategyOptions(in *securityv1.FSGroupStrategyOptions, out *security.FSGroupStrategyOptions, s conversion.Scope) error {
-	out.Type = security.FSGroupStrategyType(in.Type)
-	out.Ranges = *(*[]security.IDRange)(unsafe.Pointer(&in.Ranges))
+	*out = *(*security.FSGroupStrategyOptions)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -249,8 +248,7 @@ func Convert_v1_FSGroupStrategyOptions_To_security_FSGroupStrategyOptions(in *se
 }
 
 func autoConvert_security_FSGroupStrategyOptions_To_v1_FSGroupStrategyOptions(in *security.FSGroupStrategyOptions, out *securityv1.FSGroupStrategyOptions, s conversion.Scope) error {
-	out.Type = securityv1.FSGroupStrategyType(in.Type)
-	out.Ranges = *(*[]securityv1.IDRange)(unsafe.Pointer(&in.Ranges))
+	*out = *(*securityv1.FSGroupStrategyOptions)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -260,8 +258,7 @@ func Convert_security_FSGroupStrategyOptions_To_v1_FSGroupStrategyOptions(in *se
 }
 
 func autoConvert_v1_IDRange_To_security_IDRange(in *securityv1.IDRange, out *security.IDRange, s conversion.Scope) error {
-	out.Min = in.Min
-	out.Max = in.Max
+	*out = *(*security.IDRange)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -271,8 +268,7 @@ func Convert_v1_IDRange_To_security_IDRange(in *securityv1.IDRange, out *securit
 }
 
 func autoConvert_security_IDRange_To_v1_IDRange(in *security.IDRange, out *securityv1.IDRange, s conversion.Scope) error {
-	out.Min = in.Min
-	out.Max = in.Max
+	*out = *(*securityv1.IDRange)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -586,10 +582,7 @@ func Convert_security_RangeAllocationList_To_v1_RangeAllocationList(in *security
 }
 
 func autoConvert_v1_RunAsUserStrategyOptions_To_security_RunAsUserStrategyOptions(in *securityv1.RunAsUserStrategyOptions, out *security.RunAsUserStrategyOptions, s conversion.Scope) error {
-	out.Type = security.RunAsUserStrategyType(in.Type)
-	out.UID = (*int64)(unsafe.Pointer(in.UID))
-	out.UIDRangeMin = (*int64)(unsafe.Pointer(in.UIDRangeMin))
-	out.UIDRangeMax = (*int64)(unsafe.Pointer(in.UIDRangeMax))
+	*out = *(*security.RunAsUserStrategyOptions)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -599,10 +592,7 @@ func Convert_v1_RunAsUserStrategyOptions_To_security_RunAsUserStrategyOptions(in
 }
 
 func autoConvert_security_RunAsUserStrategyOptions_To_v1_RunAsUserStrategyOptions(in *security.RunAsUserStrategyOptions, out *securityv1.RunAsUserStrategyOptions, s conversion.Scope) error {
-	out.Type = securityv1.RunAsUserStrategyType(in.Type)
-	out.UID = (*int64)(unsafe.Pointer(in.UID))
-	out.UIDRangeMin = (*int64)(unsafe.Pointer(in.UIDRangeMin))
-	out.UIDRangeMax = (*int64)(unsafe.Pointer(in.UIDRangeMax))
+	*out = *(*securityv1.RunAsUserStrategyOptions)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -792,8 +782,7 @@ func Convert_security_ServiceAccountPodSecurityPolicyReviewStatus_To_v1_ServiceA
 }
 
 func autoConvert_v1_SupplementalGroupsStrategyOptions_To_security_SupplementalGroupsStrategyOptions(in *securityv1.SupplementalGroupsStrategyOptions, out *security.SupplementalGroupsStrategyOptions, s conversion.Scope) error {
-	out.Type = security.SupplementalGroupsStrategyType(in.Type)
-	out.Ranges = *(*[]security.IDRange)(unsafe.Pointer(&in.Ranges))
+	*out = *(*security.SupplementalGroupsStrategyOptions)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -803,8 +792,7 @@ func Convert_v1_SupplementalGroupsStrategyOptions_To_security_SupplementalGroups
 }
 
 func autoConvert_security_SupplementalGroupsStrategyOptions_To_v1_SupplementalGroupsStrategyOptions(in *security.SupplementalGroupsStrategyOptions, out *securityv1.SupplementalGroupsStrategyOptions, s conversion.Scope) error {
-	out.Type = securityv1.SupplementalGroupsStrategyType(in.Type)
-	out.Ranges = *(*[]securityv1.IDRange)(unsafe.Pointer(&in.Ranges))
+	*out = *(*securityv1.SupplementalGroupsStrategyOptions)(unsafe.Pointer(in))
 	return nil
 }
 

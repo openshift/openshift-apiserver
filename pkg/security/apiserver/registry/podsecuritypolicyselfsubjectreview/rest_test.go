@@ -66,6 +66,7 @@ func TestPodSecurityPolicySelfSubjectReview(t *testing.T) {
 						SecurityContext:               &coreapi.PodSecurityContext{},
 						DNSPolicy:                     coreapi.DNSClusterFirst,
 						ServiceAccountName:            "default",
+						DeprecatedServiceAccount:      "default",
 						SchedulerName:                 corev1.DefaultSchedulerName,
 						TerminationGracePeriodSeconds: &defaultGracePeriod,
 					},

@@ -15,7 +15,7 @@ func TestBuildConfigGroupStrategy(t *testing.T) {
 	if !GroupStrategy.NamespaceScoped() {
 		t.Errorf("BuildConfig is namespace scoped")
 	}
-	if GroupStrategy.AllowCreateOnUpdate() {
+	if GroupStrategy.AllowCreateOnUpdate(ctx) {
 		t.Errorf("BuildConfig should not allow create on update")
 	}
 	buildConfig := &buildapi.BuildConfig{
@@ -138,7 +138,7 @@ func TestBuildConfigLegacyStrategy(t *testing.T) {
 	if !LegacyStrategy.NamespaceScoped() {
 		t.Errorf("BuildConfig is namespace scoped")
 	}
-	if LegacyStrategy.AllowCreateOnUpdate() {
+	if LegacyStrategy.AllowCreateOnUpdate(ctx) {
 		t.Errorf("BuildConfig should not allow create on update")
 	}
 	buildConfig := &buildapi.BuildConfig{

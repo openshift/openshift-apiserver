@@ -30,11 +30,11 @@ func (strategy) NamespaceScoped() bool {
 }
 
 // AllowCreateOnUpdate is false for Build objects.
-func (strategy) AllowCreateOnUpdate() bool {
+func (strategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (strategy) AllowUnconditionalUpdate() bool {
+func (strategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 
@@ -197,7 +197,7 @@ func (detailsStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Obje
 }
 
 // AllowUnconditionalUpdate returns true to allow a Build with an empty resourceVersion to update the Revision
-func (detailsStrategy) AllowUnconditionalUpdate() bool {
+func (detailsStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return true
 }
 

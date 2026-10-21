@@ -27,7 +27,7 @@ func TestDeploymentConfigStrategy(t *testing.T) {
 	if !CommonStrategy.NamespaceScoped() {
 		t.Errorf("DeploymentConfig is namespace scoped")
 	}
-	if CommonStrategy.AllowCreateOnUpdate() {
+	if CommonStrategy.AllowCreateOnUpdate(ctx) {
 		t.Errorf("DeploymentConfig should not allow create on update")
 	}
 	deploymentConfig := &appsapi.DeploymentConfig{

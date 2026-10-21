@@ -22,7 +22,7 @@ func GetEtcdOptions(startingFlags map[string][]string, serializedConfig configv1
 
 	etcdOptions := options.NewEtcdOptions(storageConfig)
 	etcdOptions.DefaultStorageMediaType = "application/vnd.kubernetes.protobuf"
-	etcdOptions.DefaultWatchCacheSize = 0
+	etcdOptions.EnableWatchCache = false
 	fss := apiserverflag.NamedFlagSets{}
 	etcdOptions.AddFlags(fss.FlagSet("etcd"))
 	if err := cmdflags.ResolveIgnoreMissing(startingFlags, fss); len(err) > 0 {

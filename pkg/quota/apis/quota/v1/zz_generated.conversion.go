@@ -10,7 +10,6 @@ import (
 
 	quotav1 "github.com/openshift/api/quota/v1"
 	quota "github.com/openshift/openshift-apiserver/pkg/quota/apis/quota"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	corev1 "k8s.io/kubernetes/pkg/apis/core/v1"
@@ -255,8 +254,7 @@ func Convert_quota_ClusterResourceQuotaList_To_v1_ClusterResourceQuotaList(in *q
 }
 
 func autoConvert_v1_ClusterResourceQuotaSelector_To_quota_ClusterResourceQuotaSelector(in *quotav1.ClusterResourceQuotaSelector, out *quota.ClusterResourceQuotaSelector, s conversion.Scope) error {
-	out.LabelSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
-	out.AnnotationSelector = *(*map[string]string)(unsafe.Pointer(&in.AnnotationSelector))
+	*out = *(*quota.ClusterResourceQuotaSelector)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -266,8 +264,7 @@ func Convert_v1_ClusterResourceQuotaSelector_To_quota_ClusterResourceQuotaSelect
 }
 
 func autoConvert_quota_ClusterResourceQuotaSelector_To_v1_ClusterResourceQuotaSelector(in *quota.ClusterResourceQuotaSelector, out *quotav1.ClusterResourceQuotaSelector, s conversion.Scope) error {
-	out.LabelSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
-	out.AnnotationSelector = *(*map[string]string)(unsafe.Pointer(&in.AnnotationSelector))
+	*out = *(*quotav1.ClusterResourceQuotaSelector)(unsafe.Pointer(in))
 	return nil
 }
 
