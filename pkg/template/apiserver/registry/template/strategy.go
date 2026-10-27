@@ -49,11 +49,11 @@ func (templateStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object
 }
 
 // AllowCreateOnUpdate is false for templates.
-func (templateStrategy) AllowCreateOnUpdate() bool {
+func (templateStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (templateStrategy) AllowUnconditionalUpdate() bool {
+func (templateStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

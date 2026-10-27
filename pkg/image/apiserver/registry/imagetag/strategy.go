@@ -62,11 +62,11 @@ func (Strategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []stri
 	return nil
 }
 
-func (s Strategy) AllowCreateOnUpdate() bool {
+func (s Strategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (Strategy) AllowUnconditionalUpdate() bool {
+func (Strategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

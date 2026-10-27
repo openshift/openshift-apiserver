@@ -87,11 +87,11 @@ func (templateInstanceStrategy) WarningsOnCreate(ctx context.Context, obj runtim
 }
 
 // AllowCreateOnUpdate is false for templateinstances.
-func (templateInstanceStrategy) AllowCreateOnUpdate() bool {
+func (templateInstanceStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (templateInstanceStrategy) AllowUnconditionalUpdate() bool {
+func (templateInstanceStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 
@@ -180,11 +180,11 @@ func (statusStrategy) NamespaceScoped() bool {
 	return true
 }
 
-func (statusStrategy) AllowCreateOnUpdate() bool {
+func (statusStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (statusStrategy) AllowUnconditionalUpdate() bool {
+func (statusStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

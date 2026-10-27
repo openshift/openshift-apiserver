@@ -361,12 +361,7 @@ func Convert_apps_DeploymentCauseImageTrigger_To_v1_DeploymentCauseImageTrigger(
 }
 
 func autoConvert_v1_DeploymentCondition_To_apps_DeploymentCondition(in *appsv1.DeploymentCondition, out *apps.DeploymentCondition, s conversion.Scope) error {
-	out.Type = apps.DeploymentConditionType(in.Type)
-	out.Status = core.ConditionStatus(in.Status)
-	out.LastUpdateTime = in.LastUpdateTime
-	out.LastTransitionTime = in.LastTransitionTime
-	out.Reason = apps.DeploymentConditionReason(in.Reason)
-	out.Message = in.Message
+	*out = *(*apps.DeploymentCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -376,12 +371,7 @@ func Convert_v1_DeploymentCondition_To_apps_DeploymentCondition(in *appsv1.Deplo
 }
 
 func autoConvert_apps_DeploymentCondition_To_v1_DeploymentCondition(in *apps.DeploymentCondition, out *appsv1.DeploymentCondition, s conversion.Scope) error {
-	out.Type = appsv1.DeploymentConditionType(in.Type)
-	out.Status = apicorev1.ConditionStatus(in.Status)
-	out.LastUpdateTime = in.LastUpdateTime
-	out.LastTransitionTime = in.LastTransitionTime
-	out.Reason = string(in.Reason)
-	out.Message = in.Message
+	*out = *(*appsv1.DeploymentCondition)(unsafe.Pointer(in))
 	return nil
 }
 

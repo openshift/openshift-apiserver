@@ -10,11 +10,11 @@ import (
 
 	projectv1 "github.com/openshift/api/project/v1"
 	project "github.com/openshift/openshift-apiserver/pkg/project/apis/project"
-	corev1 "k8s.io/api/core/v1"
+	apicorev1 "k8s.io/api/core/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	core "k8s.io/kubernetes/pkg/apis/core"
-	apiscorev1 "k8s.io/kubernetes/pkg/apis/core/v1"
+	corev1 "k8s.io/kubernetes/pkg/apis/core/v1"
 )
 
 func init() {
@@ -176,7 +176,7 @@ func Convert_project_ProjectRequest_To_v1_ProjectRequest(in *project.ProjectRequ
 }
 
 func autoConvert_v1_ProjectSpec_To_project_ProjectSpec(in *projectv1.ProjectSpec, out *project.ProjectSpec, s conversion.Scope) error {
-	out.Finalizers = *(*[]core.FinalizerName)(unsafe.Pointer(&in.Finalizers))
+	*out = *(*project.ProjectSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -186,7 +186,7 @@ func Convert_v1_ProjectSpec_To_project_ProjectSpec(in *projectv1.ProjectSpec, ou
 }
 
 func autoConvert_project_ProjectSpec_To_v1_ProjectSpec(in *project.ProjectSpec, out *projectv1.ProjectSpec, s conversion.Scope) error {
-	out.Finalizers = *(*[]corev1.FinalizerName)(unsafe.Pointer(&in.Finalizers))
+	*out = *(*projectv1.ProjectSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -201,7 +201,7 @@ func autoConvert_v1_ProjectStatus_To_project_ProjectStatus(in *projectv1.Project
 		in, out := &in.Conditions, &out.Conditions
 		*out = make([]core.NamespaceCondition, len(*in))
 		for i := range *in {
-			if err := apiscorev1.Convert_v1_NamespaceCondition_To_core_NamespaceCondition(&(*in)[i], &(*out)[i], s); err != nil {
+			if err := corev1.Convert_v1_NamespaceCondition_To_core_NamespaceCondition(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
 			}
 		}
@@ -217,12 +217,12 @@ func Convert_v1_ProjectStatus_To_project_ProjectStatus(in *projectv1.ProjectStat
 }
 
 func autoConvert_project_ProjectStatus_To_v1_ProjectStatus(in *project.ProjectStatus, out *projectv1.ProjectStatus, s conversion.Scope) error {
-	out.Phase = corev1.NamespacePhase(in.Phase)
+	out.Phase = apicorev1.NamespacePhase(in.Phase)
 	if in.Conditions != nil {
 		in, out := &in.Conditions, &out.Conditions
-		*out = make([]corev1.NamespaceCondition, len(*in))
+		*out = make([]apicorev1.NamespaceCondition, len(*in))
 		for i := range *in {
-			if err := apiscorev1.Convert_core_NamespaceCondition_To_v1_NamespaceCondition(&(*in)[i], &(*out)[i], s); err != nil {
+			if err := corev1.Convert_core_NamespaceCondition_To_v1_NamespaceCondition(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
 			}
 		}

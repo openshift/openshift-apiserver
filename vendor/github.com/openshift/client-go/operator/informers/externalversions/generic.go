@@ -54,6 +54,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Operator().V1().DNSes().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("etcds"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Operator().V1().Etcds().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("ingresses"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Operator().V1().Ingresses().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("ingresscontrollers"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Operator().V1().IngressControllers().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("insightsoperators"):
@@ -94,6 +96,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Operator().V1alpha1().EtcdBackups().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("imagecontentsourcepolicies"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Operator().V1alpha1().ImageContentSourcePolicies().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("ingresses"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Operator().V1alpha1().Ingresses().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("olms"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Operator().V1alpha1().OLMs().Informer()}, nil
 

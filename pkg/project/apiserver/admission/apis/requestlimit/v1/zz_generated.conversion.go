@@ -44,8 +44,7 @@ func RegisterConversions(s *runtime.Scheme) error {
 }
 
 func autoConvert_v1_ProjectLimitBySelector_To_requestlimit_ProjectLimitBySelector(in *ProjectLimitBySelector, out *requestlimit.ProjectLimitBySelector, s conversion.Scope) error {
-	out.Selector = *(*map[string]string)(unsafe.Pointer(&in.Selector))
-	out.MaxProjects = (*int)(unsafe.Pointer(in.MaxProjects))
+	*out = *(*requestlimit.ProjectLimitBySelector)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -55,8 +54,7 @@ func Convert_v1_ProjectLimitBySelector_To_requestlimit_ProjectLimitBySelector(in
 }
 
 func autoConvert_requestlimit_ProjectLimitBySelector_To_v1_ProjectLimitBySelector(in *requestlimit.ProjectLimitBySelector, out *ProjectLimitBySelector, s conversion.Scope) error {
-	out.Selector = *(*map[string]string)(unsafe.Pointer(&in.Selector))
-	out.MaxProjects = (*int)(unsafe.Pointer(in.MaxProjects))
+	*out = *(*ProjectLimitBySelector)(unsafe.Pointer(in))
 	return nil
 }
 

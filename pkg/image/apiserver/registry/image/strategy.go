@@ -108,11 +108,11 @@ func (imageStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) [
 }
 
 // AllowCreateOnUpdate is false for images.
-func (imageStrategy) AllowCreateOnUpdate() bool {
+func (imageStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (imageStrategy) AllowUnconditionalUpdate() bool {
+func (imageStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

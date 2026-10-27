@@ -42,11 +42,11 @@ func (strategy) NamespaceScoped() bool {
 }
 
 // AllowCreateOnUpdate is false for BuildConfig objects.
-func (strategy) AllowCreateOnUpdate() bool {
+func (strategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (strategy) AllowUnconditionalUpdate() bool {
+func (strategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

@@ -58,6 +58,6 @@ func (strategy) Canonicalize(obj runtime.Object) {
 }
 
 // AllowCreateOnUpdate is false for OAuth objects
-func (strategy) AllowCreateOnUpdate() bool {
+func (strategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }

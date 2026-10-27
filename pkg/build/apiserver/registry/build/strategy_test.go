@@ -15,7 +15,7 @@ func TestBuildStrategy(t *testing.T) {
 	if !Strategy.NamespaceScoped() {
 		t.Errorf("Build is namespace scoped")
 	}
-	if Strategy.AllowCreateOnUpdate() {
+	if Strategy.AllowCreateOnUpdate(ctx) {
 		t.Errorf("Build should not allow create on update")
 	}
 	build := &buildapi.Build{
