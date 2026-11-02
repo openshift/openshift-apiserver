@@ -488,7 +488,7 @@ github.com/openshift/api/template
 github.com/openshift/api/template/v1
 github.com/openshift/api/user
 github.com/openshift/api/user/v1
-# github.com/openshift/apiserver-library-go v0.0.0-20261001145254-218f2c488d90
+# github.com/openshift/apiserver-library-go v0.0.0-20261001145254-218f2c488d90 => github.com/jbpratt/apiserver-library-go v0.0.0-20261012193134-31972f8dd9b9
 ## explicit; go 1.26.0
 github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy
 github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy/apis/imagepolicy/v1
@@ -2539,3 +2539,4 @@ sigs.k8s.io/yaml/kyaml
 # k8s.io/mount-utils => k8s.io/mount-utils v0.37.1
 # k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.37.1
 # k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.37.1
+# github.com/openshift/apiserver-library-go => github.com/jbpratt/apiserver-library-go v0.0.0-20261012193134-31972f8dd9b9

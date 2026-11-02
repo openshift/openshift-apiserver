@@ -232,3 +232,5 @@ replace (
 	k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.37.1
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.37.1
 )
+
+replace github.com/openshift/apiserver-library-go => github.com/jbpratt/apiserver-library-go v0.0.0-20261012193134-31972f8dd9b9
