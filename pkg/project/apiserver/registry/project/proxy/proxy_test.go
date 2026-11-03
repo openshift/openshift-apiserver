@@ -24,6 +24,7 @@ import (
 	"github.com/openshift/api/project"
 	oapi "github.com/openshift/openshift-apiserver/pkg/api"
 	projectapi "github.com/openshift/openshift-apiserver/pkg/project/apis/project"
+	metainternal "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 )
 
 // mockLister returns the namespaces in the list
@@ -65,6 +66,24 @@ func TestListProjects(t *testing.T) {
 	responseProject := projects.Items[0]
 	if e, r := responseProject.Name, "foo"; e != r {
 		t.Errorf("%#v != %#v.", e, r)
+	}
+}
+
+func TestWatchRejectsSendInitialEvents(t *testing.T) {
+	storage := &REST{}
+	userInfo := &user.DefaultInfo{
+		Name: "test-user",
+	}
+	ctx := apirequest.WithUser(apirequest.NewContext(), userInfo)
+
+	_, err := storage.Watch(ctx, &metainternal.ListOptions{
+		SendInitialEvents: ptr.To(true),
+	})
+	if err == nil {
+		t.Fatal("expected an error but got nil")
+	}
+	if !kerrors.IsMethodNotSupported(err) {
+		t.Errorf("expected MethodNotSupported error, got: %v", err)
 	}
 }
 
