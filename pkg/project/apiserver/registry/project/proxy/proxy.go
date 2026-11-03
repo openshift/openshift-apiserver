@@ -119,10 +119,11 @@ func (s *REST) Watch(ctx context.Context, options *metainternal.ListOptions) (wa
 	// k8s.io/initial-events-end annotation after initial events (if any).
 	includeAllExistingProjects, sendBookmark := false, false
 	if options != nil {
-		if options.ResourceVersion == "0" {
+		wantInitialEvents := options.SendInitialEvents != nil && *options.SendInitialEvents && options.AllowWatchBookmarks
+		if options.ResourceVersion == "0" || wantInitialEvents {
 			includeAllExistingProjects = true
 		}
-		if options.SendInitialEvents != nil && *options.SendInitialEvents && options.AllowWatchBookmarks {
+		if wantInitialEvents {
 			sendBookmark = true
 		}
 	}
