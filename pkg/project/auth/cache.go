@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"k8s.io/klog/v2"
@@ -173,6 +174,14 @@ func (l syncedClusterRoleBindingLister) LastSyncResourceVersion() string {
 	return l.versioner.LastSyncResourceVersion()
 }
 
+// authorizationCacheStores groups the three cache stores so they can be
+// swapped atomically during full cache invalidation.
+type authorizationCacheStores struct {
+	reviewRecordStore       cache.Store
+	userSubjectRecordStore  cache.Store
+	groupSubjectRecordStore cache.Store
+}
+
 // AuthorizationCache maintains a cache on the set of namespaces a user or group can access.
 type AuthorizationCache struct {
 	// allKnownNamespaces we track all the known namespaces, so we can detect deletes.
@@ -187,9 +196,7 @@ type AuthorizationCache struct {
 	roleBindingNamespacer         SyncedRoleBindingLister
 	roleLastSyncResourceVersioner LastSyncResourceVersioner
 
-	reviewRecordStore       cache.Store
-	userSubjectRecordStore  cache.Store
-	groupSubjectRecordStore cache.Store
+	stores atomic.Pointer[authorizationCacheStores]
 
 	clusterBindingResourceVersions sets.String
 	clusterRoleResourceVersions    sets.String
@@ -199,7 +206,7 @@ type AuthorizationCache struct {
 
 	reviewer Reviewer
 
-	syncHandler func(request *reviewRequest, userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store) error
+	syncHandler func(request *reviewRequest, userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store, copyOnWrite bool) error
 
 	watchers    []CacheWatcher
 	watcherLock sync.Mutex
@@ -255,10 +262,6 @@ func NewAuthorizationCache(
 		roleBindingNamespacer:         srbLister,
 		roleLastSyncResourceVersioner: unionLastSyncResourceVersioner{scrLister, scrbLister, srLister, srbLister},
 
-		reviewRecordStore:       cache.NewStore(reviewRecordKeyFn),
-		userSubjectRecordStore:  cache.NewStore(subjectRecordKeyFn),
-		groupSubjectRecordStore: cache.NewStore(subjectRecordKeyFn),
-
 		reviewer: reviewer,
 		skip:     &neverSkipSynchronizer{},
 
@@ -268,6 +271,11 @@ func NewAuthorizationCache(
 		lastCacheInvalidation: realClock.Now(),
 		maxCacheLifespan:      defaultMaxCacheLifespan,
 	}
+	ac.stores.Store(&authorizationCacheStores{
+		reviewRecordStore:       cache.NewStore(reviewRecordKeyFn),
+		userSubjectRecordStore:  cache.NewStore(subjectRecordKeyFn),
+		groupSubjectRecordStore: cache.NewStore(subjectRecordKeyFn),
+	})
 	ac.lastSyncResourceVersioner = namespaceLastSyncResourceVersioner
 	ac.syncHandler = ac.syncRequest
 	return ac
@@ -315,7 +323,7 @@ func (ac *AuthorizationCache) GetClusterRoleLister() SyncedClusterRoleLister {
 }
 
 // synchronizeNamespaces synchronizes access over each namespace and returns a set of namespace names that were looked at in last sync
-func (ac *AuthorizationCache) synchronizeNamespaces(userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store) sets.String {
+func (ac *AuthorizationCache) synchronizeNamespaces(userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store, copyOnWrite bool) sets.String {
 	namespaceSet := sets.NewString()
 	namespaces, err := ac.namespaceLister.List(labels.Everything())
 	if err != nil {
@@ -329,7 +337,7 @@ func (ac *AuthorizationCache) synchronizeNamespaces(userSubjectRecordStore cache
 			namespace:                namespace.Name,
 			namespaceResourceVersion: namespace.ResourceVersion,
 		}
-		if err := ac.syncHandler(reviewRequest, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore); err != nil {
+		if err := ac.syncHandler(reviewRequest, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite); err != nil {
 			utilruntime.HandleError(fmt.Errorf("error synchronizing: %v", err))
 		}
 	}
@@ -337,7 +345,7 @@ func (ac *AuthorizationCache) synchronizeNamespaces(userSubjectRecordStore cache
 }
 
 // synchronizePolicies synchronizes access over each role
-func (ac *AuthorizationCache) synchronizePolicies(userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store) {
+func (ac *AuthorizationCache) synchronizePolicies(userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store, copyOnWrite bool) {
 	roleList, err := ac.roleNamespacer.Roles(metav1.NamespaceAll).List(labels.Everything())
 	if err != nil {
 		utilruntime.HandleError(err)
@@ -348,14 +356,14 @@ func (ac *AuthorizationCache) synchronizePolicies(userSubjectRecordStore cache.S
 			namespace:                role.Namespace,
 			roleUIDToResourceVersion: map[types.UID]string{role.UID: role.ResourceVersion},
 		}
-		if err := ac.syncHandler(reviewRequest, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore); err != nil {
+		if err := ac.syncHandler(reviewRequest, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite); err != nil {
 			utilruntime.HandleError(fmt.Errorf("error synchronizing: %v", err))
 		}
 	}
 }
 
 // synchronizeRoleBindings synchronizes access over each role binding
-func (ac *AuthorizationCache) synchronizeRoleBindings(userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store) {
+func (ac *AuthorizationCache) synchronizeRoleBindings(userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store, copyOnWrite bool) {
 	roleBindingList, err := ac.roleBindingNamespacer.RoleBindings(metav1.NamespaceAll).List(labels.Everything())
 	if err != nil {
 		utilruntime.HandleError(err)
@@ -366,20 +374,20 @@ func (ac *AuthorizationCache) synchronizeRoleBindings(userSubjectRecordStore cac
 			namespace:                       roleBinding.Namespace,
 			roleBindingUIDToResourceVersion: map[types.UID]string{roleBinding.UID: roleBinding.ResourceVersion},
 		}
-		if err := ac.syncHandler(reviewRequest, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore); err != nil {
+		if err := ac.syncHandler(reviewRequest, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite); err != nil {
 			utilruntime.HandleError(fmt.Errorf("error synchronizing: %v", err))
 		}
 	}
 }
 
 // purgeDeletedNamespaces will remove all namespaces enumerated in a reviewRecordStore that are not in the namespace set
-func (ac *AuthorizationCache) purgeDeletedNamespaces(oldNamespaces, newNamespaces sets.String, userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store) {
+func (ac *AuthorizationCache) purgeDeletedNamespaces(oldNamespaces, newNamespaces sets.String, userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store, copyOnWrite bool) {
 	reviewRecordItems := reviewRecordStore.List()
 	for i := range reviewRecordItems {
 		reviewRecord := reviewRecordItems[i].(*reviewRecord)
 		if !newNamespaces.Has(reviewRecord.namespace) {
-			deleteNamespaceFromSubjects(userSubjectRecordStore, reviewRecord.users, reviewRecord.namespace)
-			deleteNamespaceFromSubjects(groupSubjectRecordStore, reviewRecord.groups, reviewRecord.namespace)
+			deleteNamespaceFromSubjects(userSubjectRecordStore, reviewRecord.users, reviewRecord.namespace, copyOnWrite)
+			deleteNamespaceFromSubjects(groupSubjectRecordStore, reviewRecord.groups, reviewRecord.namespace, copyOnWrite)
 			reviewRecordStore.Delete(reviewRecord)
 		}
 	}
@@ -424,7 +432,9 @@ func (ac *AuthorizationCache) invalidateCache(expired bool) bool {
 	return invalidateCache
 }
 
-// synchronize runs a a full synchronization over the cache data.  it must be run in a single-writer model, it's not thread-safe by design.
+// synchronize runs a full synchronization over the cache data. Only one
+// goroutine may call synchronize at a time, but List() may be called
+// concurrently from any number of goroutines.
 func (ac *AuthorizationCache) synchronize() {
 	expired := ac.cacheHasExpired()
 	// if none of our internal reflectors changed, then we can skip reviewing the cache
@@ -434,9 +444,10 @@ func (ac *AuthorizationCache) synchronize() {
 	}
 
 	// by default, we update our current caches and do an incremental change
-	userSubjectRecordStore := ac.userSubjectRecordStore
-	groupSubjectRecordStore := ac.groupSubjectRecordStore
-	reviewRecordStore := ac.reviewRecordStore
+	currentStores := ac.stores.Load()
+	userSubjectRecordStore := currentStores.userSubjectRecordStore
+	groupSubjectRecordStore := currentStores.groupSubjectRecordStore
+	reviewRecordStore := currentStores.reviewRecordStore
 
 	// if there was a global change that forced complete invalidation, we rebuild our cache and do a fast swap at end
 	invalidateCache := ac.invalidateCache(expired)
@@ -447,17 +458,25 @@ func (ac *AuthorizationCache) synchronize() {
 		reviewRecordStore = cache.NewStore(reviewRecordKeyFn)
 	}
 
-	// iterate over caches and synchronize our three caches
-	newKnownNamespaces := ac.synchronizeNamespaces(userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore)
-	ac.synchronizePolicies(userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore)
-	ac.synchronizeRoleBindings(userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore)
-	ac.purgeDeletedNamespaces(ac.allKnownNamespaces, newKnownNamespaces, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore)
+	// During full cache invalidation the stores are private to this
+	// goroutine, so in-place mutation is safe and avoids the O(n²)
+	// copy overhead of COW. During incremental updates the stores
+	// are shared with concurrent List() callers, so COW is required.
+	copyOnWrite := !invalidateCache
 
-	// if we did a full rebuild, now we swap the fully rebuilt cache
+	// iterate over caches and synchronize our three caches
+	newKnownNamespaces := ac.synchronizeNamespaces(userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite)
+	ac.synchronizePolicies(userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite)
+	ac.synchronizeRoleBindings(userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite)
+	ac.purgeDeletedNamespaces(ac.allKnownNamespaces, newKnownNamespaces, userSubjectRecordStore, groupSubjectRecordStore, reviewRecordStore, copyOnWrite)
+
+	// if we did a full rebuild, now we swap the fully rebuilt cache atomically
 	if invalidateCache {
-		ac.userSubjectRecordStore = userSubjectRecordStore
-		ac.groupSubjectRecordStore = groupSubjectRecordStore
-		ac.reviewRecordStore = reviewRecordStore
+		ac.stores.Store(&authorizationCacheStores{
+			userSubjectRecordStore:  userSubjectRecordStore,
+			groupSubjectRecordStore: groupSubjectRecordStore,
+			reviewRecordStore:       reviewRecordStore,
+		})
 	}
 	ac.allKnownNamespaces = newKnownNamespaces
 
@@ -465,8 +484,10 @@ func (ac *AuthorizationCache) synchronize() {
 	ac.lastState = currentState
 }
 
-// syncRequest takes a reviewRequest and determines if it should update the caches supplied, it is not thread-safe
-func (ac *AuthorizationCache) syncRequest(request *reviewRequest, userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store) error {
+// syncRequest takes a reviewRequest and determines if it should update the
+// caches supplied. It is only called from synchronize and shares its
+// concurrency contract: single writer, concurrent readers via List().
+func (ac *AuthorizationCache) syncRequest(request *reviewRequest, userSubjectRecordStore cache.Store, groupSubjectRecordStore cache.Store, reviewRecordStore cache.Store, copyOnWrite bool) error {
 
 	lastKnownValue, err := lastKnown(reviewRecordStore, request.namespace)
 	if err != nil {
@@ -492,10 +513,10 @@ func (ac *AuthorizationCache) syncRequest(request *reviewRequest, userSubjectRec
 		groupsToRemove.Delete(review.Groups()...)
 	}
 
-	deleteNamespaceFromSubjects(userSubjectRecordStore, usersToRemove.List(), namespace)
-	deleteNamespaceFromSubjects(groupSubjectRecordStore, groupsToRemove.List(), namespace)
-	addSubjectsToNamespace(userSubjectRecordStore, review.Users(), namespace)
-	addSubjectsToNamespace(groupSubjectRecordStore, review.Groups(), namespace)
+	deleteNamespaceFromSubjects(userSubjectRecordStore, usersToRemove.List(), namespace, copyOnWrite)
+	deleteNamespaceFromSubjects(groupSubjectRecordStore, groupsToRemove.List(), namespace, copyOnWrite)
+	addSubjectsToNamespace(userSubjectRecordStore, review.Users(), namespace, copyOnWrite)
+	addSubjectsToNamespace(groupSubjectRecordStore, review.Groups(), namespace, copyOnWrite)
 	cacheReviewRecord(request, lastKnownValue, review, reviewRecordStore)
 	ac.notifyWatchers(namespace, lastKnownValue, sets.NewString(review.Users()...), sets.NewString(review.Groups()...))
 
@@ -511,14 +532,17 @@ func (ac *AuthorizationCache) List(userInfo user.Info, selector labels.Selector)
 	user := userInfo.GetName()
 	groups := userInfo.GetGroups()
 
-	obj, exists, _ := ac.userSubjectRecordStore.GetByKey(user)
+	// snapshot the stores pointer once so we read from a consistent pair
+	stores := ac.stores.Load()
+
+	obj, exists, _ := stores.userSubjectRecordStore.GetByKey(user)
 	if exists {
 		subjectRecord := obj.(*subjectRecord)
 		keys.Insert(subjectRecord.namespaces.List()...)
 	}
 
 	for _, group := range groups {
-		obj, exists, _ := ac.groupSubjectRecordStore.GetByKey(group)
+		obj, exists, _ := stores.groupSubjectRecordStore.GetByKey(group)
 		if exists {
 			subjectRecord := obj.(*subjectRecord)
 			keys.Insert(subjectRecord.namespaces.List()...)
@@ -594,33 +618,57 @@ func skipReview(request *reviewRequest, lastKnownValue *reviewRecord) bool {
 	return true
 }
 
-// deleteNamespaceFromSubjects removes the namespace from each subject
-// if no other namespaces are active to that subject, it will also delete the subject from the cache entirely
-func deleteNamespaceFromSubjects(subjectRecordStore cache.Store, subjects []string, namespace string) {
+// deleteNamespaceFromSubjects removes the namespace from each subject.
+// When copyOnWrite is true, a new subjectRecord is created so concurrent
+// readers iterating the old record's map are not disturbed. When false,
+// the map is mutated in place (safe only when the store is not visible
+// to readers, e.g. during a full cache rebuild).
+func deleteNamespaceFromSubjects(subjectRecordStore cache.Store, subjects []string, namespace string, copyOnWrite bool) {
 	for _, subject := range subjects {
 		obj, exists, _ := subjectRecordStore.GetByKey(subject)
 		if exists {
-			subjectRecord := obj.(*subjectRecord)
-			delete(subjectRecord.namespaces, namespace)
-			if len(subjectRecord.namespaces) == 0 {
-				subjectRecordStore.Delete(subjectRecord)
+			sr := obj.(*subjectRecord)
+			if copyOnWrite {
+				if !sr.namespaces.Has(namespace) {
+					continue
+				}
+				newNamespaces := sets.NewString(sr.namespaces.UnsortedList()...)
+				newNamespaces.Delete(namespace)
+				if len(newNamespaces) == 0 {
+					subjectRecordStore.Delete(sr)
+				} else {
+					subjectRecordStore.Update(&subjectRecord{subject: subject, namespaces: newNamespaces})
+				}
+			} else {
+				delete(sr.namespaces, namespace)
+				if len(sr.namespaces) == 0 {
+					subjectRecordStore.Delete(sr)
+				}
 			}
 		}
 	}
 }
 
-// addSubjectsToNamespace adds the specified namespace to each subject
-func addSubjectsToNamespace(subjectRecordStore cache.Store, subjects []string, namespace string) {
+// addSubjectsToNamespace adds the specified namespace to each subject.
+// See deleteNamespaceFromSubjects for the copyOnWrite semantics.
+func addSubjectsToNamespace(subjectRecordStore cache.Store, subjects []string, namespace string, copyOnWrite bool) {
 	for _, subject := range subjects {
-		var item *subjectRecord
 		obj, exists, _ := subjectRecordStore.GetByKey(subject)
 		if exists {
-			item = obj.(*subjectRecord)
+			sr := obj.(*subjectRecord)
+			if copyOnWrite {
+				if sr.namespaces.Has(namespace) {
+					continue
+				}
+				newNamespaces := sets.NewString(sr.namespaces.UnsortedList()...)
+				newNamespaces.Insert(namespace)
+				subjectRecordStore.Update(&subjectRecord{subject: subject, namespaces: newNamespaces})
+			} else {
+				sr.namespaces.Insert(namespace)
+			}
 		} else {
-			item = &subjectRecord{subject: subject, namespaces: sets.NewString()}
-			subjectRecordStore.Add(item)
+			subjectRecordStore.Add(&subjectRecord{subject: subject, namespaces: sets.NewString(namespace)})
 		}
-		item.namespaces.Insert(namespace)
 	}
 }
 
