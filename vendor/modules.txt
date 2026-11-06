@@ -306,8 +306,8 @@ github.com/json-iterator/go
 ## explicit
 github.com/jteeuwen/go-bindata
 github.com/jteeuwen/go-bindata/go-bindata
-# github.com/klauspost/compress v1.18.0
-## explicit; go 1.22
+# github.com/klauspost/compress v1.20.2
+## explicit; go 1.25
 github.com/klauspost/compress
 github.com/klauspost/compress/fse
 github.com/klauspost/compress/huff0
